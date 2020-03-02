@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="description" content="Search for Structures, Proteins, Macromolecules, PDB, Uniprot, Features, Sequences, Genes, PSSH, HSSP"/>
+    <meta name="keywords" content="Structures, Proteins, Macromolecules, PDB, Uniprot, Features, Sequences, Genes, PSSH, HSSP"/>
+    <link rel="icon" href="./favicon.ico"/>
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <link rel="stylesheet" type="text/css" media="all" href="/stylesheets/jquery-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" media="all" href="/stylesheets/style.css"/>
+    <link rel="stylesheet" type="text/css" media="all" href="/stylesheets/layout.css"/>
+    <link rel="stylesheet" type="text/css" media="all" href="/stylesheets/nav.css"/>
+    <link href="/stylesheets/chardinjs.mod.css" rel="stylesheet"/>
+    <script src="/javascripts/jquery-1.9.1.min.js"></script>
+    <script src="/javascripts/chardinjs.mod.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <title>Aquaria: Simplifying insight from protein structures</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <script>
+      function getUrlParameter (sParam) {
+      if (window.location.search.length > 0) {
+        var sPageURL = window.location.search.substring(1) // no .toLowerCase() here (this affects the value!)
+        var sURLVariables = sPageURL.split('&')
+        sParam = sParam.toLowerCase()
+        for (var i = 0; i < sURLVariables.length; i++) {
+          var sParameterName = sURLVariables[i].split('=')
+          if (sParameterName[0].toLowerCase() === sParam) {
+            return decodeURIComponent(sParameterName[1]) // the value might have been encoded
+          }
+        }
+      }
+      return null
+    }
+    var persist = getUrlParameter('persist')
+    var viewer = getUrlParameter('viewer')
+    if (viewer && persist) {
+      localStorage.setItem('3DViewer', viewer)
+    }
+    window.threedViewer = (viewer || localStorage.getItem('3DViewer') || 'Jolecule')
+    window.threedViewer = window.threedViewer.toLowerCase()
+    </script>
+    <div id="home"></div>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://www.java.com/js/deployJava.js"></script>
+    <script src="/javascripts/d3.v2.min.js"></script>
+    <script src="/javascripts/browser_check.js"></script>
+    <script src="/javascripts/jquery-ui.min.js"></script>
+    <script src="/javascripts/jquery.expander.min.js"></script>
+    <script src="/javascripts/show_expanded_clusters.js"></script>
+    <script src="/javascripts/textpanels.js"></script>
+    <script src='/javascripts/pv.js'></script>
+    <script src='/javascripts/jolecule.js'></script> -->
+    <!-- <script src="./javascripts/aquaria.js"></script> -->
+    <!-- <script src="./javascripts/resize_app.js"></script>
+    <script src="./javascripts/jsdas.0.1.6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+  </body>
+</html>

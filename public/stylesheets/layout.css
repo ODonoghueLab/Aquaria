@@ -1,0 +1,471 @@
+@media screen, print
+{
+	body{
+	    margin:0 auto;
+/* 	    position: relative; */
+	}
+    
+	#footer {
+	    clear:both;
+	    width:100%;
+	    height:20px;
+	    }
+	
+	#content {
+	    float: left;  /*This was commented out*/
+	    min-height:100%;
+	    width: 98%;
+	    /*overflow: hidden;*/
+	}
+
+	#gallery {
+	    width: 250px;
+		min-height: 100px;
+		position: absolute;
+		top: 9px;
+		right: 2%;
+	}
+	
+	#center {
+		/* margin: 0 254px; */
+		margin: 0 1%;
+	}
+	
+	/* #controls {
+		position: absolute;
+		top: 9px;
+		left: 2%;
+	    width: 250px;
+	    min-height:100%;
+	} */
+
+	#controls {
+		float: left;
+		width: 250px;
+		position: absolute;
+		z-index: 11;
+		top: 1vh;
+		left: 0vw;
+	}
+	
+	#controls div, #gallery div { 
+		margin: 2px 0; 
+		width: 240px;
+	}
+	#wrapper {
+		width:96%;
+		margin:0 auto;
+	}
+	
+	div.outer_container {
+		position: relative;	
+		left: -40px;
+		height: 42px;
+	}
+	
+	div#featureContainer {
+		position: relative;
+		height: 400px;
+		overflow: scroll;
+		width: 100%;
+	}
+	div#featureContainer.noscroll {
+		height: 100%;
+	}
+	div.container {
+		position: absolute;
+		top:0px;
+		left: 40px;
+		width: 100%;
+	}
+	
+	#description span.content {
+		height: 600px;
+		overflow: hidden;
+	}
+	div#uniProtDesc {
+		height: 300px;
+		overflow: hidden;
+	}
+    
+    /* button.view-XR{
+        right: -40px;
+        bottom: -80px;
+    }
+    
+    button#view-in-AR.view-XR{
+        padding: 5px;
+    }
+    
+    button#view-in-GLTF.view-XR{
+        padding: 22px;
+	} */
+	
+	div.panel span#threeD {
+		height: 87vh;
+		width: 108.3%;
+		margin: 0 -3%;
+	}
+    
+}
+
+/**
+ * iPads
+ **/
+@media only screen
+and (min-width : 600px)
+and (max-width : 1024px) {
+	#wrapper {
+		width:100%;
+		margin:0 auto;
+	}
+	#center {
+	    min-height:100%;
+		float:right;
+	    width: calc(100vw - 330px);
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		margin-right: 65px;
+	}
+	#structureviewer,
+	#structurematches {
+		margin-left: 33px;
+	}
+	#gallery {
+		float:left;
+		width:134px;
+		min-height:100%;
+		position: static;
+		clear: both;
+		margin-left: 10px;
+	}
+	#controls {
+		float:left;
+	    width:250px;
+	    min-height:100%;
+		position: static;
+		margin: 10px auto 2px 10px;
+	}
+	#controls div#logo {
+		width: 240px;
+		margin-left: 10px;
+	}
+	#controls div#wait {
+		position: absolute;
+		top: -2px;
+		left: 15px;
+		z-index: 101;
+	}
+}
+
+/**
+ * Smartphones (portrait and landscape) -----------
+ **/
+@media only screen
+and (min-width : 300px)
+and (max-width : 600px) {
+	/* Styles */
+	/* #gallery,
+	#gallery div{
+		float: none;
+		position: absolute;
+		display: block;
+		margin: 0px;
+		box-sizing: border-box;
+	} */
+	/* #controls {
+		margin: 0px;
+		display: block;
+		min-height: 0px;
+	} */
+
+	/* #center {
+		margin-right: auto;
+		width: 100%;
+		z-index: -1;
+	}
+	 */
+
+	#center{
+		margin: 0 10%;
+	}
+	#controls div#logo {
+		width: 45px
+	}
+	#controls div#wait {
+		position: absolute;
+		left: -1px;
+		z-index: 1;
+		top: 1vh;
+	}
+	#controls div#wait img{
+		width: 50px;
+	}
+	
+	#structureviewer {
+		margin-left: 27px;
+	}
+
+	div#description.panel, div#about.panel, div#gallery,
+	div.ui-resizable-handle ui-resizable-s, #osyns p, 
+	p#intro, #psyns p, #gsyns p, .panel h3, 
+	div.popup, div.ui-tooltip-content, div.balloon, div.ui-tooltip ui-widget ui-corner-all ui-widget-content
+	{
+		display: none;
+    }
+
+    div#structureviewer.panel{
+        margin-left: -8px;
+        height: 82vh;
+        min-width: 70%;
+	}
+
+    button.view-XR{
+        right: -40px;
+        bottom: -80px;
+    }
+    
+    button#view-in-AR.view-XR{
+        padding: 12px;
+    }
+    
+    button#view-in-GLTF.view-XR{
+        padding: 12px;
+    }
+
+
+	div.panel{
+		border: 1px solid #9990;
+	}
+
+	div.panel span#threeD {
+		height: 87vh;
+		width: 145.3%;
+		margin: 0 -16%;
+	}
+    
+    div.panel h3.sub {
+        width: 82%;
+        background-color: #a7a7a7;
+	}
+	
+	/* div#featureContainer {
+		position: relative;
+		height: 78vh;
+		overflow: scroll;
+	} */
+
+	div[role="tooltip"], div[role="tooltip"] > *{
+		visibility: hidden;
+	}
+
+    div#searchByName.panel{
+		background: #f0f8ff00;
+		border: #f0f8ff00;
+	}
+	div#searchByName.panel{
+		top: 1vh;
+		left: 13vw;
+	}
+
+	#input1, #input2{
+		display: inline-block;
+    	width: 43%;
+	}
+	
+	div.panel.infocus {
+		box-shadow: none;
+	}
+
+
+	div#structurematches.panel{
+        background: #ccc;
+		height: 96vh;
+		width: 100%;
+		display: block;
+	}
+
+	/* h3#titleBar3Dview {
+		position: absolute;
+		display: block;
+		z-index: 11;
+		top: 100%;
+		border-radius: 0px;
+		font-size: 3.5vw;
+		letter-spacing: 0px;
+		padding: 4px;
+		left: 1vh;
+    	right: 1vh;
+	} */
+	
+	/* .rightHeaderBar, #help3D{
+		display: none;
+	}
+
+	.panel h3{
+		background-color: #9990;
+		color: #121111;
+	}
+	span.explanation a {
+		color: #08C;
+		text-decoration: none;
+	}
+
+	div.panel h3 span.explanation {
+		color: #121111;
+	} */
+
+	/* html {
+		scroll-behavior: smooth;
+	  } */
+
+	  /* body{
+	    margin:0 auto;
+	}
+    
+	#footer {
+		clear:both;
+		width:100%;
+		height:20px;
+	} */
+	
+	/* #content {
+	    float: left; 
+	    min-height:100%;
+	    width: 98%;
+	}
+
+	#gallery {
+	    width: 250px;
+		min-height: 100px;
+		position: absolute;
+		top: 9px;
+		right: 2%;
+	}
+	
+	#center {
+		margin: 0 1%;
+	} */
+	
+	/* #controls {
+		position: absolute;
+		top: 9px;
+		left: 2%;
+	    width: 250px;
+	    min-height:100%;
+	} */
+
+	/* #controls {
+		float: left;
+		width: 250px;
+		position: absolute;
+		z-index: 11;
+		top: 1vh;
+		left: 0vw;
+	}
+	
+	#controls div, #gallery div { 
+		margin: 2px 0; 
+		width: 240px;
+	} */
+	/* #wrapper {
+		width:96%;
+		margin:0 auto;
+	}
+	
+	div.outer_container {
+		position: relative;	
+		left: -40px;
+		height: 42px;
+	} */
+	
+	/* div#featureContainer {
+		position: relative;
+		height: 400px;
+		overflow: scroll;
+	}
+	div#featureContainer.noscroll {
+		height: 100%;
+	}
+	div.container {
+		position: absolute;
+		top:0px;
+		left: 40px;
+		width: 100%;
+	}
+	
+	#description span.content {
+		height: 600px;
+		overflow: hidden;
+	}
+	div#uniProtDesc {
+		height: 300px;
+		overflow: hidden;
+	} */
+	
+	/* div.outer_container {
+		position: relative;	
+		left: -40px;
+		height: 42px;
+	}
+
+	div.container {
+		position: absolute;
+		top:0px;
+		left: 40px;
+		width: 100%;
+	}
+
+	#structurematches{
+		margin-left: 0px;
+	} */
+
+	/* #vis{
+		margin-left: 33px; */
+		/* max-height: 95%;
+		max-width: 93%;
+		overflow: scroll; */
+	/* } */
+
+	/* BELOW THIS IS PROBABLY REDUNDANT */
+
+	
+	
+    /* #h_featurelist{
+        display: block;
+    }
+    
+    div#featurelist{
+        display: none;
+    }
+	 */
+	/* Inner width of structure matches */
+    /* .container>svg {
+        display: block;
+		top: -4px;
+	} */
+	/* Inner height of structuer matches */
+	
+
+	/* Separation between each matching structures */
+	/* div.outer_container {
+	} */
+
+	/* div#featurelist.toggled{
+		width: 100%;
+    } */
+	/* .outer_container>svg{
+        width: 10%;
+	} */
+
+	/* div.ruler {
+		margin-bottom: 2px;
+	} */
+    
+    /* .ruler svg{
+		margin-left: 10%;
+    } */
+
+}
+

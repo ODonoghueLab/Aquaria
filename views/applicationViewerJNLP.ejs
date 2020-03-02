@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp codebase="<%=codebase%>" href="<%=href%>">
+  <information>
+    <title>Aquaria</title>
+    <vendor>O'Donoghue Lab</vendor>
+    <homepage href="http://aquaria.ws/"/>
+    <description>Aquaria Application Protein Visualizer</description>
+    <description kind="short">Aquaria Application</description>
+    <offline-allowed/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+    <resources>
+      <j2se href="http://java.sun.com/products/autodl/j2se" version="1.6+"/>
+      <property name="sun.java2d.noddraw" value="true"/>
+      <jar href="<%=prefix%>aquaria-app-bundle.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Windows" arch="x86">
+      <nativelib href = "aquaria-bundle-natives-windows-i586.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Windows" arch="amd64">
+      <nativelib href = "aquaria-bundle-natives-windows-amd64.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Windows" arch="x86_64">
+      <nativelib href = "aquaria-bundle-natives-windows-amd64.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="SunOS" arch="sparc">
+      <nativelib href = "aquaria-bundle-natives-solaris-sparc.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="SunOS" arch="sparcv9">
+      <nativelib href = "aquaria-bundle-natives-solaris-sparcv9.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="SunOS" arch="x86">
+      <nativelib href = "aquaria-bundle-natives-solaris-i586.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="SunOS" arch="amd64">
+      <nativelib href = "aquaria-bundle-natives-solaris-amd64.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="SunOS" arch="x86_64">
+      <nativelib href = "aquaria-bundle-natives-solaris-amd64.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Linux" arch="i386">
+      <nativelib href = "aquaria-bundle-natives-linux-i586.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Linux" arch="x86">
+      <nativelib href = "aquaria-bundle-natives-linux-i586.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Linux" arch="amd64">
+      <nativelib href = "aquaria-bundle-natives-linux-amd64.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Linux" arch="x86_64">
+      <nativelib href = "aquaria-bundle-natives-linux-amd64.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Linux" arch="arm">
+      <nativelib href = "aquaria-bundle-natives-linux-armv6.jar" version="<%=version_number%>"/>
+      <nativelib href = "aquaria-bundle-natives-linux-armv6hf.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Linux" arch="armv7">
+      <nativelib href = "aquaria-bundle-natives-linux-armv6.jar" version="<%=version_number%>"/>
+      <nativelib href = "aquaria-bundle-natives-linux-armv6hf.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Mac OS X" arch="i386">
+      <nativelib href = "aquaria-bundle-natives-macosx-universal.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources>
+    <resources os="Mac OS X" arch="x86_64">
+      <nativelib href = "aquaria-bundle-natives-macosx-universal.jar" version="<%=version_number%>"/>
+      <property name="jnlp.versionEnabled" value="true"/>
+    </resources> 
+
+  <application-desc 
+      name="Aquaria"
+      main-class="org.srs3d.viewer.launch.CaptureApplication"
+      width="1200" 
+      height="800">
+        <argument><%=structuresString%></argument>
+       <argument>scriptable=false</argument>
+       <argument>annotationView=on</argument>
+       <argument>toolbar=off</argument>
+       <argument>menubar=on</argument>
+       <argument>sequenceView=on</argument>
+       <argument>expertMode=on</argument>
+       <argument><%=instanceIdString%></argument>
+       <argument>defaultStyle=Homology</argument>
+       <argument><%=sequenceAlignmentsString%></argument>
+       <argument>code=Capture</argument>
+       <argument>width=1200</argument>
+       <argument>height=800</argument>
+       <argument>gl_swap_interval=1</argument>
+       <argument>gl_debug=false</argument>
+       <argument>gl_trace=false</argument>
+       <argument><%=pdb_idString%></argument>
+       <argument>id=AquariaApplication</argument>
+       <argument><%=interactiveString%></argument>
+       <PARAM name="codebase_lookup" value="false"/>
+  </application-desc>
+  <update check="always" policy="always"/>
+</jnlp>
