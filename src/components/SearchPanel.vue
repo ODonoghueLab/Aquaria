@@ -53,8 +53,11 @@ export default {
 }
 </script>
 
-<style>
-    /* #searchByName{
+<style scoped>
+div.panel{
+  width: 240px;
+}
+  /* #searchByName{
         background: aliceblue;
     }
     .panel h3{
