@@ -1,6 +1,4 @@
 ////// Expanding clusters /////////////
-
-
 	
 	var position, container_position, left_edge,
 		limit = 10, 

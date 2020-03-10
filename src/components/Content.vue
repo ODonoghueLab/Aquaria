@@ -2,21 +2,18 @@
 <div id="content">
     <Controls/>
     <Center />
-    <Gallery />
   </div>
 </template>
 
 <script>
 import Controls from './Controls'
 import Center from './Center'
-import Gallery from './Gallery'
 
 export default {
   name: 'Content',
   components: {
     Controls,
-    Center,
-    Gallery
+    Center
   }
 }
 </script>

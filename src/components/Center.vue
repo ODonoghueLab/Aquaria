@@ -1,19 +1,19 @@
 <template>
   <div id="center">
     <StructureViewer/>
-    <StructureMatches/>
+    <Structures/>
   </div>
 </template>
 
 <script>
 import StructureViewer from './StructureViewer'
-import StructureMatches from './StructureMatches'
+import Structures from './Structures'
 
 export default {
   name: 'Center',
   components: {
     StructureViewer,
-    StructureMatches
+    Structures
   }
 }
 </script>
