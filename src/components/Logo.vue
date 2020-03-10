@@ -62,19 +62,18 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+    #logo img{
+      height: 4vh;
+    }
     #wait img{
         position: absolute;
-        left: 4px;
-        width: 79px;
+        left: 6px;
+        height: 4vh;
     }
     #logo{
         display: flex;
         width: 100%;
         height: auto;
-    }
-    #intro{
-        position: absolute;
-        top: 73px;
     }
 </style>

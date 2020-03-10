@@ -105,7 +105,8 @@ function updatePDBPanel(PDBData, commonName, score) {
 		});	
 		
 		//update ABOUT PDB title
-		$("#description h3 span.explanation").html("<a href='http://www.rcsb.org/pdb/explore.do?structureId="+ pdbid +"' title='Go to PDB'>PDB "+pdbid+"</a>");
+		$(".md-tabs > div > button> span > div > div").eq(1).html("About " + "<a href='http://www.rcsb.org/pdb/explore.do?structureId="+ pdbid +"' title='Go to PDB'>PDB "+pdbid+"</a>")
+		// $("#description h3 span.explanation").html("<a href='http://www.rcsb.org/pdb/explore.do?structureId="+ pdbid +"' title='Go to PDB'>PDB "+pdbid+"</a>");
 
 		$("#aboutPDBHider").show();
 		AQUARIA.blankPanel("#aboutPDB", false);
@@ -399,7 +400,8 @@ var displayProtSynonyms = function(data) {
 		});	
 		
 		//update ABOUT title
-		$("#about h3 span.explanation").html("<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>");
+		$(".md-tabs > div > button> span > div > div").eq(0).html("About " + "<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>")
+		// $(".md-button-content").html("About " + "<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>");
 	}
 
 	

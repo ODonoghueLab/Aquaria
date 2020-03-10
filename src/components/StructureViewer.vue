@@ -35,6 +35,10 @@ export default {
 </script>
 
 <style scoped>
+div.panel{
+  height: 100vh;
+}
+
 #updateJava3D {
     display: none;
 }
@@ -80,12 +84,11 @@ export default {
     height: 100%;
 }
 
-div.panel span#threeD {
+/* div.panel span#threeD {
     height: 100vh;
     width: 100vw;
 }
 div.panel span#threeD {
-    /* resize: vertical; */
     overflow: hidden;
     min-height: 100vh;
     z-index: 10;
@@ -97,7 +100,7 @@ div.panel span#threeD {
     overflow: hidden;
     position: absolute;
     z-index: 1;
-}
+} */
 
 /* .jolecule-embed-toolbar, .jolecule-embed-toolbar a {
     color: #777;

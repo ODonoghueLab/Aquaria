@@ -57,27 +57,7 @@ export default {
 div.panel{
   width: 240px;
 }
-  /* #searchByName{
-        background: aliceblue;
-    }
-    .panel h3{
-    background-color: #999;
-    border-radius: 10px;
-    color: white;
-    font-size: 100%;
-    font-weight: normal;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    padding: 2px 3px 2px 10px;
-    margin: 0px;
-    }
-
-    span.content{
-        padding: 0 6px;
-    }
-
-    #myform{
-        visibility: visible;
-        position: relative;
-    } */
+#myform{
+  padding-left: 14px;
+}
 </style>

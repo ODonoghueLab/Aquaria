@@ -91,7 +91,7 @@ function startLogoSpin() {
 
 $(document).ready(function(e) {
 	
-	//make scrollbars appear
+	// make scrollbars appear
     $("#description span.content, div#uniProtDesc").on("mouseover", function() {
 			$(this).css("overflow-y","auto");
 		});
