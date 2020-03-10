@@ -1,19 +1,13 @@
 <template>
-    <div class="panel" id="about" data-intro="UniProt summary of the specified protein's function." data-position="right">
-        <h3>About <span class="explanation"> Uniprot ID</span></h3>
+    <!-- <div class="panel" id="about" data-intro="UniProt summary of the specified protein's function." data-position="right">
+    </div> -->
+        <!-- <h3>About <span class="explanation"> Uniprot ID</span></h3> -->
         <div id="uniProtDesc"></div>
-      </div>
 </template>
 
 <script>
-import $ from 'jquery'
-
 export default {
-  name: 'AboutUniprot',
-  created () {
-    var pdbid = '2xwc'
-    $('#description h3 span.explanation').html("<a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbid + "' title='Go to PDB'>PDB " + pdbid + '</a>')
-  }
+  name: 'AboutUniprot'
 }
 </script>
 
@@ -34,7 +28,9 @@ export default {
   }
 
   div#uniProtDesc {
-  height: 300px;
-  overflow: hidden;
+    height: 300px;
+    overflow: hidden;
+    padding: 0px 10px;
   }
+
 </style>

@@ -1,8 +1,8 @@
 <template>
-    <div id="gallery">
-      <div class="panel" id="description" data-intro="PDB summary for the shown structure." data-position="bottom">
-        <h3>About <span class="explanation"> PDB</span></h3>
-        <span class="content" id="aboutPDB">
+    <!-- <div id="gallery"> -->
+      <!-- <div class="panel" id="description" data-intro="PDB summary for the shown structure." data-position="bottom"> -->
+        <!-- <h3>About <span class="explanation"> PDB</span></h3> -->
+        <span class="content" id="description" data-intro="PDB summary for the shown structure." data-position="bottom">
             <span id="biounitDisplay"
                   style="display: none;"><span id="biounitLeft"
                                                style="display: inline-block;"
@@ -24,8 +24,8 @@
               <p id="molecule" title="View this structure in Aquaria" data-intro="Information about currently focused PDB chain." data-position="left"><strong>Molecule: </strong><span class="text">unavailable</span></p>
               <p id="organism"><strong>Organism: </strong><span class="text">unavailable</span></p> </span>
                     </span>
-      </div>
-    </div>
+      <!-- </div> -->
+    <!-- </div> -->
 </template>
 
 <script>
@@ -71,12 +71,7 @@ span.explanation a {
 div.panel span#biounitDisplay {
     color: #555;
     padding: 2px 0;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#ccc), to(#aaa));
     background-image: -webkit-linear-gradient(top, #ccc, #aaa);
-    background-image: -moz-linear-gradient(top, #ccc, #aaa);
-    background-image: -ms-linear-gradient(top, #ccc, #aaa);
-    background-image: -o-linear-gradient(top, #ccc, #aaa);
-    background-image: linear-gradient(top, #ccc, #aaa);
 }
 
 #biounitLeft {

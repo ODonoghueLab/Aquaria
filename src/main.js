@@ -2,11 +2,13 @@ import Vue from 'vue'
 import router from './router'
 import store from './store'
 import Wrapper from './views/Wrapper'
-// import socketio from 'socket.io-client'
-// import VueSocketIO from 'vue-socket.io'
+import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
+import 'vue-material/dist/vue-material.min.css'
+// import 'vue-material/dist/theme/default.css'
 
-// export const SocketInstance = socketio('http://localhost:8009')
-// Vue.use(VueSocketIO, SocketInstance)
+Vue.use(MdButton)
+Vue.use(MdContent)
+Vue.use(MdTabs)
 
 Vue.config.productionTip = false
 
