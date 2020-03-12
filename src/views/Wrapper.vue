@@ -34,7 +34,11 @@ export default {
       method: 'get',
       url: url
     })
-      .then(response => (window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id)
+      .then(function (response) {
+        if (response.data.initialParams) {
+          window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
+        }
+      }
       )
   }
   // mounted () {

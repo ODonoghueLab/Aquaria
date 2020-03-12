@@ -31,6 +31,7 @@ export default {
     max-height: 400px;
     overflow: scroll;
     border-radius: 10px;
+    position: relative;
   }
 
   .md-tabs {
