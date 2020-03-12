@@ -1,5 +1,5 @@
 <template>
-    <div class="toggled" id="featurelist"></div>
+    <div class="toggled" id="featurelist" style="display:none"></div>
 </template>
 
 <script>

@@ -122,7 +122,7 @@
     
     $("div#c_"+pdbid+"_"+cluster_nbr+" div.expansion")
       .css("left", left_edge +"px")
-      .css("top", parseInt(-(treeheight*0.5) + 20)+"px"); //.css("top", parseInt(position.top - (treeheight/2) + 8) +"px"); 
+      .css("top", parseInt(-(treeheight*0.5) - 60)+"px"); //.css("top", parseInt(position.top - (treeheight/2) + 8) +"px"); 
 	  
 	}
 

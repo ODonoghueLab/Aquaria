@@ -1,5 +1,5 @@
 <template>
-  <div class="panel" id="structureviewer">
+  <div id="structureviewer">
     <Title3D/>
         <div id="updateJava3D" class="aquariaWarning">
           <p><strong>Aquaria needs to update your Java3D.</strong></p>
@@ -35,7 +35,7 @@ export default {
 </script>
 
 <style scoped>
-div.panel{
+#structureviewer{
   height: 100vh;
 }
 

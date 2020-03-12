@@ -1854,6 +1854,7 @@ var MAX_PROTEIN_HISTORY = 5;
       AQUARIA.panel3d = new Applet3DPanel('#threeDSpan');
     } else if (window.threedViewer === 'jolecule') {
       AQUARIA.panel3d = new JoleculePanel('#threeDSpan', AQUARIA.chainSelected);
+      console.log("THIS WORK: AQUARIA.JS 1", AQUARIA.panel3d);
     } else if (window.threedViewer === 'webgl') {
       AQUARIA.panel3d = new PV3DPanel('#threeDSpan');
     } else if (window.threedViewer === 'idr') {
@@ -1862,7 +1863,6 @@ var MAX_PROTEIN_HISTORY = 5;
       console.log('AQUARIA.domready cannot find viewer: ' + window.threedViewer);
     }
     AQUARIA.gesture = new molecularControlToolkitJS.leap(AQUARIA.panel3d.gestures());
-    console.log("THIS WORK: AQUARIA.JS 1", AQUARIA.panel3d, AQUARIA.chainSelected);
 
     setupDNode();
   });
@@ -1966,7 +1966,7 @@ window.ATL_JQ_PAGE_PROPS = {
   }
 };
 //};
-},{"./IDRPanel":1,"./applet3DPanel":2,"./featurelist":5,"./fetch_features":7,"./joleculePanel":8,"./pv3DPanel":11,"./show_matching_structures":12,"./topten":13,"dnode":21,"domready":23,"molecular-control-toolkit-js":49,"shoe":61}],4:[function(require,module,exports){
+},{"./IDRPanel":1,"./applet3DPanel":2,"./featurelist":5,"./fetch_features":7,"./joleculePanel":8,"./pv3DPanel":11,"./show_matching_structures":12,"./topten":13,"dnode":21,"domready":23,"molecular-control-toolkit-js":50,"shoe":62}],4:[function(require,module,exports){
 var Cluster = require('../shared/cluster');
 
 var ClusterRenderer = function(cluster, rank, xScale, width, height, onTextClick, onClusterItemClick) {
@@ -2034,6 +2034,9 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 		pad = -6;
 	}
 
+	this.w = document.getElementById("structureviewer").offsetWidth
+				- AQUARIA.margin.right - AQUARIA.margin.left;
+
 	var outerdiv = d3.select("#allclusters").append("div").attr("id", "out_" + id).attr(
 			"class", "outer_container");
 	outerdiv.append("svg").attr("width", 40).attr("height", 40).attr("viewBox",
@@ -2044,13 +2047,13 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 
 	// draw outline of the whole chain
 	this.nusvg = outerdiv.append("div").attr("id", "c_" + id).attr("class",
-			"container").append("svg").attr("width", this.width + 200).attr("height",
+			"container").append("svg").attr("width", this.w + 20).attr("height",
 			this.height + 30)
 			.attr("viewBox", "0 0 " + (this.width + 200) + " " + (this.height + 30)).attr(
 					"preserveAspectRatio", "none");
 
 	this.nusvg.append("g").attr("id", "structure_" + id).attr("transform",
-			"translate(" + (AQUARIA.margin.left + structStart) + ",20)").on(
+			"translate(" + (AQUARIA.margin.left + structStart + 100) + ",20)").on(
 			"mouseover", function() {
 				return d3.select(this).call(that.mouseover, that);
 			}).on("mouseout", function() {
@@ -2259,7 +2262,7 @@ ClusterRenderer.prototype.mouseout = function(d, that) {
 };
 
 module.exports = ClusterRenderer;
-},{"../shared/cluster":66}],5:[function(require,module,exports){
+},{"../shared/cluster":68}],5:[function(require,module,exports){
 var featureSet;
 var width;
 var height;
@@ -4155,7 +4158,6 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
   var alignment = new jolecule.AquariaAlignment()
   this.joleculeAlignment = alignment
   var controller = this.embededJolecule.controller
-  console.log("THIS IS JOLECULE ALIGNMENT", this.joleculeAlignment)
 
   this.embededJolecule.soupWidget.focus = function() {
     document.activeElement.blur()
@@ -5707,7 +5709,7 @@ function createRandomRotations(n) {
 
 module.exports = PV3DPanel;
 
-},{"./pv/menuBar":9,"numeric":52,"seedrandom":53}],12:[function(require,module,exports){
+},{"./pv/menuBar":9,"numeric":53,"seedrandom":54}],12:[function(require,module,exports){
 var ClusterRenderer = require('./clusterRenderer');
 // Render 2D structures in SVG.
 //
@@ -5878,7 +5880,7 @@ ShowMatchingStructures.prototype.drawAxisRuler = function(layerId) { // console.
 			.attr("data-intro","Graphical representation of the specified protein's sequence")
 			.attr("data-position", "left")
 		.append("svg").attr("width",
-			parseInt(this.width + AQUARIA.margin.left)).attr("viewBox",
+			parseInt(this.width + AQUARIA.margin.left)-80).attr("viewBox",
 			"0 0 " + parseInt(this.width + AQUARIA.margin.left) + " 15").attr(
 			"preserveAspectRatio", "none").attr("height", 15).append("g").attr(
 			"transform", "translate(" + AQUARIA.margin.left + ",0)");
@@ -5957,7 +5959,7 @@ var TopTen = function (id, MAX_SIZE) {
 	  localStorage.removeItem(this.id);
 	}
 	var existing = localStorage.getItem(this.id);
-  this.cache = LRU(MAX_SIZE);
+  this.cache = new LRU(MAX_SIZE);
 	if (existing === null) {
 	}
 	else {
@@ -5966,12 +5968,6 @@ var TopTen = function (id, MAX_SIZE) {
 		  that.cache.set(entry.key, entry.value);
 		});
 	}
-	
-	
-	
-	
-
-
 };
 
 
@@ -6002,13 +5998,12 @@ TopTen.prototype.getAll = function() {
 
 
 module.exports = TopTen;
-},{"lru-cache":48}],14:[function(require,module,exports){
+},{"lru-cache":49}],14:[function(require,module,exports){
 /** generic functions and stuff to run once document is loaded
  * 
  */
 
 // jQuery - format numbers with commas every 3 digits;   to use:  $("span.numbers").digits();
-
 $.fn.digits = function(){ 
     return this.each(function(){ 
         $(this).text( $(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") ); 
@@ -6026,41 +6021,7 @@ $(document).ready(function() {
 	  $("#help3D").hide();
 
 });
-/*
-function jsToolTips() {
-	// CONVERT ALL title ATTRIBUTES TO data-title TO DISPLAY TOOLTIPS IN JAVASCRIPT
-	$("[title]").attr("data-title", function() { 
-		var tooltip = $(this).attr("title");
-		$(this).removeAttr("title");
-		return tooltip; 
-	});
-	
-	
-	$("[data-title]").mouseenter( 
-		function(e) { console.log("hovering over data-title");
-			$(".longtitle").remove(); //remove old instance from DOM
-			var tooltip = null;	//reset
-			tooltip = $(this).attr("data-title");
-			timer = window.setTimeout( showTitle, 500, tooltip, e);
-		});
-		
-	$("[data-title]").mouseleave( function() {
-		nodeOut();
-		});
-	
-	function nodeOut(){ window.clearTimeout(timer); $(".longtitle").fadeOut(); }
-	
-	function showTitle(strng, event) {
-		var p = $(event.target).offsetParent().offset();
-		var t = $(event.target).offset();
-		var wx = parseInt(t.left-p.left);
-		var wy = parseInt(t.top-p.top); 
-		
-		$(event.target).offsetParent().append("<div class='longtitle' style='left:"+wx+"px; top:"+(wy+20)+"px;'>"+strng+"</div>");
-		$("div.longtitle").fadeIn("slow");
-	}
-}
-*/
+
 $(function() {
     $( document ).tooltip({ position: { my: "right top+15", at: "right center", collision: "none" }}, { show: { delay: 1200 } });
   });
@@ -6073,83 +6034,81 @@ $(function() {
 // Authors: Sean O'Donoghue. Kenny Sabir
 //
 // WARNING, this logger is now used by client & server. The client cannot use the logger.
-//var logger = require('./log');
+// var logger = require('./log');
 
 var Cache = function (maximum_cache_size) {
-	
-	var cache = {};
-	var last_access = {};
-	var enabled = true;
-	if (typeof maximum_cache_size === 'undefined') {maximum_cache_size = 100};
-	
-	return {
-		write: function(key, value) {
-			if(typeof(Storage)!=="undefined"){
-				console.log("Cache.write save "+key+" to local storage");
-				localStorage.setItem(key, JSON.stringify(value));
-			} else {
-//				console.log("*** write to cache");
-				if (enabled) {
-					
-					last_access[key] = Date();
-		
-					// store in cache
-					cache[key] = value;
-					
-					// if cache size is too large, remove oldest key
-					var size = Object.keys(cache).length;
-					//logger.info('Stored ' + key + ' in cache (size = ' + size + ')');
-					if (size > maximum_cache_size) {
-						var oldest_key = null;
-						var oldest_date = null;
-						// find and delete oldest key
-						oldest_date = last_access[key];
-						Object.keys(cache).forEach(function (temp_key) {
-							// console.log('checking key = ' + temp_key);
-							if (last_access[temp_key] <= oldest_date) {
-								//console.log('key is older: ' + last_access[temp_key]);
-								oldest_key = temp_key;
-								oldest_date = last_access[temp_key];
-							}
-						});
-						// console.log('final oldest key = ' + oldest_key);
-						if (oldest_key !== null) {
-							delete cache[oldest_key];
-							delete last_access[oldest_key];
-						}
-						//logger.info('Deleted ' + oldest_key + ' from cache');
-					}
-				}
-			}
-			return(value);
-		},
-		read: function(key) {
-			if(typeof(Storage)!=="undefined"){
-				if (localStorage.getItem(key) !== null){
-					console.log("Cache.read "+key+" fetched from local storage");
-					return(JSON.parse(localStorage.getItem(key)));
-				} else {
-					console.log("Cache.write error: "+key+" not found in local storage");
-					return(false);
-				}
-			} else if (enabled && key in cache && cache[key]) {
-				// use cached value if available
-				//logger.info('Read ' + key + ' from cache');
-//				console.log("*** read from cache");
-				return(cache[key]);
-			} else {
-				return(false);
-			}
-		},
-		clear: function() {
-			cache = {};
-			last_access = {};
-			
-		}
-	}
-};
+  var cache = {}
+  var last_access = {}
+  var enabled = true
+  if (typeof maximum_cache_size === 'undefined') { maximum_cache_size = 100 };
 
-module.exports = Cache;
+  return {
+    write: function (key, value) {
+      if (typeof (Storage) !== "undefined"){
+        console.log("Cache.write save " + key + " to local storage")
+        localStorage.setItem(key, JSON.stringify(value))
+      } else {
+        //				console.log("*** write to cache");
+        if (enabled) {
+          last_access[key] = Date()
+
+          // store in cache
+          cache[key] = value
+
+          // if cache size is too large, remove oldest key
+          var size = Object.keys(cache).length
+          // logger.info('Stored ' + key + ' in cache (size = ' + size + ')');
+          if (size > maximum_cache_size) {
+            var oldest_key = null
+            var oldest_date = null
+            // find and delete oldest key
+            oldest_date = last_access[key]
+            Object.keys(cache).forEach(function (temp_key) {
+              // console.log('checking key = ' + temp_key);
+              if (last_access[temp_key] <= oldest_date) {
+                // console.log('key is older: ' + last_access[temp_key]);
+                oldest_key = temp_key
+                oldest_date = last_access[temp_key]
+              }
+            })
+            // console.log('final oldest key = ' + oldest_key);
+            if (oldest_key !== null) {
+              delete cache[oldest_key]
+              delete last_access[oldest_key]
+            }
+            // logger.info('Deleted ' + oldest_key + ' from cache');
+          }
+        }
+      }
+      return (value)
+    },
+    read: function (key) {
+      if (typeof (Storage) !== "undefined"){
+        if (localStorage.getItem(key) !== null){
+          console.log("Cache.read " + key + " fetched from local storage")
+          return (JSON.parse(localStorage.getItem(key)))
+        } else {
+          console.log("Cache.write error: " + key + " not found in local storage")
+          return (false)
+        }
+      } else if (enabled && key in cache && cache[key]) {
+        // use cached value if available
+        // logger.info('Read ' + key + ' from cache');
+        //				console.log("*** read from cache");
+        return (cache[key])
+      } else {
+        return (false)
+      }
+    },
+    clear: function () {
+      cache = {}
+      last_access = {}
+    }
+  }
+}
+
+module.exports = Cache
+
 },{}],16:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var scrubber = require('./lib/scrub');
@@ -6277,7 +6236,7 @@ Proto.prototype.apply = function (f, args) {
     catch (err) { this.emit('error', err) }
 };
 
-},{"./lib/foreach":17,"./lib/is_enum":18,"./lib/keys":19,"./lib/scrub":20,"events":72}],17:[function(require,module,exports){
+},{"./lib/foreach":17,"./lib/is_enum":18,"./lib/keys":19,"./lib/scrub":20,"events":74}],17:[function(require,module,exports){
 module.exports = function forEach (xs, f) {
     if (xs.forEach) return xs.forEach(f)
     for (var i = 0; i < xs.length; i++) {
@@ -6380,7 +6339,7 @@ Scrubber.prototype.unscrub = function (msg, f) {
     return args;
 };
 
-},{"./foreach":17,"./keys":19,"traverse":63}],21:[function(require,module,exports){
+},{"./foreach":17,"./keys":19,"traverse":64}],21:[function(require,module,exports){
 var dnode = require('./lib/dnode');
 
 module.exports = function (cons, opts) {
@@ -6544,7 +6503,7 @@ dnode.prototype.destroy = function () {
 };
 
 }).call(this,require('_process'))
-},{"_process":77,"dnode-protocol":16,"jsonify":25,"stream":92}],23:[function(require,module,exports){
+},{"_process":79,"dnode-protocol":16,"jsonify":25,"stream":94}],23:[function(require,module,exports){
 /*!
   * domready (c) Dustin Diaz 2014 - License MIT
   */
@@ -11426,7 +11385,7 @@ Bone.prototype.direction = function(){
 
 };
 
-},{"./pointable":42,"gl-matrix":24,"underscore":64}],29:[function(require,module,exports){
+},{"./pointable":42,"gl-matrix":24,"underscore":65}],29:[function(require,module,exports){
 var CircularBuffer = module.exports = function(size) {
   this.pos = 0;
   this._buf = [];
@@ -11613,7 +11572,7 @@ BaseConnection.prototype.reportFocus = function(state) {
 }
 
 _.extend(BaseConnection.prototype, EventEmitter.prototype);
-},{"../protocol":43,"events":72,"underscore":64}],31:[function(require,module,exports){
+},{"../protocol":43,"events":74,"underscore":65}],31:[function(require,module,exports){
 var BaseConnection = module.exports = require('./base')
   , _ = require('underscore');
 
@@ -11713,7 +11672,7 @@ BrowserConnection.prototype.stopFocusLoop = function() {
   delete this.focusDetectorTimer;
 }
 
-},{"./base":30,"underscore":64}],32:[function(require,module,exports){
+},{"./base":30,"underscore":65}],32:[function(require,module,exports){
 var WebSocket = require('ws')
   , BaseConnection = require('./base')
   , _ = require('underscore');
@@ -11738,7 +11697,7 @@ NodeConnection.prototype.setupSocket = function() {
   return socket;
 }
 
-},{"./base":30,"underscore":64,"ws":65}],33:[function(require,module,exports){
+},{"./base":30,"underscore":65,"ws":48}],33:[function(require,module,exports){
 (function (process){
 var Frame = require('./frame')
   , Hand = require('./hand')
@@ -12484,7 +12443,7 @@ Controller.prototype.useRegisteredPlugins = function(){
 _.extend(Controller.prototype, EventEmitter.prototype);
 
 }).call(this,require('_process'))
-},{"./circular_buffer":29,"./connection/browser":31,"./connection/node":32,"./dialog":34,"./finger":35,"./frame":36,"./gesture":37,"./hand":38,"./pipeline":41,"./pointable":42,"_process":77,"events":72,"underscore":64}],34:[function(require,module,exports){
+},{"./circular_buffer":29,"./connection/browser":31,"./connection/node":32,"./dialog":34,"./finger":35,"./frame":36,"./gesture":37,"./hand":38,"./pipeline":41,"./pointable":42,"_process":79,"events":74,"underscore":65}],34:[function(require,module,exports){
 (function (process){
 var Dialog = module.exports = function(message, options){
   this.options = (options || {});
@@ -12633,7 +12592,7 @@ Dialog.warnBones = function(){
 
 }
 }).call(this,require('_process'))
-},{"_process":77}],35:[function(require,module,exports){
+},{"_process":79}],35:[function(require,module,exports){
 var Pointable = require('./pointable'),
   Bone = require('./bone')
   , Dialog = require('./dialog')
@@ -12824,7 +12783,7 @@ Finger.prototype.toString = function() {
 
 Finger.Invalid = { valid: false };
 
-},{"./bone":28,"./dialog":34,"./pointable":42,"underscore":64}],36:[function(require,module,exports){
+},{"./bone":28,"./dialog":34,"./pointable":42,"underscore":65}],36:[function(require,module,exports){
 var Hand = require("./hand")
   , Pointable = require("./pointable")
   , createGesture = require("./gesture").createGesture
@@ -13329,7 +13288,7 @@ Frame.Invalid = {
   translation: function() { return vec3.create(); }
 };
 
-},{"./finger":35,"./gesture":37,"./hand":38,"./interaction_box":40,"./pointable":42,"gl-matrix":24,"underscore":64}],37:[function(require,module,exports){
+},{"./finger":35,"./gesture":37,"./hand":38,"./interaction_box":40,"./pointable":42,"gl-matrix":24,"underscore":65}],37:[function(require,module,exports){
 var glMatrix = require("gl-matrix")
   , vec3 = glMatrix.vec3
   , EventEmitter = require('events').EventEmitter
@@ -13814,7 +13773,7 @@ KeyTapGesture.prototype.toString = function() {
   return "KeyTapGesture ["+JSON.stringify(this)+"]";
 }
 
-},{"events":72,"gl-matrix":24,"underscore":64}],38:[function(require,module,exports){
+},{"events":74,"gl-matrix":24,"underscore":65}],38:[function(require,module,exports){
 var Pointable = require("./pointable")
   , Bone = require('./bone')
   , glMatrix = require("gl-matrix")
@@ -14268,7 +14227,7 @@ Hand.Invalid = {
   translation: function() { return vec3.create(); }
 };
 
-},{"./bone":28,"./pointable":42,"gl-matrix":24,"underscore":64}],39:[function(require,module,exports){
+},{"./bone":28,"./pointable":42,"gl-matrix":24,"underscore":65}],39:[function(require,module,exports){
 /**
  * Leap is the global namespace of the Leap API.
  * @namespace Leap
@@ -14355,7 +14314,7 @@ module.exports = {
   }
 }
 
-},{"./circular_buffer":29,"./controller":33,"./finger":35,"./frame":36,"./gesture":37,"./hand":38,"./interaction_box":40,"./pointable":42,"./protocol":43,"./ui":44,"./version.js":47,"events":72,"gl-matrix":24,"underscore":64}],40:[function(require,module,exports){
+},{"./circular_buffer":29,"./controller":33,"./finger":35,"./frame":36,"./gesture":37,"./hand":38,"./interaction_box":40,"./pointable":42,"./protocol":43,"./ui":44,"./version.js":47,"events":74,"gl-matrix":24,"underscore":65}],40:[function(require,module,exports){
 var glMatrix = require("gl-matrix")
   , vec3 = glMatrix.vec3;
 
@@ -14844,7 +14803,7 @@ var JSONProtocol = exports.JSONProtocol = function(header) {
 
 
 
-},{"./finger":35,"./frame":36,"./hand":38,"./pointable":42,"events":72,"underscore":64}],44:[function(require,module,exports){
+},{"./finger":35,"./frame":36,"./hand":38,"./pointable":42,"events":74,"underscore":65}],44:[function(require,module,exports){
 exports.UI = {
   Region: require("./ui/region"),
   Cursor: require("./ui/cursor")
@@ -14948,7 +14907,7 @@ Region.prototype.mapToXY = function(position, width, height) {
 }
 
 _.extend(Region.prototype, EventEmitter.prototype)
-},{"events":72,"underscore":64}],47:[function(require,module,exports){
+},{"events":74,"underscore":65}],47:[function(require,module,exports){
 // This file is automatically updated from package.json by grunt.
 module.exports = {
   full: '0.6.4',
@@ -14957,266 +14916,356 @@ module.exports = {
   dot: 4
 }
 },{}],48:[function(require,module,exports){
-;(function () { // closure for web browsers
+(function (global){
+/// shim for browser packaging
 
-if (typeof module === 'object' && module.exports) {
-  module.exports = LRUCache
-} else {
-  // just set the global for non-node platforms.
-  this.LRUCache = LRUCache
+module.exports = function() {
+  return global.WebSocket || global.MozWebSocket;
 }
 
-function hOP (obj, key) {
-  return Object.prototype.hasOwnProperty.call(obj, key)
-}
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],49:[function(require,module,exports){
+'use strict'
 
-function naiveLength () { return 1 }
+// A linked list to keep track of recently-used-ness
+const Yallist = require('yallist')
 
-function LRUCache (options) {
-  if (!(this instanceof LRUCache))
-    return new LRUCache(options)
+const MAX = Symbol('max')
+const LENGTH = Symbol('length')
+const LENGTH_CALCULATOR = Symbol('lengthCalculator')
+const ALLOW_STALE = Symbol('allowStale')
+const MAX_AGE = Symbol('maxAge')
+const DISPOSE = Symbol('dispose')
+const NO_DISPOSE_ON_SET = Symbol('noDisposeOnSet')
+const LRU_LIST = Symbol('lruList')
+const CACHE = Symbol('cache')
+const UPDATE_AGE_ON_GET = Symbol('updateAgeOnGet')
 
-  if (typeof options === 'number')
-    options = { max: options }
+const naiveLength = () => 1
 
-  if (!options)
-    options = {}
+// lruList is a yallist where the head is the youngest
+// item, and the tail is the oldest.  the list contains the Hit
+// objects as the entries.
+// Each Hit object has a reference to its Yallist.Node.  This
+// never changes.
+//
+// cache is a Map (or PseudoMap) that matches the keys to
+// the Yallist.Node object.
+class LRUCache {
+  constructor (options) {
+    if (typeof options === 'number')
+      options = { max: options }
 
-  this._max = options.max
-  // Kind of weird to have a default max of Infinity, but oh well.
-  if (!this._max || !(typeof this._max === "number") || this._max <= 0 )
-    this._max = Infinity
+    if (!options)
+      options = {}
 
-  this._lengthCalculator = options.length || naiveLength
-  if (typeof this._lengthCalculator !== "function")
-    this._lengthCalculator = naiveLength
+    if (options.max && (typeof options.max !== 'number' || options.max < 0))
+      throw new TypeError('max must be a non-negative number')
+    // Kind of weird to have a default max of Infinity, but oh well.
+    const max = this[MAX] = options.max || Infinity
 
-  this._allowStale = options.stale || false
-  this._maxAge = options.maxAge || null
-  this._dispose = options.dispose
-  this.reset()
-}
+    const lc = options.length || naiveLength
+    this[LENGTH_CALCULATOR] = (typeof lc !== 'function') ? naiveLength : lc
+    this[ALLOW_STALE] = options.stale || false
+    if (options.maxAge && typeof options.maxAge !== 'number')
+      throw new TypeError('maxAge must be a number')
+    this[MAX_AGE] = options.maxAge || 0
+    this[DISPOSE] = options.dispose
+    this[NO_DISPOSE_ON_SET] = options.noDisposeOnSet || false
+    this[UPDATE_AGE_ON_GET] = options.updateAgeOnGet || false
+    this.reset()
+  }
 
-// resize the cache when the max changes.
-Object.defineProperty(LRUCache.prototype, "max",
-  { set : function (mL) {
-      if (!mL || !(typeof mL === "number") || mL <= 0 ) mL = Infinity
-      this._max = mL
-      if (this._length > this._max) trim(this)
+  // resize the cache when the max changes.
+  set max (mL) {
+    if (typeof mL !== 'number' || mL < 0)
+      throw new TypeError('max must be a non-negative number')
+
+    this[MAX] = mL || Infinity
+    trim(this)
+  }
+  get max () {
+    return this[MAX]
+  }
+
+  set allowStale (allowStale) {
+    this[ALLOW_STALE] = !!allowStale
+  }
+  get allowStale () {
+    return this[ALLOW_STALE]
+  }
+
+  set maxAge (mA) {
+    if (typeof mA !== 'number')
+      throw new TypeError('maxAge must be a non-negative number')
+
+    this[MAX_AGE] = mA
+    trim(this)
+  }
+  get maxAge () {
+    return this[MAX_AGE]
+  }
+
+  // resize the cache when the lengthCalculator changes.
+  set lengthCalculator (lC) {
+    if (typeof lC !== 'function')
+      lC = naiveLength
+
+    if (lC !== this[LENGTH_CALCULATOR]) {
+      this[LENGTH_CALCULATOR] = lC
+      this[LENGTH] = 0
+      this[LRU_LIST].forEach(hit => {
+        hit.length = this[LENGTH_CALCULATOR](hit.value, hit.key)
+        this[LENGTH] += hit.length
+      })
     }
-  , get : function () { return this._max }
-  , enumerable : true
-  })
+    trim(this)
+  }
+  get lengthCalculator () { return this[LENGTH_CALCULATOR] }
 
-// resize the cache when the lengthCalculator changes.
-Object.defineProperty(LRUCache.prototype, "lengthCalculator",
-  { set : function (lC) {
-      if (typeof lC !== "function") {
-        this._lengthCalculator = naiveLength
-        this._length = this._itemCount
-        for (var key in this._cache) {
-          this._cache[key].length = 1
-        }
-      } else {
-        this._lengthCalculator = lC
-        this._length = 0
-        for (var key in this._cache) {
-          this._cache[key].length = this._lengthCalculator(this._cache[key].value)
-          this._length += this._cache[key].length
-        }
+  get length () { return this[LENGTH] }
+  get itemCount () { return this[LRU_LIST].length }
+
+  rforEach (fn, thisp) {
+    thisp = thisp || this
+    for (let walker = this[LRU_LIST].tail; walker !== null;) {
+      const prev = walker.prev
+      forEachStep(this, fn, walker, thisp)
+      walker = prev
+    }
+  }
+
+  forEach (fn, thisp) {
+    thisp = thisp || this
+    for (let walker = this[LRU_LIST].head; walker !== null;) {
+      const next = walker.next
+      forEachStep(this, fn, walker, thisp)
+      walker = next
+    }
+  }
+
+  keys () {
+    return this[LRU_LIST].toArray().map(k => k.key)
+  }
+
+  values () {
+    return this[LRU_LIST].toArray().map(k => k.value)
+  }
+
+  reset () {
+    if (this[DISPOSE] &&
+        this[LRU_LIST] &&
+        this[LRU_LIST].length) {
+      this[LRU_LIST].forEach(hit => this[DISPOSE](hit.key, hit.value))
+    }
+
+    this[CACHE] = new Map() // hash of items by key
+    this[LRU_LIST] = new Yallist() // list of items in order of use recency
+    this[LENGTH] = 0 // length of items in the list
+  }
+
+  dump () {
+    return this[LRU_LIST].map(hit =>
+      isStale(this, hit) ? false : {
+        k: hit.key,
+        v: hit.value,
+        e: hit.now + (hit.maxAge || 0)
+      }).toArray().filter(h => h)
+  }
+
+  dumpLru () {
+    return this[LRU_LIST]
+  }
+
+  set (key, value, maxAge) {
+    maxAge = maxAge || this[MAX_AGE]
+
+    if (maxAge && typeof maxAge !== 'number')
+      throw new TypeError('maxAge must be a number')
+
+    const now = maxAge ? Date.now() : 0
+    const len = this[LENGTH_CALCULATOR](value, key)
+
+    if (this[CACHE].has(key)) {
+      if (len > this[MAX]) {
+        del(this, this[CACHE].get(key))
+        return false
       }
 
-      if (this._length > this._max) trim(this)
+      const node = this[CACHE].get(key)
+      const item = node.value
+
+      // dispose of the old one before overwriting
+      // split out into 2 ifs for better coverage tracking
+      if (this[DISPOSE]) {
+        if (!this[NO_DISPOSE_ON_SET])
+          this[DISPOSE](key, item.value)
+      }
+
+      item.now = now
+      item.maxAge = maxAge
+      item.value = value
+      this[LENGTH] += len - item.length
+      item.length = len
+      this.get(key)
+      trim(this)
+      return true
     }
-  , get : function () { return this._lengthCalculator }
-  , enumerable : true
-  })
 
-Object.defineProperty(LRUCache.prototype, "length",
-  { get : function () { return this._length }
-  , enumerable : true
-  })
+    const hit = new Entry(key, value, len, now, maxAge)
 
+    // oversized objects fall out of cache automatically.
+    if (hit.length > this[MAX]) {
+      if (this[DISPOSE])
+        this[DISPOSE](key, value)
 
-Object.defineProperty(LRUCache.prototype, "itemCount",
-  { get : function () { return this._itemCount }
-  , enumerable : true
-  })
-
-LRUCache.prototype.forEach = function (fn, thisp) {
-  thisp = thisp || this
-  var i = 0;
-  for (var k = this._mru - 1; k >= 0 && i < this._itemCount; k--) if (this._lruList[k]) {
-    i++
-    var hit = this._lruList[k]
-    if (this._maxAge && (Date.now() - hit.now > this._maxAge)) {
-      del(this, hit)
-      if (!this._allowStale) hit = undefined
+      return false
     }
-    if (hit) {
-      fn.call(thisp, hit.value, hit.key, this)
-    }
-  }
-}
 
-LRUCache.prototype.keys = function () {
-  var keys = new Array(this._itemCount)
-  var i = 0
-  for (var k = this._mru - 1; k >= 0 && i < this._itemCount; k--) if (this._lruList[k]) {
-    var hit = this._lruList[k]
-    keys[i++] = hit.key
-  }
-  return keys
-}
-
-LRUCache.prototype.values = function () {
-  var values = new Array(this._itemCount)
-  var i = 0
-  for (var k = this._mru - 1; k >= 0 && i < this._itemCount; k--) if (this._lruList[k]) {
-    var hit = this._lruList[k]
-    values[i++] = hit.value
-  }
-  return values
-}
-
-LRUCache.prototype.reset = function () {
-  if (this._dispose && this._cache) {
-    for (var k in this._cache) {
-      this._dispose(k, this._cache[k].value)
-    }
-  }
-
-  this._cache = Object.create(null) // hash of items by key
-  this._lruList = Object.create(null) // list of items in order of use recency
-  this._mru = 0 // most recently used
-  this._lru = 0 // least recently used
-  this._length = 0 // number of items in the list
-  this._itemCount = 0
-}
-
-// Provided for debugging/dev purposes only. No promises whatsoever that
-// this API stays stable.
-LRUCache.prototype.dump = function () {
-  return this._cache
-}
-
-LRUCache.prototype.dumpLru = function () {
-  return this._lruList
-}
-
-LRUCache.prototype.set = function (key, value) {
-  if (hOP(this._cache, key)) {
-    // dispose of the old one before overwriting
-    if (this._dispose) this._dispose(key, this._cache[key].value)
-    if (this._maxAge) this._cache[key].now = Date.now()
-    this._cache[key].value = value
-    this.get(key)
+    this[LENGTH] += hit.length
+    this[LRU_LIST].unshift(hit)
+    this[CACHE].set(key, this[LRU_LIST].head)
+    trim(this)
     return true
   }
 
-  var len = this._lengthCalculator(value)
-  var age = this._maxAge ? Date.now() : 0
-  var hit = new Entry(key, value, this._mru++, len, age)
-
-  // oversized objects fall out of cache automatically.
-  if (hit.length > this._max) {
-    if (this._dispose) this._dispose(key, value)
-    return false
+  has (key) {
+    if (!this[CACHE].has(key)) return false
+    const hit = this[CACHE].get(key).value
+    return !isStale(this, hit)
   }
 
-  this._length += hit.length
-  this._lruList[hit.lu] = this._cache[key] = hit
-  this._itemCount ++
-
-  if (this._length > this._max) trim(this)
-  return true
-}
-
-LRUCache.prototype.has = function (key) {
-  if (!hOP(this._cache, key)) return false
-  var hit = this._cache[key]
-  if (this._maxAge && (Date.now() - hit.now > this._maxAge)) {
-    return false
+  get (key) {
+    return get(this, key, true)
   }
-  return true
-}
 
-LRUCache.prototype.get = function (key) {
-  return get(this, key, true)
-}
+  peek (key) {
+    return get(this, key, false)
+  }
 
-LRUCache.prototype.peek = function (key) {
-  return get(this, key, false)
-}
+  pop () {
+    const node = this[LRU_LIST].tail
+    if (!node)
+      return null
 
-LRUCache.prototype.pop = function () {
-  var hit = this._lruList[this._lru]
-  del(this, hit)
-  return hit || null
-}
+    del(this, node)
+    return node.value
+  }
 
-LRUCache.prototype.del = function (key) {
-  del(this, this._cache[key])
-}
+  del (key) {
+    del(this, this[CACHE].get(key))
+  }
 
-function get (self, key, doUse) {
-  var hit = self._cache[key]
-  if (hit) {
-    if (self._maxAge && (Date.now() - hit.now > self._maxAge)) {
-      del(self, hit)
-      if (!self._allowStale) hit = undefined
-    } else {
-      if (doUse) use(self, hit)
+  load (arr) {
+    // reset the cache
+    this.reset()
+
+    const now = Date.now()
+    // A previous serialized cache has the most recent items first
+    for (let l = arr.length - 1; l >= 0; l--) {
+      const hit = arr[l]
+      const expiresAt = hit.e || 0
+      if (expiresAt === 0)
+        // the item was created without expiration in a non aged cache
+        this.set(hit.k, hit.v)
+      else {
+        const maxAge = expiresAt - now
+        // dont add already expired items
+        if (maxAge > 0) {
+          this.set(hit.k, hit.v, maxAge)
+        }
+      }
     }
-    if (hit) hit = hit.value
   }
-  return hit
-}
 
-function use (self, hit) {
-  shiftLU(self, hit)
-  hit.lu = self._mru ++
-  if (self._maxAge) hit.now = Date.now()
-  self._lruList[hit.lu] = hit
-}
-
-function trim (self) {
-  while (self._lru < self._mru && self._length > self._max)
-    del(self, self._lruList[self._lru])
-}
-
-function shiftLU (self, hit) {
-  delete self._lruList[ hit.lu ]
-  while (self._lru < self._mru && !self._lruList[self._lru]) self._lru ++
-}
-
-function del (self, hit) {
-  if (hit) {
-    if (self._dispose) self._dispose(hit.key, hit.value)
-    self._length -= hit.length
-    self._itemCount --
-    delete self._cache[ hit.key ]
-    shiftLU(self, hit)
+  prune () {
+    this[CACHE].forEach((value, key) => get(this, key, false))
   }
 }
 
-// classy, since V8 prefers predictable objects.
-function Entry (key, value, lu, length, now) {
-  this.key = key
-  this.value = value
-  this.lu = lu
-  this.length = length
-  this.now = now
+const get = (self, key, doUse) => {
+  const node = self[CACHE].get(key)
+  if (node) {
+    const hit = node.value
+    if (isStale(self, hit)) {
+      del(self, node)
+      if (!self[ALLOW_STALE])
+        return undefined
+    } else {
+      if (doUse) {
+        if (self[UPDATE_AGE_ON_GET])
+          node.value.now = Date.now()
+        self[LRU_LIST].unshiftNode(node)
+      }
+    }
+    return hit.value
+  }
 }
 
-})()
+const isStale = (self, hit) => {
+  if (!hit || (!hit.maxAge && !self[MAX_AGE]))
+    return false
 
-},{}],49:[function(require,module,exports){
+  const diff = Date.now() - hit.now
+  return hit.maxAge ? diff > hit.maxAge
+    : self[MAX_AGE] && (diff > self[MAX_AGE])
+}
+
+const trim = self => {
+  if (self[LENGTH] > self[MAX]) {
+    for (let walker = self[LRU_LIST].tail;
+      self[LENGTH] > self[MAX] && walker !== null;) {
+      // We know that we're about to delete this one, and also
+      // what the next least recently used key will be, so just
+      // go ahead and set it now.
+      const prev = walker.prev
+      del(self, walker)
+      walker = prev
+    }
+  }
+}
+
+const del = (self, node) => {
+  if (node) {
+    const hit = node.value
+    if (self[DISPOSE])
+      self[DISPOSE](hit.key, hit.value)
+
+    self[LENGTH] -= hit.length
+    self[CACHE].delete(hit.key)
+    self[LRU_LIST].removeNode(node)
+  }
+}
+
+class Entry {
+  constructor (key, value, length, now, maxAge) {
+    this.key = key
+    this.value = value
+    this.length = length
+    this.now = now
+    this.maxAge = maxAge || 0
+  }
+}
+
+const forEachStep = (self, fn, node, thisp) => {
+  let hit = node.value
+  if (isStale(self, hit)) {
+    del(self, node)
+    if (!self[ALLOW_STALE])
+      hit = undefined
+  }
+  if (hit)
+    fn.call(thisp, hit.value, hit.key, self)
+}
+
+module.exports = LRUCache
+
+},{"yallist":67}],50:[function(require,module,exports){
 var leapConnector = require('./src/leapConnector');
 
 
 module.exports.leap = leapConnector;
-},{"./src/leapConnector":50}],50:[function(require,module,exports){
+},{"./src/leapConnector":51}],51:[function(require,module,exports){
 var Leap = require('leapjs');
 var Pointer = require('./pointer')
 
@@ -15415,7 +15464,7 @@ LeapConnector.prototype.onFrame = function(frame) {
 
 module.exports = LeapConnector;
 
-},{"./pointer":51,"leapjs":39}],51:[function(require,module,exports){
+},{"./pointer":52,"leapjs":39}],52:[function(require,module,exports){
 // adapted from a forum post by cabbibo:
 // https://github.com/leapmotion/leapjs/issues/31
 // http://cabbibo.com/leap/lmlab/mouse/test.html
@@ -15588,7 +15637,7 @@ function convert(velocityX, velocityY, type){
 
 module.exports = point;
 module.exports.reset = params.resetPosition;
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -20016,7 +20065,7 @@ numeric.svd= function svd(A) {
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 // A library of seedable RNGs implemented in Javascript.
 //
 // Usage:
@@ -20078,7 +20127,7 @@ sr.tychei = tychei;
 
 module.exports = sr;
 
-},{"./lib/alea":54,"./lib/tychei":55,"./lib/xor128":56,"./lib/xor4096":57,"./lib/xorshift7":58,"./lib/xorwow":59,"./seedrandom":60}],54:[function(require,module,exports){
+},{"./lib/alea":55,"./lib/tychei":56,"./lib/xor128":57,"./lib/xor4096":58,"./lib/xorshift7":59,"./lib/xorwow":60,"./seedrandom":61}],55:[function(require,module,exports){
 // A port of an algorithm by Johannes Baagøe <baagoe@baagoe.com>, 2010
 // http://baagoe.com/en/RandomMusings/javascript/
 // https://github.com/nquinlan/better-random-numbers-for-javascript-mirror
@@ -20194,7 +20243,7 @@ if (module && module.exports) {
 
 
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // A Javascript implementaion of the "Tyche-i" prng algorithm by
 // Samuel Neves and Filipe Araujo.
 // See https://eden.dei.uc.pt/~sneves/pubs/2011-snfa2.pdf
@@ -20299,7 +20348,7 @@ if (module && module.exports) {
 
 
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 // A Javascript implementaion of the "xor128" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -20382,7 +20431,7 @@ if (module && module.exports) {
 
 
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 // A Javascript implementaion of Richard Brent's Xorgens xor4096 algorithm.
 //
 // This fast non-cryptographic random number generator is designed for
@@ -20530,7 +20579,7 @@ if (module && module.exports) {
   (typeof define) == 'function' && define   // present with an AMD loader
 );
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 // A Javascript implementaion of the "xorshift7" algorithm by
 // François Panneton and Pierre L'ecuyer:
 // "On the Xorgshift Random Number Generators"
@@ -20629,7 +20678,7 @@ if (module && module.exports) {
 );
 
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 // A Javascript implementaion of the "xorwow" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -20717,7 +20766,7 @@ if (module && module.exports) {
 
 
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /*
 Copyright 2019 David Bau.
 
@@ -20972,7 +21021,7 @@ if ((typeof module) == 'object' && module.exports) {
   Math    // math: package containing random, pow, and seedrandom
 );
 
-},{"crypto":68}],61:[function(require,module,exports){
+},{"crypto":70}],62:[function(require,module,exports){
 var Stream = require('stream');
 var sockjs = require('sockjs-client');
 var resolve = require('url').resolve;
@@ -21037,7 +21086,7 @@ module.exports = function (u, cb) {
     return stream;
 };
 
-},{"sockjs-client":62,"stream":92,"url":94}],62:[function(require,module,exports){
+},{"sockjs-client":63,"stream":94,"url":96}],63:[function(require,module,exports){
 /* SockJS client, version 0.3.1.7.ga67f.dirty, http://sockjs.org, MIT License
 
 Copyright (c) 2011-2012 VMware, Inc.
@@ -23362,7 +23411,7 @@ if (typeof module === 'object' && module && module.exports) {
 // [*] End of lib/all.js
 
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 var traverse = module.exports = function (obj) {
     return new Traverse(obj);
 };
@@ -23678,7 +23727,7 @@ var hasOwnProperty = Object.hasOwnProperty || function (obj, key) {
     return key in obj;
 };
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 //     Underscore.js 1.4.4
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
@@ -24906,16 +24955,445 @@ var hasOwnProperty = Object.hasOwnProperty || function (obj, key) {
 
 }).call(this);
 
-},{}],65:[function(require,module,exports){
-(function (global){
-/// shim for browser packaging
-
-module.exports = function() {
-  return global.WebSocket || global.MozWebSocket;
+},{}],66:[function(require,module,exports){
+'use strict'
+module.exports = function (Yallist) {
+  Yallist.prototype[Symbol.iterator] = function* () {
+    for (let walker = this.head; walker; walker = walker.next) {
+      yield walker.value
+    }
+  }
 }
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
+'use strict'
+module.exports = Yallist
+
+Yallist.Node = Node
+Yallist.create = Yallist
+
+function Yallist (list) {
+  var self = this
+  if (!(self instanceof Yallist)) {
+    self = new Yallist()
+  }
+
+  self.tail = null
+  self.head = null
+  self.length = 0
+
+  if (list && typeof list.forEach === 'function') {
+    list.forEach(function (item) {
+      self.push(item)
+    })
+  } else if (arguments.length > 0) {
+    for (var i = 0, l = arguments.length; i < l; i++) {
+      self.push(arguments[i])
+    }
+  }
+
+  return self
+}
+
+Yallist.prototype.removeNode = function (node) {
+  if (node.list !== this) {
+    throw new Error('removing node which does not belong to this list')
+  }
+
+  var next = node.next
+  var prev = node.prev
+
+  if (next) {
+    next.prev = prev
+  }
+
+  if (prev) {
+    prev.next = next
+  }
+
+  if (node === this.head) {
+    this.head = next
+  }
+  if (node === this.tail) {
+    this.tail = prev
+  }
+
+  node.list.length--
+  node.next = null
+  node.prev = null
+  node.list = null
+
+  return next
+}
+
+Yallist.prototype.unshiftNode = function (node) {
+  if (node === this.head) {
+    return
+  }
+
+  if (node.list) {
+    node.list.removeNode(node)
+  }
+
+  var head = this.head
+  node.list = this
+  node.next = head
+  if (head) {
+    head.prev = node
+  }
+
+  this.head = node
+  if (!this.tail) {
+    this.tail = node
+  }
+  this.length++
+}
+
+Yallist.prototype.pushNode = function (node) {
+  if (node === this.tail) {
+    return
+  }
+
+  if (node.list) {
+    node.list.removeNode(node)
+  }
+
+  var tail = this.tail
+  node.list = this
+  node.prev = tail
+  if (tail) {
+    tail.next = node
+  }
+
+  this.tail = node
+  if (!this.head) {
+    this.head = node
+  }
+  this.length++
+}
+
+Yallist.prototype.push = function () {
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    push(this, arguments[i])
+  }
+  return this.length
+}
+
+Yallist.prototype.unshift = function () {
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    unshift(this, arguments[i])
+  }
+  return this.length
+}
+
+Yallist.prototype.pop = function () {
+  if (!this.tail) {
+    return undefined
+  }
+
+  var res = this.tail.value
+  this.tail = this.tail.prev
+  if (this.tail) {
+    this.tail.next = null
+  } else {
+    this.head = null
+  }
+  this.length--
+  return res
+}
+
+Yallist.prototype.shift = function () {
+  if (!this.head) {
+    return undefined
+  }
+
+  var res = this.head.value
+  this.head = this.head.next
+  if (this.head) {
+    this.head.prev = null
+  } else {
+    this.tail = null
+  }
+  this.length--
+  return res
+}
+
+Yallist.prototype.forEach = function (fn, thisp) {
+  thisp = thisp || this
+  for (var walker = this.head, i = 0; walker !== null; i++) {
+    fn.call(thisp, walker.value, i, this)
+    walker = walker.next
+  }
+}
+
+Yallist.prototype.forEachReverse = function (fn, thisp) {
+  thisp = thisp || this
+  for (var walker = this.tail, i = this.length - 1; walker !== null; i--) {
+    fn.call(thisp, walker.value, i, this)
+    walker = walker.prev
+  }
+}
+
+Yallist.prototype.get = function (n) {
+  for (var i = 0, walker = this.head; walker !== null && i < n; i++) {
+    // abort out of the list early if we hit a cycle
+    walker = walker.next
+  }
+  if (i === n && walker !== null) {
+    return walker.value
+  }
+}
+
+Yallist.prototype.getReverse = function (n) {
+  for (var i = 0, walker = this.tail; walker !== null && i < n; i++) {
+    // abort out of the list early if we hit a cycle
+    walker = walker.prev
+  }
+  if (i === n && walker !== null) {
+    return walker.value
+  }
+}
+
+Yallist.prototype.map = function (fn, thisp) {
+  thisp = thisp || this
+  var res = new Yallist()
+  for (var walker = this.head; walker !== null;) {
+    res.push(fn.call(thisp, walker.value, this))
+    walker = walker.next
+  }
+  return res
+}
+
+Yallist.prototype.mapReverse = function (fn, thisp) {
+  thisp = thisp || this
+  var res = new Yallist()
+  for (var walker = this.tail; walker !== null;) {
+    res.push(fn.call(thisp, walker.value, this))
+    walker = walker.prev
+  }
+  return res
+}
+
+Yallist.prototype.reduce = function (fn, initial) {
+  var acc
+  var walker = this.head
+  if (arguments.length > 1) {
+    acc = initial
+  } else if (this.head) {
+    walker = this.head.next
+    acc = this.head.value
+  } else {
+    throw new TypeError('Reduce of empty list with no initial value')
+  }
+
+  for (var i = 0; walker !== null; i++) {
+    acc = fn(acc, walker.value, i)
+    walker = walker.next
+  }
+
+  return acc
+}
+
+Yallist.prototype.reduceReverse = function (fn, initial) {
+  var acc
+  var walker = this.tail
+  if (arguments.length > 1) {
+    acc = initial
+  } else if (this.tail) {
+    walker = this.tail.prev
+    acc = this.tail.value
+  } else {
+    throw new TypeError('Reduce of empty list with no initial value')
+  }
+
+  for (var i = this.length - 1; walker !== null; i--) {
+    acc = fn(acc, walker.value, i)
+    walker = walker.prev
+  }
+
+  return acc
+}
+
+Yallist.prototype.toArray = function () {
+  var arr = new Array(this.length)
+  for (var i = 0, walker = this.head; walker !== null; i++) {
+    arr[i] = walker.value
+    walker = walker.next
+  }
+  return arr
+}
+
+Yallist.prototype.toArrayReverse = function () {
+  var arr = new Array(this.length)
+  for (var i = 0, walker = this.tail; walker !== null; i++) {
+    arr[i] = walker.value
+    walker = walker.prev
+  }
+  return arr
+}
+
+Yallist.prototype.slice = function (from, to) {
+  to = to || this.length
+  if (to < 0) {
+    to += this.length
+  }
+  from = from || 0
+  if (from < 0) {
+    from += this.length
+  }
+  var ret = new Yallist()
+  if (to < from || to < 0) {
+    return ret
+  }
+  if (from < 0) {
+    from = 0
+  }
+  if (to > this.length) {
+    to = this.length
+  }
+  for (var i = 0, walker = this.head; walker !== null && i < from; i++) {
+    walker = walker.next
+  }
+  for (; walker !== null && i < to; i++, walker = walker.next) {
+    ret.push(walker.value)
+  }
+  return ret
+}
+
+Yallist.prototype.sliceReverse = function (from, to) {
+  to = to || this.length
+  if (to < 0) {
+    to += this.length
+  }
+  from = from || 0
+  if (from < 0) {
+    from += this.length
+  }
+  var ret = new Yallist()
+  if (to < from || to < 0) {
+    return ret
+  }
+  if (from < 0) {
+    from = 0
+  }
+  if (to > this.length) {
+    to = this.length
+  }
+  for (var i = this.length, walker = this.tail; walker !== null && i > to; i--) {
+    walker = walker.prev
+  }
+  for (; walker !== null && i > from; i--, walker = walker.prev) {
+    ret.push(walker.value)
+  }
+  return ret
+}
+
+Yallist.prototype.splice = function (start, deleteCount /*, ...nodes */) {
+  if (start > this.length) {
+    start = this.length - 1
+  }
+  if (start < 0) {
+    start = this.length + start;
+  }
+
+  for (var i = 0, walker = this.head; walker !== null && i < start; i++) {
+    walker = walker.next
+  }
+
+  var ret = []
+  for (var i = 0; walker && i < deleteCount; i++) {
+    ret.push(walker.value)
+    walker = this.removeNode(walker)
+  }
+  if (walker === null) {
+    walker = this.tail
+  }
+
+  if (walker !== this.head && walker !== this.tail) {
+    walker = walker.prev
+  }
+
+  for (var i = 2; i < arguments.length; i++) {
+    walker = insert(this, walker, arguments[i])
+  }
+  return ret;
+}
+
+Yallist.prototype.reverse = function () {
+  var head = this.head
+  var tail = this.tail
+  for (var walker = head; walker !== null; walker = walker.prev) {
+    var p = walker.prev
+    walker.prev = walker.next
+    walker.next = p
+  }
+  this.head = tail
+  this.tail = head
+  return this
+}
+
+function insert (self, node, value) {
+  var inserted = node === self.head ?
+    new Node(value, null, node, self) :
+    new Node(value, node, node.next, self)
+
+  if (inserted.next === null) {
+    self.tail = inserted
+  }
+  if (inserted.prev === null) {
+    self.head = inserted
+  }
+
+  self.length++
+
+  return inserted
+}
+
+function push (self, item) {
+  self.tail = new Node(item, self.tail, null, self)
+  if (!self.head) {
+    self.head = self.tail
+  }
+  self.length++
+}
+
+function unshift (self, item) {
+  self.head = new Node(item, null, self.head, self)
+  if (!self.tail) {
+    self.tail = self.head
+  }
+  self.length++
+}
+
+function Node (value, prev, next, list) {
+  if (!(this instanceof Node)) {
+    return new Node(value, prev, next, list)
+  }
+
+  this.list = list
+  this.value = value
+
+  if (prev) {
+    prev.next = this
+    this.prev = prev
+  } else {
+    this.prev = null
+  }
+
+  if (next) {
+    next.prev = this
+    this.next = next
+  } else {
+    this.next = null
+  }
+}
+
+try {
+  // add if support for Symbol.iterator is present
+  require('./iterator.js')(Yallist)
+} catch (er) {}
+
+},{"./iterator.js":66}],68:[function(require,module,exports){
 
 var Cluster = function (psshEntry) {
 	this.members = null;
@@ -25036,7 +25514,7 @@ module.exports = Cluster;
 
 
 
-},{}],67:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -25162,9 +25640,9 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],68:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 
-},{}],69:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -26716,14 +27194,14 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":67,"ieee754":73,"isarray":70}],70:[function(require,module,exports){
+},{"base64-js":69,"ieee754":75,"isarray":72}],72:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],71:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -26834,7 +27312,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":75}],72:[function(require,module,exports){
+},{"../../is-buffer/index.js":77}],74:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -27137,7 +27615,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],73:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -27223,7 +27701,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],74:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -27252,7 +27730,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],75:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -27275,12 +27753,12 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],76:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],77:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -27340,7 +27818,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],78:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 (function (global){
 /*! http://mths.be/punycode v1.2.4 by @mathias */
 ;(function(root) {
@@ -27851,7 +28329,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],79:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -27937,7 +28415,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],80:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28024,16 +28502,16 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],81:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":79,"./encode":80}],82:[function(require,module,exports){
+},{"./decode":81,"./encode":82}],84:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":83}],83:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":85}],85:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -28126,7 +28604,7 @@ function forEach (xs, f) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_readable":85,"./_stream_writable":87,"_process":77,"core-util-is":71,"inherits":74}],84:[function(require,module,exports){
+},{"./_stream_readable":87,"./_stream_writable":89,"_process":79,"core-util-is":73,"inherits":76}],86:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28174,7 +28652,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":86,"core-util-is":71,"inherits":74}],85:[function(require,module,exports){
+},{"./_stream_transform":88,"core-util-is":73,"inherits":76}],87:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -29129,7 +29607,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":83,"_process":77,"buffer":69,"core-util-is":71,"events":72,"inherits":74,"isarray":76,"stream":92,"string_decoder/":93,"util":68}],86:[function(require,module,exports){
+},{"./_stream_duplex":85,"_process":79,"buffer":71,"core-util-is":73,"events":74,"inherits":76,"isarray":78,"stream":94,"string_decoder/":95,"util":70}],88:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -29340,7 +29818,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":83,"core-util-is":71,"inherits":74}],87:[function(require,module,exports){
+},{"./_stream_duplex":85,"core-util-is":73,"inherits":76}],89:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -29821,10 +30299,10 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":83,"_process":77,"buffer":69,"core-util-is":71,"inherits":74,"stream":92}],88:[function(require,module,exports){
+},{"./_stream_duplex":85,"_process":79,"buffer":71,"core-util-is":73,"inherits":76,"stream":94}],90:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":84}],89:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":86}],91:[function(require,module,exports){
 (function (process){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = require('stream');
@@ -29838,13 +30316,13 @@ if (!process.browser && process.env.READABLE_STREAM === 'disable') {
 }
 
 }).call(this,require('_process'))
-},{"./lib/_stream_duplex.js":83,"./lib/_stream_passthrough.js":84,"./lib/_stream_readable.js":85,"./lib/_stream_transform.js":86,"./lib/_stream_writable.js":87,"_process":77,"stream":92}],90:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":85,"./lib/_stream_passthrough.js":86,"./lib/_stream_readable.js":87,"./lib/_stream_transform.js":88,"./lib/_stream_writable.js":89,"_process":79,"stream":94}],92:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":86}],91:[function(require,module,exports){
+},{"./lib/_stream_transform.js":88}],93:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":87}],92:[function(require,module,exports){
+},{"./lib/_stream_writable.js":89}],94:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -29973,7 +30451,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":72,"inherits":74,"readable-stream/duplex.js":82,"readable-stream/passthrough.js":88,"readable-stream/readable.js":89,"readable-stream/transform.js":90,"readable-stream/writable.js":91}],93:[function(require,module,exports){
+},{"events":74,"inherits":76,"readable-stream/duplex.js":84,"readable-stream/passthrough.js":90,"readable-stream/readable.js":91,"readable-stream/transform.js":92,"readable-stream/writable.js":93}],95:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -30196,7 +30674,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":69}],94:[function(require,module,exports){
+},{"buffer":71}],96:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -30905,4 +31383,4 @@ function isNullOrUndefined(arg) {
   return  arg == null;
 }
 
-},{"punycode":78,"querystring":81}]},{},[1,2,3,4,5,6,7,8,11,12,13,14,9]);
+},{"punycode":80,"querystring":83}]},{},[1,2,3,4,5,6,7,8,11,12,13,14,9]);

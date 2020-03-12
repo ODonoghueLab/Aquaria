@@ -30,7 +30,6 @@ export default {
   div#uniProtDesc {
     height: 300px;
     overflow: hidden;
-    padding: 0px 10px;
   }
 
 </style>

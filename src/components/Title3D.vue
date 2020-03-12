@@ -42,9 +42,13 @@
 export default {
   name: 'Title3D'
 }
-
 </script>
 
-<style>
-
+<style scoped>
+h3{
+  position: absolute;
+  z-index: 2;
+  top: 80vh;
+  left: 40%;
+}
 </style>

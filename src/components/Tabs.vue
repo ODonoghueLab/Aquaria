@@ -38,6 +38,7 @@ export default {
   }
 
   .md-tab{
+    padding: 0;
     background-color: #cccccc;
   }
 </style>

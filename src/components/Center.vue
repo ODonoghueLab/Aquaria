@@ -1,8 +1,10 @@
 <template>
+<div>
   <div id="center">
     <StructureViewer/>
-    <Structures/>
+    <Structures id="structures"/>
   </div>
+</div>
 </template>
 
 <script>
@@ -19,5 +21,4 @@ export default {
 </script>
 
 <style>
-
 </style>

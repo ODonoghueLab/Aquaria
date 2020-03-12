@@ -2,10 +2,7 @@
   <div id="controls">
     <Logo/>
     <div>
-        <SearchPanel/>
-        <!-- <AboutUniProt/>
-        <Gallery /> -->
-        <br/>
+        <SearchPanel id="searchByName"/>
         <Tabs/>
     </div>
   </div>
@@ -14,8 +11,6 @@
 <script>
 import Logo from './Logo'
 import SearchPanel from './SearchPanel'
-// import AboutUniProt from './AboutUniprot'
-// import Gallery from './Gallery'
 import Tabs from './Tabs'
 
 export default {
@@ -31,5 +26,7 @@ export default {
 <style scoped>
 #controls{
   padding-left: 10px;
+  position: absolute;
+  z-index: 2;
 }
 </style>

@@ -168,7 +168,7 @@ ShowMatchingStructures.prototype.drawAxisRuler = function(layerId) { // console.
 			.attr("data-intro","Graphical representation of the specified protein's sequence")
 			.attr("data-position", "left")
 		.append("svg").attr("width",
-			parseInt(this.width + AQUARIA.margin.left)).attr("viewBox",
+			parseInt(this.width + AQUARIA.margin.left)-80).attr("viewBox",
 			"0 0 " + parseInt(this.width + AQUARIA.margin.left) + " 15").attr(
 			"preserveAspectRatio", "none").attr("height", 15).append("g").attr(
 			"transform", "translate(" + AQUARIA.margin.left + ",0)");
