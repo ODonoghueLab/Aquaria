@@ -855,16 +855,46 @@ var MAX_PROTEIN_HISTORY = 5;
         AQUARIA.short_molecule_name = short_name;
 
         if (accession && pdbId && score) {
-          $("#structureviewerexplanation").html("<a id='accession_link' href='https://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name +
+          $("#structureviewerexplanation").html("<a id='accession_link' title='About Uniprot ID'>" + AQUARIA.preferred_protein_name +
             "</a> sequence aligned onto <a href='/" + accession + "' title='View the structure for " + short_name + " in Aquaria'>" + short_name +
-            "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" + chainId + "</a> (" + score +
+            "</a> structure from <a id='about_pdb' title='About PDB ID'>PDB " + pdbId + "-" + chainId + "</a> (" + score +
             "% sequence identity)&nbsp;&nbsp;<a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a>");
 
           var evalue = AQUARIA.currentMember.E_value; // e-value from pssh2
           $("#help3D").show().parent().attr("onmouseenter", "AQUARIA.explainTitle('" + accession + "','" + AQUARIA.preferred_protein_name + "','" + short_name + "','" + pdbId + "','" + chainId +
             "','" + score + "','" + evalue + "');");
+
+            if ($('#title3D').is(':visible')) {
+              $('#accession_link').on('click', function () {
+                if ($('#gallery').is(':visible')) {
+                  $('#gallery').hide()
+                  $('#searchByName').hide()
+                  $('#uniprot').show()
+                } else if ($('#uniprot').is(':visible')) {
+                  $('#searchByName').show()
+                  $('#uniprot').hide()
+                } else {
+                  $('#uniprot').show()
+                  $('#searchByName').hide()
+                }
+              })
+              $('#about_pdb').on('click', function () {
+                if ($('#uniprot').is(':visible')) {
+                  $('#uniprot').hide()
+                  $('#searchByName').hide()
+                  $('#gallery').show()
+                } else if ($('#gallery').is(':visible')) {
+                  $('#searchByName').show()
+                  $('#gallery').hide()
+                } else {
+                  $('#gallery').show()
+                  $('#searchByName').hide()
+                }
+              })
+            }
+
         } else { // DNA or RNA (no accession)
-          $("#structureviewerexplanation").html(short_name + "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" +
+          $("#structureviewerexplanation").html(short_name + "</a> structure from <a title='About PDB ID'>PDB " + pdbId + "-" +
             chainId + "</a> (" + score + "% sequence identity)");
         }
 
@@ -2049,7 +2079,7 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 	this.nusvg = outerdiv.append("div").attr("id", "c_" + id).attr("class",
 			"container").append("svg").attr("width", this.w + 20).attr("height",
 			this.height + 30)
-			.attr("viewBox", "0 0 " + (this.width + 200) + " " + (this.height + 30)).attr(
+			.attr("viewBox", "0 0 " + (this.width + 220) + " " + (this.height + 30)).attr(
 					"preserveAspectRatio", "none");
 
 	this.nusvg.append("g").attr("id", "structure_" + id).attr("transform",
@@ -2405,9 +2435,9 @@ function drawTrack(datum, i) {
 		d3
 				.select(this)
 				.append("svg")
-				.attr("width", width + AQUARIA.margin.left)
+				.attr("width", width - AQUARIA.margin.left - 40 )
 				.attr("height", 25)
-				.attr("viewBox", "0 0 " + (width + AQUARIA.margin.left) + " 25")
+				.attr("viewBox", "0 0 " + (width - AQUARIA.margin.left - 40) + " 25")
 				.attr("preserveAspectRatio", "none")
 				.attr("id", "s_" + groupCount + "_" + o)
 				.attr("title",

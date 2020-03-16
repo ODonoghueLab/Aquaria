@@ -1,7 +1,7 @@
 <template>
 <div id="content">
     <Controls />
-    <Center />
+    <Center id="center"/>
   </div>
 </template>
 
@@ -18,5 +18,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+#center{
+  display: inline-flex;
+  width: 100%;
+}
 </style>

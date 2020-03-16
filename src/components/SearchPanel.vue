@@ -1,7 +1,6 @@
 <template>
     <div id="searchByName">
-        <!-- <h3>Specify a Protein</h3> -->
-        <!-- <span class="content"> -->
+            <h3>Specify a Protein</h3>
               <form id="myform"
                     name="myform"
                     ACTION="#"
@@ -25,16 +24,6 @@
                                       data-position="right" /></p>
                 <!--<input type="hidden" id="organismid" name="organismid" value="9606"/>-->
               </form>
-               <div id='psyns'>
-                  <p>(example: <a href="#" v-on:click="fillin('p53')">p53</a> or <a href="#" v-on:click="fillin('P04637');">P04637</a>)</p>
-              </div>
-              <div style="display:none;"
-                    id='gsyns'>
-                <p>&nbsp;</p>
-              </div>
-              <div id='osyns'>
-                  <p>&nbsp;</p>
-              </div>
       <!-- </span> -->
       </div>
 
@@ -56,17 +45,12 @@ export default {
 </script>
 
 <style>
-#searchByName{
-  position: relative;
-  left: 45vw;
-}
 #myform{
   display: inline-flex;
-  padding-left: 14px;
 }
 
-#input1 #input2{
-  position: absolute;
+#input1, #input2{
+  padding: 4px;
 }
 
 input[type=search].ui-autocomplete-loading {
@@ -104,38 +88,6 @@ input[type=search].ui-autocomplete-loading {
 
   .auto_complete_identifier {
     color: #79a;
-  }
-
-  .tit_aq {
-    position: absolute;
-    left: 10px;
-    top: 1px;
-    width: 123px;
-    height: 48px;
-    font-size: 34px;
-    color: #FFF;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-  }
-
-  .input1 {
-    position: relative;
-    left: 10px;
-    top: 15px;
-    width: 300px;
-    height: 17px;
-    background-color: #9cb1de;
-    z-index: 6;
-  }
-
-  .input2 {
-    position: relative;
-    left: 10px;
-    top: 15px;
-    width: 300px;
-    height: 17px;
-    background-color: #9cb1de;
-    z-index: 6;
   }
 
   input {

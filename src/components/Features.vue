@@ -8,6 +8,10 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
-
+<style scoped>
+#featurelist{
+  overflow: scroll;
+  height: 83vh;
+  padding: 8px;
+}
 </style>

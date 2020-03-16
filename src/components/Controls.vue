@@ -1,24 +1,19 @@
 <template>
   <div id="controls">
     <Logo/>
-    <div>
-        <SearchPanel id="searchByName"/>
-        <Tabs/>
-    </div>
+    <AffordanceMode />
   </div>
 </template>
 
 <script>
 import Logo from './Logo'
-import SearchPanel from './SearchPanel'
-import Tabs from './Tabs'
+import AffordanceMode from './Affordance'
 
 export default {
   name: 'Controls',
   components: {
     Logo,
-    SearchPanel,
-    Tabs
+    AffordanceMode
   }
 }
 </script>
@@ -27,6 +22,7 @@ export default {
 #controls{
   padding-left: 10px;
   position: absolute;
-  z-index: 2;
+  width: 0;
+  display: flex;
 }
 </style>

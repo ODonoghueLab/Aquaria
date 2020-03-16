@@ -1,6 +1,5 @@
 <template>
-  <div id="structureviewer">
-    <Title3D/>
+  <div>
         <div id="updateJava3D" class="aquariaWarning">
           <p><strong>Aquaria needs to update your Java3D.</strong></p>
           <form action="/downloads/AquariaSetupMac.dmg">
@@ -24,13 +23,8 @@
 </template>
 
 <script>
-import Title3D from './Title3D'
-
 export default {
-  name: 'StructureViewer',
-  components: {
-    Title3D
-  }
+  name: 'StructureViewer'
 }
 </script>
 
@@ -102,7 +96,7 @@ div.panel span#threeD {
     z-index: 1;
 } */
 
-/* .jolecule-embed-toolbar, .jolecule-embed-toolbar a {
+.jolecule-embed-toolbar, .jolecule-embed-toolbar a {
     color: #777;
     text-decoration: none;
 }
@@ -136,7 +130,7 @@ div.panel span#threeD {
     font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
     border: 1px solid #888;
-    background-color: rgba(200, 200, 200, 0.8);
+    background-color: rgba(200, 200, 200, 0);
     color: #333;
-} */
+}
 </style>

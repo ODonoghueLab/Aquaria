@@ -38,7 +38,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'Title3D'
 }
@@ -48,7 +47,9 @@ export default {
 h3{
   position: absolute;
   z-index: 2;
-  top: 80vh;
-  left: 40%;
+  top: 40px;
+  font-size: 10px;
+  margin: 4vh;
+  background-color: #999999;
 }
 </style>

@@ -315,7 +315,7 @@ export default {
     opacity: 0.68;
     -moz-opacity: 0.68;
     width: 100%;
-    z-index: 99;
+    z-index: 3;
   }
 
   div.panel span.help {

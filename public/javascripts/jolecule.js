@@ -91672,8 +91672,11 @@ class ColorLegendWidget extends CanvasWidget {
     }
 
 	//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
+	$("#export-button").removeAttr("style")
+	.attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
+	
 	$("#toggle-toolbar-button").removeAttr("style")
-    .attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
+	.attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
 
 	$("#toggle-toolbar-button2").click(function(){
 		$("#toggle-toolbar-button").removeAttr("style")
@@ -91685,7 +91688,7 @@ class ColorLegendWidget extends CanvasWidget {
 	.attr("style", "position: absolute; z-index: 2; top: 0px; right: 3px; margin: 5px; transform: rotate(180deg)")
 	});
 
-	$('.jolecule-embed-header').attr("style", "display: none; flex-flow: row-reverse; border-bottom: 2px solid rgb(170, 170, 170);")
+	$('.jolecule-embed-header').attr("style", "display: none; flex-flow: row-reverse;")
 
 	$(".jolecule-embed-view").removeAttr('style').css({
 	position: "",
@@ -91698,6 +91701,23 @@ class ColorLegendWidget extends CanvasWidget {
 	if((($("#threeDSpan-inner-clipping-plane").length > 0 ) && $("#export-button").length <=0)){
 		$(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
 	}
+	
+	var select_residue = new MutationObserver(function(){
+		$("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
+
+		$("#color-legend").click(function(){
+		$('[id^="color-legend-"]').toggle();
+		})
+
+		$('[id^="color-legend-"]').hide()
+	});
+
+	select_residue.observe(document.getElementById("color-legend"),{ 
+	childlist: true,
+	attributes : true, 
+	attributeFilter : ['style'] 
+	});
+  
 	  
     this.resize()
     this.update()
@@ -92176,12 +92196,17 @@ class ToggleToolbarWidget {
 
     this.buttonInDisplayOffset = { x: 0, y: 0 }
 
-    this.toolbarDiv = __WEBPACK_IMPORTED_MODULE_0_jquery___default()(toolbarSelector)
+	this.toolbarDiv = __WEBPACK_IMPORTED_MODULE_0_jquery___default()(toolbarSelector)
+	
+	this.usdz = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('<img id="export-button" src="/images/ar-button.png">')
+	  .css({ margin: '5px', position: 'relative' })
+	  
+    this.proteinDisplayDiv.append(this.usdz)
 
     this.buttonInDisplayDiv = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('<div id="toggle-toolbar-button">')
       .html('&#9776;')
       .addClass('jolecule-button')
-      .css({ margin: '5px', position: 'absolute' })
+      .css({ margin: '5px', position: 'relative' })
       .on('click touch', e => {
         this.isChange = true
         this.update()

@@ -1,7 +1,7 @@
 <template>
-    <!-- <div id="gallery"> -->
-      <!-- <div class="panel" id="description" data-intro="PDB summary for the shown structure." data-position="bottom"> -->
-        <!-- <h3>About <span class="explanation"> PDB</span></h3> -->
+    <div id="gallery">
+      <div class="panel" id="description" data-intro="PDB summary for the shown structure." data-position="bottom">
+        <h3>About <span class="explanation"> PDB</span></h3>
         <span class="content" id="description" data-intro="PDB summary for the shown structure." data-position="bottom">
             <span id="biounitDisplay"
                   style="display: none;"><span id="biounitLeft"
@@ -24,8 +24,8 @@
               <p id="molecule" title="View this structure in Aquaria" data-intro="Information about currently focused PDB chain." data-position="left"><strong>Molecule: </strong><span class="text">unavailable</span></p>
               <p id="organism"><strong>Organism: </strong><span class="text">unavailable</span></p> </span>
                     </span>
-      <!-- </div> -->
-    <!-- </div> -->
+      </div>
+    </div>
 </template>
 
 <script>
@@ -36,20 +36,24 @@ export default {
 
 <style scoped>
 #gallery{
-    width: 250px;
+    width: 100%;
     min-height: 100px;
 }
+div.panel{
+    border: 1px solid rgb(153, 153, 153);
+    font-size: 89%;
+    height: 35vh;
+  }
 #aboutPDBHider{
     height: 350px;
     overflow: scroll;
 }
 #gallery div {
     margin: 2px 0;
-    width: 240px;
 }
 
 #description span.content {
-    height: 310px;
+    height: 32vh;
     overflow: hidden;
     display: block;
 }

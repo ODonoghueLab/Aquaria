@@ -131,8 +131,9 @@ span.content p, p.expandable, p.hidden {
     font-weight: normal;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    padding: 2px 3px 2px 10px;
+    /* padding: 2px 3px 2px 10px; */
     margin: 0px;
+    padding: 7px 10px 4px 29px;
 }
 
 div.panel {

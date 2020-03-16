@@ -1,8 +1,8 @@
 <template>
-  <div class="panel" id="structurematches" data-intro=" " data-position="top">
-    <h3 class="sub" title="Click to see clusters of matching structures" rel="vis">Matching Structures<span class="explanation" id="structureexplanation"> in PDB</span>
+  <div>
+    <h3 class="sub" title="Click to see clusters of matching structures" rel="vis" v-on:click="narrowpanel()">Matching Structures<span class="explanation" id="structureexplanation"> in PDB</span>
     </h3>
-    <h3 class="sub inactive" title="Click to see annotated features" rel="featurelist" id="h_featurelist" data-intro="Provides access to sequence features." data-position="top">Features
+    <h3 class="sub inactive" title="Click to see annotated features" rel="featurelist" id="h_featurelist" data-intro="Provides access to sequence features." data-position="top" v-on:click="widepanel()">Features
       <span class="explanation" id="featureExplanation"></span>
       <span class="counter" id="featureCounter"></span>
     </h3>
@@ -15,11 +15,27 @@
 <script>
 import MatchingStructures from './MatchingStructures'
 import FeatureList from './Features'
+import $ from 'jquery'
+
 export default {
   name: 'Structures',
   components: {
     MatchingStructures,
     FeatureList
+  },
+  methods: {
+    widepanel: function () {
+      var width = window.innerWidth - 55
+      $('#structurematches').css({
+        width: width
+      })
+    },
+    narrowpanel: function () {
+      var width = window.innerWidth - 75
+      $('#structurematches').css({
+        width: width
+      })
+    }
   }
 }
 </script>
