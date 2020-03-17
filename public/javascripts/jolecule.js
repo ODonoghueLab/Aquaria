@@ -91702,7 +91702,7 @@ class ColorLegendWidget extends CanvasWidget {
 		$(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
 	}
 	
-	var select_residue = new MutationObserver(function(){
+	var toggle_legend = new MutationObserver(function(){
 		$("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
 
 		$("#color-legend").click(function(){
@@ -91712,12 +91712,33 @@ class ColorLegendWidget extends CanvasWidget {
 		$('[id^="color-legend-"]').hide()
 	});
 
-	select_residue.observe(document.getElementById("color-legend"),{ 
+	toggle_legend.observe(document.getElementById("color-legend"),{ 
 	childlist: true,
 	attributes : true, 
 	attributeFilter : ['style'] 
 	});
-  
+
+	//THE COVERAGE MAP
+	$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
+
+	var a = $("div.container.loaded").html()
+	var b = $('<div id="first_match">').append(a)
+	$("#threeDSpan-inner-sequence-widget-inner").append(b)
+
+	// $("#first_match").css({"overflow":"hidden"})
+	// $("#first_match>svg>g:first-child").attr("transform", "translate(1,10)")
+	// $("#first_match>svg>g").find('.thumbnail').html()
+	// $("#first_match g.cluster").find('line').remove()
+	// var c = $("#first_match>svg>g>g>rect").width() + parseInt($("#first_match>svg>g>rect").css('transform').split(', ')[4])
+	// document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + c + " 75");
+
+
+	// $("#threeDSpan-inner-sequence-widget-inner>canvas>.container.loaded").attr("c")
+	// $(".container.loaded").css({
+	// 	"top": "-12vh",
+	// 	"position": "relative",
+	// 	"z-index": "78996"
+	// })
 	  
     this.resize()
     this.update()
@@ -105170,11 +105191,18 @@ class SoupWidget extends __WEBPACK_IMPORTED_MODULE_8__webgl_widget__["a" /* Webg
 
     if (!this.isClickInitiated) {
       this.iAtomPreClick = this.iAtomHover
-      this.isClickInitiated = true
+	  this.isClickInitiated = true
+	  console.log("THIS IS CLICKED")
+	//   if($('#threeDSpan-inner-sequence-widget-inner>canvas').is(':visible')){
+	// 	$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
+	//   }
+	//   else{
+	// $("#threeDSpan-inner-sequence-widget-inner>canvas").toggle()
+	// $(".container.loaded").show()
     } else if (elapsedTime < 600) {
       this.doubleclick(event)
-      this.isClickInitiated = false
-    }
+	  this.isClickInitiated = false
+	}
 
     this.getPointer(event)
     this.savePointer()
