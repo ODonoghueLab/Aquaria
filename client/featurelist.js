@@ -140,9 +140,9 @@ function drawTrack(datum, i) {
 		d3
 				.select(this)
 				.append("svg")
-				.attr("width", width + AQUARIA.margin.left)
+				.attr("width", width - AQUARIA.margin.left - 40)
 				.attr("height", 25)
-				.attr("viewBox", "0 0 " + (width + AQUARIA.margin.left) + " 25")
+				.attr("viewBox", "0 0 " + (width - AQUARIA.margin.left - 40) + " 25")
 				.attr("preserveAspectRatio", "none")
 				.attr("id", "s_" + groupCount + "_" + o)
 				.attr("title",

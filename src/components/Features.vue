@@ -1,13 +1,20 @@
 <template>
-    <div class="toggled" id="featurelist"></div>
+    <div class="toggled" id="featurelist" style="display:none"></div>
 </template>
 
 <script>
 export default {
-  name: 'FeatureList'
+  name: 'FeatureList',
+  methods () {
+
+  }
 }
 </script>
 
-<style lang="less" scoped>
-
+<style scoped>
+#featurelist{
+  overflow: scroll;
+  height: 83vh;
+  padding: 8px;
+}
 </style>

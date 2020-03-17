@@ -1,8 +1,18 @@
 <template>
-    <!-- <div class="panel" id="about" data-intro="UniProt summary of the specified protein's function." data-position="right">
-    </div> -->
-        <!-- <h3>About <span class="explanation"> Uniprot ID</span></h3> -->
+    <div class="panel" id="about" data-intro="UniProt summary of the specified protein's function." data-position="right">
+      <h3>About <span class="explanation"> Uniprot ID</span></h3>
+      <div id='psyns'>
+                  <p>(example: <a href="#" v-on:click="fillin('p53')">p53</a> or <a href="#" v-on:click="fillin('P04637');">P04637</a>)</p>
+              </div>
+              <div style="display:none;"
+                    id='gsyns'>
+                <p>Genes: &nbsp;</p>
+              </div>
+              <div id='osyns'>
+                  <p>&nbsp;</p>
+              </div>
         <div id="uniProtDesc"></div>
+    </div>
 </template>
 
 <script>
@@ -12,9 +22,6 @@ export default {
 </script>
 
 <style scoped>
-  div.panel{
-    width: 240px;
-  }
   .panel h3{
   background-color: #999;
   border-radius: 10px;
@@ -28,9 +35,12 @@ export default {
   }
 
   div#uniProtDesc {
-    height: 300px;
+    height: 30vh;
     overflow: hidden;
-    padding: 0px 10px;
   }
-
+  div.panel{
+    border: 1px solid rgb(153, 153, 153);
+    font-size: 89%;
+    height: 35vh;
+  }
 </style>

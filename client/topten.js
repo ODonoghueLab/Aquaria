@@ -9,7 +9,7 @@ var TopTen = function (id, MAX_SIZE) {
 	  localStorage.removeItem(this.id);
 	}
 	var existing = localStorage.getItem(this.id);
-  this.cache = LRU(MAX_SIZE);
+  this.cache = new LRU(MAX_SIZE);
 	if (existing === null) {
 	}
 	else {

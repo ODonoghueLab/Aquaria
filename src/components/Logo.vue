@@ -1,12 +1,13 @@
 <template>
     <div id="logo-intro">
     <div id="logo">
-        <img src="../assets/img/aquaria-logo.png" alt="Aquaria Logo">
+        <img src="../assets/img/icon-large.png" alt="Aquaria Logo" v-if="$mq === 'laptop'">
+        <img src="../assets/img/icon-large.png" alt="Aquaria Logo" v-if="$mq === 'mobile' || $mq === 'tablet'" v-on:click="showAbout()">
         <div id="wait">
-            <img src="../assets/img/aquaria-spin.gif" alt="Loading" title="Loading data...">
+            <img id="gif" src="../assets/img/aquaria-spin.gif" alt="Loading" title="Loading data...">
         </div>
     </div>
-    <p id="intro">
+    <p id="intro" v-if="$mq === 'laptop'">
         <span class="small">
             <a href="#" v-on:click="showAbout()" >Updated:
                 <span class="lastupdate">{{data}}</span>
@@ -30,7 +31,6 @@ export default {
   methods: {
     showAbout: function () {
     // dim background
-
       if (document.getElementsByClassName('dimmer').length === 0) {
         $('body').append('<div class="dimmer"></div>')
         $('div.dimmer').on('click', function () {
@@ -63,17 +63,38 @@ export default {
 </script>
 
 <style scoped>
-    #logo img{
-      height: 4vh;
-    }
-    #wait img{
-        position: absolute;
-        left: 6px;
-        height: 4vh;
+    img{
+      width: 50px;
+      position: relative;
+      padding: 4px 0px 0px 0px;
     }
     #logo{
-        display: flex;
-        width: 100%;
-        height: auto;
+      width: 50px;
     }
+    #intro{
+      width: 10vw;
+    }
+    #gif{
+      position: relative;
+      bottom: 53px;
+      width: 44px;
+      left: 5px;
+    }
+    #logo-intro{
+      z-index: 1;
+    }
+    /* img{
+        position: absolute;
+        display: flex;
+        height: auto;
+        width: 7vh;
+    }
+    #wait{
+        position: absolute;
+        left: 6px;
+    }
+    #intro{
+      position: relative;
+      padding-top: 68px;
+    } */
 </style>

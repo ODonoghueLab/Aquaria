@@ -1,29 +1,19 @@
 <template>
   <div id="controls">
     <Logo/>
-    <div>
-        <SearchPanel/>
-        <!-- <AboutUniProt/>
-        <Gallery /> -->
-        <br/>
-        <Tabs/>
-    </div>
+    <AffordanceMode />
   </div>
 </template>
 
 <script>
 import Logo from './Logo'
-import SearchPanel from './SearchPanel'
-// import AboutUniProt from './AboutUniprot'
-// import Gallery from './Gallery'
-import Tabs from './Tabs'
+import AffordanceMode from './Affordance'
 
 export default {
   name: 'Controls',
   components: {
     Logo,
-    SearchPanel,
-    Tabs
+    AffordanceMode
   }
 }
 </script>
@@ -31,5 +21,8 @@ export default {
 <style scoped>
 #controls{
   padding-left: 10px;
+  position: absolute;
+  width: 0;
+  display: flex;
 }
 </style>

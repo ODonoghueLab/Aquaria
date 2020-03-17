@@ -105,8 +105,9 @@ function updatePDBPanel(PDBData, commonName, score) {
 		});	
 		
 		//update ABOUT PDB title
-		$(".md-tabs > div > button> span > div > div").eq(1).html("About " + "<a href='http://www.rcsb.org/pdb/explore.do?structureId="+ pdbid +"' title='Go to PDB'>PDB "+pdbid+"</a>")
 		// $("#description h3 span.explanation").html("<a href='http://www.rcsb.org/pdb/explore.do?structureId="+ pdbid +"' title='Go to PDB'>PDB "+pdbid+"</a>");
+		$("#gallery h3 span.explanation").html("<a href='http://www.rcsb.org/pdb/explore.do?structureId="+ pdbid +"' title='Go to PDB'>PDB "+pdbid+"</a>");
+
 
 		$("#aboutPDBHider").show();
 		AQUARIA.blankPanel("#aboutPDB", false);
@@ -287,7 +288,7 @@ function updateUniprotInfo(sequence) {
 
 	var hiddenPs = $("p.hidden").length;
 	if (hiddenPs > 0) {		
-		$("div#uniProtDesc").after('<p id="morelink"><a href="javascript:showAll();">more details ('+hiddenPs+')</a></p>');	
+		$("div#uniProtDesc").after('<p id="morelink" style="position: relative;padding-left: 10px;margin: 0;"><a href="javascript:showAll();">more details ('+hiddenPs+')</a></p>');	
 	}
 
 	AQUARIA.blankPanel("#uniProtDesc", false);
@@ -359,6 +360,7 @@ var displayProtSynonyms = function(data) {
 			}
 		}
 		
+
 		if (gns && gns.length) {
 			if (gns.length > 1) {
 				gnames = "<b>Genes:</b>&nbsp;";
@@ -399,9 +401,18 @@ var displayProtSynonyms = function(data) {
 			}
 		});	
 		
+		//NEBLINA's SCRIPT FOR AFFORDANCE VIEW
+		if (gns && gns.length) {
+			gene_name = gns[0];
+		}
+
+		$("#gene_name").show()
+					.empty()
+					.append(gene_name);
+
 		//update ABOUT title
-		$(".md-tabs > div > button> span > div > div").eq(0).html("About " + "<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>")
-		// $(".md-button-content").html("About " + "<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>");
+		// $(".md-tabs > div > button> span > div > div").eq(0).html("About " + "<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>")
+		$("#uniprot h3 span.explanation").html("<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>");
 	}
 
 	

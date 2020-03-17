@@ -6,11 +6,6 @@ import About from '../views/About.vue'
 Vue.use(VueRouter)
 
 const routes = [
-  // {
-  //   path: '/',
-  //   name: 'Home',
-  //   component: Home
-  // },
   {
     path: '/:id/:pdbid?/:chainid?',
     name: 'Wrapper',

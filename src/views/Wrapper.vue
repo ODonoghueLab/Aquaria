@@ -11,10 +11,10 @@
 import Content from '../components/Content'
 import Footer from '../components/Footer'
 import BadBrowser from '../components/BadBrowser'
-import io from 'socket.io-client'
-// import axios from 'axios'
+// import io from 'socket.io-client'
+import axios from 'axios'
 
-var socket = io.connect('http://localhost:8009')
+// var socket = io.connect('http://localhost:8009')
 
 export default {
   name: 'Wrapper',
@@ -25,35 +25,22 @@ export default {
   },
   data () {
     return {
-      data: null
+      primary_accession: null
     }
   },
-  created () {
-    this.getRealtimeData()
-  },
-  methods: {
-    fillData (fetchedData) {
-      this.data = fetchedData
-      console.log(this.data)
-    },
-    getRealtimeData () {
-      socket.on('newdata', fetchedData => {
-        this.fillData(fetchedData)
-      })
-    }
+  beforeMount () {
+    const url = 'http://localhost:8009' + window.location.pathname
+    axios({
+      method: 'get',
+      url: url
+    })
+      .then(function (response) {
+        if (response.data.initialParams) {
+          window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
+        }
+      }
+      )
   }
-  // beforeMount () {
-  //   const url = 'http://localhost:8009' + window.location.pathname
-  //   axios({
-  //     method: 'get',
-  //     url: url
-  //   })
-  //     .then(response => (this.data = response.data)
-  //     )
-  //   // if (typeof initialParams !== 'undefined') {
-  //   //   window.initialParams = JSON.parse(window.initialParams)
-  //   // }
-  // }
   // mounted () {
   //   const url = 'http://localhost:8009'
 
@@ -144,13 +131,14 @@ span.content p, p.expandable, p.hidden {
     font-weight: normal;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    padding: 2px 3px 2px 10px;
+    /* padding: 2px 3px 2px 10px; */
     margin: 0px;
+    padding: 7px 10px 4px 29px;
 }
 
 div.panel {
     background: #CCC;
-    border: 1px solid #999;
+    border: 1px solid rgba(153, 153, 153, 0);
     border-radius: 12px;
 }
 

@@ -358,17 +358,62 @@ var MAX_PROTEIN_HISTORY = 5;
 
         AQUARIA.short_molecule_name = short_name;
 
+        // if (accession && pdbId && score) {
+        //   $("#structureviewerexplanation").html("<a id='accession_link' href='https://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name +
+        //     "</a> sequence aligned onto <a href='/" + accession + "' title='View the structure for " + short_name + " in Aquaria'>" + short_name +
+        //     "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" + chainId + "</a> (" + score +
+        //     "% sequence identity)&nbsp;&nbsp;<a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a>");
+
+        //   var evalue = AQUARIA.currentMember.E_value; // e-value from pssh2
+        //   $("#help3D").show().parent().attr("onmouseenter", "AQUARIA.explainTitle('" + accession + "','" + AQUARIA.preferred_protein_name + "','" + short_name + "','" + pdbId + "','" + chainId +
+        //     "','" + score + "','" + evalue + "');");
+        // } else { // DNA or RNA (no accession)
+        //   $("#structureviewerexplanation").html(short_name + "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" +
+        //     chainId + "</a> (" + score + "% sequence identity)");
+        // }
+
+        //NEBLINA's Scripts
         if (accession && pdbId && score) {
-          $("#structureviewerexplanation").html("<a id='accession_link' href='https://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name +
+          $("#structureviewerexplanation").html("<a id='accession_link' title='About Uniprot ID'>" + AQUARIA.preferred_protein_name +
             "</a> sequence aligned onto <a href='/" + accession + "' title='View the structure for " + short_name + " in Aquaria'>" + short_name +
-            "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" + chainId + "</a> (" + score +
+            "</a> structure from <a id='pdb_link' title='About PDB ID'>PDB " + pdbId + "-" + chainId + "</a> (" + score +
             "% sequence identity)&nbsp;&nbsp;<a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a>");
 
           var evalue = AQUARIA.currentMember.E_value; // e-value from pssh2
           $("#help3D").show().parent().attr("onmouseenter", "AQUARIA.explainTitle('" + accession + "','" + AQUARIA.preferred_protein_name + "','" + short_name + "','" + pdbId + "','" + chainId +
             "','" + score + "','" + evalue + "');");
+
+            if ($('#title3D').is(':visible')) {
+              $('#accession_link').on('click', function () {
+                if ($('#gallery').is(':visible')) {
+                  $('#gallery').hide()
+                  $('#searchByName').hide()
+                  $('#uniprot').show()
+                } else if ($('#uniprot').is(':visible')) {
+                  $('#searchByName').show()
+                  $('#uniprot').hide()
+                } else {
+                  $('#uniprot').show()
+                  $('#searchByName').hide()
+                }
+              })
+              $('#about_pdb').on('click', function () {
+                if ($('#uniprot').is(':visible')) {
+                  $('#uniprot').hide()
+                  $('#searchByName').hide()
+                  $('#gallery').show()
+                } else if ($('#gallery').is(':visible')) {
+                  $('#searchByName').show()
+                  $('#gallery').hide()
+                } else {
+                  $('#gallery').show()
+                  $('#searchByName').hide()
+                }
+              })
+            }
+
         } else { // DNA or RNA (no accession)
-          $("#structureviewerexplanation").html(short_name + "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" +
+          $("#structureviewerexplanation").html(short_name + "</a> structure from <a title='About PDB ID'>PDB " + pdbId + "-" +
             chainId + "</a> (" + score + "% sequence identity)");
         }
 
@@ -1330,7 +1375,7 @@ var MAX_PROTEIN_HISTORY = 5;
   };
 
   var setupDNode = function() {
-    var stream = shoe('/dnode');
+    var stream = shoe('http://localhost:8009/dnode');
     try {
       var dnodeConnection = dnode();
       dnodeConnection.on('end', function(end) {
