@@ -4,7 +4,10 @@
 
 <script>
 export default {
-  name: 'FeatureList'
+  name: 'FeatureList',
+  methods () {
+
+  }
 }
 </script>
 

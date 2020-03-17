@@ -50,6 +50,7 @@ export default {
     position: absolute;
     left: 25vw;
     z-index: 33;
+    height: 0px;
 }
 #gene_name{
     font-size: 2vh;

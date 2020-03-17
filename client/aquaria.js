@@ -411,7 +411,7 @@ var MAX_PROTEIN_HISTORY = 5;
                 }
               })
             }
-            
+
         } else { // DNA or RNA (no accession)
           $("#structureviewerexplanation").html(short_name + "</a> structure from <a title='About PDB ID'>PDB " + pdbId + "-" +
             chainId + "</a> (" + score + "% sequence identity)");
@@ -1375,7 +1375,7 @@ var MAX_PROTEIN_HISTORY = 5;
   };
 
   var setupDNode = function() {
-    var stream = shoe('/dnode');
+    var stream = shoe('http://localhost:8009/dnode');
     try {
       var dnodeConnection = dnode();
       dnodeConnection.on('end', function(end) {
