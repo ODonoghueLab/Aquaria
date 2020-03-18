@@ -99,5 +99,4 @@ div.panel span.help {
 div.panel h4#reference_title {
     padding: 0 6px;
 }
-
 </style>

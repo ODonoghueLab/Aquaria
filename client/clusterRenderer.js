@@ -65,6 +65,7 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 		pad = -6;
 	}
 
+	//NEBLINA's SCRIPT
 	this.w = document.getElementById("structureviewer").offsetWidth
 				- AQUARIA.margin.right - AQUARIA.margin.left;
 
@@ -78,7 +79,7 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 
 	// draw outline of the whole chain
 	this.nusvg = outerdiv.append("div").attr("id", "c_" + id).attr("class",
-			"container").append("svg").attr("width", this.w + 20).attr("height",
+			"container").append("svg").attr("width", this.w - 30).attr("height",
 			this.height + 30)
 			.attr("viewBox", "0 0 " + (this.width + 200) + " " + (this.height + 30)).attr(
 					"preserveAspectRatio", "none");

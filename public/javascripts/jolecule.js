@@ -91702,6 +91702,7 @@ class ColorLegendWidget extends CanvasWidget {
 		$(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
 	}
 	
+	//TOGGLE COLOR LEGEND
 	var toggle_legend = new MutationObserver(function(){
 		$("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
 
@@ -91719,26 +91720,33 @@ class ColorLegendWidget extends CanvasWidget {
 	});
 
 	//THE COVERAGE MAP
-	$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
+	// $("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
 
-	var a = $("div.container.loaded").html()
-	var b = $('<div id="first_match">').append(a)
-	$("#threeDSpan-inner-sequence-widget-inner").append(b)
+	// var a = $("div.container.loaded").html()
+	// var b = $('<div id="first_match">').append(a)
+	// $("#threeDSpan-inner-sequence-widget-inner").append(b)
 
-	// $("#first_match").css({"overflow":"hidden"})
-	// $("#first_match>svg>g:first-child").attr("transform", "translate(1,10)")
-	// $("#first_match>svg>g").find('.thumbnail').html()
-	// $("#first_match g.cluster").find('line').remove()
-	// var c = $("#first_match>svg>g>g>rect").width() + parseInt($("#first_match>svg>g>rect").css('transform').split(', ')[4])
-	// document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + c + " 75");
+	// // $("#first_match").css({"overflow":"hidden"})
+	// $("#first_match>svg>g:first-child").attr("transform", "translate(1,0)")
+	// // $("#first_match>svg>g").find('.thumbnail').remove()
+	// // $("#first_match g.cluster").find('line').remove()
+	// // var c = $("#first_match>svg>g>g>rect").width() 
+	// // parseInt($("#first_match>svg>g>rect").css('transform').split(', ')[4])
+	// // document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + c + " 75");
+	// // document.querySelector("#first_match > svg").setAttribute("height","100%");
+	// // $("#first_match rect.cluster").css({"fill":"none","stroke":"none"})
 
 
-	// $("#threeDSpan-inner-sequence-widget-inner>canvas>.container.loaded").attr("c")
-	// $(".container.loaded").css({
-	// 	"top": "-12vh",
-	// 	"position": "relative",
-	// 	"z-index": "78996"
-	// })
+
+	// var windowWidth = window.innerWidth
+	// $("#first_match>svg>g").find('.thumbnail').remove()
+	// document.querySelector("#first_match>svg>g>g>line").setAttribute("x1",-windowWidth);
+	// document.querySelector("#first_match>svg>g>g>line").setAttribute("x2",windowWidth);
+
+
+	// //REMOVE FOOTER BORDER 
+
+	// $(".jolecule-embed-footer").css({"border-top":"none"})
 	  
     this.resize()
     this.update()
