@@ -10,10 +10,13 @@ export default {
 
 <style>
  #vis {
-    display: block;
     min-height: 200px;
     padding: 2px;
     position: relative;
+  }
+
+  .outer_container{
+    display: inline-flex;
   }
 
   div[data-id="structurematches"].chardinjs-helper-layer.chardinjs-top {

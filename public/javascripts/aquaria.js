@@ -2077,7 +2077,7 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 
 	// draw outline of the whole chain
 	this.nusvg = outerdiv.append("div").attr("id", "c_" + id).attr("class",
-			"container").append("svg").attr("width", this.w + 20).attr("height",
+			"container").append("svg").attr("width", this.w - 20).attr("height",
 			this.height + 30)
 			.attr("viewBox", "0 0 " + (this.width + 220) + " " + (this.height + 30)).attr(
 					"preserveAspectRatio", "none");
