@@ -144,6 +144,8 @@ div.panel {
 
 .ui-widget-content {
     background: #BBDDEE;
+    z-index: 222;
+    width: 100vh;
 }
 
 .ui-widget {
@@ -161,7 +163,6 @@ div.panel {
     padding: 2px 5px;
     cursor: default;
     display: block;
-    /* width: 100%; */
     font: menu;
     font-size: 12px;
     line-height: 16px;

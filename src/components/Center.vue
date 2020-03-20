@@ -38,7 +38,7 @@ export default {
   height: 93vh;
   z-index: 4;
   margin-left: 27px;
-  /* overflow-y: scroll; */
+  overflow-y: scroll;
   display: none;
 }
 #structureviewer{

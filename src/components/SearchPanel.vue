@@ -91,7 +91,7 @@ input[type=search].ui-autocomplete-loading {
   }
 
   input {
-    z-index: 9;
+    z-index: 40;
   }
 
   .ui-autocomplete ul {
