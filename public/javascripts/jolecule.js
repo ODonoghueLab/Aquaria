@@ -91669,85 +91669,131 @@ class ColorLegendWidget extends CanvasWidget {
       buttonDiv.append(colorDiv)
       buttonDiv.append(entry.label)
       this.buttonsDiv.append(buttonDiv)
-    }
-
-	//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
-	$("#export-button").removeAttr("style")
-	.attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
-	
-	$("#toggle-toolbar-button").removeAttr("style")
-	.attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
-
-	$("#toggle-toolbar-button2").click(function(){
-		$("#toggle-toolbar-button").removeAttr("style")
-		.attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
-	})
-
-	$(window).on('resize', function() {
-	$("#toggle-toolbar-button").removeAttr( 'style' )
-	.attr("style", "position: absolute; z-index: 2; top: 0px; right: 3px; margin: 5px; transform: rotate(180deg)")
-	});
-
-	$('.jolecule-embed-header').attr("style", "display: none; flex-flow: row-reverse;")
-
-	$(".jolecule-embed-view").removeAttr('style').css({
-	position: "",
-	"z-index": "1",
-	"padding": "4px 5px",
-	"display": "flex",
-	"top": "2px"
-	})
-
-	if((($("#threeDSpan-inner-clipping-plane").length > 0 ) && $("#export-button").length <=0)){
-		$(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
 	}
-	
-	//TOGGLE COLOR LEGEND
-	var toggle_legend = new MutationObserver(function(){
-		$("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
+	//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
+$("#export-button").removeAttr("style")
+.attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
 
-		$("#color-legend").click(function(){
-		$('[id^="color-legend-"]').toggle();
-		})
+$("#toggle-toolbar-button").removeAttr("style")
+.attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
 
-		$('[id^="color-legend-"]').hide()
-	});
+$("#toggle-toolbar-button2").click(function(){
+    $("#toggle-toolbar-button").removeAttr("style")
+    .attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
+})
 
-	toggle_legend.observe(document.getElementById("color-legend"),{ 
-	childlist: true,
-	attributes : true, 
-	attributeFilter : ['style'] 
-	});
+$(window).on('resize', function() {
+$("#toggle-toolbar-button").removeAttr( 'style' )
+.attr("style", "position: absolute; z-index: 2; top: 0px; right: 3px; margin: 5px; transform: rotate(180deg)")
+});
 
-	//THE COVERAGE MAP
-	// $("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
+$('.jolecule-embed-header').attr("style", "display: none; flex-flow: row-reverse;")
 
-	// var a = $("div.container.loaded").html()
-	// var b = $('<div id="first_match">').append(a)
-	// $("#threeDSpan-inner-sequence-widget-inner").append(b)
+$(".jolecule-embed-view").removeAttr('style').css({
+position: "",
+"z-index": "1",
+"padding": "4px 5px",
+"display": "flex",
+"top": "2px"
+})
 
-	// // $("#first_match").css({"overflow":"hidden"})
-	// $("#first_match>svg>g:first-child").attr("transform", "translate(1,0)")
-	// // $("#first_match>svg>g").find('.thumbnail').remove()
-	// // $("#first_match g.cluster").find('line').remove()
-	// // var c = $("#first_match>svg>g>g>rect").width() 
-	// // parseInt($("#first_match>svg>g>rect").css('transform').split(', ')[4])
-	// // document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + c + " 75");
-	// // document.querySelector("#first_match > svg").setAttribute("height","100%");
-	// // $("#first_match rect.cluster").css({"fill":"none","stroke":"none"})
+if((($("#threeDSpan-inner-clipping-plane").length > 0 ) && $("#export-button").length <=0)){
+    $(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
+}
 
+//TOGGLE COLOR LEGEND
+var toggle_legend = new MutationObserver(function(){
+    $("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
 
+    $("#color-legend").click(function(){
+    $('[id^="color-legend-"]').toggle();
+    })
 
-	// var windowWidth = window.innerWidth
-	// $("#first_match>svg>g").find('.thumbnail').remove()
-	// document.querySelector("#first_match>svg>g>g>line").setAttribute("x1",-windowWidth);
-	// document.querySelector("#first_match>svg>g>g>line").setAttribute("x2",windowWidth);
+    $('[id^="color-legend-"]').hide()
+});
 
+toggle_legend.observe(document.getElementById("color-legend"),{ 
+childlist: true,
+attributes : true, 
+attributeFilter : ['style'] 
+});
 
-	// //REMOVE FOOTER BORDER 
+var select_residue = new MutationObserver(function(){
+	$("#first_match").hide()
+	$("#threeDSpan-inner-sequence-widget-inner>canvas").show()
+  });
 
-	// $(".jolecule-embed-footer").css({"border-top":"none"})
-	  
+var on_load = new MutationObserver(function(m){
+	m.forEach(function(mutation){
+		if (mutation.attributeName !== 'style') return;
+		var currentValue = mutation.target.style.display;
+		if (currentValue == "none") {
+			if(document.getElementById("loading-message").innerHTML == "Preparing views..."){
+				$('#structurematches').hide()
+				$('div.dimmer').remove()
+				$('#gene_name').show()
+				$("#title3D").css("display","none")
+				$("#searchByName").css("display","none")
+
+				sessionStorage.setItem("link", $(location).attr('href'))
+					  
+				select_residue.observe(document.getElementById("threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection"),{ 
+				  childlist: true,
+				  attributes : true, 
+				  attributeFilter : ['style'] 
+				});
+				
+				if($("#first_match").length > 0){
+					$("#first_match").remove()
+				}
+				//THE COVERAGE MAP
+				$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
+					if($("#first_match").length < 1){
+					  var a = $("div.container.loaded").html()
+					  var b = $('<div id="first_match">').append(a)
+					  $("#threeDSpan-inner-sequence-widget-inner").append(b)
+				  }
+		  
+				  var windowWidth = window.innerWidth
+				  $("#first_match>svg>g").find('.thumbnail').remove()
+				  document.querySelector("#first_match>svg>g>g>line").setAttribute("x1",-windowWidth);
+				  document.querySelector("#first_match>svg>g>g>line").setAttribute("x2",windowWidth);
+				  $("#first_match>svg").css({"width": "100%"})
+				  var g_left =  parseInt($("#first_match>svg>g").css('transform').split(', ')[4])
+				  $("#first_match>svg>g").attr("transform", "translate(" + g_left + ",2)")
+				  var svg_width = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[2]
+				  var svg_height = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[3]
+				  document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + svg_width + " " + svg_height- 20 )
+		  
+				  //REMOVE FOOTER BORDER 
+		  
+				  $(".jolecule-embed-footer").css({"border-top":"none"})
+
+				  $('#first_match').on('click', function () {
+					if (document.getElementsByClassName('dimmer').length === 0) {
+					  $('body').append('<div class="dimmer"></div>')
+					  $('#gene_name').hide()
+					  $('div.dimmer').on('click', function () {
+						$('#structurematches').hide()
+						$('div.dimmer').remove()
+						$('#gene_name').show()
+					  })
+					} else {
+					  $('div.dimmer').remove()
+					}
+					$('#structurematches').slideToggle('slow')
+				  })
+		  
+			  }
+		}
+	})
+  });
+
+  on_load.observe(document.getElementById("waitingFrame"), {
+	attributes:    true,
+	attributeFilter: ["style"]
+  })
+
     this.resize()
     this.update()
   }
@@ -105166,6 +105212,9 @@ class SoupWidget extends __WEBPACK_IMPORTED_MODULE_8__webgl_widget__["a" /* Webg
         this.controller.selectAdditionalResidue(this.iResFirstPressed)
       }
     } else {
+	console.log("THIS IS CLICKED")
+	$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
+	$("#first_match").show()
       this.controller.clearSelectedResidues()
     }
 
@@ -105200,13 +105249,6 @@ class SoupWidget extends __WEBPACK_IMPORTED_MODULE_8__webgl_widget__["a" /* Webg
     if (!this.isClickInitiated) {
       this.iAtomPreClick = this.iAtomHover
 	  this.isClickInitiated = true
-	  console.log("THIS IS CLICKED")
-	//   if($('#threeDSpan-inner-sequence-widget-inner>canvas').is(':visible')){
-	// 	$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
-	//   }
-	//   else{
-	// $("#threeDSpan-inner-sequence-widget-inner>canvas").toggle()
-	// $(".container.loaded").show()
     } else if (elapsedTime < 600) {
       this.doubleclick(event)
 	  this.isClickInitiated = false

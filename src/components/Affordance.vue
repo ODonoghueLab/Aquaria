@@ -49,7 +49,6 @@ export default {
     width: 50vw;
     position: absolute;
     left: 25vw;
-    z-index: 33;
     height: 0px;
 }
 #gene_name{
@@ -61,6 +60,7 @@ export default {
     border-radius: 17px;
     width: fit-content;
     padding: 1vh;
+    z-index: 1;
 }
 
 #title3D{
@@ -84,6 +84,7 @@ export default {
     background-color: #d1d1d1;
     padding: 5px;
     border-radius: 10px;
+    z-index: 200;
 }
 #uniprot{
     display: none;
@@ -93,6 +94,7 @@ export default {
     width: 100%;
     height: fit-content;
     padding: 10px;
+    z-index: 20;
 }
 #gallery{
     display: none;
@@ -102,5 +104,6 @@ export default {
     width: 100%;
     height: fit-content;
     padding: 10px;
+    z-index: 20;
 }
 </style>

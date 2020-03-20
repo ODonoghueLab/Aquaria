@@ -20,6 +20,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "express-vue": "^5.15.0",
+    "http-server": "^0.12.1",
     "jquery": "^3.4.1",
     "method-override": "^3.0.0",
     "molecular-control-toolkit-js": "0.0.8",

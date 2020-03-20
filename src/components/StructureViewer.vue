@@ -68,7 +68,7 @@ export default {
 
 #waitingFrame {
     overflow: hidden;
-    position: absolute;
+    position: relative;
     z-index: 101;
     pointer-events: none;
     display: none;
@@ -76,6 +76,7 @@ export default {
     margin: 0px;
     width: 100%;
     height: 100%;
+    top: -100vh;
 }
 
 /* div.panel span#threeD {

@@ -46,7 +46,7 @@ export default {
 <style scoped>
 h3{
   position: absolute;
-  z-index: 2;
+  z-index: 10;
   top: 40px;
   font-size: 10px;
   margin: 4vh;
