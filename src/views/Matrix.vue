@@ -3,7 +3,8 @@
     <img src="../assets/img/icon-large.png" id="logo"/>
     <br/>
     <h3>{{structures[1].name}}</h3>
-    <p id="h4">574 matching structures</p>
+    <!-- <p id="h4">574 matching structures</p> -->
+    <p id="h4"></p>
     <div>
     <cdr-row cols="1 2@sm 3@md 4@lg" id="matrix">
       <cdr-col v-for="structure in structures" :key="structure.primary_accession" class="grid-example">
@@ -40,6 +41,11 @@ export default {
     }
   },
   updated () {
+    for (let index = 0; index < this.structures.length; index++) {
+      this.totalStructures = this.totalStructures + this.structures[index].count
+    }
+    $('#h4').html(this.totalStructures + ' matching structures')
+
     var captionPosition = $('.grid-example').width() / 2 - $('figcaption').width() / 2
     captionPosition = captionPosition + 'px'
     $('figcaption').css({
