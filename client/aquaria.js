@@ -549,7 +549,7 @@ var MAX_PROTEIN_HISTORY = 5;
       AQUARIA.blankPanel("#aboutPDB", true);
       //AQUARIA.blankPanel("#uniProtDesc", true);
       AQUARIA.remote.get_3D_alignment(member, sequence, function(newData) {
-        currentBiounit = 1;
+        currentBiounit = this.currentBiounit;
         console.log('AQUARIA.remote.get_3D_alignment', newData)
         AQUARIA.display_3D_structure(newData, member);
 

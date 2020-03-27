@@ -1,8 +1,8 @@
 <template>
     <div id="logo-intro">
     <div id="logo">
-        <img src="../assets/img/icon-large.png" alt="Aquaria Logo" v-if="$mq === 'laptop'">
-        <img src="../assets/img/icon-large.png" alt="Aquaria Logo" v-if="$mq === 'mobile' || $mq === 'tablet'" v-on:click="showAbout()">
+        <!-- <img src="../assets/img/icon-large.png" alt="Aquaria Logo" v-if="$mq === 'laptop'"> -->
+        <img src="../assets/img/icon-large.png" alt="Aquaria Logo" v-if="$mq === 'mobile' || $mq === 'tablet' || $mq === 'laptop'" v-on:click="showAbout()">
         <div id="wait">
             <img id="gif" src="../assets/img/aquaria-spin.gif" alt="Loading" title="Loading data...">
         </div>

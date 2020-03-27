@@ -89600,50 +89600,49 @@ class EmbedJolecule {
  */
 function serialize(protein, format, binary) {
 
-  // if (format === 'gltf') {
-  //     return new Promise((resolve, reject) => {
-  //         const exporter = new GLTFExporter();
-  //         exporter.parse(protein, gltf => {
-  //             const output = binary ? gltf : JSON.stringify(gltf);
-  //             resolve(output);
-  //         }, { binary });
-  //     });
-  // }
+  if (format === 'gltf') {
+      return new Promise((resolve, reject) => {
+          const exporter = new __WEBPACK_IMPORTED_MODULE_9_three_examples_jsm_exporters_GLTFExporter__["a" /* GLTFExporter */]();
+          exporter.parse(protein, gltf => {
+              const output = binary ? gltf : JSON.stringify(gltf);
+              resolve(output);
+          }, { binary });
+      });
+  }
 
-  //else if (format === 'usdz') {
+  else if (format === 'usdz') {
       return Object(__WEBPACK_IMPORTED_MODULE_11__usdz_exporter__["exportUsdz"])(protein);
-  //}
+  }
 
-  //else throw new Error(`Unknown format ${format}`);
+  else throw new Error(`Unknown format ${format}`);
 }
-
-    document.getElementById('export-button').addEventListener('click', () => exportAndDownload(form.color.value === 'material', 'usdz', 'false', this));
-    const formContainer = document.getElementById('export-panel');
+	const formContainer = document.getElementById('export-panel');
+    document.getElementById('export-button').addEventListener('click', document.getElementById('export-button').addEventListener('click', function(){
+		formContainer.classList.remove('hidden')
+		if (document.getElementsByClassName('dimmer').length === 0) {
+			$('body').append('<div class="dimmer"></div>')
+			$('#gene_name').hide()
+			$('div.dimmer').on('click', function () {
+			  $('#export-panel').hide()
+			  $('div.dimmer').remove()
+			  $('#gene_name').show()
+			})
+		  } else {
+			$('div.dimmer').remove()
+		  }
+		  $('#export-panel').slideToggle('slow')
+	}));
     const form = document.getElementById('export-form');
     form.addEventListener('submit',  (e)  => {
         e.preventDefault();
         e.returnValue = false;
-        formContainer.classList.add('hidden');
+		formContainer.classList.add('hidden');
+		$('div.dimmer').hide()
         // this.structure_present = await document.getElementById('jolecule-view-jolecule-soup-display-canvas-wrapper-selection')
         // if(this.structure_present){
-        exportAndDownload(form.color.value === 'vertex', 'usdz', 'false', this);
+        exportAndDownload(form.color.value === 'vertex', form.format.value, form.binary.checked, this);
         // }
-	});
-
-	//STUART'S VERSION
-	// document.getElementById('export-button').addEventListener('click', () => formContainer.classList.remove('hidden'));
-    // const formContainer = document.getElementById('export-panel');
-    // const form = document.getElementById('export-form');
-    // form.addEventListener('submit',  (e)  => {
-    //     e.preventDefault();
-    //     e.returnValue = false;
-    //     formContainer.classList.add('hidden');
-    //     // this.structure_present = await document.getElementById('jolecule-view-jolecule-soup-display-canvas-wrapper-selection')
-    //     // if(this.structure_present){
-    //     exportAndDownload(form.color.value === 'vertex', form.format.value, form.binary.checked, this);
-    //     // }
-	// });
-
+    });
   }
 
   clear () {
@@ -89667,15 +89666,17 @@ function serialize(protein, format, binary) {
         'flex-direction': 'row'
       })
     this.div.append(this.headerDiv)
+	
+	//NEBLINA's Script
 
-    this.hiddendiv = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('<div>')
+	this.hiddendiv = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('<div>')
     .attr("id", "export-panel")
     .addClass("hidden")
     .css({
       position: "absolute",
-      top: "0",
+      top: "25%",
       bottom: "0",
-      left: "74%",
+      left: "40%",
       right: "0",
       "text-align": "center",
       display: "none",
@@ -89697,7 +89698,7 @@ function serialize(protein, format, binary) {
       "height":"100%",
       "margin":"0",
       "padding":"0",
-      "background-color":"rgba(0, 0, 0)",
+      "background-color":"rgb(193, 193, 193)",
       "border":"solid 2px white",
       "opacity":"1",
       "display":"flex",
@@ -91186,7 +91187,7 @@ class SequenceWidget extends CanvasWidget {
     event.preventDefault()
 
     this.getPointer(event)
-    this.saveMouse()
+	this.saveMouse()
 
     if (this.pointerY < this.yTopSequence) {
       this.mousePressed = 'top'
@@ -91671,6 +91672,16 @@ class ColorLegendWidget extends CanvasWidget {
       this.buttonsDiv.append(buttonDiv)
 	}
 	//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
+
+	if($(location).attr('href')== "http://odonoghuelab.org:8009/"){
+        if(sessionStorage.getItem("link") == null ){
+          $(location).attr('href', 'http://odonoghuelab.org:8009/O15350/2xwc/A')
+        }
+        else{
+          $(location).attr('href', sessionStorage.getItem("link"))
+        }
+      }
+	  
 $("#export-button").removeAttr("style")
 .attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
 
@@ -91701,8 +91712,9 @@ if((($("#threeDSpan-inner-clipping-plane").length > 0 ) && $("#export-button").l
     $(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
 }
 
-//TOGGLE COLOR LEGEND
+// TOGGLE COLOR LEGEND
 var toggle_legend = new MutationObserver(function(){
+	console.log("THIS IS COLOR LEGEND")
     $("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
 
     $("#color-legend").click(function(){
@@ -91729,6 +91741,10 @@ var on_load = new MutationObserver(function(m){
 		var currentValue = mutation.target.style.display;
 		if (currentValue == "none") {
 			if(document.getElementById("loading-message").innerHTML == "Preparing views..."){
+				$(".jolecule-button").hide()
+				// $("#toggle-toolbar-button").hide()
+				$("#export-button").hide()
+				$("#intro").hide()
 				$('#structurematches').hide()
 				$('div.dimmer').remove()
 				$('#gene_name').show()
@@ -91757,13 +91773,13 @@ var on_load = new MutationObserver(function(m){
 				  var windowWidth = window.innerWidth
 				  $("#first_match>svg>g").find('.thumbnail').remove()
 				  document.querySelector("#first_match>svg>g>g>line").setAttribute("x1",-windowWidth);
-				  document.querySelector("#first_match>svg>g>g>line").setAttribute("x2",windowWidth);
+				  document.querySelector("#first_match>svg>g>g>line").setAttribute("x2",windowWidth+100);
 				  $("#first_match>svg").css({"width": "100%"})
 				  var g_left =  parseInt($("#first_match>svg>g").css('transform').split(', ')[4])
 				  $("#first_match>svg>g").attr("transform", "translate(" + g_left + ",2)")
-				  var svg_width = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[2]
-				  var svg_height = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[3]
-				  document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + svg_width + " " + svg_height- 20 )
+				//   var svg_width = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[2]
+				//   var svg_height = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[3]
+				//   document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + svg_width + " " + svg_height- 20 )
 		  
 				  //REMOVE FOOTER BORDER 
 		  
@@ -92273,6 +92289,7 @@ class ToggleToolbarWidget {
 
 	this.toolbarDiv = __WEBPACK_IMPORTED_MODULE_0_jquery___default()(toolbarSelector)
 	
+	//NEBLINA's SCRIPT
 	this.usdz = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('<img id="export-button" src="/images/ar-button.png">')
 	  .css({ margin: '5px', position: 'relative' })
 	  
@@ -92281,7 +92298,7 @@ class ToggleToolbarWidget {
     this.buttonInDisplayDiv = __WEBPACK_IMPORTED_MODULE_0_jquery___default()('<div id="toggle-toolbar-button">')
       .html('&#9776;')
       .addClass('jolecule-button')
-      .css({ margin: '5px', position: 'relative' })
+      .css({ margin: '5px', position: 'absolute' })
       .on('click touch', e => {
         this.isChange = true
         this.update()
@@ -92298,8 +92315,7 @@ class ToggleToolbarWidget {
         this.update()
         e.preventDefault()
       })
-	this.toolbarDiv.append(this.buttonInToolbarDiv)
-
+    this.toolbarDiv.append(this.buttonInToolbarDiv)
 
     this.soupWidget.addObserver(this)
     this.resize()
@@ -105205,17 +105221,30 @@ class SoupWidget extends __WEBPACK_IMPORTED_MODULE_8__webgl_widget__["a" /* Webg
       if (!event.metaKey && !event.shiftKey) {
         let res = this.soup.getResidueProxy(iResPressed)
         let val = !res.selected
-        this.controller.selectResidue(iResPressed, val)
+		this.controller.selectResidue(iResPressed, val)
+		$("#threeDSpan-inner-sequence-widget-inner>canvas").show()
       } else if (event.shiftKey) {
-        this.controller.selectAdditionalRangeToResidue(this.iResFirstPressed)
+		this.controller.selectAdditionalRangeToResidue(this.iResFirstPressed)
+		$("#threeDSpan-inner-sequence-widget-inner>canvas").show()
       } else {
-        this.controller.selectAdditionalResidue(this.iResFirstPressed)
+		this.controller.selectAdditionalResidue(this.iResFirstPressed)
+		$("#threeDSpan-inner-sequence-widget-inner>canvas").show()
       }
     } else {
-	console.log("THIS IS CLICKED")
-	$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
-	$("#first_match").show()
-      this.controller.clearSelectedResidues()
+	  this.controller.clearSelectedResidues()
+	  $(".jolecule-button").show()
+	  $("#export-button").show()
+
+	  setTimeout(function(){ 
+		  $(".jolecule-button").hide()
+		  $("#export-button").hide()
+		  // $("#first_match").show()
+	  }, 10000);
+	  
+	setTimeout(function(){ 
+		$("#first_match").show()
+		$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
+	}, 500);
     }
 
     this.iAtomFirstPressed = null
@@ -105230,7 +105259,10 @@ class SoupWidget extends __WEBPACK_IMPORTED_MODULE_8__webgl_widget__["a" /* Webg
 
     if (this.isGesture) {
       return
-    }
+	}
+	
+	console.log("THIS IS CLICKED")
+		
 
     event.preventDefault()
 
@@ -105241,18 +105273,18 @@ class SoupWidget extends __WEBPACK_IMPORTED_MODULE_8__webgl_widget__["a" /* Webg
 
     if (this.iAtomFirstPressed === this.soupView.getICenteredAtom()) {
       this.isDraggingCentralAtom = this.iAtomFirstPressed !== null
-    }
-
+	}
+	
     let now = new Date().getTime()
-    let elapsedTime = this.timePressed ? now - this.timePressed : 0
+	let elapsedTime = this.timePressed ? now - this.timePressed : 0
 
     if (!this.isClickInitiated) {
       this.iAtomPreClick = this.iAtomHover
 	  this.isClickInitiated = true
     } else if (elapsedTime < 600) {
       this.doubleclick(event)
-	  this.isClickInitiated = false
-	}
+      this.isClickInitiated = false
+    }
 
     this.getPointer(event)
     this.savePointer()
@@ -113502,7 +113534,7 @@ var VRButton = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export GLTFExporter */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return GLTFExporter; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__build_three_module_js__ = __webpack_require__(12);
 /**
  * @author fernandojsg / http://fernandojsg.com
