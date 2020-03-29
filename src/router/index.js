@@ -21,7 +21,7 @@ const routes = [
     component: Matrix
   },
   {
-    path: '/:id/:pdbid?/:chainid?',
+    path: '/:id?/:pdbid?/:chainid?',
     name: 'Wrapper',
     component: Wrapper
   }

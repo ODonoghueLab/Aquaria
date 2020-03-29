@@ -854,7 +854,7 @@ var MAX_PROTEIN_HISTORY = 5;
 
         AQUARIA.short_molecule_name = short_name;
 
-        if (accession && pdbId && score) {
+        if (accession && pdbId && score) { 
           $("#structureviewerexplanation").html("<a id='accession_link' title='About Uniprot ID'>" + AQUARIA.preferred_protein_name +
             "</a> sequence aligned onto <a href='/" + accession + "' title='View the structure for " + short_name + " in Aquaria'>" + short_name +
             "</a> structure from <a id='about_pdb' title='About PDB ID'>PDB " + pdbId + "-" + chainId + "</a> (" + score +
@@ -863,8 +863,21 @@ var MAX_PROTEIN_HISTORY = 5;
           var evalue = AQUARIA.currentMember.E_value; // e-value from pssh2
           $("#help3D").show().parent().attr("onmouseenter", "AQUARIA.explainTitle('" + accession + "','" + AQUARIA.preferred_protein_name + "','" + short_name + "','" + pdbId + "','" + chainId +
             "','" + score + "','" + evalue + "');");
+          
+          $("a").css({
+            color: 'rgb(104, 199, 247)'
+          }).on("mouseenter", function () {
+            $(this).css({
+              'text-decoration': 'underline'
+            })
+            }).on("mouseleave", function () {
+              $(this).css({
+                'text-decoration': 'none'
+              })
+              })
 
             if ($('#title3D').is(':visible')) {
+              console.log("TITLE 3D Visible")
               $('#accession_link').on('click', function () {
                 if ($('#gallery').is(':visible')) {
                   $('#gallery').hide()
@@ -899,7 +912,6 @@ var MAX_PROTEIN_HISTORY = 5;
         }
 
       } else {
-
         $("#accession_link").text(AQUARIA.preferred_protein_name);
         //$("#help3D").hide();
 

@@ -410,6 +410,12 @@ var displayProtSynonyms = function(data) {
 					.empty()
 					.append(gene_name);
 
+		var geneLeft = $('#affordance_mode').width() / 2 - $('#gene_name').width() / 2
+		geneLeft = geneLeft + 'px'
+		$('#gene_name').css({
+			'margin-left': geneLeft
+		})
+
 		//update ABOUT title
 		// $(".md-tabs > div > button> span > div > div").eq(0).html("About " + "<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>")
 		$("#uniprot h3 span.explanation").html("<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>");

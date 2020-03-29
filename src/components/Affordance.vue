@@ -29,12 +29,6 @@ export default {
     $('#searchByName').css({
       'margin-left': searchLeft
     })
-
-    var geneLeft = $('#affordance_mode').width() / 4 - $('#gene_name').width() / 3
-    geneLeft = geneLeft + 'px'
-    $('#gene_name').css({
-      'margin-left': geneLeft
-    })
   },
   methods: {
     showPanels: function () {
@@ -74,6 +68,12 @@ export default {
     width: fit-content;
     padding: 1vh;
     z-index: 1;
+    text-transform: none;
+}
+
+#gene_name:hover {
+  transform: scale(1.1);
+  border-color: black;
 }
 
 #title3D{

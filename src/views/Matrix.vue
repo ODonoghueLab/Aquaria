@@ -2,17 +2,14 @@
   <div id="Matrix">
     <img src="../assets/img/icon-large.png" id="logo"/>
     <br/>
-    <h3>{{structures[1].name}}</h3>
-    <!-- <p id="h4">574 matching structures</p> -->
+    <h3></h3>
     <p id="h4"></p>
     <div>
     <cdr-row cols="1 2@sm 3@md 4@lg" id="matrix">
       <cdr-col v-for="structure in structures" :key="structure.primary_accession" class="grid-example">
       <img v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="addCard(structure.primary_accession)"/>
-      <figcaption>{{structure.synonym}}</figcaption>
+      <figcaption id="caption">{{structure.synonym}}</figcaption>
       <p id="numStructures" :style="[structure.count == 0 ? {'color': 'red'} : {'color': '#5a5a5a'}]">{{structure.count}} matching structures</p>
-      <!-- {{structure.primary_accession}} -->
-      <!-- <MatrixView id="structure" v-bind:primary_accession="structure.primary_accession"/> -->
       </cdr-col>
     </cdr-row>
     </div>
@@ -45,7 +42,7 @@ export default {
       this.totalStructures = this.totalStructures + this.structures[index].count
     }
     $('#h4').html(this.totalStructures + ' matching structures')
-
+    $('h3').html(this.structures[1].name)
     var captionPosition = $('.grid-example').width() / 2 - $('figcaption').width() / 2
     captionPosition = captionPosition + 'px'
     $('figcaption').css({
@@ -65,14 +62,14 @@ export default {
     })
   },
   beforeMount () {
-    console.log('MATRIX', window.location.pathname.split('/')[1])
-    // const url = 'http://localhost:8009/' + window.location.pathname.split('/')[2]
-    const url = 'http://localhost:8009/' + window.localStorage.getItem('OrgID')
+    const url = 'http://odonoghuelab.org:8009/' + window.location.pathname.split('/')[2]
     axios({
       method: 'get',
       url: url
     })
       .then(response => (this.structures = JSON.parse(response.data.primary_accessions)))
+
+    // window.location.pathname = '/' + this.structures[1].name
   },
   methods: {
     addCard: function (primaryAccession) {
@@ -134,6 +131,14 @@ export default {
   height: 20vh;
 }
 
+.grid-example:hover #caption{
+  transform: scale(1.2);
+}
+
+.grid-example:hover #numStructures{
+  transform: scale(1.5);
+}
+
 div.grid-example.col_1\.0\.4{
   padding: 0px;
 }
@@ -155,12 +160,12 @@ h3{
     bottom: 19vh;
     position: static;
     font-size: 54px;
-    background-color: #777676;
+    background-color: #77777780;
     width: fit-content;
     padding: 10px;
     border-radius: 13px;
     /* left: 38%; */
-    opacity: 61%;
+    /* opacity: 61%; */
     color: white;
 }
 
@@ -177,12 +182,12 @@ h3{
 figcaption{
     position: absolute;
     font-size: 23px;
-    background-color: #5a5959;
+    background-color: #5a595954;
     width: fit-content;
     top: 8px;
     padding: 10px;
     border-radius: 7px;
-    opacity: 44%;
+    /* opacity: 44%; */
     color: white;
     margin-top: 3px;
     max-width: 74%;

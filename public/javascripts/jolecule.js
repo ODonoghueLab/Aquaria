@@ -91768,15 +91768,28 @@ var on_load = new MutationObserver(function(m){
 					  var a = $("div.container.loaded").html()
 					  var b = $('<div id="first_match">').append(a)
 					  $("#threeDSpan-inner-sequence-widget-inner").append(b)
-				  }
+				}
 		  
-				  var windowWidth = window.innerWidth
-				  $("#first_match>svg>g").find('.thumbnail').remove()
-				  document.querySelector("#first_match>svg>g>g>line").setAttribute("x1",-windowWidth);
-				  document.querySelector("#first_match>svg>g>g>line").setAttribute("x2",windowWidth+100);
-				  $("#first_match>svg").css({"width": "100%"})
-				  var g_left =  parseInt($("#first_match>svg>g").css('transform').split(', ')[4])
-				  $("#first_match>svg>g").attr("transform", "translate(" + g_left + ",2)")
+				var windowWidth = window.innerWidth
+				$("#first_match>svg>g").find('.thumbnail').remove()
+				document.querySelector("#first_match>svg>g>g>line").setAttribute("x1",-windowWidth);
+				document.querySelector("#first_match>svg>g>g>line").setAttribute("x2",windowWidth+100);
+				$("#first_match>svg").css({"width": "100%"})
+				var g_left =  parseInt($("#first_match>svg>g").css('transform').split(', ')[4])
+				$("#first_match>svg>g").attr("transform", "translate(" + g_left + ",2)")
+				$("#first_match").css({
+					
+				})
+				$("#first_match").on("mouseenter", function () {
+				$("#first_match").css({
+					transform: "scale(1.04)"
+				})
+				});
+				$("#first_match").on("mouseleave", function () {
+					$("#first_match").css({
+						transform: "scale(1)"
+					})
+					});
 				//   var svg_width = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[2]
 				//   var svg_height = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[3]
 				//   document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + svg_width + " " + svg_height- 20 )
@@ -105239,7 +105252,7 @@ class SoupWidget extends __WEBPACK_IMPORTED_MODULE_8__webgl_widget__["a" /* Webg
 		  $(".jolecule-button").hide()
 		  $("#export-button").hide()
 		  // $("#first_match").show()
-	  }, 10000);
+	  }, 5000);
 	  
 	setTimeout(function(){ 
 		$("#first_match").show()

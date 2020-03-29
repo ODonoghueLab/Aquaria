@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 import Center from './Center'
 
 export default {
@@ -13,15 +13,6 @@ export default {
   props: ['primary_accession'],
   components: {
     Center
-  },
-  beforeMount () {
-    const url = 'http://localhost:8009/' + window.location.pathname.split('/')[2]
-    // const url = 'http://localhost:8009/2kby'
-    axios({
-      method: 'get',
-      url: url,
-      headers: { 'Cache-Control': 'no-cache' }
-    }).then(response => (this.structures = JSON.parse(response.data.primary_accessions)))
   }
 }
 </script>
