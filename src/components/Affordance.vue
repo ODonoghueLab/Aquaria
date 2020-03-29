@@ -23,6 +23,13 @@ export default {
     Gallery,
     Title3D
   },
+  mounted () {
+    var searchLeft = $('#affordance_mode').width() / 2 - $('#searchByName').width() / 2
+    searchLeft = searchLeft + 'px'
+    $('#searchByName').css({
+      'margin-left': searchLeft
+    })
+  },
   methods: {
     showPanels: function () {
     // dim background
@@ -48,7 +55,7 @@ export default {
 #affordance_mode{
     width: 50vw;
     position: absolute;
-    left: 25vw;
+    margin-left: 25vw;
     height: 0px;
 }
 #gene_name{
@@ -61,6 +68,12 @@ export default {
     width: fit-content;
     padding: 1vh;
     z-index: 1;
+    text-transform: none;
+}
+
+#gene_name:hover {
+  transform: scale(1.1);
+  border-color: black;
 }
 
 #title3D{

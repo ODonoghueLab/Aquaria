@@ -1,6 +1,6 @@
 <template>
     <div id="about_overlay">
-            <h3>About Aquaria <span class='x'>&nbsp;</span></h3>
+            <h3>About Aquaria <span class='x' v-on:click="hideAbout()">&nbsp;</span></h3>
             <p id="starter"><img src="../../public/images/logo-large.png"
                    width="605"
                    height="167"
@@ -32,12 +32,21 @@
 
 <script>
 import store from '@/store/index'
+import $ from 'jquery'
 
 export default {
   name: 'AboutAquaria',
   computed: {
     data () {
       return store.state.message
+    }
+  },
+  methods: {
+    hideAbout: function () {
+    // dim background
+      $('div#about_overlay, div#help_overlay').hide()
+      $('div.dimmer').remove()
+      $('div#about_overlay').hide()
     }
   }
 }

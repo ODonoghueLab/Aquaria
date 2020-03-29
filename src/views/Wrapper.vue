@@ -11,10 +11,6 @@
 import Content from '../components/Content'
 import Footer from '../components/Footer'
 import BadBrowser from '../components/BadBrowser'
-// import io from 'socket.io-client'
-import axios from 'axios'
-
-// var socket = io.connect('http://localhost:8009')
 
 export default {
   name: 'Wrapper',
@@ -22,27 +18,29 @@ export default {
     Content,
     BadBrowser,
     Footer
-  },
-  data () {
-    return {
-      primary_accession: null
-    }
-  },
-  beforeMount () {
-    const url = 'http://localhost:8009' + window.location.pathname
-    axios({
-      method: 'get',
-      url: url
-    })
-      .then(function (response) {
-        if (response.data.initialParams) {
-          window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
-        }
-      }
-      )
   }
+  // data () {
+  //   return {
+  //     primary_accession: null
+  //   }
+  // },
+  // beforeMount () {
+  //   axios({
+  //     method: 'get',
+  //     url: url
+  //   })
+  //     .then(function (response) {
+  //       // if (response.data.initialParams) {
+  //       //   window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
+  //       // }
+  //       if (response.data.primary_accessions) {
+  //         window.location.pathname = '/orgID/' + response.data.OrganismID
+  //       }
+  //     }
+  //     )
+  // }
   // mounted () {
-  //   const url = 'http://localhost:8009'
+  //
 
   //   axios({
   //     method: 'get',
@@ -107,10 +105,10 @@ a, p#psyns a, p#osyns a, .simulatelink {
     text-decoration: none;
 }
 
-span>a{
+/* span>a{
   color: rgb(104, 199, 247);
   text-decoration: none;
-}
+} */
 
 span.content p, p.expandable, p.hidden {
     color: #666;
