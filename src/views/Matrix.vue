@@ -62,7 +62,9 @@ export default {
     })
   },
   beforeMount () {
-    const url = 'http://odonoghuelab.org:8009/' + window.location.pathname.split('/')[2]
+    // const url = 'http://odonoghuelab.org:8009/' + window.location.pathname.split('/')[2]
+       const url = 'http://localhost:8009/' + window.location.pathname.split('/')[2]
+
     axios({
       method: 'get',
       url: url

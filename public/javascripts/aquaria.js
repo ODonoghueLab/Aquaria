@@ -1868,7 +1868,8 @@ var MAX_PROTEIN_HISTORY = 5;
   };
 
   var setupDNode = function() {
-    var stream = shoe('http://odonoghuelab.org:8009/dnode');
+    // var stream = shoe('http://odonoghuelab.org:8009/dnode');
+    var stream = shoe('http://localhost:8009/dnode');
     try {
       var dnodeConnection = dnode();
       dnodeConnection.on('end', function(end) {
@@ -3998,11 +3999,12 @@ var processNextServer = function(primary_accession,
 
 		console.log("fetch_features.processNextServer isFetchingFromServer =", isFetchingFromServer);
 		if (isFetchingFromServer == "External Features (JSON)"){
-			// check URL for json url
+      // check URL for json url
+      console.log("THIS IS SERVER", servers[currentServer])
 			checkURLForFeatures(primary_accession, servers[currentServer], featureCallback);
 
 		} else if (isFetchingFromServer == "Uniprot"){
-			console.log("fetch_features.processNextServer process " + isFetchingFromServer);
+      console.log("fetch_features.processNextServer process " + isFetchingFromServer);
 			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
 		}
 	}
@@ -4154,16 +4156,22 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 fetch_uniprot = function(primary_accession, server, featureCallback) {
 
 	console.log("fetch_features.fetch_uniprot fetching features from uniprot...");
-	url = "https://www.uniprot.org/uniprot/" + primary_accession + ".xml";
+  url = "https://www.uniprot.org/uniprot/" + primary_accession + ".xml";
 	$.ajax({url : url, 
-			type: "GET",
-			dataType: "xml",
+      type: "GET",
+      dataType: "xml",
+      error: function() {
+        data = AQUARIA.remote.get_features(window.location.pathname.split('/')[1], function(orgNames) {
+          // console.log("features.displayOrgSynonyms: " + orgNames[0].Features)
+          parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, JSON.parse(orgNames[0].Features))
+        })
+      },
 			success: function(xml) {
-				data = parseUniprot(xml);
+        data = parseUniprot(xml);
+        console.log("THIS IS RESPONSE2", data)
 				parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data)
 			}
 	});
-	
 };
 
 module.exports = fetch_annotations;

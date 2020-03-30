@@ -601,7 +601,6 @@ function createCORSRequest(method, url) {
  * https://docs.google.com/document/d/1wFJjdyl1OASnsBNkUzUx4ME8YhVybhIWCTr3Z1fBEWQ/pub
  */
 function parseUniprot(xml) {
-	
 	var data = {};
 	$(xml).find("feature").each(function() {
 		var type = capitaliseFirstLetter($(this).attr("type"));

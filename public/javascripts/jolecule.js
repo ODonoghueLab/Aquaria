@@ -91673,9 +91673,18 @@ class ColorLegendWidget extends CanvasWidget {
 	}
 	//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
 
-	if($(location).attr('href')== "http://odonoghuelab.org:8009/"){
+	// if($(location).attr('href')== "http://odonoghuelab.org:8009/"){
+    //     if(sessionStorage.getItem("link") == null ){
+    //       $(location).attr('href', 'http://odonoghuelab.org:8009/O15350/2xwc/A')
+    //     }
+    //     else{
+    //       $(location).attr('href', sessionStorage.getItem("link"))
+    //     }
+    //   }
+
+	if($(location).attr('href')== "http://localhost:8009/"){
         if(sessionStorage.getItem("link") == null ){
-          $(location).attr('href', 'http://odonoghuelab.org:8009/O15350/2xwc/A')
+          $(location).attr('href', 'http://localhost:8009/O15350/2xwc/A')
         }
         else{
           $(location).attr('href', sessionStorage.getItem("link"))

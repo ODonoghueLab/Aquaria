@@ -18,7 +18,8 @@ export default {
   },
   beforeMount () {
     if (window.location.pathname.split('/')[1] !== 'OrgID') {
-      const url = 'http://odonoghuelab.org:8009' + window.location.pathname
+      const url = 'http://localhost.org:8009' + window.location.pathname
+      //      const url = 'http://localhost:8009' + window.location.pathname
       axios({
         method: 'get',
         url: url
