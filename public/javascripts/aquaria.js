@@ -1869,8 +1869,8 @@ var MAX_PROTEIN_HISTORY = 5;
   };
 
   var setupDNode = function() {
-    // var stream = shoe('http://odonoghuelab.org:8009/dnode');
-    var stream = shoe('http://localhost:8010/dnode');
+    var stream = shoe('http://odonoghuelab.org:8010/dnode');
+    // var stream = shoe('http://localhost:8010/dnode');
     try {
       var dnodeConnection = dnode();
       dnodeConnection.on('end', function(end) {

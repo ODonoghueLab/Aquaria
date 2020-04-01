@@ -64,11 +64,11 @@ export default {
   beforeMount () {
     var url = ''
     if (window.location.pathname.split('/')[1] === 'SARS-CoV-2' || window.location.pathname.split('/')[1] === 'covid19') {
-      url = 'http://localhost:8010/2697049'
-      // url = 'http://odonoghuelab.org:8009/2697049'
+      // url = 'http://localhost:8010/2697049'
+      url = 'http://odonoghuelab.org:8010/2697049'
     } else {
-      url = 'http://localhost:8010/' + window.location.pathname.split('/')[2]
-      // url = 'http://odonoghuelab.org:8009/' + window.location.pathname.split('/')[2]
+      // url = 'http://localhost:8010/' + window.location.pathname.split('/')[2]
+      url = 'http://odonoghuelab.org:8010/' + window.location.pathname.split('/')[2]
     }
 
     axios({
@@ -94,7 +94,10 @@ export default {
       $('#centerView').attr('v-bind:primary_accession', primaryAccession)
       this.clicked = true
       //      window.location.pathname = window.location.pathname + '/' + primaryAccession
-      window.location.href = 'http://localhost:8009/' + primaryAccession
+
+      // THIS GOES BACK TO AQUARIA.WS
+      // window.location.href = 'http://localhost:8009/' + primaryAccession
+      window.location.href = 'http://odonoghuelab.org:8009/' + primaryAccession
     }
   },
   computed () {

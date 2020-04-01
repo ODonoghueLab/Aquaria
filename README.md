@@ -18,7 +18,7 @@ Before running on production mode edit the 'app.js' file to use dist folder inst
 npm run build
 node app.js
 ```
-Load page on localhost:8009
+Load page on localhost:8010
 
 ----------
 ### Lints and fixes files
