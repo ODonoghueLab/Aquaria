@@ -1214,6 +1214,7 @@ var MAX_PROTEIN_HISTORY = 5;
 
       cache_matching_structures(primary_accession, function(primary_accession) {
         AQUARIA.remote.get_matching_structures(loadRequest, sequenceCallback, clusterCallback, function(err, loadRequest, Selected_PDB, finalClusters, cachedHit, version_string) {
+          console.log("THIS IS CLUSTERS", finalClusters)
           if (loadRequest.primary_accession === AQUARIA.structures2match.initialLoadRequest.primary_accession) {
             //					  AQUARIA.updateIssueEnvironment();
 
@@ -1868,7 +1869,8 @@ var MAX_PROTEIN_HISTORY = 5;
   };
 
   var setupDNode = function() {
-    var stream = shoe('http://odonoghuelab.org:8009/dnode');
+    var stream = shoe('http://odonoghuelab.org:8010/dnode');
+    // var stream = shoe('http://localhost:8010/dnode');
     try {
       var dnodeConnection = dnode();
       dnodeConnection.on('end', function(end) {
@@ -2318,7 +2320,6 @@ function createFeatureUI() {
 	height = 40 - AQUARIA.margin.top - AQUARIA.margin.bottom + 35; // height
 	// for one
 	// structure
-
 };
 
 function updateFeatureTabTitle(preferredProteinName) {
@@ -2329,8 +2330,11 @@ function updateFeatureTabTitle(preferredProteinName) {
 
 var updateFeatureUI = function(featureList) {
 	featureSet = featureList || featureSet;
-	console.log("featurelist.updateFeatureUI");
-
+  console.log("featurelist.updateFeatureUI");
+  //for length in featurelist if 
+  // if(featureList[n].Server.includes("External Features (JSON)"))
+  //push out of featurelist and into a new object array
+  // }
 	$("#featurelist div").remove(); // remove old contents
 //	$("#featureExplanation").text(" Loading...");
 //	$("#featureCounter").html("<img src='/images/89.GIF'/>").show();
@@ -2437,7 +2441,7 @@ var document_observer = new MutationObserver( function (mutations) {
 	attributeFilter: ["style"],
 	characterDataOldValue: true 
   });
-};
+}
 
 function drawTrack(datum, i) { 
 	var features = datum.Tracks;
@@ -3302,7 +3306,9 @@ var processNextServer = function(primary_accession, uniprot_sequence_MD5_hash,
 	if (currentServer < das_servers.length) {
 		isFetchingFromServer = das_servers[currentServer]['Server'];
 
-		console.log("************* isFetchingFromServer");
+    console.log("************* isFetchingFromServer");
+    //if external json create features in a new tab. Remove else, uniprot features should always be shown. If uniprot or db features not present
+    //ask user to add new features. 
 		if (isFetchingFromServer == "External Features (JSON)"){
 			// check URL for json url
 			checkURLForFeatures(primary_accession, uniprot_sequence_MD5_hash, das_servers[currentServer], featureCallback);
@@ -3998,11 +4004,12 @@ var processNextServer = function(primary_accession,
 
 		console.log("fetch_features.processNextServer isFetchingFromServer =", isFetchingFromServer);
 		if (isFetchingFromServer == "External Features (JSON)"){
-			// check URL for json url
+      // check URL for json url
+      console.log("THIS IS SERVER", servers[currentServer])
 			checkURLForFeatures(primary_accession, servers[currentServer], featureCallback);
 
 		} else if (isFetchingFromServer == "Uniprot"){
-			console.log("fetch_features.processNextServer process " + isFetchingFromServer);
+      console.log("fetch_features.processNextServer process " + isFetchingFromServer);
 			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
 		}
 	}
@@ -4138,7 +4145,8 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 function checkURLForFeatures(primary_accession, server, featureCallback){
 	var url = getUrlParameter("features");
 	if (url){
-	  $.getJSON( url, function (responseJSON) { //After load, parse data returned by xhr.responseText
+    $.getJSON( url, function (responseJSON) { //After load, parse data returned by xhr.responseText
+      $("#tabs").append('<h3 data-v-3109cfb0="" class="sub">Custom Features<span id="externalfeatures" class="explanation"></h3>')
 			parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, responseJSON);
 	    });
 	} else {
@@ -4154,16 +4162,22 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 fetch_uniprot = function(primary_accession, server, featureCallback) {
 
 	console.log("fetch_features.fetch_uniprot fetching features from uniprot...");
-	url = "https://www.uniprot.org/uniprot/" + primary_accession + ".xml";
+  url = "https://www.uniprot.org/uniprot/" + primary_accession + ".xml";
 	$.ajax({url : url, 
-			type: "GET",
-			dataType: "xml",
+      type: "GET",
+      dataType: "xml",
+      error: function() {
+        data = AQUARIA.remote.get_features(window.location.pathname.split('/')[1], function(orgNames) {
+          // console.log("features.displayOrgSynonyms: " + orgNames[0].Features)
+          parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, JSON.parse(orgNames[0].Features))
+        })
+      },
 			success: function(xml) {
-				data = parseUniprot(xml);
+        data = parseUniprot(xml);
+        console.log("THIS IS RESPONSE2", data)
 				parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data)
 			}
 	});
-	
 };
 
 module.exports = fetch_annotations;

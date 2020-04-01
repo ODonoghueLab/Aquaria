@@ -5,7 +5,7 @@
     <h3></h3>
     <p id="h4"></p>
     <div>
-    <cdr-row cols="1 2@sm 3@md 4@lg" id="matrix">
+    <cdr-row cols="4 4@sm 3@md 4@lg" id="matrix">
       <cdr-col v-for="structure in structures" :key="structure.primary_accession" class="grid-example">
       <img v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="addCard(structure.primary_accession)"/>
       <figcaption id="caption">{{structure.synonym}}</figcaption>
@@ -62,7 +62,15 @@ export default {
     })
   },
   beforeMount () {
-    const url = 'http://odonoghuelab.org:8009/' + window.location.pathname.split('/')[2]
+    var url = ''
+    if (window.location.pathname.split('/')[1] === 'SARS-CoV-2' || window.location.pathname.split('/')[1] === 'covid19') {
+      // url = 'http://localhost:8010/2697049'
+      url = 'http://odonoghuelab.org:8010/2697049'
+    } else {
+      // url = 'http://localhost:8010/' + window.location.pathname.split('/')[2]
+      url = 'http://odonoghuelab.org:8010/' + window.location.pathname.split('/')[2]
+    }
+
     axios({
       method: 'get',
       url: url
@@ -85,7 +93,11 @@ export default {
       $('#matrixView').slideToggle('slow')
       $('#centerView').attr('v-bind:primary_accession', primaryAccession)
       this.clicked = true
-      window.location.pathname = window.location.pathname + '/' + primaryAccession
+      //      window.location.pathname = window.location.pathname + '/' + primaryAccession
+
+      // THIS GOES BACK TO AQUARIA.WS
+      // window.location.href = 'http://localhost:8009/' + primaryAccession
+      window.location.href = 'http://odonoghuelab.org:8009/' + primaryAccession
     }
   },
   computed () {
@@ -116,7 +128,6 @@ export default {
   background-color: lightgray;
     /* These are the main settings for the page layout */
   width: 840px; /* was: 760px */
-  height: 30%;
   /* margin: 0px auto 0px auto; */
   padding: 0px;
   /* Development only */

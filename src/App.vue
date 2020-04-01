@@ -17,28 +17,35 @@ export default {
     }
   },
   beforeMount () {
-    if (window.location.pathname.split('/')[1] !== 'OrgID') {
-      const url = 'http://odonoghuelab.org:8009' + window.location.pathname
-      axios({
-        method: 'get',
-        url: url
-      })
-        .then(function (response) {
-          if (response.data.initialParams) {
-            window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
-          }
-          if (response.data.primary_accessions) {
-            window.localStorage.setItem('OrgID', response.data.OrganismID)
-            if (response.data.OrganismID === '2697049') {
-              window.location.pathname = 'SARS-CoV-2'
-            } else {
-              window.location.pathname = '/orgID/' + response.data.OrganismID
-            }
-            this.primary_accession = response
-          }
-        }
-        )
+    // var regex = /(^\d+\/*$)/
+    var url = ''
+
+    if (window.location.pathname.split('/')[1] === 'covid19') {
+      // url = 'http://localhost:8010/SARS-CoV-2'
+      url = 'http://odonoghuelab.org:8010/SARS-CoV-2'
+    } else {
+      url = 'http://odonoghuelab.org:8010/' + window.location.pathname
+      // url = 'http://localhost:8010/' + window.location.pathname
     }
+    axios({
+      method: 'get',
+      url: url
+    })
+      .then(function (response) {
+        if (response.data.initialParams) {
+          window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
+        }
+        if (response.data.primary_accessions) {
+          window.localStorage.setItem('OrgID', response.data.OrganismID)
+          if (response.data.OrganismID === '2697049') {
+            window.location.pathname = 'SARS-CoV-2'
+          } else {
+            window.location.pathname = '/orgID/' + response.data.OrganismID
+          }
+          this.primary_accession = response
+        }
+      }
+      )
   }
 }
 </script>

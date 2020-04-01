@@ -130,7 +130,7 @@ var document_observer = new MutationObserver( function (mutations) {
 	attributeFilter: ["style"],
 	characterDataOldValue: true 
   });
-};
+}
 
 function drawTrack(datum, i) { 
 	var features = datum.Tracks;

@@ -91681,6 +91681,15 @@ class ColorLegendWidget extends CanvasWidget {
           $(location).attr('href', sessionStorage.getItem("link"))
         }
       }
+
+	// if($(location).attr('href')== "http://localhost:8010/"){
+    //     if(sessionStorage.getItem("link") == null ){
+    //       $(location).attr('href', 'http://localhost:8010/O15350/2xwc/A')
+    //     }
+    //     else{
+    //       $(location).attr('href', sessionStorage.getItem("link"))
+    //     }
+    //   }
 	  
 $("#export-button").removeAttr("style")
 .attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
