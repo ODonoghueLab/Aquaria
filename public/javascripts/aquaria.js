@@ -1870,7 +1870,7 @@ var MAX_PROTEIN_HISTORY = 5;
 
   var setupDNode = function() {
     // var stream = shoe('http://odonoghuelab.org:8009/dnode');
-    var stream = shoe('http://localhost:8009/dnode');
+    var stream = shoe('http://localhost:8010/dnode');
     try {
       var dnodeConnection = dnode();
       dnodeConnection.on('end', function(end) {
@@ -2334,7 +2334,7 @@ var updateFeatureUI = function(featureList) {
   //for length in featurelist if 
   // if(featureList[n].Server.includes("External Features (JSON)"))
   //push out of featurelist and into a new object array
-  }
+  // }
 	$("#featurelist div").remove(); // remove old contents
 //	$("#featureExplanation").text(" Loading...");
 //	$("#featureCounter").html("<img src='/images/89.GIF'/>").show();
@@ -2441,7 +2441,7 @@ var document_observer = new MutationObserver( function (mutations) {
 	attributeFilter: ["style"],
 	characterDataOldValue: true 
   });
-};
+}
 
 function drawTrack(datum, i) { 
 	var features = datum.Tracks;
@@ -3306,7 +3306,9 @@ var processNextServer = function(primary_accession, uniprot_sequence_MD5_hash,
 	if (currentServer < das_servers.length) {
 		isFetchingFromServer = das_servers[currentServer]['Server'];
 
-		console.log("************* isFetchingFromServer");
+    console.log("************* isFetchingFromServer");
+    //if external json create features in a new tab. Remove else, uniprot features should always be shown. If uniprot or db features not present
+    //ask user to add new features. 
 		if (isFetchingFromServer == "External Features (JSON)"){
 			// check URL for json url
 			checkURLForFeatures(primary_accession, uniprot_sequence_MD5_hash, das_servers[currentServer], featureCallback);

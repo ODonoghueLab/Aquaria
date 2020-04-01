@@ -16,7 +16,12 @@ const routes = [
     // component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
-    path: '/orgID/:id',
+    path: '/covid19',
+    name: 'Matrix',
+    component: Matrix
+  },
+  {
+    path: '/:id(\\d+)',
     name: 'Matrix',
     component: Matrix
   },

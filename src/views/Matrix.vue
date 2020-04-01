@@ -62,8 +62,14 @@ export default {
     })
   },
   beforeMount () {
-    // const url = 'http://odonoghuelab.org:8009/' + window.location.pathname.split('/')[2]
-    const url = 'http://localhost:8009/' + window.location.pathname.split('/')[2]
+    var url = ''
+    if (window.location.pathname.split('/')[1] === 'SARS-CoV-2' || window.location.pathname.split('/')[1] === 'covid19') {
+      url = 'http://localhost:8010/2697049'
+      // url = 'http://odonoghuelab.org:8009/2697049'
+    } else {
+      url = 'http://localhost:8010/' + window.location.pathname.split('/')[2]
+      // url = 'http://odonoghuelab.org:8009/' + window.location.pathname.split('/')[2]
+    }
 
     axios({
       method: 'get',
@@ -87,7 +93,8 @@ export default {
       $('#matrixView').slideToggle('slow')
       $('#centerView').attr('v-bind:primary_accession', primaryAccession)
       this.clicked = true
-      window.location.pathname = window.location.pathname + '/' + primaryAccession
+      //      window.location.pathname = window.location.pathname + '/' + primaryAccession
+      window.location.href = 'http://localhost:8009/' + primaryAccession
     }
   },
   computed () {
@@ -118,7 +125,6 @@ export default {
   background-color: lightgray;
     /* These are the main settings for the page layout */
   width: 840px; /* was: 760px */
-  height: 30%;
   /* margin: 0px auto 0px auto; */
   padding: 0px;
   /* Development only */

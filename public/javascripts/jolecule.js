@@ -91682,9 +91682,9 @@ class ColorLegendWidget extends CanvasWidget {
     //     }
     //   }
 
-	if($(location).attr('href')== "http://localhost:8009/"){
+	if($(location).attr('href')== "http://localhost:8010/"){
         if(sessionStorage.getItem("link") == null ){
-          $(location).attr('href', 'http://localhost:8009/O15350/2xwc/A')
+          $(location).attr('href', 'http://localhost:8010/O15350/2xwc/A')
         }
         else{
           $(location).attr('href', sessionStorage.getItem("link"))
