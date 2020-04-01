@@ -5,7 +5,7 @@
     <h3></h3>
     <p id="h4"></p>
     <div>
-    <cdr-row cols="1 2@sm 3@md 4@lg" id="matrix">
+    <cdr-row cols="4 4@sm 3@md 4@lg" id="matrix">
       <cdr-col v-for="structure in structures" :key="structure.primary_accession" class="grid-example">
       <img v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="addCard(structure.primary_accession)"/>
       <figcaption id="caption">{{structure.synonym}}</figcaption>

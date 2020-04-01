@@ -1214,6 +1214,7 @@ var MAX_PROTEIN_HISTORY = 5;
 
       cache_matching_structures(primary_accession, function(primary_accession) {
         AQUARIA.remote.get_matching_structures(loadRequest, sequenceCallback, clusterCallback, function(err, loadRequest, Selected_PDB, finalClusters, cachedHit, version_string) {
+          console.log("THIS IS CLUSTERS", finalClusters)
           if (loadRequest.primary_accession === AQUARIA.structures2match.initialLoadRequest.primary_accession) {
             //					  AQUARIA.updateIssueEnvironment();
 
@@ -2319,7 +2320,6 @@ function createFeatureUI() {
 	height = 40 - AQUARIA.margin.top - AQUARIA.margin.bottom + 35; // height
 	// for one
 	// structure
-
 };
 
 function updateFeatureTabTitle(preferredProteinName) {
@@ -2330,8 +2330,11 @@ function updateFeatureTabTitle(preferredProteinName) {
 
 var updateFeatureUI = function(featureList) {
 	featureSet = featureList || featureSet;
-	console.log("featurelist.updateFeatureUI");
-
+  console.log("featurelist.updateFeatureUI");
+  //for length in featurelist if 
+  // if(featureList[n].Server.includes("External Features (JSON)"))
+  //push out of featurelist and into a new object array
+  }
 	$("#featurelist div").remove(); // remove old contents
 //	$("#featureExplanation").text(" Loading...");
 //	$("#featureCounter").html("<img src='/images/89.GIF'/>").show();
@@ -4140,7 +4143,8 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 function checkURLForFeatures(primary_accession, server, featureCallback){
 	var url = getUrlParameter("features");
 	if (url){
-	  $.getJSON( url, function (responseJSON) { //After load, parse data returned by xhr.responseText
+    $.getJSON( url, function (responseJSON) { //After load, parse data returned by xhr.responseText
+      $("#tabs").append('<h3 data-v-3109cfb0="" class="sub">Custom Features<span id="externalfeatures" class="explanation"></h3>')
 			parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, responseJSON);
 	    });
 	} else {

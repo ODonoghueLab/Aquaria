@@ -708,6 +708,12 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 	$.ajax({url : url, 
 			type: "GET",
 			dataType: "xml",
+			error: function() {
+				data = AQUARIA.remote.get_features(window.location.pathname.split('/')[1], function(orgNames) {
+				  // console.log("features.displayOrgSynonyms: " + orgNames[0].Features)
+				  parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, JSON.parse(orgNames[0].Features))
+				})
+			  },
 			success: function(xml) {
 				data = parseUniprot(xml);
 				parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data)
