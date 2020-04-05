@@ -91673,23 +91673,14 @@ class ColorLegendWidget extends CanvasWidget {
 	}
 	//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
 
-	if($(location).attr('href')== "http://odonoghuelab.org:8009/"){
+	if($(location).attr('pathname')== "/"){
         if(sessionStorage.getItem("link") == null ){
-          $(location).attr('href', 'http://odonoghuelab.org:8009/O15350/2xwc/A')
+          $(location).attr('pathname', '/O15350/2xwc/A')
         }
         else{
-          $(location).attr('href', sessionStorage.getItem("link"))
+          $(location).attr('pathname', sessionStorage.getItem("link"))
         }
       }
-
-	// if($(location).attr('href')== "http://localhost:8010/"){
-    //     if(sessionStorage.getItem("link") == null ){
-    //       $(location).attr('href', 'http://localhost:8010/O15350/2xwc/A')
-    //     }
-    //     else{
-    //       $(location).attr('href', sessionStorage.getItem("link"))
-    //     }
-    //   }
 	  
 $("#export-button").removeAttr("style")
 .attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
@@ -91760,7 +91751,7 @@ var on_load = new MutationObserver(function(m){
 				$("#title3D").css("display","none")
 				$("#searchByName").css("display","none")
 
-				sessionStorage.setItem("link", $(location).attr('href'))
+				sessionStorage.setItem("link", $(location).attr('pathname'))
 					  
 				select_residue.observe(document.getElementById("threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection"),{ 
 				  childlist: true,

@@ -7,7 +7,7 @@
     <div>
     <cdr-row cols="4 4@sm 3@md 4@lg" id="matrix">
       <cdr-col v-for="structure in structures" :key="structure.primary_accession" class="grid-example">
-      <img v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="addCard(structure.primary_accession)"/>
+      <img v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="redirect(structure.primary_accession)"/>
       <figcaption id="caption">{{structure.synonym}}</figcaption>
       <p id="numStructures" :style="[structure.count == 0 ? {'color': 'red'} : {'color': '#5a5a5a'}]">{{structure.count}} matching structures</p>
       </cdr-col>
@@ -34,13 +34,11 @@ export default {
       structures: null,
       organism: null,
       clicked: false,
+      matching_structures: null,
       totalStructures: 0
     }
   },
   updated () {
-    for (let index = 0; index < this.structures.length; index++) {
-      this.totalStructures = this.totalStructures + this.structures[index].count
-    }
     $('#h4').html(this.totalStructures + ' matching structures')
     $('h3').html(this.structures[1].name)
     var captionPosition = $('.grid-example').width() / 2 - $('figcaption').width() / 2
@@ -62,25 +60,61 @@ export default {
     })
   },
   beforeMount () {
+    var numStructures = [0, 2, 2, 2, 0, 0, 0, 0, 0, 25, 357, 495, 117, 0]
+    // function csvJSON (csv) {
+    //   var lines = csv.split('\n')
+    //   var result = []
+    //   var headers = lines[0].split(',')
+    //   for (var i = 1; i < lines.length; i++) {
+    //     var obj = {}
+    //     var currentline = lines[i].split(',')
+    //     for (var j = 0; j < headers.length; j++) {
+    //       obj[headers[j]] = currentline[j]
+    //     }
+    //     result.push(obj)
+    //   }
+    //   return JSON.stringify(result)
+    // }
+
     var url = ''
     if (window.location.pathname.split('/')[1] === 'SARS-CoV-2' || window.location.pathname.split('/')[1] === 'covid19') {
-      // url = 'http://localhost:8010/2697049'
-      url = 'http://odonoghuelab.org:8010/2697049'
+      url = window.location.protocol + '//' + window.location.hostname + ':8010/2697049'
     } else {
-      // url = 'http://localhost:8010/' + window.location.pathname.split('/')[2]
-      url = 'http://odonoghuelab.org:8010/' + window.location.pathname.split('/')[2]
+      url = window.location.protocol + '//' + window.location.hostname + ':8010/' + window.location.pathname.split('/')[2]
     }
 
     axios({
       method: 'get',
       url: url
     })
-      .then(response => (this.structures = JSON.parse(response.data.primary_accessions)))
+      .then(response => {
+        this.structures = JSON.parse(response.data.primary_accessions)
+
+        for (let index = 0; index < this.structures.length; index++) {
+          this.structures[index].count = numStructures[index]
+          this.totalStructures = this.totalStructures + numStructures[index]
+          // var hostname = window.location.hostname
+          // url = window.location.protocol + '//' + hostname + ':8010/' + this.structures[index].primary_accession + '.csv'
+          // axios({
+          //   method: 'get',
+          //   url: url
+          // })
+          //   .then(response => {
+          //     this.matching_structures = csvJSON(response.data)
+          //     this.matching_structures = JSON.parse(this.matching_structures)
+          //     console.log('THIS IS TEXT', this.matching_structures)
+          //     for (var i = 0; i < this.matching_structures.length; i++) {
+          //       this.structures[index].count = this.structures[index].count + parseInt(this.matching_structures[i]['cluster size'])
+          //     }
+          //     this.totalStructures = this.totalStructures + this.structures[index].count
+          //   })
+        }
+      })
 
     // window.location.pathname = '/' + this.structures[1].name
   },
   methods: {
-    addCard: function (primaryAccession) {
+    redirect: function (primaryAccession) {
       if (document.getElementsByClassName('dimmer').length === 0) {
         $('body').append('<div class="dimmer"></div>')
         $('div.dimmer').on('click', function () {
@@ -96,8 +130,8 @@ export default {
       //      window.location.pathname = window.location.pathname + '/' + primaryAccession
 
       // THIS GOES BACK TO AQUARIA.WS
-      // window.location.href = 'http://localhost:8009/' + primaryAccession
-      window.location.href = 'http://odonoghuelab.org:8009/' + primaryAccession
+      var url = window.location.protocol + '//' + window.location.hostname + ':8009/' + primaryAccession
+      window.open(url)
     }
   },
   computed () {
@@ -143,11 +177,13 @@ export default {
 }
 
 .grid-example:hover #caption{
-  transform: scale(1.2);
+  transform: scale(1.025);
+  cursor: pointer;
 }
 
-.grid-example:hover #numStructures{
-  transform: scale(1.5);
+.grid-example:hover #numStructures, img{
+  /* transform: scale(1.1); */
+  cursor: pointer;
 }
 
 div.grid-example.col_1\.0\.4{
