@@ -1,7 +1,5 @@
 <template>
   <div id="app">
-      <!-- <router-link to="O15350/2xwc/A">Home</router-link> | -->
-      <!-- <router-link to="/about">About</router-link> -->
       <router-view/>
   </div>
 </template>
@@ -19,13 +17,11 @@ export default {
   beforeMount () {
     // var regex = /(^\d+\/*$)/
     var url = ''
-
+    var hostname = window.location.protocol + '//' + window.location.hostname
     if (window.location.pathname.split('/')[1] === 'covid19') {
-      // url = 'http://localhost:8010/SARS-CoV-2'
-      url = 'http://odonoghuelab.org:8010/SARS-CoV-2'
+      url = hostname + ':8010/SARS-CoV-2'
     } else {
-      url = 'http://odonoghuelab.org:8010/' + window.location.pathname
-      // url = 'http://localhost:8010/' + window.location.pathname
+      url = hostname + ':8010' + window.location.pathname
     }
     axios({
       method: 'get',
