@@ -1,14 +1,14 @@
 <template>
   <div id="Matrix">
-    <img src="../assets/img/icon-large.png" id="logo"/>
+    <!-- <img src="../assets/img/icon-large.png" id="logo"/> -->
     <br/>
     <h3></h3>
     <p id="h4"></p>
-    <div>
+    <div class="noflex">
     <cdr-row cols="4 4@sm 3@md 4@lg" id="matrix">
       <cdr-col v-for="structure in structures" :key="structure.primary_accession" class="grid-example">
       <img v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="redirect(structure.primary_accession)"/>
-      <figcaption id="caption">{{structure.synonym}}</figcaption>
+      <figcaption>{{structure.synonym}}</figcaption>
       <p id="numStructures" :style="[structure.count == 0 ? {'color': 'red'} : {'color': '#5a5a5a'}]">{{structure.count}} matching structures</p>
       </cdr-col>
     </cdr-row>
@@ -41,23 +41,23 @@ export default {
   updated () {
     $('#h4').html(this.totalStructures + ' matching structures')
     $('h3').html(this.structures[1].name)
-    var captionPosition = $('.grid-example').width() / 2 - $('figcaption').width() / 2
-    captionPosition = captionPosition + 'px'
-    $('figcaption').css({
-      'margin-left': captionPosition
-    })
+    // var captionPosition = $('.grid-example').width() / 2 - $('figcaption').width() / 2
+    // captionPosition = captionPosition + 'px'
+    // $('figcaption').css({
+    //   'margin-left': captionPosition
+    // })
 
-    var h3Position = $('#Matrix').width() / 2 - $('h3').width() / 2
-    h3Position = h3Position + 'px'
-    $('h3').css({
-      'margin-left': h3Position
-    })
+    // var h3Position = $('#Matrix').width() / 2 - $('h3').width() / 2
+    // h3Position = h3Position + 'px'
+    // $('h3').css({
+    //   'margin-left': h3Position
+    // })
 
-    var h3pPosition = $('#Matrix').width() / 2 - $('#Matrix>p').width() / 2
-    h3pPosition = h3pPosition + 'px'
-    $('#Matrix>p').css({
-      'margin-left': h3pPosition
-    })
+    // var h3pPosition = $('#Matrix').width() / 2 - $('#Matrix>p').width() / 2
+    // h3pPosition = h3pPosition + 'px'
+    // $('#Matrix>p').css({
+    //   'margin-left': h3pPosition
+    // })
   },
   beforeMount () {
     var numStructures = [0, 2, 2, 2, 0, 0, 0, 0, 0, 25, 357, 495, 117, 0]
@@ -127,17 +127,10 @@ export default {
       $('#matrixView').slideToggle('slow')
       $('#centerView').attr('v-bind:primary_accession', primaryAccession)
       this.clicked = true
-      //      window.location.pathname = window.location.pathname + '/' + primaryAccession
 
       // THIS GOES BACK TO AQUARIA.WS
       var url = window.location.protocol + '//' + window.location.hostname + ':8009/' + primaryAccession
       window.open(url)
-    }
-  },
-  computed () {
-    var i
-    for (i = 0; i < this.structures.length; i++) {
-      this.totalStructures = this.totalStructures + this.structures[i].count
     }
   }
 }
@@ -146,109 +139,102 @@ export default {
 <style scoped>
 #matrix{
   margin-top: 20px;
+  background: #c0c0c0;
+  height: 100%;
 }
 #Matrix{
   position: relative;
   height: 100vh;
+  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat 20px 12px;
+  background-size: 70px 72px;
+  text-align: center;
 }
-#structure{
+/* #structure{
   width: 10vw;
   height: 10vw;
-}
+} */
 .grid-example {
   position: relative;
   padding: 10px;
   text-align: center;
-  background-color: lightgray;
     /* These are the main settings for the page layout */
   width: 840px; /* was: 760px */
-  /* margin: 0px auto 0px auto; */
-  padding: 0px;
+  background-color: #cccccc;
   /* Development only */
-  border-color: black;
-  border-style: dotted;
-  border-width: 1px;
-  font-size: 10pt;
-  line-height: 12pt;
-  height: 10vw;
-  border-top: none;
-  border-left: none;
-  height: 20vh;
+  border-color: #c0c0c0;
+  border-style: solid;
+  border-width: 0.1px 4px;
+  font-size: 10px;
+  line-height: 12px;
+  height: 24%;
 }
-
-.grid-example:hover #caption{
-  transform: scale(1.025);
+.grid-example img {
+  transition: opacity 0.5s;
+  max-width: 100%;
+  width: 33vh;
+  margin: 18px auto 0 auto;
+  border:0px none;
+}
+.grid-example:hover figcaption{
+   transform: scale(1.05);
+  opacity: 1;
   cursor: pointer;
 }
-
-.grid-example:hover #numStructures, img{
+.grid-example:hover #numStructures{
+  transform: scale(1.25);
+  cursor: pointer;
+}
+.grid-example:hover img{
   /* transform: scale(1.1); */
   cursor: pointer;
 }
 
-div.grid-example.col_1\.0\.4{
-  padding: 0px;
+.grid-example:hover img {
+  opacity:0.8;
 }
-
 .cdr-col_1\.0\.4.cdr-col_1\.0\.4{
   padding: 0px;
 }
-
-.cdr-row_1\.0\.4 {
-    background-color: #cccccc;
-    border-color: black;
-    border-style: dotted;
-    border-right: none;
-    border-bottom: none;
-    border-width: 1px;
+.noflex{
+  height: 88%;
 }
-
+.noflex div{
+  display: inline-block;
+  overflow: hidden;
+  margin:0;
+}
 h3{
-    bottom: 19vh;
-    position: static;
-    font-size: 54px;
+    font-size: calc(12px + 2vw);
     background-color: #77777780;
     width: fit-content;
-    padding: 10px;
+    padding: 10px 16px;
     border-radius: 13px;
-    /* left: 38%; */
-    /* opacity: 61%; */
     color: white;
+    margin: 0 auto;
 }
-
 #h4{
-    bottom: 15vh;
-    position: static;
-    font-size: 30px;
-    width: fit-content;
+    font-size: calc(10px + 1vw);
     padding: 5px;
-    border-radius: 13px;
-    /* left: 43.5%; */
 }
-
 figcaption{
     position: absolute;
-    font-size: 23px;
-    background-color: #5a595954;
-    width: fit-content;
+    display: block;
+    font-size: calc(12px + 0.4vw);
+    background-color: #5a595988;
+    width: 74%;
+    left: 13%;
     top: 8px;
     padding: 10px;
     border-radius: 7px;
-    /* opacity: 44%; */
+    opacity: 0.75;
     color: white;
     margin-top: 3px;
-    max-width: 74%;
-    line-height: 21px
+    line-height: 1em;
+    transition: opacity 0.3s, transform 0.3s;
 }
 #numStructures{
   position: absolute;
   bottom: 2px;
-}
-
-#logo{
-  width: 67px;
-  position: relative;
-  padding: 11px 0px 0px 8px;
-  float: left;
+  transition: transform 0.3s;
 }
 </style>
