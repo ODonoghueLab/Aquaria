@@ -275,7 +275,7 @@ figcaption{
 and (min-width : 100px)
 and (max-width : 400px) {
   figcaption {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .grid-example img {
