@@ -49,7 +49,8 @@ export default {
     var isSafari = window.safari !== undefined
     if (isSafari) {
       $('img.image').css({
-        height: '167px'
+        height: '167px',
+        'margin-top': '60px'
       })
       if (window.innerWidth < 415) {
         $('img.image').css({
