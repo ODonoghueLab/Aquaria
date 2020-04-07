@@ -11,7 +11,7 @@
     <div class="noflex">
     <cdr-row cols="4 4@sm 3@md 4@lg" id="matrix">
       <cdr-col v-for="structure in structures" :key="structure.primary_accession" class="grid-example">
-      <img v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="redirect(structure.primary_accession)"/>
+      <img class="image" v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="redirect(structure.primary_accession)"/>
       <figcaption>{{structure.synonym}}</figcaption>
       <p id="numStructures" :style="[structure.count == 0 ? {'color': 'red'} : {'color': '#5a5a5a'}]">{{structure.count}} matching structures</p>
       </cdr-col>
@@ -46,6 +46,23 @@ export default {
     }
   },
   updated () {
+    var isSafari = window.safari !== undefined
+    if (isSafari) {
+      $('img.image').css({
+        height: '167px'
+      })
+      if (window.innerWidth < 415) {
+        $('img.image').css({
+          margin: '47px auto 0 -44%',
+          'max-width': '200%',
+          height: '67px'
+        })
+      }
+      $('.grid-example').css({
+        'margin-top': '6px'
+      })
+    }
+
     $('#h4').html(this.totalStructures + ' matching structures')
     $('#name').html(this.structures[1].name)
     // var captionPosition = $('.grid-example').width() / 2 - $('figcaption').width() / 2
@@ -279,12 +296,14 @@ and (max-width : 400px) {
   }
 
   .grid-example img {
-  margin: 66px auto 0 -34%;
+  /* margin: 66px auto 0 -34%; */
+  margin: 49px auto 0 -44%;
   }
 
   .grid-example img {
     max-width: 200%;
-    width: 171%;
+    /* width: 171%; */
+    width: 195%;
   }
 }
   @media only screen
@@ -295,14 +314,13 @@ and (max-width : 400px) {
   }
 
   .grid-example img {
-  margin: 55px auto 0 -34%;
+  margin: 47px auto 0 -44%;
   }
 
   .grid-example img {
     max-width: 200%;
-    width: 171%;
+    width: 195%;
   }
-
 }
 
 @media only screen
