@@ -1,9 +1,13 @@
 <template>
   <div id="Matrix">
-    <!-- <img src="../assets/img/icon-large.png" id="logo"/> -->
+    <div id="top">
+    <img src="../assets/img/icon-large.png" id="logo" v-on:click="showAbout()"/>
+    <div id="title">
     <br/>
-    <h3></h3>
+    <h3 id="name"></h3>
     <p id="h4"></p>
+    </div>
+    </div>
     <div class="noflex">
     <cdr-row cols="4 4@sm 3@md 4@lg" id="matrix">
       <cdr-col v-for="structure in structures" :key="structure.primary_accession" class="grid-example">
@@ -14,6 +18,7 @@
     </cdr-row>
     </div>
     <MatrixView id="matrixView" style="display: none;" v-if="clicked"/>
+    <AboutAquaria />
   </div>
 </template>
 
@@ -22,12 +27,14 @@ import MatrixView from '../components/MatrixView'
 import * as CdrComps from '../cedar.js'
 import axios from 'axios'
 import $ from 'jquery'
+import AboutAquaria from '../components/AboutAquaria'
 
 export default {
   name: 'Matrix',
   components: {
     ...CdrComps,
-    MatrixView
+    MatrixView,
+    AboutAquaria
   },
   data () {
     return {
@@ -40,7 +47,7 @@ export default {
   },
   updated () {
     $('#h4').html(this.totalStructures + ' matching structures')
-    $('h3').html(this.structures[1].name)
+    $('#name').html(this.structures[1].name)
     // var captionPosition = $('.grid-example').width() / 2 - $('figcaption').width() / 2
     // captionPosition = captionPosition + 'px'
     // $('figcaption').css({
@@ -53,11 +60,11 @@ export default {
     //   'margin-left': h3Position
     // })
 
-    // var h3pPosition = $('#Matrix').width() / 2 - $('#Matrix>p').width() / 2
-    // h3pPosition = h3pPosition + 'px'
-    // $('#Matrix>p').css({
-    //   'margin-left': h3pPosition
-    // })
+    var matrixHeight = $('#home').height() - $('#title').height() - 30
+    matrixHeight = matrixHeight + 'px'
+    $('.noflex').css({
+      height: matrixHeight
+    })
   },
   beforeMount () {
     var numStructures = [0, 2, 2, 2, 0, 0, 0, 0, 0, 25, 357, 495, 117, 0]
@@ -131,6 +138,20 @@ export default {
       // THIS GOES BACK TO AQUARIA.WS
       var url = window.location.protocol + '//' + window.location.hostname + ':8009/' + primaryAccession
       window.open(url)
+    },
+    showAbout: function () {
+    // dim background
+      if (document.getElementsByClassName('dimmer').length === 0) {
+        $('body').append('<div class="dimmer"></div>')
+        $('div.dimmer').on('click', function () {
+          $('div#about_overlay, div#help_overlay').hide()
+          $('div.dimmer').remove()
+        })
+      } else {
+        $('div.dimmer').remove()
+      }
+
+      $('div#about_overlay').slideToggle('slow')
     }
   }
 }
@@ -145,8 +166,8 @@ export default {
 #Matrix{
   position: relative;
   height: 100vh;
-  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat 20px 12px;
-  background-size: 70px 72px;
+  background: #c0c0c0;
+  background-size: 50px 50px;
   text-align: center;
 }
 /* #structure{
@@ -175,13 +196,12 @@ export default {
   margin: 18px auto 0 auto;
   border:0px none;
 }
-.grid-example:hover figcaption{
-   transform: scale(1.05);
+.cdr-col__content_1\.0\.4:hover figcaption{
   opacity: 1;
   cursor: pointer;
 }
 .grid-example:hover #numStructures{
-  transform: scale(1.25);
+  color: black;
   cursor: pointer;
 }
 .grid-example:hover img{
@@ -195,16 +215,14 @@ export default {
 .cdr-col_1\.0\.4.cdr-col_1\.0\.4{
   padding: 0px;
 }
-.noflex{
-  height: 88%;
-}
+
 .noflex div{
   display: inline-block;
   overflow: hidden;
   margin:0;
 }
 h3{
-    font-size: calc(12px + 2vw);
+    font-size: calc(12px + 1.2vw);
     background-color: #77777780;
     width: fit-content;
     padding: 10px 16px;
@@ -214,15 +232,14 @@ h3{
 }
 #h4{
     font-size: calc(10px + 1vw);
-    padding: 5px;
+    padding-top: 5px;
 }
 figcaption{
     position: absolute;
     display: block;
-    font-size: calc(12px + 0.4vw);
     background-color: #5a595988;
-    width: 74%;
-    left: 13%;
+    width: 84%;
+    left: 8.4%;
     top: 8px;
     padding: 10px;
     border-radius: 7px;
@@ -231,10 +248,92 @@ figcaption{
     margin-top: 3px;
     line-height: 1em;
     transition: opacity 0.3s, transform 0.3s;
+    font-size: calc(12px + 0.4vw);
 }
 #numStructures{
   position: absolute;
   bottom: 2px;
   transition: transform 0.3s;
 }
+
+#top{
+  display: inline-flex;
+}
+
+#logo{
+  position: absolute;
+    left: 0%;
+    width: 50px;
+    margin: 23px 11px;
+}
+
+#logo:hover {
+    cursor: pointer;
+    }
+
+@media only screen
+and (min-width : 100px)
+and (max-width : 400px) {
+  figcaption {
+    font-size: 8px;
+  }
+
+  .grid-example img {
+  margin: 66px auto 0 -34%;
+  }
+
+  .grid-example img {
+    max-width: 200%;
+    width: 171%;
+  }
+}
+  @media only screen
+  and (min-width : 400px)
+  and (max-width : 540px) {
+  figcaption {
+    font-size: 10px;
+  }
+
+  .grid-example img {
+  margin: 55px auto 0 -34%;
+  }
+
+  .grid-example img {
+    max-width: 200%;
+    width: 171%;
+  }
+
+}
+
+@media only screen
+  and (min-width : 541px)
+  and (max-width : 624px) {
+  figcaption {
+    font-size: 10px;
+  }
+
+  .grid-example img {
+  margin: 48px auto 0 -34%;
+  }
+
+  .grid-example img {
+    max-width: 200%;
+    width: 171%;
+  }
+
+}
+
+@media only screen
+  and (min-width : 625px)
+  and (max-width : 1240px) {
+  figcaption {
+    font-size: 10px;
+  }
+
+  .grid-example img {
+  margin: 48px auto 0 auto;
+  }
+
+}
+
 </style>
