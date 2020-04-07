@@ -48,6 +48,13 @@ export default {
       $('div.dimmer').remove()
       $('div#about_overlay').hide()
     }
+  },
+  mounted () {
+    var Position = window.innerWidth / 2 - $('#about_overlay').width() / 2
+    Position = Position + 'px'
+    $('#about_overlay').css({
+      left: Position
+    })
   }
 }
 </script>
