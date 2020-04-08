@@ -89673,7 +89673,7 @@ function serialize(protein, format, binary) {
     .attr("id", "export-panel")
     .addClass("hidden")
     .css({
-      position: "absolute",
+      position: "fixed",
       top: "25%",
       bottom: "0",
       left: "40%",
@@ -89685,7 +89685,7 @@ function serialize(protein, format, binary) {
       "background-color": "rgba(0, 0, 0, 0.8)",
       "z-index": "99999",
       "width": "22%",
-      "height": "44%"
+      "height": "50%"
     })
 
     this.div.append(this.hiddendiv)
