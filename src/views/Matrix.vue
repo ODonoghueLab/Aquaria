@@ -6,7 +6,7 @@
           <br/>
           <p id="Orgname"></p>
           <p id="matches"></p>
-          <p id="help" v-on:click="showAbout()">?</p>
+          <p id="help" v-on:click="showAbout2()">?</p>
           </div>
     </div>
     <div id="container">
@@ -17,6 +17,7 @@
         </div>
     </div>
     <AboutAquaria />
+    <AboutSource />
   </div>
 </template>
 
@@ -25,12 +26,14 @@ import * as CdrComps from '../cedar.js'
 import axios from 'axios'
 import $ from 'jquery'
 import AboutAquaria from '../components/AboutAquaria'
+import AboutSource from '../components/AboutSource'
 
 export default {
   name: 'Matrix',
   components: {
     ...CdrComps,
-    AboutAquaria
+    AboutAquaria,
+    AboutSource
   },
   data () {
     return {
@@ -91,6 +94,20 @@ export default {
       }
 
       $('div#about_overlay').slideToggle('slow')
+    },
+    showAbout2: function () {
+    // dim background
+      if (document.getElementsByClassName('dimmer').length === 0) {
+        $('body').append('<div class="dimmer"></div>')
+        $('div.dimmer').on('click', function () {
+          $('div#about_source, div#help_overlay').hide()
+          $('div.dimmer').remove()
+        })
+      } else {
+        $('div.dimmer').remove()
+      }
+
+      $('div#about_source').slideToggle('slow')
     }
   }
 }
