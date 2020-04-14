@@ -6,6 +6,7 @@
           <br/>
           <p id="Orgname"></p>
           <p id="matches"></p>
+          <p id="help" v-on:click="showAbout2()">?</p>
           </div>
     </div>
     <div id="container">
@@ -16,6 +17,7 @@
         </div>
     </div>
     <AboutAquaria />
+    <AboutSource />
   </div>
 </template>
 
@@ -24,12 +26,14 @@ import * as CdrComps from '../cedar.js'
 import axios from 'axios'
 import $ from 'jquery'
 import AboutAquaria from '../components/AboutAquaria'
+import AboutSource from '../components/AboutSource'
 
 export default {
   name: 'Matrix',
   components: {
     ...CdrComps,
-    AboutAquaria
+    AboutAquaria,
+    AboutSource
   },
   data () {
     return {
@@ -90,6 +94,20 @@ export default {
       }
 
       $('div#about_overlay').slideToggle('slow')
+    },
+    showAbout2: function () {
+    // dim background
+      if (document.getElementsByClassName('dimmer').length === 0) {
+        $('body').append('<div class="dimmer"></div>')
+        $('div.dimmer').on('click', function () {
+          $('div#about_source, div#help_overlay').hide()
+          $('div.dimmer').remove()
+        })
+      } else {
+        $('div.dimmer').remove()
+      }
+
+      $('div#about_source').slideToggle('slow')
     }
   }
 }
@@ -110,23 +128,23 @@ export default {
     margin-left: 12px;
     margin-top: 15px;
     margin-bottom: 15px;
-    padding: 0px 20px 0px 20px;
+    padding: 7px 20px 0px 20px;
 }
 
 #Orgname{
       color: white;
-      font-size: calc(12px + 1.1vw);
+      font-size: calc(12px + 0.8vw);
       font-weight: bold;
 }
 
 #matches{
-    font-size: calc(10px + 0.9vw);
+    font-size: calc(10px + 0.4vw);
     padding-top: 5px;
 }
 
 @media only screen
   and (min-width : 330px)
-  and (max-width : 1100px) {
+  and (max-width : 700px) {
     #title{
     padding: 1.6vh 20px 0px 20px;
   }
@@ -134,12 +152,26 @@ export default {
 
 @media only screen
   and (min-width : 100px)
-  and (max-width : 1100px) {
+  and (max-width : 700px) {
     #title{
     margin-left: 57px;
   }
 }
 
+#help{
+  border-radius: 50%;
+  background-color: aliceblue;
+  width: calc(10px + 0.8vw);
+  height: calc(10px + 0.8vw);
+  font-size: calc(10px + 0.4vw);
+  margin-top: 6px;
+  margin-left: 5px;
+}
+
+#help:hover{
+  background-color:orange;
+  color: white;
+}
 /* Christian's work */
 
 #matrix{
