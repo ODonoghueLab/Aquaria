@@ -6,6 +6,7 @@
           <br/>
           <p id="Orgname"></p>
           <p id="matches"></p>
+          <p id="help" v-on:click="showAbout()">?</p>
           </div>
     </div>
     <div id="container">
@@ -110,23 +111,23 @@ export default {
     margin-left: 12px;
     margin-top: 15px;
     margin-bottom: 15px;
-    padding: 0px 20px 0px 20px;
+    padding: 7px 20px 0px 20px;
 }
 
 #Orgname{
       color: white;
-      font-size: calc(12px + 1.1vw);
+      font-size: calc(12px + 0.8vw);
       font-weight: bold;
 }
 
 #matches{
-    font-size: calc(10px + 0.9vw);
+    font-size: calc(10px + 0.4vw);
     padding-top: 5px;
 }
 
 @media only screen
   and (min-width : 330px)
-  and (max-width : 1100px) {
+  and (max-width : 700px) {
     #title{
     padding: 1.6vh 20px 0px 20px;
   }
@@ -134,12 +135,26 @@ export default {
 
 @media only screen
   and (min-width : 100px)
-  and (max-width : 1100px) {
+  and (max-width : 700px) {
     #title{
     margin-left: 57px;
   }
 }
 
+#help{
+  border-radius: 50%;
+  background-color: aliceblue;
+  width: calc(10px + 0.8vw);
+  height: calc(10px + 0.8vw);
+  font-size: calc(10px + 0.4vw);
+  margin-top: 6px;
+  margin-left: 5px;
+}
+
+#help:hover{
+  background-color:orange;
+  color: white;
+}
 /* Christian's work */
 
 #matrix{
