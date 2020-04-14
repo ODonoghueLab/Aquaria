@@ -1,29 +1,25 @@
 <template>
   <div id="Matrix">
-    <div id="top">
-    <img src="../assets/img/icon-large.png" id="logo" v-on:click="showAbout()"/>
-    <div id="title">
-    <br/>
-    <h3 id="name"></h3>
-    <p id="h4"></p>
+    <div id="header">
+          <div id="logo" v-on:click="showAbout()"></div>
+          <div id="title">
+          <br/>
+          <p id="Orgname"></p>
+          <p id="matches"></p>
+          </div>
     </div>
+    <div id="container">
+        <div v-for="structure in structures" :key="structure.primary_accession" class="cell">
+          <h3>{{structure.synonym}}</h3>
+          <img v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="redirect(structure.primary_accession)"/>
+          <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#5a5a5a'}]">{{structure.count}} matching structures</p>
+        </div>
     </div>
-    <div class="noflex">
-    <cdr-row cols="4 4@sm 3@md 4@lg" id="matrix">
-      <cdr-col v-for="structure in structures" :key="structure.primary_accession" class="grid-example">
-      <img class="image" v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="redirect(structure.primary_accession)"/>
-      <figcaption>{{structure.synonym}}</figcaption>
-      <p id="numStructures" :style="[structure.count == 0 ? {'color': 'red'} : {'color': '#5a5a5a'}]">{{structure.count}} matching structures</p>
-      </cdr-col>
-    </cdr-row>
-    </div>
-    <MatrixView id="matrixView" style="display: none;" v-if="clicked"/>
     <AboutAquaria />
   </div>
 </template>
 
 <script>
-import MatrixView from '../components/MatrixView'
 import * as CdrComps from '../cedar.js'
 import axios from 'axios'
 import $ from 'jquery'
@@ -33,7 +29,6 @@ export default {
   name: 'Matrix',
   components: {
     ...CdrComps,
-    MatrixView,
     AboutAquaria
   },
   data () {
@@ -41,66 +36,21 @@ export default {
       structures: null,
       organism: null,
       clicked: false,
-      matching_structures: null,
       totalStructures: 0
     }
   },
   updated () {
-    var isSafari = window.safari !== undefined
-    if (isSafari) {
-      $('img.image').css({
-        height: '183px',
-        'margin-top': '37px'
-      })
-      if (window.innerWidth < 415) {
-        $('img.image').css({
-          margin: '47px auto 0 -44%',
-          'max-width': '200%',
-          height: '67px'
-        })
-      }
-      $('.grid-example').css({
-        'margin-top': '6px'
-      })
-    }
-
-    $('#h4').html(this.totalStructures + ' matching structures')
-    $('#name').html(this.structures[1].name)
-    // var captionPosition = $('.grid-example').width() / 2 - $('figcaption').width() / 2
-    // captionPosition = captionPosition + 'px'
-    // $('figcaption').css({
-    //   'margin-left': captionPosition
-    // })
-
-    // var h3Position = $('#Matrix').width() / 2 - $('h3').width() / 2
-    // h3Position = h3Position + 'px'
-    // $('h3').css({
-    //   'margin-left': h3Position
-    // })
-
+    $('#matches').html(this.totalStructures + ' matching structures')
+    $('#Orgname').html(this.structures[1].name + '&nbsp;')
     var matrixHeight = $('#home').height() - $('#title').height() - 30
     matrixHeight = matrixHeight + 'px'
     $('.noflex').css({
       height: matrixHeight
     })
+    // $('h1').html(this.structures[1].name + ' <span id="count"> ' + this.totalStructures + ' matching structures</span><a href="#"><span id="help">?</span></a>')
   },
   beforeMount () {
     var numStructures = [0, 2, 2, 2, 0, 0, 0, 0, 0, 25, 357, 495, 117, 0]
-    // function csvJSON (csv) {
-    //   var lines = csv.split('\n')
-    //   var result = []
-    //   var headers = lines[0].split(',')
-    //   for (var i = 1; i < lines.length; i++) {
-    //     var obj = {}
-    //     var currentline = lines[i].split(',')
-    //     for (var j = 0; j < headers.length; j++) {
-    //       obj[headers[j]] = currentline[j]
-    //     }
-    //     result.push(obj)
-    //   }
-    //   return JSON.stringify(result)
-    // }
-
     var url = ''
     if (window.location.pathname.split('/')[1] === 'SARS-CoV-2' || window.location.pathname.split('/')[1] === 'covid19') {
       url = window.location.protocol + '//' + window.location.hostname + ':8010/2697049'
@@ -118,41 +68,11 @@ export default {
         for (let index = 0; index < this.structures.length; index++) {
           this.structures[index].count = numStructures[index]
           this.totalStructures = this.totalStructures + numStructures[index]
-          // var hostname = window.location.hostname
-          // url = window.location.protocol + '//' + hostname + ':8010/' + this.structures[index].primary_accession + '.csv'
-          // axios({
-          //   method: 'get',
-          //   url: url
-          // })
-          //   .then(response => {
-          //     this.matching_structures = csvJSON(response.data)
-          //     this.matching_structures = JSON.parse(this.matching_structures)
-          //     console.log('THIS IS TEXT', this.matching_structures)
-          //     for (var i = 0; i < this.matching_structures.length; i++) {
-          //       this.structures[index].count = this.structures[index].count + parseInt(this.matching_structures[i]['cluster size'])
-          //     }
-          //     this.totalStructures = this.totalStructures + this.structures[index].count
-          //   })
         }
       })
-
-    // window.location.pathname = '/' + this.structures[1].name
   },
   methods: {
     redirect: function (primaryAccession) {
-      if (document.getElementsByClassName('dimmer').length === 0) {
-        $('body').append('<div class="dimmer"></div>')
-        $('div.dimmer').on('click', function () {
-          $('#matrixView').hide()
-          $('div.dimmer').remove()
-        })
-      } else {
-        $('div.dimmer').remove()
-      }
-      $('#matrixView').slideToggle('slow')
-      $('#centerView').attr('v-bind:primary_accession', primaryAccession)
-      this.clicked = true
-
       // THIS GOES BACK TO AQUARIA.WS
       var url = window.location.protocol + '//' + window.location.hostname + ':8009/' + primaryAccession
       window.open(url)
@@ -176,183 +96,181 @@ export default {
 </script>
 
 <style scoped>
+#logo{
+    width: 84px;
+    height: 86px;
+    position: absolute;
+    left: 0px;
+}
+
+#title{
+    display: inline-flex;
+    border-radius: 5em;
+    background: #999999;
+    margin-left: 57px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 0px 20px 0px 20px;
+}
+
+#Orgname{
+      color: white;
+      font-size: calc(12px + 1.1vw);
+      font-weight: bold;
+}
+
+#matches{
+    font-size: calc(10px + 0.9vw);
+    padding-top: 5px;
+}
+
+@media only screen
+  and (min-width : 330px)
+  and (max-width : 1100px) {
+    #title{
+    padding: 1.6vh 20px 0px 20px;
+  }
+}
+
+/* Christian's work */
+
 #matrix{
   margin-top: 20px;
   background: #c0c0c0;
-  height: 100%;
 }
 #Matrix{
-  position: relative;
   height: 100vh;
-  background: #c0c0c0;
-  background-size: 50px 50px;
+  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat 10px 12px;
+  background-size: 60px 62px;
   text-align: center;
 }
-/* #structure{
-  width: 10vw;
-  height: 10vw;
-} */
-.grid-example {
-  position: relative;
-  padding: 10px;
-  text-align: center;
-    /* These are the main settings for the page layout */
-  width: 840px; /* was: 760px */
-  background-color: #cccccc;
-  /* Development only */
-  border-color: #c0c0c0;
-  border-style: solid;
-  border-width: 0.1px 4px;
-  font-size: 10px;
-  line-height: 12px;
-  height: 24%;
-}
-.grid-example img {
-  transition: opacity 0.5s;
-  max-width: 100%;
-  width: 33vh;
-  margin: 18px auto 0 auto;
-  border:0px none;
-}
-.cdr-col__content_1\.0\.4:hover figcaption{
-  opacity: 1;
-  cursor: pointer;
-}
-.grid-example:hover #numStructures{
-  color: black;
-  cursor: pointer;
-}
-.grid-example:hover img{
-  /* transform: scale(1.1); */
-  cursor: pointer;
-}
-
-.grid-example:hover img {
-  opacity:0.8;
-}
-.cdr-col_1\.0\.4.cdr-col_1\.0\.4{
-  padding: 0px;
-}
-
-.noflex div{
-  display: inline-block;
-  overflow: hidden;
-  margin:0;
-}
-h3{
-    font-size: calc(12px + 1.2vw);
-    background-color: #77777780;
-    width: fit-content;
-    padding: 10px 16px;
-    border-radius: 13px;
-    color: white;
-    margin: 0 auto;
-}
-#h4{
-    font-size: calc(10px + 1vw);
-    padding-top: 5px;
-}
-figcaption{
-    position: absolute;
-    display: block;
-    background-color: #5a595988;
-    width: 84%;
-    left: 8.4%;
-    top: 8px;
-    padding: 10px;
-    border-radius: 7px;
-    opacity: 0.75;
-    color: white;
-    margin-top: 3px;
-    line-height: 1em;
-    transition: opacity 0.3s, transform 0.3s;
-    font-size: calc(12px + 0.4vw);
-}
-#numStructures{
-  position: absolute;
-  bottom: 2px;
-  transition: transform 0.3s;
-}
-
-#top{
-  display: inline-flex;
-}
-
-#logo{
-  position: absolute;
-    left: 0%;
-    width: 50px;
-    margin: 23px 11px;
-}
-
-#logo:hover {
-    cursor: pointer;
+/* general layout and colors */
+    body {
+        margin: 0;
+        padding: 0;
+        background: #bbbbbb;
+    }
+    #header {
+        padding: 2px 12px;
+        height:5em;
+        display: inline-flex;
+    }
+    #header h1 {
+        font-size: calc(12px + 0.7vw);
+        color: #ffffff;
+        font-weight:900;
+        line-height: 145%;
+        background:#999999;
+        width:fit-content;
+        padding: 0 20px;
+        border-radius: 5em;
+        margin: 4px auto 0;
+        margin-top: 20px;
+    }
+    div.no_match h3 {
+        /* color: #666666; */
+        font-weight:400;
+    }
+    .cell {
+        background-color: #cccccc;
+        position: relative;
+        overflow: hidden;
+        /* 'relative' as reference point for absolute positioned elements inside */
+    }
+    /* * * * * CSS grid * * * * */
+    #container {
+        display: grid;
+        grid-gap: 6px;
+        background: #c0c0c0;
+        padding: 6px;
+        height: 90vh;
+        width: 98vw;
+        margin: 0 auto;
+    }
+    /* Wide aspect ratio */
+    @media (min-aspect-ratio: 8/5) and (max-aspect-ratio: 15/4) {
+        #container {
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            height: 84vh;
+        }
+    }
+    /* Tall aspect ratio */
+    @media (max-aspect-ratio: 3/4) {
+        #container {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+        }
+    }
+/* In-between aspect ratio, put it at the bottom to avoid override*/
+    @media (min-aspect-ratio: 3/4) and (max-aspect-ratio: 8/5) {
+        #container  {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+        }
+    }
+    .cell {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+    .cell img {
+        width: 100%; /*  = 100% of the available space */
+        /* don't specify height to maintain aspect ratio */
+        position: relative;
+        top: 25%;
+        z-index:0;
+    }
+    /* TYPOGRAPHY */
+    /* responsive sizes */
+    #Matrix .cell {
+        /* font-family: 'Source Sans Pro', sans-serif; */
+        font-size: 10px;
+    }
+    @media screen and (min-width: 320px) {
+        #Matrix .cell {
+            font-size: calc(10px + 6 * ((100vw - 320px) / 680));
+        }
+    }
+    @media screen and (min-width: 1000px) {
+        #Matrix .cell {
+            font-size: 16px;
+        }
     }
 
-@media only screen
-and (min-width : 100px)
-and (max-width : 400px) {
-  figcaption {
-    font-size: 8px;
-  }
-
-  .grid-example img {
-  /* margin: 66px auto 0 -34%; */
-  margin: 49px auto 0 -44%;
-  }
-
-  .grid-example img {
-    max-width: 200%;
-    /* width: 171%; */
-    width: 195%;
-  }
-}
-  @media only screen
-  and (min-width : 400px)
-  and (max-width : 540px) {
-  figcaption {
-    font-size: 10px;
-  }
-
-  .grid-example img {
-  margin: 47px auto 0 -44%;
-  }
-
-  .grid-example img {
-    max-width: 200%;
-    width: 195%;
-  }
-}
-
-@media only screen
-  and (min-width : 541px)
-  and (max-width : 624px) {
-  figcaption {
-    font-size: 10px;
-  }
-
-  .grid-example img {
-  margin: 48px auto 0 -34%;
-  }
-
-  .grid-example img {
-    max-width: 200%;
-    width: 171%;
-  }
-
-}
-
-@media only screen
-  and (min-width : 625px)
-  and (max-width : 1240px) {
-  figcaption {
-    font-size: 10px;
-  }
-
-  .grid-example img {
-  margin: 48px auto 0 auto;
-  }
-
-}
-
+    /* Alignment */
+    body {
+        text-align: center;
+    }
+    h1, h3, p {
+        margin: 0;
+    }
+    span#count {
+        color:#383838;
+        font-weight: 300;
+        font-size: 60%;
+        margin-left: 20px;
+    }
+    a span#help {
+        display:inline-block;
+        color:#ffffff;
+        background:#0876d6;
+        font-weight: 700;
+        font-size: 80%;
+        border-radius: 50%;
+        margin-left: 20px;
+        width: 1.2em;
+        line-height: 1.2em;
+    }
+    .cell p {
+        position: absolute;
+        width: 100%; /* this, together with 'text-align:center' from body, keeps text centered */
+        bottom: 5%;
+        z-index:1;
+    }
+    .cell h3 {
+        position: absolute;
+        width: 100%;
+        top: 5%;
+        z-index:1;
+    }
 </style>
