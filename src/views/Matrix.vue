@@ -107,7 +107,7 @@ export default {
     display: inline-flex;
     border-radius: 5em;
     background: #999999;
-    margin-left: 57px;
+    margin-left: 12px;
     margin-top: 15px;
     margin-bottom: 15px;
     padding: 0px 20px 0px 20px;
@@ -129,6 +129,14 @@ export default {
   and (max-width : 1100px) {
     #title{
     padding: 1.6vh 20px 0px 20px;
+  }
+}
+
+@media only screen
+  and (min-width : 100px)
+  and (max-width : 1100px) {
+    #title{
+    margin-left: 57px;
   }
 }
 
