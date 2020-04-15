@@ -109,6 +109,34 @@ export default {
 
       $('div#about_source').slideToggle('slow')
     }
+  },
+  mounted () {
+    if ((window.outerHeight - window.innerHeight) >= 40) {
+      $('#container').css({
+        height: '70vh'
+      })
+      $('#Matrix').css({
+        height: '93vh'
+      })
+    } else {
+      $('#container').css({
+        height: '86vh'
+      })
+    }
+    window.addEventListener('resize', function () {
+      if ((window.outerHeight - window.innerHeight) >= 40) {
+        $('#container').css({
+          height: '70vh'
+        })
+        $('#Matrix').css({
+          height: '93vh'
+        })
+      } else {
+        $('#container').css({
+          height: '86vh'
+        })
+      }
+    })
   }
 }
 </script>
