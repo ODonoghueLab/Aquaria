@@ -11,7 +11,7 @@
     <div id="container">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell">
           <h3>{{structure.synonym}}</h3>
-          <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg'" v-bind:srcset="'../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w'" @click="redirect(structure.primary_accession)"/>
+          <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg'" v-bind:srcset="'../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w'" @click="redirect(structure.primary_accession)"/>
           <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]">{{structure.count}} matching structures</p>
         </div>
     </div>
@@ -288,7 +288,7 @@ export default {
         max-height: 100%; /*  = 100% of the available space */
         /* don't specify width to maintain aspect ratio */
         position: relative;
-        top: 10%;
+        top: 8%;
         z-index:0;
     }
     /* TYPOGRAPHY */

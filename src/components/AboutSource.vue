@@ -1,6 +1,6 @@
 <template>
     <div id="about_source">
-            <h3>About Aquaria <span class='x' v-on:click="hideAbout()">&nbsp;</span></h3>
+            <h3>About Covid19 <span class='x' v-on:click="hideAbout()">&nbsp;</span></h3>
             <p id="starter"><img src="../../public/images/logo-large.png"
                    width="605"
                    height="167"
