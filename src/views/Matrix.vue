@@ -6,7 +6,7 @@
           <br/>
           <p id="Orgname"></p>
           <p id="matches"></p>
-          <p id="help" v-on:click="showAbout2()">?</p>
+          <p id="help" v-on:mouseover="showAbout2()" v-on:mouseout="showAbout2()">?</p>
           </div>
     </div>
     <div id="container">
@@ -97,18 +97,46 @@ export default {
     },
     showAbout2: function () {
     // dim background
-      if (document.getElementsByClassName('dimmer').length === 0) {
-        $('body').append('<div class="dimmer"></div>')
-        $('div.dimmer').on('click', function () {
-          $('div#about_source, div#help_overlay').hide()
-          $('div.dimmer').remove()
-        })
-      } else {
-        $('div.dimmer').remove()
-      }
+      // if (document.getElementsByClassName('dimmer').length === 0) {
+      //   $('body').append('<div class="dimmer"></div>')
+      //   $('div.dimmer').on('click', function () {
+      //     $('div#about_source, div#help_overlay').hide()
+      //     $('div.dimmer').remove()
+      //   })
+      // } else {
+      //   $('div.dimmer').remove()
+      // }
 
       $('div#about_source').slideToggle('slow')
     }
+  },
+  mounted () {
+    if ((window.outerHeight - window.innerHeight) >= 40) {
+      $('#container').css({
+        height: '70vh'
+      })
+      $('#Matrix').css({
+        height: '93vh'
+      })
+    } else {
+      $('#container').css({
+        height: '86vh'
+      })
+    }
+    window.addEventListener('resize', function () {
+      if ((window.outerHeight - window.innerHeight) >= 40) {
+        $('#container').css({
+          height: '70vh'
+        })
+        $('#Matrix').css({
+          height: '93vh'
+        })
+      } else {
+        $('#container').css({
+          height: '86vh'
+        })
+      }
+    })
   }
 }
 </script>
@@ -119,6 +147,10 @@ export default {
     height: 86px;
     position: absolute;
     left: 0px;
+}
+
+#logo:hover{
+  cursor: pointer;
 }
 
 #title{
@@ -142,6 +174,12 @@ export default {
     padding-top: 5px;
 }
 
+.cell:hover{
+  cursor: pointer;
+}
+#about_source{
+  top: 59px;
+}
 @media only screen
   and (min-width : 330px)
   and (max-width : 700px) {

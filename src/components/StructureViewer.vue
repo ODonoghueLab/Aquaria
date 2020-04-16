@@ -23,8 +23,32 @@
 </template>
 
 <script>
+import $ from 'jquery'
+
 export default {
-  name: 'StructureViewer'
+  name: 'StructureViewer',
+  mounted () {
+    if ((window.outerHeight - window.innerHeight) >= 40) {
+      $('#structureviewer').css({
+        height: '89vh'
+      })
+    } else {
+      $('#structureviewer').css({
+        height: '100vh'
+      })
+    }
+    window.addEventListener('resize', function () {
+      if ((window.outerHeight - window.innerHeight) >= 40) {
+        $('#structureviewer').css({
+          height: '89vh'
+        })
+      } else {
+        $('#structureviewer').css({
+          height: '100vh'
+        })
+      }
+    })
+  }
 }
 </script>
 
