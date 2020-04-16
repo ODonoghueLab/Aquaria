@@ -3,7 +3,6 @@
     <div id="header">
           <div id="logo" v-on:click="showAbout()"></div>
           <div id="title">
-          <br/>
           <p id="Orgname"></p>
           <p id="matches"></p>
           <p id="help" v-on:mouseover="showAbout2()" v-on:mouseout="showAbout2()">?</p>
@@ -12,8 +11,8 @@
     <div id="container">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell">
           <h3>{{structure.synonym}}</h3>
-          <img v-bind:src="'../images/covid19/' + structure.primary_accession + '.png'" @click="redirect(structure.primary_accession)"/>
-          <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#5a5a5a'}]">{{structure.count}} matching structures</p>
+          <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg'" v-bind:srcset="'../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w'" @click="redirect(structure.primary_accession)"/>
+          <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]">{{structure.count}} matching structures</p>
         </div>
     </div>
     <AboutAquaria />
@@ -96,44 +95,33 @@ export default {
       $('div#about_overlay').slideToggle('slow')
     },
     showAbout2: function () {
-    // dim background
-      // if (document.getElementsByClassName('dimmer').length === 0) {
-      //   $('body').append('<div class="dimmer"></div>')
-      //   $('div.dimmer').on('click', function () {
-      //     $('div#about_source, div#help_overlay').hide()
-      //     $('div.dimmer').remove()
-      //   })
-      // } else {
-      //   $('div.dimmer').remove()
-      // }
-
       $('div#about_source').slideToggle('slow')
     }
   },
   mounted () {
-    if ((window.outerHeight - window.innerHeight) >= 40) {
-      $('#container').css({
-        height: '70vh'
-      })
+    if ((window.outerHeight - window.innerHeight) >= 80) {
       $('#Matrix').css({
-        height: '93vh'
+        height: '74vh'
       })
+      // $('#Matrix').css({
+      //   height: '93vh'
+      // })
     } else {
-      $('#container').css({
-        height: '86vh'
+      $('#Matrix').css({
+        height: '90vh'
       })
     }
     window.addEventListener('resize', function () {
-      if ((window.outerHeight - window.innerHeight) >= 40) {
-        $('#container').css({
-          height: '70vh'
-        })
+      if ((window.outerHeight - window.innerHeight) >= 80) {
         $('#Matrix').css({
-          height: '93vh'
+          height: '74vh'
         })
+        // $('#Matrix').css({
+        //   height: '93vh'
+        // })
       } else {
-        $('#container').css({
-          height: '86vh'
+        $('#Matrix').css({
+          height: '90vh'
         })
       }
     })
@@ -148,30 +136,32 @@ export default {
     position: absolute;
     left: 0px;
 }
-
 #logo:hover{
   cursor: pointer;
 }
 
 #title{
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 5em;
     background: #999999;
     margin-left: 12px;
     margin-top: 15px;
     margin-bottom: 15px;
-    padding: 7px 20px 0px 20px;
+    padding: 2px calc(5px + 0.4vw);
 }
 
 #Orgname{
       color: white;
       font-size: calc(12px + 0.8vw);
       font-weight: bold;
+      padding: 0 1vw;
 }
 
 #matches{
     font-size: calc(10px + 0.4vw);
-    padding-top: 5px;
+    /* padding-top: 5px; */
 }
 
 .cell:hover{
@@ -180,19 +170,23 @@ export default {
 #about_source{
   top: 59px;
 }
-@media only screen
-  and (min-width : 330px)
-  and (max-width : 700px) {
-    #title{
-    padding: 1.6vh 20px 0px 20px;
-  }
-}
 
 @media only screen
   and (min-width : 100px)
   and (max-width : 700px) {
     #title{
-    margin-left: 57px;
+    margin-left: calc(32px + 0.8vw);
+  }
+}
+/* iPhone SE */
+@media only screen
+  and (min-width : 200px)
+  and (max-height : 600px) {
+    #Orgname{
+    font-size: calc(9px + 0.8vw);
+  }
+  #matches {
+    font-size: calc(8px + 0.5vw);
   }
 }
 
@@ -202,7 +196,7 @@ export default {
   width: calc(10px + 0.8vw);
   height: calc(10px + 0.8vw);
   font-size: calc(10px + 0.4vw);
-  margin-top: 6px;
+  /* margin-top: 6px; */
   margin-left: 5px;
 }
 
@@ -218,8 +212,8 @@ export default {
 }
 #Matrix{
   height: 100vh;
-  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat 10px 12px;
-  background-size: 60px 62px;
+  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) 8px;
+  background-size: calc(44px + 0.8vw) calc(46px + 0.8vw);
   text-align: center;
 }
 /* general layout and colors */
@@ -229,9 +223,8 @@ export default {
         background: #bbbbbb;
     }
     #header {
-        padding: 2px 12px;
-        height:5em;
-        display: inline-flex;
+        padding: 2px 22px;
+        /* height:5em; */
     }
     #header h1 {
         font-size: calc(12px + 0.7vw);
@@ -261,7 +254,7 @@ export default {
         grid-gap: 6px;
         background: #c0c0c0;
         padding: 6px;
-        height: 90vh;
+        height: 100%;
         width: 98vw;
         margin: 0 auto;
     }
@@ -292,10 +285,10 @@ export default {
         grid-row: span 1;
     }
     .cell img {
-        width: 100%; /*  = 100% of the available space */
-        /* don't specify height to maintain aspect ratio */
+        max-height: 100%; /*  = 100% of the available space */
+        /* don't specify width to maintain aspect ratio */
         position: relative;
-        top: 25%;
+        top: 10%;
         z-index:0;
     }
     /* TYPOGRAPHY */
@@ -306,7 +299,7 @@ export default {
     }
     @media screen and (min-width: 320px) {
         #Matrix .cell {
-            font-size: calc(10px + 6 * ((100vw - 320px) / 680));
+            font-size: calc(8px + 6 * ((100vw - 320px) / 680));
         }
     }
     @media screen and (min-width: 1000px) {

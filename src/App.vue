@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" style="height: 90vh;">
       <router-view/>
   </div>
 </template>
@@ -53,14 +53,15 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  background-color: #cccccc;
+  background-color: #c0c0c0;
 }
 #home{
-  background-color: #cccccc;
+  background-color: #c0c0c0;
+  height: fit-content;
 }
 
 html{
-  background-color: #cccccc;
+  background-color: #c0c0c0;
 }
 
 #nav {
