@@ -108,7 +108,7 @@ export default {
       // })
     } else {
       $('#Matrix').css({
-        height: '90vh'
+        height: '93vh'
       })
     }
     window.addEventListener('resize', function () {
@@ -121,7 +121,7 @@ export default {
         // })
       } else {
         $('#Matrix').css({
-          height: '90vh'
+          height: '93vh'
         })
       }
     })
