@@ -28,18 +28,7 @@ import $ from 'jquery'
 export default {
   name: 'StructureViewer',
   mounted () {
-    if ((window.outerHeight - window.innerHeight) >= 80) {
-      $('#structureviewer').css({
-        height: '88vh'
-      })
-      window.scrollTo(0, 0)
-    } else {
-      $('#structureviewer').css({
-        height: '101vh'
-      })
-      window.scrollTo(0, 0)
-    }
-    window.addEventListener('resize', function () {
+    if (window.innerWidth < 1400 && window.innerHeight < 1400) {
       if ((window.outerHeight - window.innerHeight) >= 80) {
         $('#structureviewer').css({
           height: '88vh'
@@ -47,18 +36,31 @@ export default {
         window.scrollTo(0, 0)
       } else {
         $('#structureviewer').css({
-          height: '101vh'
+          height: '102vh'
         })
         window.scrollTo(0, 0)
       }
-    })
+      window.addEventListener('resize', function () {
+        if ((window.outerHeight - window.innerHeight) >= 80) {
+          $('#structureviewer').css({
+            height: '88vh'
+          })
+          window.scrollTo(0, 0)
+        } else {
+          $('#structureviewer').css({
+            height: '102vh'
+          })
+          window.scrollTo(0, 0)
+        }
+      })
+    }
   }
 }
 </script>
 
 <style scoped>
 #structureviewer{
-  height: 100vh;
+  height: 101vh;
 }
 
 #updateJava3D {
