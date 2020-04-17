@@ -91672,15 +91672,6 @@ class ColorLegendWidget extends CanvasWidget {
       this.buttonsDiv.append(buttonDiv)
 	}
 	//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
-
-	if($(location).attr('pathname')== "/"){
-        if(sessionStorage.getItem("link") == null ){
-          $(location).attr('pathname', '/O15350/2xwc/A')
-        }
-        else{
-          $(location).attr('pathname', sessionStorage.getItem("link"))
-        }
-      }
 	  
 $("#export-button").removeAttr("style")
 .attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")

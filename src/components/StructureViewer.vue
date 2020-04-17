@@ -28,7 +28,26 @@ import $ from 'jquery'
 export default {
   name: 'StructureViewer',
   mounted () {
-    if (window.innerWidth < 1400 && window.innerHeight < 1400) {
+    function checkPhone () {
+      var iDevices = [
+        'iPad Simulator',
+        'iPhone Simulator',
+        'iPod Simulator',
+        'iPad',
+        'iPhone',
+        'iPod'
+      ]
+
+      if (navigator.platform) {
+        while (iDevices.length) {
+          if (navigator.platform === iDevices.pop() || (screen.width >= 300 && screen.width <= 600)) { return true }
+        }
+      } else {
+        return false
+      }
+    }
+    var isPhone = checkPhone()
+    if (isPhone) {
       if ((window.outerHeight - window.innerHeight) >= 80) {
         $('#structureviewer').css({
           height: '88vh'
@@ -36,7 +55,7 @@ export default {
         window.scrollTo(0, 0)
       } else {
         $('#structureviewer').css({
-          height: '102vh'
+          height: '103vh'
         })
         window.scrollTo(0, 0)
       }
@@ -48,7 +67,7 @@ export default {
           window.scrollTo(0, 0)
         } else {
           $('#structureviewer').css({
-            height: '102vh'
+            height: '103vh'
           })
           window.scrollTo(0, 0)
         }

@@ -18,7 +18,7 @@ export default {
     Content,
     BadBrowser,
     Footer
-  }
+  },
   // data () {
   //   return {
   //     primary_accession: null
@@ -39,59 +39,51 @@ export default {
   //     }
   //     )
   // }
-  // mounted () {
-  //
+  mounted () {
+    const Script1 = document.createElement('script')
+    Script1.setAttribute('src', '/javascripts/d3.v2.min.js')
+    document.body.appendChild(Script1)
 
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/d3.v2.min.js'
-  //   })
+    const Script2 = document.createElement('script')
+    Script2.setAttribute('src', '/javascripts/browser_check.js')
+    document.body.appendChild(Script2)
 
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/browser_check.js'
-  //   }).then(response => (
-  //     document.createElement('script').setAttribute('src', response.data))
-  //   )
+    const Script3 = document.createElement('script')
+    Script3.setAttribute('src', '/javascripts/jquery-ui.min.js')
+    document.body.appendChild(Script3)
 
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/jquery-ui.min.js'
-  //   })
+    const Script4 = document.createElement('script')
+    Script4.setAttribute('src', '/javascripts/jquery.expander.min.js')
+    document.body.appendChild(Script4)
 
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/jquery.expander.min.js'
-  //   })
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/show_expanded_clusters.js'
-  //   })
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/textpanels.js'
-  //   })
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/pv.js'
-  //   })
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/jolecule.js'
-  //   })
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/aquaria.js'
-  //   })
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/resize_app.js'
-  //   })
-  //   axios({
-  //     method: 'get',
-  //     url: url + '/javascripts/jsdas.0.1.6.min.js'
-  //   })
-  // }
+    const Script5 = document.createElement('script')
+    Script5.setAttribute('src', '/javascripts/show_expanded_clusters.js')
+    document.body.appendChild(Script5)
+
+    const Script6 = document.createElement('script')
+    Script6.setAttribute('src', '/javascripts/textpanels.js')
+    document.body.appendChild(Script6)
+
+    const Script7 = document.createElement('script')
+    Script7.setAttribute('src', '/javascripts/pv.js')
+    document.body.appendChild(Script7)
+
+    const Script8 = document.createElement('script')
+    Script8.setAttribute('src', '/javascripts/jolecule.js')
+    document.body.appendChild(Script8)
+
+    const Script9 = document.createElement('script')
+    Script9.setAttribute('src', '/javascripts/aquaria.js')
+    document.body.appendChild(Script9)
+
+    const Script10 = document.createElement('script')
+    Script10.setAttribute('src', '/javascripts/resize_app.js')
+    document.body.appendChild(Script10)
+
+    const Script11 = document.createElement('script')
+    Script11.setAttribute('src', '/javascripts/jsdas.0.1.6.min.js')
+    document.body.appendChild(Script11)
+  }
 }
 </script>
 
