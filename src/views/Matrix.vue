@@ -8,11 +8,15 @@
           <p id="help" v-on:mouseover="showAbout2()" v-on:mouseout="showAbout2()">?</p>
           </div>
     </div>
-    <div id="container">
+     <div id="container">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell">
-          <h3>{{structure.synonym}}</h3>
-          <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg'" v-bind:srcset="'../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w'" @click="redirect(structure.primary_accession)"/>
-          <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]">{{structure.count}} matching structures</p>
+          <h3 @click="redirect(structure.primary_accession)">{{structure.synonym}}</h3>
+          <picture @click="redirect(structure.primary_accession)">
+             <source v-bind:srcset="'../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w'"  type="image/webp" sizes="33vw">
+             <source v-bind:srcset="'../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w'"  type="image/jpeg" sizes="33vw">
+             <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg'"/>
+           </picture>
+          <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]" @click="redirect(structure.primary_accession)">{{structure.count}} matching structures</p>
         </div>
     </div>
     <AboutAquaria />
@@ -103,26 +107,24 @@ export default {
       $('#Matrix').css({
         height: '74vh'
       })
-      // $('#Matrix').css({
-      //   height: '93vh'
-      // })
+      window.scrollTo(0, 0)
     } else {
       $('#Matrix').css({
-        height: '93vh'
+        height: '92.5vh'
       })
+      window.scrollTo(0, 9)
     }
     window.addEventListener('resize', function () {
       if ((window.outerHeight - window.innerHeight) >= 80) {
         $('#Matrix').css({
           height: '74vh'
         })
-        // $('#Matrix').css({
-        //   height: '93vh'
-        // })
+        window.scrollTo(0, 0)
       } else {
         $('#Matrix').css({
-          height: '93vh'
+          height: '92.5vh'
         })
+        window.scrollTo(0, 9)
       }
     })
   }
@@ -263,7 +265,7 @@ export default {
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            height: 84vh;
+            height: 88vh;
         }
     }
     /* Tall aspect ratio */
@@ -271,6 +273,7 @@ export default {
         #container {
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(5, 1fr);
+            height: 100%;
         }
     }
 /* In-between aspect ratio, put it at the bottom to avoid override*/
@@ -288,7 +291,7 @@ export default {
         max-height: 100%; /*  = 100% of the available space */
         /* don't specify width to maintain aspect ratio */
         position: relative;
-        top: 8%;
+        top: 4%;
         z-index:0;
     }
     /* TYPOGRAPHY */
