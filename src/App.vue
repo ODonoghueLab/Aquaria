@@ -16,6 +16,13 @@ export default {
   },
   beforeMount () {
     // var regex = /(^\d+\/*$)/
+    if (window.location.pathname === '/') {
+      if (sessionStorage.getItem('link') == null) {
+        window.location.pathname = '/O15350/2xwc/A'
+      } else {
+        window.location.pathname = sessionStorage.getItem('link')
+      }
+    }
     var url = ''
     var hostname = window.location.protocol + '//' + window.location.hostname
     if (window.location.pathname.split('/')[1] === 'covid19') {

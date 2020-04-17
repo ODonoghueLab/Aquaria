@@ -8,16 +8,16 @@
         </div>
     </div>
     <p id="intro" v-if="$mq === 'laptop'">
-        <span class="small">
+        <!-- <span class="small">
             <a href="#" v-on:click="showAbout()" >Updated:
                 <span class="lastupdate">{{data}}</span>
             </a>
-        </span>
-        <br>
+        </span> -->
+        <!-- <br>
         <a href="#" v-on:click="showAbout()" style="color:#DDD;">About</a> |
         <a target="_blank" style="color:#DDD;" href="https://www.biostars.org/t/aquaria">Forum</a> |
         <a href="#" v-on:click="showExplanations()" style="color:#DDD;">Help</a>
-        <br>
+        <br> -->
     </p>
     </div>
 </template>
