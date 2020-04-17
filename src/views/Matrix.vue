@@ -10,13 +10,13 @@
     </div>
      <div id="container">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell">
-          <h3>{{structure.synonym}}</h3>
-          <picture>
+          <h3 @click="redirect(structure.primary_accession)">{{structure.synonym}}</h3>
+          <picture @click="redirect(structure.primary_accession)">
              <source v-bind:srcset="'../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w'"  type="image/webp" sizes="33vw">
              <source v-bind:srcset="'../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w'"  type="image/jpeg" sizes="33vw">
-             <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg'" @click="redirect(structure.primary_accession)"/>
+             <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg'"/>
            </picture>
-          <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]">{{structure.count}} matching structures</p>
+          <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]" @click="redirect(structure.primary_accession)">{{structure.count}} matching structures</p>
         </div>
     </div>
     <AboutAquaria />
