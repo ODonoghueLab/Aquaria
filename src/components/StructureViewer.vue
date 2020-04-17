@@ -32,20 +32,24 @@ export default {
       $('#structureviewer').css({
         height: '88vh'
       })
+      window.scrollTo(0, 0)
     } else {
       $('#structureviewer').css({
         height: '101vh'
       })
+      window.scrollTo(0, 0)
     }
     window.addEventListener('resize', function () {
       if ((window.outerHeight - window.innerHeight) >= 80) {
         $('#structureviewer').css({
           height: '88vh'
         })
+        window.scrollTo(0, 0)
       } else {
         $('#structureviewer').css({
           height: '101vh'
         })
+        window.scrollTo(0, 0)
       }
     })
   }
@@ -99,8 +103,8 @@ export default {
     padding: 0px;
     margin: 0px;
     width: 100%;
-    height: 100%;
-    top: -100vh;
+    height: 100vh;
+    top: -101vh;
 }
 
 /* div.panel span#threeD {
