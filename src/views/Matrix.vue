@@ -81,7 +81,12 @@ export default {
   methods: {
     redirect: function (primaryAccession) {
       // THIS GOES BACK TO AQUARIA.WS
-      var url = window.location.protocol + '//' + window.location.hostname + ':8009/' + primaryAccession
+      let redirectionPort = ':8009/';
+      if (window.location.hostname === 'aquaria.ws') {
+        // Only on AWS production server, use the default port
+        redirectionPort = '/';
+      }
+      var url = window.location.protocol + '//' + window.location.hostname + redirectionPort + primaryAccession
       window.open(url)
     },
     showAbout: function () {
