@@ -14,6 +14,7 @@
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "bristol": "^0.4.0",
+    "build": "^0.1.4",
     "cookie-parser": "^1.4.4",
     "core-js": "^3.6.4",
     "dnode": "^1.2.2",

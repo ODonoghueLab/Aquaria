@@ -47,8 +47,8 @@ export default {
     }
   },
   updated () {
-    $('#matches').html(this.totalStructures + ' matching structures')
-    $('#Orgname').html(this.structures[1].name + '&nbsp;')
+    // $('#matches').html(this.totalStructures + ' matching structures')
+    $('#Orgname').html('Structural models of ' + this.structures[1].name + ' proteins&nbsp;')
     var matrixHeight = $('#home').height() - $('#title').height() - 30
     matrixHeight = matrixHeight + 'px'
     $('.noflex').css({
@@ -64,7 +64,6 @@ export default {
     } else {
       url = window.location.protocol + '//' + window.location.hostname + ':8010/' + window.location.pathname.split('/')[2]
     }
-
     axios({
       method: 'get',
       url: url
@@ -81,7 +80,12 @@ export default {
   methods: {
     redirect: function (primaryAccession) {
       // THIS GOES BACK TO AQUARIA.WS
-      var url = window.location.protocol + '//' + window.location.hostname + ':8009/' + primaryAccession
+      let redirectionPort = ':8009/'
+      if (window.location.hostname === 'aquaria.ws') {
+        // Only on AWS production server, use the default port
+        redirectionPort = '/'
+      }
+      var url = window.location.protocol + '//' + window.location.hostname + redirectionPort + primaryAccession
       window.open(url)
     },
     showAbout: function () {
@@ -107,13 +111,12 @@ export default {
       $('#Matrix').css({
         height: '74vh'
       })
-      window.scrollTo(0, 0)
     } else {
       $('#Matrix').css({
         height: '92.5vh'
       })
-      window.scrollTo(0, 9)
     }
+    window.scrollTo(0, 9)
     window.addEventListener('resize', function () {
       if ((window.outerHeight - window.innerHeight) >= 80) {
         $('#Matrix').css({
