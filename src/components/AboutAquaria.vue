@@ -72,8 +72,9 @@ export default {
     margin: 10px auto;
     background-color: #DDD;
     z-index: 105;
-    bottom: 1em;
+    /* bottom: 1em; */
     overflow: scroll;
+    font-size: 10px;
 }
 #about_overlay h3{
     background-color: #999;
@@ -86,4 +87,15 @@ export default {
     padding: 2px 3px 2px 10px;
     margin: 0px;
 }
+  @media screen and (min-width: 320px) {
+      #about_overlay {
+          font-size: calc(8px + 6 * ((100vw - 320px) / 680));
+      }
+  }
+  @media screen and (min-width: 1000px) {
+      #about_overlay {
+          font-size: 16px;
+      }
+  }
+
 </style>

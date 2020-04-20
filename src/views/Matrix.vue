@@ -259,12 +259,12 @@ export default {
         grid-gap: 6px;
         background: #c0c0c0;
         padding: 6px;
-        height: 100%;
+        height: 92vh;
         width: 98vw;
         margin: 0 auto;
     }
     /* Wide aspect ratio */
-    @media (min-aspect-ratio: 8/5) and (max-aspect-ratio: 15/4) {
+    @media (max-aspect-ratio: 15/4) and (min-aspect-ratio: 8/5) {
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
@@ -276,14 +276,27 @@ export default {
         #container {
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            height: 100%;
+            height: 88vh;
+        }
+    }
+    @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
+        #container {
+            height: 94vh;
         }
     }
 /* In-between aspect ratio, put it at the bottom to avoid override*/
-    @media (min-aspect-ratio: 3/4) and (max-aspect-ratio: 8/5) {
+    @media (max-aspect-ratio: 8/5) and (min-aspect-ratio: 3/4) {
         #container  {
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
+            height: 90vh;
+        }
+    }
+        @media (max-aspect-ratio: 8/5) and
+              (min-aspect-ratio: 3/4) and
+              (min-height: 1000px) {
+        #container  {
+            height: 93vh;
         }
     }
     .cell {
