@@ -159,7 +159,7 @@ export default {
 
 #Orgname{
       color: white;
-      font-size: calc(9px + 0.8vw);
+      font-size: calc(9px + 0.9vw);
       font-weight: bold;
       padding: 0 1vw;
 }
