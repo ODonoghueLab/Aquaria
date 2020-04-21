@@ -159,7 +159,7 @@ export default {
 
 #Orgname{
       color: white;
-      font-size: calc(12px + 0.8vw);
+      font-size: calc(9px + 0.8vw);
       font-weight: bold;
       padding: 0 1vw;
 }
@@ -188,10 +188,10 @@ export default {
   and (min-width : 200px)
   and (max-height : 600px) {
     #Orgname{
-    font-size: calc(9px + 0.8vw);
+    font-size: calc(8px + 0.5vw);
   }
   #matches {
-    font-size: calc(8px + 0.5vw);
+    font-size: calc(7px + 0.5vw);
   }
 }
 
@@ -304,11 +304,14 @@ export default {
         grid-row: span 1;
     }
     .cell img {
-        max-height: 100%; /*  = 100% of the available space */
-        /* don't specify width to maintain aspect ratio */
-        position: relative;
-        top: 4%;
-        z-index:0;
+        max-height: 100%;
+        max-width: 100%;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
     }
     /* TYPOGRAPHY */
     /* responsive sizes */
