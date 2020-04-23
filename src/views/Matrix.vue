@@ -2,7 +2,7 @@
   <div id="Matrix">
     <div id="header">
           <div id="logo" v-on:click="showAbout()"></div>
-          <AboutMatrix v-bind:OrganismName="this.structures[1].name" id="about_matrix" />
+          <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
     </div>
      <div id="container">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
@@ -56,7 +56,7 @@ export default {
     })
       .then(response => {
         this.structures = JSON.parse(response.data.primary_accessions)
-
+        // this.organismSynonyms = this.structures.OrgSynonyms
         for (let index = 0; index < this.structures.length; index++) {
           this.structures[index].count = numStructures[index]
           this.totalStructures = this.totalStructures + numStructures[index]
@@ -91,6 +91,11 @@ export default {
         document.querySelector('div.dimmer').remove()
       }
     }
+  },
+  updated () {
+    setTimeout(function () {
+      document.querySelector('.matrixLoading').remove()
+    }, 1000)
   },
   mounted () {
     if ((window.outerHeight - window.innerHeight) >= 80) {
@@ -142,7 +147,7 @@ export default {
 #Matrix{
   height: 100vh;
   background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) 8px;
-  background-size: calc(44px + 0.8vw) calc(46px + 0.8vw);
+  background-size: calc(30px + 1.5vw) calc(31px + 1.5vw);
   text-align: center;
 }
 /* general layout and colors */

@@ -18,7 +18,7 @@ export default {
     Content,
     BadBrowser,
     Footer
-  },
+  }
   // data () {
   //   return {
   //     primary_accession: null
@@ -39,51 +39,51 @@ export default {
   //     }
   //     )
   // }
-  mounted () {
-    const Script1 = document.createElement('script')
-    Script1.setAttribute('src', '/javascripts/d3.v2.min.js')
-    document.body.appendChild(Script1)
+  //   mounted () {
+  //     const Script1 = document.createElement('script')
+  //     Script1.setAttribute('src', '/javascripts/d3.v2.min.js')
+  //     document.body.appendChild(Script1)
 
-    const Script2 = document.createElement('script')
-    Script2.setAttribute('src', '/javascripts/browser_check.js')
-    document.body.appendChild(Script2)
+  //     const Script2 = document.createElement('script')
+  //     Script2.setAttribute('src', '/javascripts/browser_check.js')
+  //     document.body.appendChild(Script2)
 
-    const Script3 = document.createElement('script')
-    Script3.setAttribute('src', '/javascripts/jquery-ui.min.js')
-    document.body.appendChild(Script3)
+  //     const Script3 = document.createElement('script')
+  //     Script3.setAttribute('src', '/javascripts/jquery-ui.min.js')
+  //     document.body.appendChild(Script3)
 
-    const Script4 = document.createElement('script')
-    Script4.setAttribute('src', '/javascripts/jquery.expander.min.js')
-    document.body.appendChild(Script4)
+  //     const Script4 = document.createElement('script')
+  //     Script4.setAttribute('src', '/javascripts/jquery.expander.min.js')
+  //     document.body.appendChild(Script4)
 
-    const Script5 = document.createElement('script')
-    Script5.setAttribute('src', '/javascripts/show_expanded_clusters.js')
-    document.body.appendChild(Script5)
+  //     const Script5 = document.createElement('script')
+  //     Script5.setAttribute('src', '/javascripts/show_expanded_clusters.js')
+  //     document.body.appendChild(Script5)
 
-    const Script6 = document.createElement('script')
-    Script6.setAttribute('src', '/javascripts/textpanels.js')
-    document.body.appendChild(Script6)
+  //     const Script6 = document.createElement('script')
+  //     Script6.setAttribute('src', '/javascripts/textpanels.js')
+  //     document.body.appendChild(Script6)
 
-    const Script7 = document.createElement('script')
-    Script7.setAttribute('src', '/javascripts/pv.js')
-    document.body.appendChild(Script7)
+  //     const Script7 = document.createElement('script')
+  //     Script7.setAttribute('src', '/javascripts/pv.js')
+  //     document.body.appendChild(Script7)
 
-    const Script8 = document.createElement('script')
-    Script8.setAttribute('src', '/javascripts/jolecule.js')
-    document.body.appendChild(Script8)
+  //     const Script8 = document.createElement('script')
+  //     Script8.setAttribute('src', '/javascripts/jolecule.js')
+  //     document.body.appendChild(Script8)
 
-    const Script9 = document.createElement('script')
-    Script9.setAttribute('src', '/javascripts/aquaria.js')
-    document.body.appendChild(Script9)
+  //     const Script9 = document.createElement('script')
+  //     Script9.setAttribute('src', '/javascripts/aquaria.js')
+  //     document.body.appendChild(Script9)
 
-    const Script10 = document.createElement('script')
-    Script10.setAttribute('src', '/javascripts/resize_app.js')
-    document.body.appendChild(Script10)
+  //     const Script10 = document.createElement('script')
+  //     Script10.setAttribute('src', '/javascripts/resize_app.js')
+  //     document.body.appendChild(Script10)
 
-    const Script11 = document.createElement('script')
-    Script11.setAttribute('src', '/javascripts/jsdas.0.1.6.min.js')
-    document.body.appendChild(Script11)
-  }
+//     const Script11 = document.createElement('script')
+//     Script11.setAttribute('src', '/javascripts/jsdas.0.1.6.min.js')
+//     document.body.appendChild(Script11)
+//   }
 }
 </script>
 

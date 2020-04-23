@@ -1,6 +1,10 @@
 <template>
   <div id="app">
       <router-view/>
+      <div class="matrixLoading" id="loading_overlay"> LOADING....</div>
+      <!-- <div id="waiting_gif">
+            <img id="loading_gif" src="./assets/img/aquaria-spin.gif">
+      </div> -->
   </div>
 </template>
 
@@ -49,11 +53,47 @@ export default {
         }
       }
       )
+  },
+  mounted () {
+    if (window.location.pathname === '/SARS-CoV-2') {
+      document.querySelector('.matrixLoading').style.visibility = 'visible'
+    }
   }
 }
 </script>
 
 <style>
+.matrixLoading{
+  display: block;
+  visibility: hidden;
+}
+
+#loading_overlay{
+    background: #5E5E5E ;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    opacity: 0.77;
+    -moz-opacity: 0.68;
+    width: 100%;
+    z-index: 6;
+    color: white;
+    font-size: calc(16px + 6 * ((100vw - 320px) / 680));
+    padding: 45vh 22vh;
+  }
+
+/* #loading_gif{
+  width: calc(30px + 1.5vw);
+  height: calc(31px + 1.5vw);
+}
+
+#waiting_gif{
+  position: absolute;
+  z-index: 8;
+  margin: calc(6px + 0.4vw) 8px;
+} */
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -65,6 +105,7 @@ export default {
 #home{
   background-color: #c0c0c0;
   height: fit-content;
+  overflow: hidden;
 }
 
 html{
