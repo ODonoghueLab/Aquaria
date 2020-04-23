@@ -65,7 +65,7 @@ export default {
 #about_overlay{
     /* display: none; */
     border-radius: 12px;
-    position: fixed;
+    position: absolute;
     top: 1em;
     left: 10%;
     max-width: 700px;
@@ -74,10 +74,11 @@ export default {
     margin: 10px auto;
     background-color: #DDD;
     z-index: 105;
-    /* bottom: 1em; */
+    bottom: 1em;
     overflow: scroll;
     visibility: hidden;
     font-size: 10px;
+    height: fit-content;
 }
 #about_overlay h3{
     background-color: #999;
