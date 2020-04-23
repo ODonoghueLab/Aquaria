@@ -9,14 +9,16 @@
           </div>
     </div>
      <div id="container">
-        <div v-for="structure in structures" :key="structure.primary_accession" class="cell">
-          <h3 @click="redirect(structure.primary_accession)">{{structure.synonym}}</h3>
-          <picture @click="redirect(structure.primary_accession)">
+        <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
+          <a v-bind:href="[structure.count > 0 ? redirect(structure.primary_accession) : '']" :style="[structure.count > 0 ? {} : {'pointer-events': 'none'}]" target="_blank" class='link'>
+          <h3>{{structure.synonym}}</h3>
+          <picture>
              <source v-bind:srcset="'../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w'"  type="image/webp" sizes="33vw">
              <source v-bind:srcset="'../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w'"  type="image/jpeg" sizes="33vw">
              <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg'"/>
            </picture>
-          <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]" @click="redirect(structure.primary_accession)">{{structure.count}} matching structures</p>
+          <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]">{{structure.count}} matching structures</p>
+          </a>
         </div>
     </div>
     <AboutAquaria />
@@ -86,7 +88,7 @@ export default {
         redirectionPort = '/'
       }
       var url = window.location.protocol + '//' + window.location.hostname + redirectionPort + primaryAccession
-      window.open(url)
+      return url
     },
     showAbout: function () {
     // dim background
@@ -135,6 +137,9 @@ export default {
 </script>
 
 <style scoped>
+.link{
+  color: #2c3e50;
+}
 #logo{
     width: 84px;
     height: 86px;
