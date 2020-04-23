@@ -41,6 +41,7 @@ export default {
 <style scoped>
 #about_source{
     display: none;
+    height: fit-content;
     border-radius: 12px;
     position: fixed;
     top: 1em;

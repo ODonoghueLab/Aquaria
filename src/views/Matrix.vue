@@ -2,11 +2,7 @@
   <div id="Matrix">
     <div id="header">
           <div id="logo" v-on:click="showAbout()"></div>
-          <div id="title">
-          <p id="Orgname"></p>
-          <p id="matches"></p>
-          <p id="help" v-on:mouseover="showAbout2()" v-on:mouseout="showAbout2()">?</p>
-          </div>
+          <AboutMatrix v-bind:OrganismName="this.structures[1].name" id="about_matrix" />
     </div>
      <div id="container">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
@@ -22,23 +18,21 @@
         </div>
     </div>
     <AboutAquaria />
-    <AboutSource />
   </div>
 </template>
 
 <script>
 import * as CdrComps from '../cedar.js'
 import axios from 'axios'
-import $ from 'jquery'
 import AboutAquaria from '../components/AboutAquaria'
-import AboutSource from '../components/AboutSource'
+import AboutMatrix from '../components/AboutMatrix'
 
 export default {
   name: 'Matrix',
   components: {
     ...CdrComps,
     AboutAquaria,
-    AboutSource
+    AboutMatrix
   },
   data () {
     return {
@@ -47,16 +41,6 @@ export default {
       clicked: false,
       totalStructures: 0
     }
-  },
-  updated () {
-    // $('#matches').html(this.totalStructures + ' matching structures')
-    $('#Orgname').html('Structural models of ' + this.structures[1].name + ' proteins&nbsp;')
-    var matrixHeight = $('#home').height() - $('#title').height() - 30
-    matrixHeight = matrixHeight + 'px'
-    $('.noflex').css({
-      height: matrixHeight
-    })
-    // $('h1').html(this.structures[1].name + ' <span id="count"> ' + this.totalStructures + ' matching structures</span><a href="#"><span id="help">?</span></a>')
   },
   beforeMount () {
     var numStructures = [0, 2, 2, 2, 0, 0, 0, 0, 0, 25, 357, 495, 117, 0]
@@ -92,43 +76,34 @@ export default {
     },
     showAbout: function () {
     // dim background
+      document.querySelector('div#about_overlay').style.visibility = 'visible'
       if (document.getElementsByClassName('dimmer').length === 0) {
-        $('body').append('<div class="dimmer"></div>')
-        $('div.dimmer').on('click', function () {
-          $('div#about_overlay, div#help_overlay').hide()
-          $('div.dimmer').remove()
+        var elemDiv = document.createElement('div')
+        elemDiv.className = 'dimmer'
+        document.body.append(elemDiv)
+        document.querySelector('div#about_overlay').style.visibility = 'visible'
+        document.querySelector('div.dimmer').addEventListener('click', function () {
+          document.querySelector('div#about_overlay').style.visibility = 'hidden'
+          document.querySelector('div.dimmer').remove()
         })
       } else {
-        $('div.dimmer').remove()
+        document.querySelector('div.dimmer').remove()
       }
-
-      $('div#about_overlay').slideToggle('slow')
-    },
-    showAbout2: function () {
-      $('div#about_source').slideToggle('slow')
     }
   },
   mounted () {
     if ((window.outerHeight - window.innerHeight) >= 80) {
-      $('#Matrix').css({
-        height: '74vh'
-      })
+      document.getElementById('Matrix').style.height = '74vh'
     } else {
-      $('#Matrix').css({
-        height: '92.5vh'
-      })
+      document.getElementById('Matrix').style.height = '92.5vh'
     }
     window.scrollTo(0, 9)
     window.addEventListener('resize', function () {
       if ((window.outerHeight - window.innerHeight) >= 80) {
-        $('#Matrix').css({
-          height: '74vh'
-        })
+        document.getElementById('Matrix').style.height = '74vh'
         window.scrollTo(0, 0)
       } else {
-        $('#Matrix').css({
-          height: '92.5vh'
-        })
+        document.getElementById('Matrix').style.height = '92.5vh'
         window.scrollTo(0, 9)
       }
     })
@@ -139,6 +114,7 @@ export default {
 <style scoped>
 .link{
   color: #2c3e50;
+  font-weight:400;
 }
 #logo{
     width: 84px;
@@ -150,30 +126,6 @@ export default {
   cursor: pointer;
 }
 
-#title{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 5em;
-    background: #999999;
-    margin-left: 12px;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    padding: 2px calc(5px + 0.4vw);
-}
-
-#Orgname{
-      color: white;
-      font-size: calc(9px + 0.9vw);
-      font-weight: bold;
-      padding: 0 1vw;
-}
-
-#matches{
-    font-size: calc(10px + 0.4vw);
-    /* padding-top: 5px; */
-}
-
 .cell:hover{
   cursor: pointer;
 }
@@ -181,41 +133,7 @@ export default {
   top: 59px;
 }
 
-@media only screen
-  and (min-width : 100px)
-  and (max-width : 700px) {
-    #title{
-    margin-left: calc(32px + 0.8vw);
-  }
-}
-/* iPhone SE */
-@media only screen
-  and (min-width : 200px)
-  and (max-height : 600px) {
-    #Orgname{
-    font-size: calc(8px + 0.5vw);
-  }
-  #matches {
-    font-size: calc(7px + 0.5vw);
-  }
-}
-
-#help{
-  border-radius: 50%;
-  background-color: aliceblue;
-  width: calc(10px + 0.8vw);
-  height: calc(10px + 0.8vw);
-  font-size: calc(10px + 0.4vw);
-  /* margin-top: 6px; */
-  margin-left: 5px;
-}
-
-#help:hover{
-  background-color:orange;
-  color: white;
-}
 /* Christian's work */
-
 #matrix{
   margin-top: 20px;
   background: #c0c0c0;
@@ -236,20 +154,8 @@ export default {
         padding: 2px 22px;
         /* height:5em; */
     }
-    #header h1 {
-        font-size: calc(12px + 0.7vw);
-        color: #ffffff;
-        font-weight:900;
-        line-height: 145%;
-        background:#999999;
-        width:fit-content;
-        padding: 0 20px;
-        border-radius: 5em;
-        margin: 4px auto 0;
-        margin-top: 20px;
-    }
+
     div.no_match h3 {
-        /* color: #666666; */
         font-weight:400;
     }
     .cell {
@@ -334,7 +240,6 @@ export default {
             font-size: 16px;
         }
     }
-
     /* Alignment */
     body {
         text-align: center;
@@ -370,5 +275,6 @@ export default {
         width: 100%;
         top: 5%;
         z-index:1;
+        font-size: inherit;
     }
 </style>

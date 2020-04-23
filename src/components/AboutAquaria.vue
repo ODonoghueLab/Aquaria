@@ -44,9 +44,11 @@ export default {
   methods: {
     hideAbout: function () {
     // dim background
-      $('div#about_overlay, div#help_overlay').hide()
-      $('div.dimmer').remove()
-      $('div#about_overlay').hide()
+      // $('div#about_overlay, div#help_overlay').hide()
+      document.querySelector('div#about_overlay').style.visibility = 'hidden'
+      document.querySelector('div.dimmer').remove()
+      // $('div.dimmer').remove()
+      // $('div#about_overlay').hide()
     }
   },
   mounted () {
@@ -61,7 +63,7 @@ export default {
 
 <style scoped>
 #about_overlay{
-    display: none;
+    /* display: none; */
     border-radius: 12px;
     position: fixed;
     top: 1em;
@@ -74,6 +76,7 @@ export default {
     z-index: 105;
     /* bottom: 1em; */
     overflow: scroll;
+    visibility: hidden;
     font-size: 10px;
 }
 #about_overlay h3{
