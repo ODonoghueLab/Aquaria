@@ -72,7 +72,6 @@ export default {
         redirectionPort = '/'
       }
       var url = window.location.protocol + '//' + window.location.hostname + redirectionPort + primaryAccession
-      // window.open(url)
       return url
     },
     showAbout: function () {
