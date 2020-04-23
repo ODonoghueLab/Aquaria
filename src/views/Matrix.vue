@@ -2,7 +2,7 @@
   <div id="Matrix">
     <div id="header">
           <div id="logo" v-on:click="showAbout()"></div>
-          <AboutMatrix v-bind:OrganismName="this.structures[1].name" id="title" />
+          <AboutMatrix v-bind:OrganismName="this.structures[1].name" id="about_matrix" />
     </div>
      <div id="container">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
@@ -91,9 +91,6 @@ export default {
         document.querySelector('div.dimmer').remove()
       }
     }
-    // showAbout2: function () {
-    //   $('div#about_source').slideToggle('slow')
-    // }
   },
   mounted () {
     if ((window.outerHeight - window.innerHeight) >= 80) {
@@ -117,7 +114,8 @@ export default {
 
 <style scoped>
 .link{
-  color: black;
+  color: #2c3e50;
+  font-weight:400;
 }
 #logo{
     width: 84px;
@@ -129,32 +127,14 @@ export default {
   cursor: pointer;
 }
 
-#title{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 5em;
-    background: #999999;
-    margin-left: 12px;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    padding: 2px calc(5px + 0.4vw);
-}
-
 .cell:hover{
   cursor: pointer;
 }
-
-@media only screen
-  and (min-width : 100px)
-  and (max-width : 700px) {
-    #title{
-    margin-left: calc(32px + 0.8vw);
-  }
+#about_source{
+  top: 59px;
 }
 
 /* Christian's work */
-
 #matrix{
   margin-top: 20px;
   background: #c0c0c0;
@@ -177,7 +157,6 @@ export default {
     }
 
     div.no_match h3 {
-        /* color: #666666; */
         font-weight:400;
     }
     .cell {
@@ -192,12 +171,12 @@ export default {
         grid-gap: 6px;
         background: #c0c0c0;
         padding: 6px;
-        height: 100%;
+        height: 92vh;
         width: 98vw;
         margin: 0 auto;
     }
     /* Wide aspect ratio */
-    @media (min-aspect-ratio: 8/5) and (max-aspect-ratio: 15/4) {
+    @media (max-aspect-ratio: 15/4) and (min-aspect-ratio: 8/5) {
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
@@ -209,14 +188,27 @@ export default {
         #container {
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            height: 100%;
+            height: 88vh;
+        }
+    }
+    @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
+        #container {
+            height: 94vh;
         }
     }
 /* In-between aspect ratio, put it at the bottom to avoid override*/
-    @media (min-aspect-ratio: 3/4) and (max-aspect-ratio: 8/5) {
+    @media (max-aspect-ratio: 8/5) and (min-aspect-ratio: 3/4) {
         #container  {
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
+            height: 90vh;
+        }
+    }
+        @media (max-aspect-ratio: 8/5) and
+              (min-aspect-ratio: 3/4) and
+              (min-height: 1000px) {
+        #container  {
+            height: 93vh;
         }
     }
     .cell {
@@ -224,11 +216,14 @@ export default {
         grid-row: span 1;
     }
     .cell img {
-        max-height: 100%; /*  = 100% of the available space */
-        /* don't specify width to maintain aspect ratio */
-        position: relative;
-        top: 4%;
-        z-index:0;
+        max-height: 100%;
+        max-width: 100%;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
     }
     /* TYPOGRAPHY */
     /* responsive sizes */
@@ -246,12 +241,11 @@ export default {
             font-size: 16px;
         }
     }
-
     /* Alignment */
     body {
         text-align: center;
     }
-    h3, p {
+    h1, h3, p {
         margin: 0;
     }
     span#count {
@@ -282,5 +276,6 @@ export default {
         width: 100%;
         top: 5%;
         z-index:1;
+        font-size: inherit;
     }
 </style>

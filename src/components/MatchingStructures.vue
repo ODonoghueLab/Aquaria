@@ -310,12 +310,12 @@ export default {
   }
 
   div.dimmer {
-    background: black;
+    background: #5E5E5E ;
     height: 100%;
     position: fixed;
     left: 0;
     top: 0;
-    opacity: 0.68;
+    opacity: 0.77;
     -moz-opacity: 0.68;
     width: 100%;
     z-index: 3;
