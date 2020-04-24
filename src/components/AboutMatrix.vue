@@ -93,7 +93,7 @@ export default {
     align-items: baseline;
     border-radius: 5em;
     background: #999999;
-    padding: 2px calc(5px + 0.4vw);
+    padding: 5px calc(5px + 0.4vw);
 }
 
 #content {
@@ -103,10 +103,10 @@ export default {
     border-radius: 2em;
     background: #DEDEDE;
     top: 10px;
-    left: 20%;
-    right: 20%;
+    left: 33%;
+    right: 33%;
     padding: 8px calc(10px + 0.4vw) 20px calc(10px + 0.4vw);
-    width: 60%;
+    width: 34%;
     max-height: 95vh;
     overflow: auto;
 }
@@ -133,21 +133,22 @@ export default {
     height: calc(10px + .8vw);
     font-size: calc(10px + .4vw);
     margin: 0px 0px 0px 5px;
-    line-height: calc(10px + 1.2vw);
+    line-height: calc(10px + 1vw);
 }
 
 #close:hover, #help:hover {
   background-color:#E9A45B;
   color: white;
+  cursor: pointer;
 }
 
 /* iPhone SE */
 @media only screen
   and (min-width : 200px)
   and (max-height : 600px) {
-    #Orgname{
+    /* #Orgname{
     font-size: calc(8px + 0.5vw);
-  }
+  } */
   #matches {
     font-size: calc(7px + 0.5vw);
   }
@@ -157,9 +158,9 @@ export default {
     @media (max-aspect-ratio: 3/4) {
         #content{
             font-size: 10px;
-            left: 10%;
-            right: 10%;
-            width: 80%;
+            left: 15%;
+            right: 15%;
+            width: 70%;
         }
     }
     @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
