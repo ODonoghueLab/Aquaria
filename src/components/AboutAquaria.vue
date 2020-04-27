@@ -78,6 +78,7 @@ export default {
     overflow: scroll;
     visibility: hidden;
     font-size: 10px;
+    max-height: 90vh;
     height: fit-content;
 }
 #about_overlay h3{
@@ -93,7 +94,8 @@ export default {
 }
   @media screen and (min-width: 320px) {
       #about_overlay {
-          font-size: calc(8px + 6 * ((100vw - 320px) / 680));
+          /* font-size: calc(8px + 6 * ((100vw - 320px) / 680)); */
+          font-size: calc(8px + 1.3vw);
       }
   }
   @media screen and (min-width: 1000px) {

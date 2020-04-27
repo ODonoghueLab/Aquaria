@@ -3,7 +3,7 @@
         <div id="title_0">
             <span id="Orgname_0">Structural models of {{ OrganismName }} proteins&nbsp;</span>
             <span id="matches_0"></span>
-            <span id="help" @click="showAbout()">?</span>
+            <span id="help" @mouseover="showAbout()">?</span>
         </div>
         <div id="content">            <!-- if content visible, help mouseover disable -->
             <div id="title">
@@ -118,7 +118,7 @@ export default {
 }
 #Orgname, #Orgname_0 {
     color: #fff;
-    font-size: calc(8px + .9vw);
+    font-size: calc(8px + 0.8vw);
     font-weight: 700;
 }
 
@@ -146,11 +146,22 @@ export default {
 @media only screen
   and (min-width : 200px)
   and (max-height : 600px) {
-    /* #Orgname{
-    font-size: calc(8px + 0.5vw);
-  } */
+    #Orgname{
+    font-size: calc(7px + 1vw);
+  }
   #matches {
     font-size: calc(7px + 0.5vw);
+  }
+  #title_0 {
+    padding: 5px calc(3px + 0.4vw);
+  }
+  #title{
+    padding: 5px calc(5px + 1vw);
+  }
+  #content{
+    left: 7%;
+    right: 7%;
+    width: 86%;
   }
 }
 
@@ -158,9 +169,9 @@ export default {
     @media (max-aspect-ratio: 3/4) {
         #content{
             font-size: 10px;
-            left: 15%;
-            right: 15%;
-            width: 70%;
+            left: 10%;
+            right: 10%;
+            width: 80%;
         }
     }
     @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
@@ -170,7 +181,8 @@ export default {
     }
     @media screen and (min-width: 320px) {
       #content {
-          font-size: calc(8px + 6 * ((100vw - 320px) / 680));
+          /* font-size: calc(8px + 7 * ((100vw - 320px) / 680)); */
+          font-size: calc(8px + 1.3vw);
       }
     }
     @media screen and (min-width: 1000px) {
@@ -178,6 +190,15 @@ export default {
             font-size: 16px;
         }
     }
+    @media (min-width: 590px) and (max-width: 1000px) {
+        #content{
+            font-size: calc(8px + 0.8vw);
+            left: 25%;
+            right: 25%;
+            width: 50%;
+        }
+    }
+
 /* .x{
     position: relative;
     left: 50px;

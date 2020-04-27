@@ -94,24 +94,46 @@ export default {
   updated () {
     setTimeout(function () {
       document.querySelector('.matrixLoading').remove()
-    }, 1000)
+    }, 350)
   },
   mounted () {
-    if ((window.outerHeight - window.innerHeight) >= 80) {
-      document.getElementById('Matrix').style.height = '74vh'
-    } else {
-      document.getElementById('Matrix').style.height = '92.5vh'
+    var checkPhone = function () {
+      var iDevices = [
+        'iPad Simulator',
+        'iPhone Simulator',
+        'iPod Simulator',
+        'iPad',
+        'iPhone',
+        'iPod'
+      ]
+
+      if (navigator.platform) {
+        while (iDevices.length) {
+          if (navigator.platform === iDevices.pop() || (screen.width >= 300 && screen.width <= 600)) { return true }
+        }
+      } else {
+        return false
+      }
     }
-    window.scrollTo(0, 9)
-    window.addEventListener('resize', function () {
+    var isPhone = checkPhone()
+    if (isPhone) {
       if ((window.outerHeight - window.innerHeight) >= 80) {
         document.getElementById('Matrix').style.height = '74vh'
-        window.scrollTo(0, 0)
+        alert('yes_siz')
       } else {
         document.getElementById('Matrix').style.height = '92.5vh'
         window.scrollTo(0, 9)
       }
-    })
+      window.addEventListener('resize', function () {
+        if ((window.outerHeight - window.innerHeight) >= 80) {
+          document.getElementById('Matrix').style.height = '74vh'
+          window.scrollTo(0, 0)
+        } else {
+          document.getElementById('Matrix').style.height = '92.5vh'
+          window.scrollTo(0, 9)
+        }
+      })
+    }
   }
 }
 </script>
@@ -172,7 +194,7 @@ export default {
         grid-gap: 6px;
         background: #c0c0c0;
         padding: 6px;
-        height: 92vh;
+        height: 92%;
         width: 98vw;
         margin: 0 auto;
     }
@@ -181,7 +203,7 @@ export default {
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            height: 88vh;
+            height: 88%;
         }
     }
     /* Tall aspect ratio */
@@ -189,12 +211,12 @@ export default {
         #container {
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            height: 88vh;
+            height: 88%;
         }
     }
     @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
         #container {
-            height: 94vh;
+            height: 94%;
         }
     }
 /* In-between aspect ratio, put it at the bottom to avoid override*/
@@ -202,14 +224,14 @@ export default {
         #container  {
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            height: 90vh;
+            height: 90%;
         }
     }
         @media (max-aspect-ratio: 8/5) and
               (min-aspect-ratio: 3/4) and
               (min-height: 1000px) {
         #container  {
-            height: 93vh;
+            height: 93%;
         }
     }
     .cell {
