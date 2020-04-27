@@ -69,12 +69,12 @@ export default {
 }
 @media screen and (min-width: 320px) {
       #about_source {
-          font-size: calc(8px + 6 * ((100vw - 320px) / 680));
+        font-size: calc(8px + 6 * ((100vw - 320px) / 680));
       }
   }
   @media screen and (min-width: 1000px) {
       #about_source {
-          font-size: 16px;
+        font-size: 16px;
       }
   }
 

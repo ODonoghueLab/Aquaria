@@ -1,10 +1,12 @@
 <template>
   <div id="app">
       <router-view/>
-      <div class="matrixLoading" id="loading_overlay"> LOADING....</div>
-      <!-- <div id="waiting_gif">
-            <img id="loading_gif" src="./assets/img/aquaria-spin.gif">
-      </div> -->
+      <div class="matrixLoading">
+      <div id="waiting_gif">
+          <img id="loading_gif" src="./assets/img/aquaria-spin.gif">
+      </div>
+      <div id="loading_overlay"> LOADING<span id="myspan"></span></div>
+      </div>
   </div>
 </template>
 
@@ -57,6 +59,11 @@ export default {
   mounted () {
     if (window.location.pathname === '/SARS-CoV-2') {
       document.querySelector('.matrixLoading').style.visibility = 'visible'
+      var span = document.getElementById('myspan')
+
+      setInterval(function () {
+        if ((span.innerHTML += '.').length === 5) { span.innerHTML = '' }
+      }, 500)
     }
   }
 }
@@ -64,26 +71,49 @@ export default {
 
 <style>
 .matrixLoading{
-  display: block;
+  display: flex;
   visibility: hidden;
+  padding: 45vh 45vw;
+  background: #5E5E5E;
+  height: 100vh;
+  width: 100vw;
+}
+
+#myspan{
+  position: relative;
 }
 
 #loading_overlay{
-    background: #5E5E5E ;
+    display: inline-flex;
     height: 100%;
     position: fixed;
-    left: 0;
-    top: 0;
-    opacity: 0.77;
-    -moz-opacity: 0.68;
     width: 100%;
     z-index: 6;
     color: white;
     font-size: calc(16px + 6 * ((100vw - 320px) / 680));
-    padding: 45vh 22vh;
+    padding-top: calc(38px + 1.5vw);
+    margin-left: calc(1.8vw - 12px);
   }
 
-/* #loading_gif{
+    /* Tall aspect ratio */
+  @media (max-aspect-ratio: 3/4) {
+        #loading_overlay {
+            font-size: calc(8px + 1.5vw);
+        }
+        #waiting-git{
+          left: calc(49vw - 5px);
+        }
+    }
+    @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
+        #loading_overlay {
+            font-size: calc(8px + 0.8vw);
+        }
+        #waiting-git{
+          left: calc(49vw - 5px);
+        }
+    }
+
+#loading_gif{
   width: calc(30px + 1.5vw);
   height: calc(31px + 1.5vw);
 }
@@ -91,8 +121,9 @@ export default {
 #waiting_gif{
   position: absolute;
   z-index: 8;
-  margin: calc(6px + 0.4vw) 8px;
-} */
+  /* left: 47.5vw; */
+  left: calc(49vw - 8px);
+}
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -101,6 +132,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   background-color: #c0c0c0;
+  overflow: scroll;
 }
 #home{
   background-color: #c0c0c0;
