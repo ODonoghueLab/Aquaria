@@ -97,9 +97,7 @@ export default {
     }, 350)
 
     window.addEventListener('resize', function () {
-        console.log("THIS IS RESIZED")
         if ((window.outerHeight - window.innerHeight) >= 114) {
-          alert('more than 80, resize')
           document.getElementById('Matrix').style.height = '84vh'
           document.getElementById('about_overlay').style.maxHeight = '80vh'
           document.getElementById('content').style.maxHeight = '80vh'
@@ -132,10 +130,7 @@ export default {
     }
     var isPhone = checkPhone()
     if (isPhone) {
-      var x = window.outerHeight - window.innerHeight
-      alert(x)
       if ((window.outerHeight - window.innerHeight) >= 114) {
-        alert('more than 80')
         document.getElementById('Matrix').style.height = '84vh'
         document.getElementById('container').style.height = '87%'
         document.getElementById('about_overlay').style.maxHeight = '80vh'
