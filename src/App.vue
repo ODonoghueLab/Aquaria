@@ -74,7 +74,7 @@ export default {
   display: flex;
   visibility: hidden;
   padding: 45vh 45vw;
-  background: #5E5E5E;
+  background: #ABABAB;
   height: 100vh;
   width: 100vw;
 }
@@ -89,7 +89,7 @@ export default {
     position: fixed;
     width: 100%;
     z-index: 6;
-    color: white;
+    color: #DDDDDD;
     font-size: calc(16px + 6 * ((100vw - 320px) / 680));
     padding-top: calc(38px + 1.5vw);
     margin-left: calc(1.8vw - 12px);
