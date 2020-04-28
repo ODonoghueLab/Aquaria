@@ -178,8 +178,8 @@ export default {
 } */
 #Matrix{
   height: 100vh;
-  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) 8px;
-  background-size: calc(30px + 1.5vw) calc(31px + 1.5vw);
+  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) 9px;
+  background-size: calc(40px + 1.5vw) calc(40px + 1.5vw);
   text-align: center;
 }
 /* general layout and colors */

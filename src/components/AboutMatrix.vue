@@ -1,11 +1,16 @@
 <template>
     <div id="about_matrix">
-        <div id="title_0">
+        <div id="title_0" v-if="$mq === 'laptop'">
             <span id="Orgname_0">Structural models of {{ OrganismName }} proteins&nbsp;</span>
             <span id="matches_0"></span>
-            <span id="help" @mouseover="showAbout()">?</span>
+            <span id="help" @mouseover="showAbout()" v-if="$mq === 'laptop'">?</span>
         </div>
-        <div id="content">            <!-- if content visible, help mouseover disable -->
+        <div id="title_0" v-if="$mq === 'mobile' || $mq === 'tablet'" @mousedown="showAboutPhone()">
+            <span id="Orgname_0">Structural models of {{ OrganismName }} proteins&nbsp;</span>
+            <span id="matches_0"></span>
+            <span id="help">?</span>
+        </div>
+        <div id="content">
             <div id="title">
                 <span id="Orgname">Structural models of {{ OrganismName }} proteins&nbsp;</span>
                 <span id="matches"></span>
@@ -30,35 +35,45 @@ export default {
       return store.state.message
     }
   },
-  props: ['OrganismName', 'OrgSynonyms'],
+  props: ['OrganismName', 'OrgSynonyms', 'checkDevice'],
   methods: {
     hideAbout: function () {
       document.querySelector('#content').style.visibility = 'hidden'
       document.querySelector('div.dimmer').remove()
-      // document.querySelector('#help').style.display = 'block'
-      // document.querySelector('#close').style.display = 'none'
       setTimeout(function () { document.querySelector('#help').style.pointerEvents = 'auto' }, 1000)
       document.querySelector('#help').style.pointerEvents = 'none'
     },
     showAbout: function () {
       document.querySelector('#content').style.visibility = 'visible'
-      // document.querySelector('#help').style.display = 'none'
-      // document.querySelector('#close').style.display = 'block'
       if (document.getElementsByClassName('dimmer').length === 0) {
         var elemDiv = document.createElement('div')
         elemDiv.className = 'dimmer'
         document.body.append(elemDiv)
         document.querySelector('#content').style.visibility = 'visible'
+
         document.querySelector('div.dimmer').addEventListener('mouseover', function () {
           document.querySelector('#content').style.visibility = 'hidden'
-          // document.querySelector('#help').style.display = 'block'
-          // document.querySelector('#close').style.display = 'none'
           document.querySelector('div.dimmer').remove()
         })
       } else {
         document.querySelector('div.dimmer').remove()
       }
-    // dim background
+    },
+    showAboutPhone: function () {
+      document.querySelector('#content').style.visibility = 'visible'
+      if (document.getElementsByClassName('dimmer').length === 0) {
+        var elemDiv = document.createElement('div')
+        elemDiv.className = 'dimmer'
+        document.body.append(elemDiv)
+        document.querySelector('#content').style.visibility = 'visible'
+
+        document.querySelector('div.dimmer').addEventListener('click', function () {
+          document.querySelector('#content').style.visibility = 'hidden'
+          document.querySelector('div.dimmer').remove()
+        })
+      } else {
+        document.querySelector('div.dimmer').remove()
+      }
     }
   }
 //   mounted () {
