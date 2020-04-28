@@ -33,7 +33,6 @@ export default {
   props: ['OrganismName', 'OrgSynonyms'],
   methods: {
     hideAbout: function () {
-      console.log('THIS ')
       document.querySelector('#content').style.visibility = 'hidden'
       document.querySelector('div.dimmer').remove()
       // document.querySelector('#help').style.display = 'block'
@@ -107,7 +106,7 @@ export default {
     right: 33%;
     padding: 8px calc(10px + 0.4vw) 20px calc(10px + 0.4vw);
     width: 34%;
-    max-height: 95vh;
+    max-height: 90vh;
     overflow: auto;
 }
 #content p {

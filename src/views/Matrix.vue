@@ -95,8 +95,23 @@ export default {
     setTimeout(function () {
       document.querySelector('.matrixLoading').remove()
     }, 350)
-  },
-  mounted () {
+
+    window.addEventListener('resize', function () {
+        console.log("THIS IS RESIZED")
+        if ((window.outerHeight - window.innerHeight) >= 114) {
+          alert('more than 80, resize')
+          document.getElementById('Matrix').style.height = '84vh'
+          document.getElementById('about_overlay').style.maxHeight = '80vh'
+          document.getElementById('content').style.maxHeight = '80vh'
+          window.scrollTo(0, 0)
+        } else {
+          document.getElementById('Matrix').style.height = '100vh'
+          document.getElementById('about_overlay').style.maxHeight = '90vh'
+          document.getElementById('content').style.maxHeight = '95vh'
+          window.scrollTo(0, 9)
+        }
+      })
+
     var checkPhone = function () {
       var iDevices = [
         'iPad Simulator',
@@ -117,22 +132,21 @@ export default {
     }
     var isPhone = checkPhone()
     if (isPhone) {
-      if ((window.outerHeight - window.innerHeight) >= 80) {
-        document.getElementById('Matrix').style.height = '74vh'
-        alert('yes_siz')
+      var x = window.outerHeight - window.innerHeight
+      alert(x)
+      if ((window.outerHeight - window.innerHeight) >= 114) {
+        alert('more than 80')
+        document.getElementById('Matrix').style.height = '84vh'
+        document.getElementById('container').style.height = '87%'
+        document.getElementById('about_overlay').style.maxHeight = '80vh'
+        document.getElementById('content').style.maxHeight = '80vh'
       } else {
-        document.getElementById('Matrix').style.height = '92.5vh'
+        document.getElementById('Matrix').style.height = '100vh'
+        document.getElementById('container').style.height = '91%'
+        document.getElementById('about_overlay').style.maxHeight = '90vh'
+        document.getElementById('content').style.maxHeight = '95vh'
         window.scrollTo(0, 9)
       }
-      window.addEventListener('resize', function () {
-        if ((window.outerHeight - window.innerHeight) >= 80) {
-          document.getElementById('Matrix').style.height = '74vh'
-          window.scrollTo(0, 0)
-        } else {
-          document.getElementById('Matrix').style.height = '92.5vh'
-          window.scrollTo(0, 9)
-        }
-      })
     }
   }
 }
@@ -158,10 +172,10 @@ export default {
 }
 
 /* Christian's work */
-#matrix{
+/* #matrix{
   margin-top: 20px;
   background: #c0c0c0;
-}
+} */
 #Matrix{
   height: 100vh;
   background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) 8px;
@@ -194,7 +208,7 @@ export default {
         grid-gap: 6px;
         background: #c0c0c0;
         padding: 6px;
-        height: 92%;
+        height: 90%;
         width: 98vw;
         margin: 0 auto;
     }
@@ -203,7 +217,7 @@ export default {
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            height: 88%;
+            height: 89%;
         }
     }
     /* Tall aspect ratio */
@@ -211,12 +225,12 @@ export default {
         #container {
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            height: 88%;
+            height: 92%;
         }
     }
     @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
         #container {
-            height: 94%;
+            height: 92%;
         }
     }
 /* In-between aspect ratio, put it at the bottom to avoid override*/
@@ -224,7 +238,7 @@ export default {
         #container  {
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            height: 90%;
+            height: 89%;
         }
     }
         @media (max-aspect-ratio: 8/5) and

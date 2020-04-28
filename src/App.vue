@@ -137,7 +137,6 @@ export default {
 #home{
   background-color: #c0c0c0;
   height: fit-content;
-  overflow: hidden;
 }
 
 html{
