@@ -91673,141 +91673,144 @@ class ColorLegendWidget extends CanvasWidget {
 	}
 	//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
 	  
-$("#export-button").removeAttr("style")
-.attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
+	$("#export-button").removeAttr("style")
+	.attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
 
-$("#toggle-toolbar-button").removeAttr("style")
-.attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
+	$("#toggle-toolbar-button").removeAttr("style")
+	.attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
 
-$("#toggle-toolbar-button2").click(function(){
-    $("#toggle-toolbar-button").removeAttr("style")
-    .attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
-})
+	$("#toggle-toolbar-button2").click(function(){
+		$("#toggle-toolbar-button").removeAttr("style")
+		.attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
+	})
 
-$(window).on('resize', function() {
-$("#toggle-toolbar-button").removeAttr( 'style' )
-.attr("style", "position: absolute; z-index: 2; top: 0px; right: 3px; margin: 5px; transform: rotate(180deg)")
-});
+	$(window).on('resize', function() {
+	$("#toggle-toolbar-button").removeAttr( 'style' )
+	.attr("style", "position: absolute; z-index: 2; top: 0px; right: 3px; margin: 5px; transform: rotate(180deg)")
+	});
 
-$('.jolecule-embed-header').attr("style", "display: none; flex-flow: row-reverse;")
+	$('.jolecule-embed-header').attr("style", "display: none; flex-flow: row-reverse;")
 
-$(".jolecule-embed-view").removeAttr('style').css({
-position: "",
-"z-index": "1",
-"padding": "4px 5px",
-"display": "flex",
-"top": "2px"
-})
+	$(".jolecule-embed-view").removeAttr('style').css({
+	position: "",
+	"z-index": "1",
+	"padding": "4px 5px",
+	"display": "flex",
+	"top": "2px"
+	})
 
-if((($("#threeDSpan-inner-clipping-plane").length > 0 ) && $("#export-button").length <=0)){
-    $(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
-}
+	if((($("#threeDSpan-inner-clipping-plane").length > 0 ) && $("#export-button").length <=0)){
+		$(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
+	}
+	
+	//Align feature description text
+	$("#threeDSpan-inner-jolecule-soup-display").css({'text-align':'left'})
 
-// TOGGLE COLOR LEGEND
-var toggle_legend = new MutationObserver(function(){
-	console.log("THIS IS COLOR LEGEND")
-    $("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
+	// TOGGLE COLOR LEGEND
+	var toggle_legend = new MutationObserver(function(){
+		console.log("THIS IS COLOR LEGEND")
+		$("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
 
-    $("#color-legend").click(function(){
-    $('[id^="color-legend-"]').toggle();
-    })
+		$("#color-legend").click(function(){
+		$('[id^="color-legend-"]').toggle();
+		})
 
-    $('[id^="color-legend-"]').hide()
-});
+		$('[id^="color-legend-"]').hide()
+	});
 
-toggle_legend.observe(document.getElementById("color-legend"),{ 
-childlist: true,
-attributes : true, 
-attributeFilter : ['style'] 
-});
+	toggle_legend.observe(document.getElementById("color-legend"),{ 
+	childlist: true,
+	attributes : true, 
+	attributeFilter : ['style'] 
+	});
 
-var select_residue = new MutationObserver(function(){
-	$("#first_match").hide()
-	$("#threeDSpan-inner-sequence-widget-inner>canvas").show()
-  });
+	var select_residue = new MutationObserver(function(){
+		$("#first_match").hide()
+		$("#threeDSpan-inner-sequence-widget-inner>canvas").show()
+	});
 
-var on_load = new MutationObserver(function(m){
-	m.forEach(function(mutation){
-		if (mutation.attributeName !== 'style') return;
-		var currentValue = mutation.target.style.display;
-		if (currentValue == "none") {
-			if(document.getElementById("loading-message").innerHTML == "Preparing views..."){
-				$(".jolecule-button").hide()
-				// $("#toggle-toolbar-button").hide()
-				$("#export-button").hide()
-				$("#intro").hide()
-				$('#structurematches').hide()
-				$('div.dimmer').remove()
-				$('#gene_name').show()
-				$("#title3D").css("display","none")
-				$("#searchByName").css("display","none")
+	var on_load = new MutationObserver(function(m){
+		m.forEach(function(mutation){
+			if (mutation.attributeName !== 'style') return;
+			var currentValue = mutation.target.style.display;
+			if (currentValue == "none") {
+				if(document.getElementById("loading-message").innerHTML == "Preparing views..."){
+					$(".jolecule-button").hide()
+					// $("#toggle-toolbar-button").hide()
+					$("#export-button").hide()
+					$("#intro").hide()
+					$('#structurematches').hide()
+					$('div.dimmer').remove()
+					$('#gene_name').show()
+					$("#title3D").css("display","none")
+					$("#searchByName").css("display","none")
 
-				sessionStorage.setItem("link", $(location).attr('pathname'))
-					  
-				select_residue.observe(document.getElementById("threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection"),{ 
-				  childlist: true,
-				  attributes : true, 
-				  attributeFilter : ['style'] 
-				});
-				
-				if($("#first_match").length > 0){
-					$("#first_match").remove()
-				}
-				//THE COVERAGE MAP
-				$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
-					if($("#first_match").length < 1){
-					  var a = $("div.container.loaded").html()
-					  var b = $('<div id="first_match">').append(a)
-					  $("#threeDSpan-inner-sequence-widget-inner").append(b)
-				}
-		  
-				var windowWidth = window.innerWidth
-				$("#first_match>svg>g").find('.thumbnail').remove()
-				document.querySelector("#first_match>svg>g>g>line").setAttribute("x1",-windowWidth);
-				document.querySelector("#first_match>svg>g>g>line").setAttribute("x2",windowWidth+100);
-				$("#first_match>svg").css({"width": "100%"})
-				var g_left =  parseInt($("#first_match>svg>g").css('transform').split(', ')[4])
-				$("#first_match>svg>g").attr("transform", "translate(" + g_left + ",2)")
-				$("#first_match").css({
+					sessionStorage.setItem("link", $(location).attr('pathname'))
+						
+					select_residue.observe(document.getElementById("threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection"),{ 
+					childlist: true,
+					attributes : true, 
+					attributeFilter : ['style'] 
+					});
 					
-				})
-				$("#first_match").on("mouseenter", function () {
-				$("#first_match").css({
-					transform: "scale(1.04)"
-				})
-				});
-				$("#first_match").on("mouseleave", function () {
+					if($("#first_match").length > 0){
+						$("#first_match").remove()
+					}
+					//THE COVERAGE MAP
+					$("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
+						if($("#first_match").length < 1){
+						var a = $("div.container.loaded").html()
+						var b = $('<div id="first_match">').append(a)
+						$("#threeDSpan-inner-sequence-widget-inner").append(b)
+					}
+			
+					var windowWidth = window.innerWidth
+					$("#first_match>svg>g").find('.thumbnail').remove()
+					document.querySelector("#first_match>svg>g>g>line").setAttribute("x1",-windowWidth);
+					document.querySelector("#first_match>svg>g>g>line").setAttribute("x2",windowWidth+100);
+					$("#first_match>svg").css({"width": "100%"})
+					var g_left =  parseInt($("#first_match>svg>g").css('transform').split(', ')[4])
+					$("#first_match>svg>g").attr("transform", "translate(" + g_left + ",2)")
 					$("#first_match").css({
-						transform: "scale(1)"
+						
+					})
+					$("#first_match").on("mouseenter", function () {
+					$("#first_match").css({
+						transform: "scale(1.04)"
 					})
 					});
-				//   var svg_width = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[2]
-				//   var svg_height = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[3]
-				//   document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + svg_width + " " + svg_height- 20 )
-		  
-				  //REMOVE FOOTER BORDER 
-		  
-				  $(".jolecule-embed-footer").css({"border-top":"none"})
+					$("#first_match").on("mouseleave", function () {
+						$("#first_match").css({
+							transform: "scale(1)"
+						})
+						});
+					//   var svg_width = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[2]
+					//   var svg_height = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[3]
+					//   document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + svg_width + " " + svg_height- 20 )
+			
+					//REMOVE FOOTER BORDER 
+			
+					$(".jolecule-embed-footer").css({"border-top":"none"})
 
-				  $('#first_match').on('click', function () {
-					if (document.getElementsByClassName('dimmer').length === 0) {
-					  $('body').append('<div class="dimmer"></div>')
-					  $('#gene_name').hide()
-					  $('div.dimmer').on('click', function () {
-						$('#structurematches').hide()
+					$('#first_match').on('click', function () {
+						if (document.getElementsByClassName('dimmer').length === 0) {
+						$('body').append('<div class="dimmer"></div>')
+						$('#gene_name').hide()
+						$('div.dimmer').on('click', function () {
+							$('#structurematches').hide()
+							$('div.dimmer').remove()
+							$('#gene_name').show()
+						})
+						} else {
 						$('div.dimmer').remove()
-						$('#gene_name').show()
-					  })
-					} else {
-					  $('div.dimmer').remove()
-					}
-					$('#structurematches').slideToggle('slow')
-				  })
-		  
-			  }
-		}
-	})
-  });
+						}
+						$('#structurematches').slideToggle('slow')
+					})
+			
+				}
+			}
+		})
+	});
 
   on_load.observe(document.getElementById("waitingFrame"), {
 	attributes:    true,
@@ -127605,19 +127608,19 @@ class AquariaAlignment {
         residue.resNum
       )
       let pdbC = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.get(__WEBPACK_IMPORTED_MODULE_2__data__["j" /* resToAa */], residue.resType, '.')
-      let label = `Structure: ${pdbId}-${residue.chain} ${pdbC}${
+      let label = `<b>Structure: </b>${pdbId}-${residue.chain} ${pdbC}${
         residue.resNum
-      } <br>Atom: ${atom.atomType}`
+      } <br><b>Atom: </b> ${atom.atomType}`
       if (!__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.isNil(seqResNum)) {
         if (seqName) {
-          label = `Sequence: ${seqName} ${c}${seqResNum} <br>` + label
+          label = `<b>Sequence: </b> ${seqName} ${c}${seqResNum} <br>` + label
         } else {
-          label = `Sequence: [No match]<br>` + label
+          label = `<b>Sequence: </b> [No match]<br>` + label
         }
         if (this.features) {
           for (let feature of this.features) {
             if (feature.Residue === seqResNum) {
-              label += `<br>Feature: ${feature.Name}`
+              label += `<br><b>Feature: </b> ${feature.Name}`
               if (feature.Description) {
                 if (feature.Name) {
                   label += ' - '
