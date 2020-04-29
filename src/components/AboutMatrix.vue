@@ -107,7 +107,7 @@ export default {
     align-items: baseline;
     border-radius: 5em;
     background: #999999;
-    padding: 5px calc(5px + 0.4vw);
+    padding: 5px calc(13px + 0.4vw);
 }
 
 #content {
@@ -170,12 +170,12 @@ export default {
     padding: 5px calc(3px + 0.4vw);
   }
   #title{
-    padding: 5px calc(5px + 1vw);
+    padding: 5px calc(13px + 1vw);
   }
   #content{
-    left: 7%;
-    right: 7%;
-    width: 86%;
+    left: 5%;
+    right: 5%;
+    width: 90%;
   }
 }
 
@@ -183,9 +183,9 @@ export default {
     @media (max-aspect-ratio: 3/4) {
         #content{
             font-size: 10px;
-            left: 10%;
-            right: 10%;
-            width: 80%;
+            left: 5%;
+            right: 5%;
+            width: 90%;
         }
     }
     @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
