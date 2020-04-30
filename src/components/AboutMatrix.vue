@@ -91,7 +91,7 @@ export default {
 #about_matrix{
     margin-left: 12px;
     margin-top: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 @media only screen
