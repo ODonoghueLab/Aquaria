@@ -238,6 +238,18 @@ export default {
             height: 89%;
         }
     }
+
+    @media screen and (orientation:landscape){
+        #container {
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            height: 82%;
+        }
+        #about_matrix{
+          margin-bottom: 11px;
+        }
+    }
+
     /* Tall aspect ratio */
     @media (max-aspect-ratio: 3/4) {
         #container {
@@ -266,6 +278,7 @@ export default {
             height: 93%;
         }
     }
+
     .cell {
         grid-column: span 1;
         grid-row: span 1;
