@@ -116,7 +116,7 @@ export default {
     }
 
     var isPhone = checkPhone()
-    if (isPhone && window.innerHeight > 415) {
+    if (isPhone && window.innerHeight > 415 && window.matchMedia("(orientation: portrait)").matches) {
       if ((window.outerHeight - window.innerHeight) >= 114) {
         document.getElementById('Matrix').style.height = '84vh'
         document.getElementById('container').style.height = '87%'
@@ -124,7 +124,7 @@ export default {
         document.getElementById('content').style.maxHeight = '80vh'
         window.scrollTo(0, 0)
       } else {
-        document.getElementById('Matrix').style.height = '100vh'
+        document.getElementById('Matrix').style.height = '98vh'
         document.getElementById('container').style.height = '90%'
         document.getElementById('about_overlay').style.maxHeight = '90vh'
         document.getElementById('content').style.maxHeight = '95vh'
@@ -154,7 +154,7 @@ export default {
 
     var isPhone = checkPhone()
     window.addEventListener('resize', function () {
-      if (isPhone && window.innerHeight > 415) {
+      if (isPhone && window.innerHeight > 415 && window.matchMedia("(orientation: portrait)").matches) {
         if ((window.outerHeight - window.innerHeight) >= 40) {
           document.getElementById('Matrix').style.height = '84vh'
           document.getElementById('container').style.height = '87%'
@@ -162,7 +162,7 @@ export default {
           document.getElementById('content').style.maxHeight = '80vh'
           window.scrollTo(0, 0)
         } else {
-          document.getElementById('Matrix').style.height = '100vh'
+          document.getElementById('Matrix').style.height = '98vh'
           document.getElementById('container').style.height = '90%'
           document.getElementById('about_overlay').style.maxHeight = '90vh'
           document.getElementById('content').style.maxHeight = '95vh'
@@ -195,7 +195,7 @@ export default {
 
 /* Christian's work */
 #Matrix{
-  height: 100vh;
+  height: 98vh;
   background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) 9px;
   background-size: calc(40px + 1.5vw) calc(40px + 1.5vw);
   text-align: center;
@@ -235,15 +235,15 @@ export default {
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            height: 89%;
+            height: 90%;
         }
     }
 
-    @media screen and (orientation:landscape){
+    @media screen and (orientation:landscape) and (max-width : 1024px){
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            height: 82%;
+            height: 85%;
         }
         #about_matrix{
           margin-bottom: 11px;
@@ -268,7 +268,7 @@ export default {
         #container  {
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            height: 89%;
+            height: 92%;
         }
     }
         @media (max-aspect-ratio: 8/5) and
