@@ -57,6 +57,7 @@ export default {
       )
   },
   mounted () {
+    alert("Webhooks working")
     if (window.location.pathname === '/SARS-CoV-2') {
       document.querySelector('.matrixLoading').style.visibility = 'visible'
       var span = document.getElementById('myspan')
