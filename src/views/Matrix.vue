@@ -118,6 +118,7 @@ export default {
     var isPhone = checkPhone()
     if (isPhone && window.innerHeight > 415 && window.matchMedia("(orientation: portrait)").matches) {
       if ((window.outerHeight - window.innerHeight) >= 114) {
+        alert('This is working')
         document.getElementById('Matrix').style.height = '84vh'
         document.getElementById('container').style.height = '87%'
         document.getElementById('about_overlay').style.maxHeight = '80vh'
