@@ -71,6 +71,10 @@ export default {
         // Only on AWS production server, use the default port
         redirectionPort = '/'
       }
+      if (window.location.hostname === 'localhost') {
+        // Only on local dev server
+        redirectionPort = ':8080/'
+      }
       var url = window.location.protocol + '//' + window.location.hostname + redirectionPort + primaryAccession
       return url
     },
@@ -118,16 +122,17 @@ export default {
     var isPhone = checkPhone()
     if (isPhone && window.innerHeight > 415) {
       if ((window.outerHeight - window.innerHeight) >= 114) {
+        document.getElementById('home').style.backgroundColor = 'magenta'
         document.getElementById('Matrix').style.height = '84vh'
         document.getElementById('container').style.height = '87%'
         document.getElementById('about_overlay').style.maxHeight = '80vh'
         document.getElementById('content').style.maxHeight = '80vh'
         window.scrollTo(0, 0)
       } else {
-        document.getElementById('Matrix').style.height = '100vh'
-        document.getElementById('container').style.height = '90%'
-        document.getElementById('about_overlay').style.maxHeight = '90vh'
-        document.getElementById('content').style.maxHeight = '95vh'
+        // document.getElementById('Matrix').style.height = '100vh'
+        // document.getElementById('container').style.height = '90%'
+        // document.getElementById('about_overlay').style.maxHeight = '90vh'
+        // document.getElementById('content').style.maxHeight = '95vh'
         window.scrollTo(0, 9)
       }
     }
@@ -156,16 +161,17 @@ export default {
     window.addEventListener('resize', function () {
       if (isPhone && window.innerHeight > 415) {
         if ((window.outerHeight - window.innerHeight) >= 40) {
-          document.getElementById('Matrix').style.height = '84vh'
+          document.getElementById('home').style.backgroundColor = 'red'
+          document.getElementById('Matrix').style.height = '92vh'
           document.getElementById('container').style.height = '87%'
           document.getElementById('about_overlay').style.maxHeight = '80vh'
           document.getElementById('content').style.maxHeight = '80vh'
           window.scrollTo(0, 0)
         } else {
-          document.getElementById('Matrix').style.height = '100vh'
-          document.getElementById('container').style.height = '90%'
-          document.getElementById('about_overlay').style.maxHeight = '90vh'
-          document.getElementById('content').style.maxHeight = '95vh'
+          // document.getElementById('Matrix').style.height = '100vh'
+          // document.getElementById('container').style.height = '90%'
+          // document.getElementById('about_overlay').style.maxHeight = '90vh'
+          // document.getElementById('content').style.maxHeight = '95vh'
           window.scrollTo(0, 9)
         }
       }
