@@ -209,11 +209,11 @@ export default {
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            height: 89%;
+            height: 90%;
         }
     }
 
-    @media screen and (orientation:landscape){
+    @media screen and (orientation:landscape) and (max-width : 1024px){
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
