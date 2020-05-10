@@ -132,7 +132,8 @@ export default {
   text-align: center;
   color: #2c3e50;
   background-color: #c0c0c0;
-  overflow: scroll;
+  overflow: auto;
+  height: 100vh;
 }
 #home{
   background-color: #c0c0c0;

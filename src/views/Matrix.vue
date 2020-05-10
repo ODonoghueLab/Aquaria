@@ -95,77 +95,52 @@ export default {
     setTimeout(function () {
       document.querySelector('.matrixLoading').remove()
     }, 350)
+    // // * Commenting this out to test other platforms, too * //
+    // var checkPhone = function () {
+    //   var iDevices = [
+    //     'iPad Simulator',
+    //     'iPhone Simulator',
+    //     'iPod Simulator',
+    //     'iPad',
+    //     'iPhone',
+    //     'iPod'
+    //   ]
 
-    var checkPhone = function () {
-      var iDevices = [
-        'iPad Simulator',
-        'iPhone Simulator',
-        'iPod Simulator',
-        'iPad',
-        'iPhone',
-        'iPod'
-      ]
-
-      if (navigator.platform) {
-        while (iDevices.length) {
-          if (navigator.platform === iDevices.pop() || (screen.width >= 300 && screen.width <= 600)) { return true }
-        }
-      } else {
-        return false
-      }
-    }
-
-    var isPhone = checkPhone()
-    if (isPhone && window.innerHeight > 415) {
+    //   if (navigator.platform) {
+    //     while (iDevices.length) {
+    //       if (navigator.platform === iDevices.pop() || (screen.width >= 300 && screen.width <= 600)) { return true }
+    //     }
+    //   } else {
+    //     return false
+    //   }
+    // }
+    // var isPhone = checkPhone()
+    if (window.innerHeight > 415) {
       if ((window.outerHeight - window.innerHeight) >= 114) {
-        document.getElementById('Matrix').style.height = '84vh'
-        document.getElementById('container').style.height = '87%'
+        document.getElementById('Matrix').style.height = '88vh'
         document.getElementById('about_overlay').style.maxHeight = '80vh'
         document.getElementById('content').style.maxHeight = '80vh'
         window.scrollTo(0, 0)
       } else {
-        document.getElementById('Matrix').style.height = '100vh'
-        document.getElementById('container').style.height = '90%'
-        document.getElementById('about_overlay').style.maxHeight = '90vh'
-        document.getElementById('content').style.maxHeight = '95vh'
+        document.getElementById('Matrix').removeAttribute('style')
+        document.getElementById('about_overlay').removeAttribute('style')
+        document.getElementById('content').removeAttribute('style')
         window.scrollTo(0, 9)
       }
     }
   },
   created () {
-    var checkPhone = function () {
-      var iDevices = [
-        'iPad Simulator',
-        'iPhone Simulator',
-        'iPod Simulator',
-        'iPad',
-        'iPhone',
-        'iPod'
-      ]
-
-      if (navigator.platform) {
-        while (iDevices.length) {
-          if (navigator.platform === iDevices.pop() || (screen.width >= 300 && screen.width <= 600)) { return true }
-        }
-      } else {
-        return false
-      }
-    }
-
-    var isPhone = checkPhone()
     window.addEventListener('resize', function () {
-      if (isPhone && window.innerHeight > 415) {
-        if ((window.outerHeight - window.innerHeight) >= 40) {
-          document.getElementById('Matrix').style.height = '84vh'
-          document.getElementById('container').style.height = '87%'
+      if (window.innerHeight > 415) {
+        if ((window.outerHeight - window.innerHeight) >= 114) {
+          document.getElementById('Matrix').style.height = '88vh'
           document.getElementById('about_overlay').style.maxHeight = '80vh'
           document.getElementById('content').style.maxHeight = '80vh'
           window.scrollTo(0, 0)
         } else {
-          document.getElementById('Matrix').style.height = '100vh'
-          document.getElementById('container').style.height = '90%'
-          document.getElementById('about_overlay').style.maxHeight = '90vh'
-          document.getElementById('content').style.maxHeight = '95vh'
+          document.getElementById('Matrix').removeAttribute('style')
+          document.getElementById('about_overlay').removeAttribute('style')
+          document.getElementById('content').removeAttribute('style')
           window.scrollTo(0, 9)
         }
       }
@@ -195,7 +170,7 @@ export default {
 
 /* Christian's work */
 #Matrix{
-  height: 100vh;
+  height: 99vh;
   background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) 9px;
   background-size: calc(40px + 1.5vw) calc(40px + 1.5vw);
   text-align: center;
@@ -208,7 +183,7 @@ export default {
     }
     #header {
         padding: 2px 22px;
-        /* height:5em; */
+        height:5em;
     }
 
     div.no_match h3 {
@@ -227,7 +202,6 @@ export default {
         background: #c0c0c0;
         padding: 6px;
         height: 90%;
-        width: 98vw;
         margin: 0 auto;
     }
     /* Wide aspect ratio */
@@ -243,7 +217,7 @@ export default {
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            height: 82%;
+            height: 89%;
         }
         #about_matrix{
           margin-bottom: 11px;
@@ -255,7 +229,7 @@ export default {
         #container {
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            height: 92%;
+            height: 88%;
         }
     }
     @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
@@ -268,7 +242,7 @@ export default {
         #container  {
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            height: 89%;
+            height: 92%;
         }
     }
         @media (max-aspect-ratio: 8/5) and
