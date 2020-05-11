@@ -120,7 +120,7 @@ export default {
     align-items: baseline;
     border-radius: 5em;
     background: #999999;
-    padding: 5px calc(13px + 0.4vw);
+    padding: 5px calc(9px + 0.4vw);
 }
 
 #content {
@@ -173,22 +173,25 @@ export default {
 @media only screen
   and (min-width : 200px)
   and (max-height : 600px) {
-    #Orgname{
+  #Orgname{
     font-size: calc(7px + 1vw);
   }
   #matches {
     font-size: calc(7px + 0.5vw);
   }
   #title_0 {
-    padding: 5px calc(9px + 0.4vw);
+    padding: 5px calc(3px + 0.4vw);
   }
   #title{
-    padding: 5px calc(13px + 1vw);
+    padding: 5px calc(9px + 0.4);
   }
   #content{
     left: 5%;
     right: 5%;
     width: 90%;
+  }
+  #about_matrix{
+    margin-bottom: 15px;
   }
 }
 
