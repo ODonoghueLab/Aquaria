@@ -99,80 +99,70 @@ export default {
     setTimeout(function () {
       document.querySelector('.matrixLoading').remove()
     }, 350)
-    // // * Commenting this out to test other platforms, too * //
-    // var checkPhone = function () {
-    //   var iDevices = [
-    //     'iPad Simulator',
-    //     'iPhone Simulator',
-    //     'iPod Simulator',
-    //     'iPad',
-    //     'iPhone',
-    //     'iPod'
-    //   ]
+    var checkPhone = function () {
+      var iDevices = [
+        'iPad Simulator',
+        'iPhone Simulator',
+        'iPod Simulator',
+        'iPad',
+        'iPhone',
+        'iPod'
+      ]
 
-    //   if (navigator.platform) {
-    //     while (iDevices.length) {
-    //       if (navigator.platform === iDevices.pop() || (screen.width >= 300 && screen.width <= 600)) { return true }
-    //     }
-    //   } else {
-    //     return false
-    //   }
-    // }
-    // var isPhone = checkPhone()
-    if (window.innerHeight > 415) {
+      if (navigator.platform) {
+        while (iDevices.length) {
+          if (navigator.platform === iDevices.pop() || (screen.width >= 300 && screen.width <= 600)) { return true }
+        }
+      } else {
+        return false
+      }
+    }
+    var isPhone = checkPhone()
+    if (isPhone && window.innerHeight > 315) {
       if ((window.outerHeight - window.innerHeight) >= 114) {
-<<<<<<< HEAD
-        document.getElementById('home').style.backgroundColor = 'magenta'
-        document.getElementById('Matrix').style.height = '84vh'
-        document.getElementById('container').style.height = '87%'
-=======
         document.getElementById('Matrix').style.height = '88vh'
->>>>>>> 70b2a3e2c2ea52ca0fc4647322cf312883732da5
         document.getElementById('about_overlay').style.maxHeight = '80vh'
         document.getElementById('content').style.maxHeight = '80vh'
         window.scrollTo(0, 0)
       } else {
-<<<<<<< HEAD
-        // document.getElementById('Matrix').style.height = '100vh'
-        // document.getElementById('container').style.height = '90%'
-        // document.getElementById('about_overlay').style.maxHeight = '90vh'
-        // document.getElementById('content').style.maxHeight = '95vh'
-=======
         document.getElementById('Matrix').removeAttribute('style')
         document.getElementById('about_overlay').removeAttribute('style')
         document.getElementById('content').removeAttribute('style')
->>>>>>> 70b2a3e2c2ea52ca0fc4647322cf312883732da5
         window.scrollTo(0, 9)
       }
     }
   },
   created () {
+    var checkPhone = function () {
+      var iDevices = [
+        'iPad Simulator',
+        'iPhone Simulator',
+        'iPod Simulator',
+        'iPad',
+        'iPhone',
+        'iPod'
+      ]
+
+      if (navigator.platform) {
+        while (iDevices.length) {
+          if (navigator.platform === iDevices.pop() || (screen.width >= 300 && screen.width <= 600)) { return true }
+        }
+      } else {
+        return false
+      }
+    }
+    var isPhone = checkPhone()
     window.addEventListener('resize', function () {
-<<<<<<< HEAD
-      if (isPhone && window.innerHeight > 415) {
-        if ((window.outerHeight - window.innerHeight) >= 40) {
-          document.getElementById('home').style.backgroundColor = 'red'
-          document.getElementById('Matrix').style.height = '92vh'
-          document.getElementById('container').style.height = '87%'
-=======
-      if (window.innerHeight > 415) {
+      if (isPhone && window.innerHeight > 315) {
         if ((window.outerHeight - window.innerHeight) >= 114) {
           document.getElementById('Matrix').style.height = '88vh'
->>>>>>> 70b2a3e2c2ea52ca0fc4647322cf312883732da5
           document.getElementById('about_overlay').style.maxHeight = '80vh'
           document.getElementById('content').style.maxHeight = '80vh'
           window.scrollTo(0, 0)
         } else {
-<<<<<<< HEAD
-          // document.getElementById('Matrix').style.height = '100vh'
-          // document.getElementById('container').style.height = '90%'
-          // document.getElementById('about_overlay').style.maxHeight = '90vh'
-          // document.getElementById('content').style.maxHeight = '95vh'
-=======
           document.getElementById('Matrix').removeAttribute('style')
           document.getElementById('about_overlay').removeAttribute('style')
           document.getElementById('content').removeAttribute('style')
->>>>>>> 70b2a3e2c2ea52ca0fc4647322cf312883732da5
           window.scrollTo(0, 9)
         }
       }
@@ -244,7 +234,11 @@ export default {
             height: 90%;
         }
     }
-
+    @media screen and (max-height: 420px) and (max-aspect-ratio: 15/4) and (min-aspect-ratio: 8/5) {
+      #Matrix {
+        height: 88vh;
+      }
+    }
     @media screen and (orientation:landscape) and (max-width : 1024px){
         #container {
             grid-template-columns: repeat(5, 1fr);
