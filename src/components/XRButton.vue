@@ -50,13 +50,16 @@ export default {
     }
 
     // platform detection
-    // @TODO consider non-Safari browsers on iOS and non-Chrome browsers on Android
     const browser = detect()
-    if (browser.os === 'iOS' && browser.name === 'ios') {
+    if (browser.os === 'iOS' || (browser.os === 'Mac OS' && browser.name === 'safari')) {
+      // Since iOS 13, iPad Safari reports as MacOS Safari, so it must be treated same as iOS to support AR on iPad
+      // will fall back to USDZ download if used on actual MacOS Safari
       this.quickLook = true
     } else if (browser.os === 'Android OS' && browser.name === 'chrome') {
+      // @TODO consider behaviour for non-Chrome browsers on Android
       this.sceneViewer = true
     }
+    // otherwise the default behaviour (download .glb) will be used
   },
   computed: {
     baseUri () {
