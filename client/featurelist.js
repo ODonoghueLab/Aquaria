@@ -153,6 +153,12 @@ function drawTrack(datum, i) {
 						d3.select("svg.loaded").classed("loaded", false);
 						AQUARIA.panel3d.blankApplet(true, "Removing feature...")
 						AQUARIA.panel3d.blankApplet(false)
+
+						// Stu hack to detect feature changes
+						if (typeof AQUARIA.onFeatureChange === 'function') {
+							AQUARIA.onFeatureChange(null, 0);
+						}
+
 						removeCurrentAnnotationFrom3DViewer();
 					}
 					else { //console.log("clicked to display feature");
@@ -236,6 +242,11 @@ function createMouseOverCallback(feature) {
 }
 
 function passFeature(trk, nr, elmt) {
+
+		// Stu hack to detect feature changes
+		if (typeof AQUARIA.onFeatureChange === 'function') {
+			AQUARIA.onFeatureChange(trk, nr);
+		}
 
 		console.log("featurelist.passFeature " + trk.Category + " " + trk.Type
 				+ ", Track " + nr, trk); //console.log(elmt);
