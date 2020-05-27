@@ -9,9 +9,9 @@
           <a v-bind:href="[structure.count > 0 ? redirect(structure.primary_accession) : '']" :style="[structure.count > 0 ? {'cursor': 'pointer'} : {'pointer-events': 'none', 'cursor': 'none'}]" target="_blank" class='link'>
           <h3>{{structure.synonym}}</h3>
           <picture>
-             <source v-bind:srcset="'../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w'"  type="image/webp" sizes="33vw">
-             <source v-bind:srcset="'../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w'"  type="image/jpeg" sizes="33vw">
-             <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg'"/>
+             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w']" type="image/webp" sizes="33vw">
+             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w']"  type="image/jpeg" sizes="33vw">
+             <img v-bind:src="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg']"/>
            </picture>
           <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]">{{structure.count}} matching structures</p>
           </a>
@@ -119,15 +119,24 @@ export default {
     }
     var isPhone = checkPhone()
     if (isPhone && window.innerHeight > 315) {
-      if ((window.outerHeight - window.innerHeight) >= 114) {
+      if ((window.outerHeight - window.innerHeight) >= 84) {
+        // document.getElementById('header').style.backgroundColor = 'Orange'
         document.getElementById('Matrix').style.height = '88vh'
         document.getElementById('about_overlay').style.maxHeight = '80vh'
-        document.getElementById('content').style.maxHeight = '80vh'
+        document.getElementById('container').style.maxHeight = '80vh'
+        window.scrollTo(0, 0)
+      }
+      if ((window.outerHeight - window.innerHeight) >= 114) {
+        // document.getElementById('header').style.backgroundColor = 'Hotpink'
+        document.getElementById('Matrix').style.height = '88vh'
+        document.getElementById('about_overlay').style.maxHeight = '80vh'
+        document.getElementById('container').style.maxHeight = '80vh'
         window.scrollTo(0, 0)
       } else {
-        document.getElementById('Matrix').removeAttribute('style')
-        document.getElementById('about_overlay').removeAttribute('style')
-        document.getElementById('content').removeAttribute('style')
+        // document.getElementById('header').setAttribute('style', '')
+        document.getElementById('Matrix').setAttribute('style', '')
+        document.getElementById('about_overlay').setAttribute('style', '')
+        document.getElementById('container').setAttribute('style', '')
         window.scrollTo(0, 9)
       }
     }
@@ -153,16 +162,18 @@ export default {
     }
     var isPhone = checkPhone()
     window.addEventListener('resize', function () {
-      if (isPhone && window.innerHeight > 315) {
-        if ((window.outerHeight - window.innerHeight) >= 114) {
+      if (isPhone && window.innerHeight > 300) {
+        if (Math.abs(window.outerHeight - window.innerHeight) >= 114) {
+          // document.getElementById('header').style.backgroundColor = 'DeepPink'
           document.getElementById('Matrix').style.height = '88vh'
           document.getElementById('about_overlay').style.maxHeight = '80vh'
-          document.getElementById('content').style.maxHeight = '80vh'
+          document.getElementById('container').style.maxHeight = '80vh'
           window.scrollTo(0, 0)
         } else {
-          document.getElementById('Matrix').removeAttribute('style')
-          document.getElementById('about_overlay').removeAttribute('style')
-          document.getElementById('content').removeAttribute('style')
+          // document.getElementById('header').setAttribute('style', '')
+          document.getElementById('Matrix').setAttribute('style', '')
+          document.getElementById('about_overlay').setAttribute('style', '')
+          document.getElementById('container').setAttribute('style', '')
           window.scrollTo(0, 9)
         }
       }
@@ -193,7 +204,7 @@ export default {
 /* Christian's work */
 #Matrix{
   height: 99vh;
-  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) 9px;
+  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) calc(6px + 0.1vh);
   background-size: calc(40px + 1.5vw) calc(40px + 1.5vw);
   text-align: center;
 }
@@ -205,7 +216,8 @@ export default {
     }
     #header {
         padding: 2px 22px;
-        height:5em;
+        height: 4em;
+        min-height: 5vh;
     }
 
     div.no_match h3 {
@@ -304,11 +316,11 @@ export default {
             font-size: calc(8px + 6 * ((100vw - 320px) / 680));
         }
     }
-    @media screen and (min-width: 1000px) {
+    /* @media screen and (min-width: 1000px) {
         #Matrix .cell {
             font-size: 16px;
         }
-    }
+    } */
     /* Alignment */
     body {
         text-align: center;
