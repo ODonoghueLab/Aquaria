@@ -119,14 +119,7 @@ export default {
     }
     var isPhone = checkPhone()
     if (isPhone && window.innerHeight > 315) {
-      if ((window.outerHeight - window.innerHeight) >= 84) {
-        // document.getElementById('header').style.backgroundColor = 'Orange'
-        document.getElementById('Matrix').style.height = '88vh'
-        document.getElementById('about_overlay').style.maxHeight = '80vh'
-        document.getElementById('container').style.maxHeight = '80vh'
-        window.scrollTo(0, 0)
-      }
-      if ((window.outerHeight - window.innerHeight) >= 114) {
+      if (Math.abs(window.outerHeight - window.innerHeight) >= 114) {
         // document.getElementById('header').style.backgroundColor = 'Hotpink'
         document.getElementById('Matrix').style.height = '88vh'
         document.getElementById('about_overlay').style.maxHeight = '80vh'
