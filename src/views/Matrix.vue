@@ -217,7 +217,7 @@ export default {
     #header {
         padding: 2px 22px;
         height: 4em;
-        min-height: 5vh;
+        min-height: calc(48px + 1.5vw);
     }
 
     div.no_match h3 {
