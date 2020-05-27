@@ -316,11 +316,6 @@ export default {
             font-size: calc(8px + 6 * ((100vw - 320px) / 680));
         }
     }
-    /* @media screen and (min-width: 1000px) {
-        #Matrix .cell {
-            font-size: 16px;
-        }
-    } */
     /* Alignment */
     body {
         text-align: center;
