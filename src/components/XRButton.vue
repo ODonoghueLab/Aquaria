@@ -1,18 +1,37 @@
 <template>
-  <div v-if="this.dataReceived" class="xr-button">
-    <!-- iOS (AR Quick Look) -->
-    <a v-if="this.quickLook" class="xr-platform-button ios" rel="ar" :href="this.quickLookUri">
-      <img class="xr-image" src="/images/ar-button.png">
-    </a>
-    <!-- Android (Scene Viewer) -->
-    <a v-if="this.sceneViewer" class="xr-platform-button android" :href="this.sceneViewerUri">
-      <img class="xr-image" src="/images/ar-button.png">
-    </a>
-    <!-- Other (Download GLTF) -->
-    <a v-if="!this.sceneViewer && !this.quickLook" class="xr-platform-button default" :href="this.defaultUri" :download="this.proteinId + '.' + this.pdbId + '.glb'">
-      <img class="xr-image" src="/images/ar-button.png">
-    </a>
+<div>
+  <img v-if="this.dataReceived && !this.isOpen" @click="isOpen = true" class="xr-menu-button" src="/images/ar-button.png">
+  <div class="column xr-modal" v-if="isOpen">
+    <div class="column inner-modal">
+      <div class="row modal-header">
+        <div></div>
+        <h1>XR Options</h1>
+        <button @click="isOpen = false">X</button>
+      </div>
+      <div class="column modal-content">
+
+        <!-- iOS (AR Quick Look) -->
+        <a v-if="this.quickLook" class="xr-item xr-platform-button ios" rel="ar" :href="this.quickLookUri">
+          <img class="xr-image" src="/images/ar-button.png">
+        </a>
+        <!-- Android (Scene Viewer) -->
+        <a v-if="this.sceneViewer" class="xr-item xr-platform-button android" :href="this.sceneViewerUri">
+          <img class="xr-image" src="/images/ar-button.png">
+        </a>
+        <!-- Other (Download GLTF) -->
+        <a v-if="!this.sceneViewer && !this.quickLook" class="xr-item xr-platform-button default" :href="this.defaultUri" :download="this.proteinId + '.' + this.pdbId + '.glb'">
+          <img class="xr-image" src="/images/ar-button.png">
+        </a>
+
+        <!-- PlayStation -->
+        <button class="xr-item default-button" v-bind:disabled="features === null" @click="isOpen = false; psvrExport()">Send to PSVR</button>
+
+        <!-- HEVS -->
+        <button class="xr-item default-button" v-bind:disabled="true" @click="hevsExport()">Send to HEVS</button>
+      </div>
+    </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -21,15 +40,18 @@ import { detect } from 'detect-browser'
 
 const MODEL_SERVER = 'https://ie.csiro.au/services/aquaria-export'
 
+function exportFeatures (features) {
+  return features.map(f => ({
+    c: f.color,
+    n: f.name,
+    s: f.start,
+    e: f.end,
+    d: f.desc
+  }))
+}
+
 function encodeFeatures (features) {
-  const str = features
-    .map(f => ({
-      c: f.color,
-      n: f.name,
-      s: f.start,
-      e: f.end,
-      d: f.desc
-    }))
+  const str = exportFeatures(features)
     .map(f => encodeURIComponent(JSON.stringify(f)))
     .join('&f=')
   return `f=${str}`
@@ -45,7 +67,8 @@ export default {
       proteinId: 'none',
       quickLook: false,
       sceneViewer: false,
-      features: null
+      features: null,
+      isOpen: false
     }
   },
   mounted: function () {
@@ -117,13 +140,127 @@ export default {
     defaultUri () {
       return `${this.baseUri}.glb${this.query}`
     }
+  },
+  methods: {
+    psvrExport: async function () {
+      const result = await fetch(`${MODEL_SERVER}/psvr`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ protein: this.proteinId, pdb: this.pdbId, features: exportFeatures(this.features) })
+      })
+      if (result.status !== 200) {
+        alert('PSVR Error')
+      } else {
+        console.debug(`PSVR Success. Returned: ${await result.text()}`)
+      }
+    },
+    hevsExport: function () {
+      alert('coming soon!')
+    }
   }
 }
 </script>
 
 <style scoped>
 
-  .xr-button {
+  .xr-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.75);
+  }
+
+  .default-button {
+    color: black;
+    background-color: white;
+    border-radius: 5px;
+    font-size: 1.5em;
+    box-shadow: none;
+    border: 2px solid black;
+    padding: 3px;
+    line-height: 100%;
+    cursor: pointer;
+  }
+
+  .default-button:hover:enabled {
+    color: white;
+    background-color: black;
+  }
+
+  .default-button:disabled {
+    cursor: not-allowed;
+    color: gray;
+    border-color: gray;
+  }
+
+  .xr-item {
+    margin: 5px;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .xr-modal .inner-modal {
+    background-color: white;
+    width: 400px;
+    max-width: 80%;
+    height: 500px;
+    max-height: 80%;
+  }
+
+  .modal-header {
+    align-items: center;
+    background-color: black;
+    width: 100%;
+  }
+
+  .modal-header h1 {
+    flex-grow: 1;
+    color: white;
+  }
+
+  .modal-header div, .modal-header button {
+    width: 40px;
+    height: 40px;
+    margin: 10px;
+  }
+
+  .modal-header button {
+    color: white;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+  }
+
+  .modal-content {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+  }
+
+  .xr-menu-button {
+    appearance: none;
     position: absolute;
     width: 40px;
     height: 40px;
@@ -132,11 +269,12 @@ export default {
     z-index: 1;
     margin-left: 65px;
     margin-top: 10px;
+    cursor: pointer;
   }
 
   .xr-platform-button {
-    width: 100%;
-    height: 100%;
+    width: 40px;
+    height: 40px;
   }
 
   .xr-image {
