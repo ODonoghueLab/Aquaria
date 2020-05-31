@@ -2,6 +2,8 @@
   <div id="Matrix">
     <div id="header">
           <div id="logo" v-on:click="showAbout()"></div>
+          <!-- <span id="res">resized?</span>
+          <span id="hd"> hDiff</span> -->
           <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
     </div>
      <div id="container">
@@ -26,6 +28,7 @@ import * as CdrComps from '../cedar.js'
 import axios from 'axios'
 import AboutAquaria from '../components/AboutAquaria'
 import AboutMatrix from '../components/AboutMatrix'
+import $ from 'jquery'
 
 export default {
   name: 'Matrix',
@@ -79,15 +82,20 @@ export default {
       return url
     },
     showAbout: function () {
-    // dim background
-      document.querySelector('div#about_overlay').style.visibility = 'visible'
+      var Position = window.innerWidth / 2 - $('#about_overlay').width() / 2
+      Position = Position + 'px'
+      $('#about_overlay').css({
+        left: Position
+      })
+      // dim background
+      document.querySelector('div#about_overlay').style.display = 'block'
       if (document.getElementsByClassName('dimmer').length === 0) {
         var elemDiv = document.createElement('div')
         elemDiv.className = 'dimmer'
         document.body.append(elemDiv)
-        document.querySelector('div#about_overlay').style.visibility = 'visible'
+        document.querySelector('div#about_overlay').style.display = 'block'
         document.querySelector('div.dimmer').addEventListener('click', function () {
-          document.querySelector('div#about_overlay').style.visibility = 'hidden'
+          document.querySelector('div#about_overlay').style.display = 'none'
           document.querySelector('div.dimmer').remove()
         })
       } else {
@@ -118,19 +126,24 @@ export default {
       }
     }
     var isPhone = checkPhone()
+    var hDiff = (window.outerHeight - window.innerHeight)
+    // document.getElementById('res').innerHTML = 'updated! '
+    // document.getElementById('hd').innerHTML = ' hDiff: ' + hDiff
     if (isPhone && window.innerHeight > 315) {
-      if (Math.abs(window.outerHeight - window.innerHeight) >= 114) {
+      if (Math.abs(hDiff) >= 114) {
+        // document.getElementById('hd').innerHTML = ' hDiff:  ' + hDiff
         // document.getElementById('header').style.backgroundColor = 'Hotpink'
         document.getElementById('Matrix').style.height = '88vh'
         document.getElementById('about_overlay').style.maxHeight = '80vh'
         document.getElementById('container').style.maxHeight = '80vh'
         window.scrollTo(0, 0)
       } else {
+        // document.getElementById('hd').innerHTML = ' hDiff:  ' + hDiff
         // document.getElementById('header').setAttribute('style', '')
         document.getElementById('Matrix').setAttribute('style', '')
         document.getElementById('about_overlay').setAttribute('style', '')
         document.getElementById('container').setAttribute('style', '')
-        window.scrollTo(0, 9)
+        // window.scrollTo(0, 9)
       }
     }
   },
@@ -155,19 +168,26 @@ export default {
     }
     var isPhone = checkPhone()
     window.addEventListener('resize', function () {
+      var hDiff = window.outerHeight - window.innerHeight
+      // document.getElementById('res').innerHTML = 'resized! '
+      // document.getElementById('hd').innerHTML = ' hDiff: ' + hDiff
       if (isPhone && window.innerHeight > 300) {
-        if (Math.abs(window.outerHeight - window.innerHeight) >= 114) {
+        if ((Math.abs(hDiff) <= 200) && (Math.abs(hDiff) >= 50)) {
+          // document.getElementById('res').innerHTML = 'resized! '
+          // document.getElementById('hd').innerHTML = ' hDiff: ' + hDiff
           // document.getElementById('header').style.backgroundColor = 'DeepPink'
           document.getElementById('Matrix').style.height = '88vh'
           document.getElementById('about_overlay').style.maxHeight = '80vh'
           document.getElementById('container').style.maxHeight = '80vh'
           window.scrollTo(0, 0)
         } else {
+          // document.getElementById('res').innerHTML = 'also resized! '
+          // document.getElementById('hd').innerHTML = ' hDiff: ' + hDiff
           // document.getElementById('header').setAttribute('style', '')
           document.getElementById('Matrix').setAttribute('style', '')
           document.getElementById('about_overlay').setAttribute('style', '')
           document.getElementById('container').setAttribute('style', '')
-          window.scrollTo(0, 9)
+          // window.scrollTo(0, 9)
         }
       }
     })
@@ -212,7 +232,9 @@ export default {
         height: 4em;
         min-height: calc(48px + 1.5vw);
     }
-
+    #header span {
+      display: inline;
+    }
     div.no_match h3 {
         font-weight:400;
     }
