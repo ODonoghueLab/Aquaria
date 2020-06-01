@@ -212,7 +212,7 @@ export default {
     @media screen and (min-width: 320px) {
       #content {
           /* font-size: calc(8px + 7 * ((100vw - 320px) / 680)); */
-          font-size: calc(8px + 1.3vw);
+          font-size: calc(9px + 0.5vw);
       }
     }
     @media screen and (min-width: 1000px) {

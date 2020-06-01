@@ -2,6 +2,8 @@
   <div id="Matrix">
     <div id="header">
           <div id="logo" v-on:click="showAbout()"></div>
+          <!-- <span id="res">resized?</span>
+          <span id="hd"> hDiff</span> -->
           <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
     </div>
      <div id="container">
@@ -9,9 +11,9 @@
           <a v-bind:href="[structure.count > 0 ? redirect(structure.primary_accession) : '']" :style="[structure.count > 0 ? {'cursor': 'pointer'} : {'pointer-events': 'none', 'cursor': 'none'}]" target="_blank" class='link'>
           <h3>{{structure.synonym}}</h3>
           <picture>
-             <source v-bind:srcset="'../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w'"  type="image/webp" sizes="33vw">
-             <source v-bind:srcset="'../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w'"  type="image/jpeg" sizes="33vw">
-             <img v-bind:src="'../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg'"/>
+             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w']" type="image/webp" sizes="33vw">
+             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w']"  type="image/jpeg" sizes="33vw">
+             <img v-bind:src="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg']"/>
            </picture>
           <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]">{{structure.count}} matching structures</p>
           </a>
@@ -26,6 +28,7 @@ import * as CdrComps from '../cedar.js'
 import axios from 'axios'
 import AboutAquaria from '../components/AboutAquaria'
 import AboutMatrix from '../components/AboutMatrix'
+import $ from 'jquery'
 
 export default {
   name: 'Matrix',
@@ -71,19 +74,28 @@ export default {
         // Only on AWS production server, use the default port
         redirectionPort = '/'
       }
+      if (window.location.hostname === 'localhost') {
+        // Only on local dev server
+        redirectionPort = ':8080/'
+      }
       var url = window.location.protocol + '//' + window.location.hostname + redirectionPort + primaryAccession
       return url
     },
     showAbout: function () {
-    // dim background
-      document.querySelector('div#about_overlay').style.visibility = 'visible'
+      var Position = window.innerWidth / 2 - $('#about_overlay').width() / 2
+      Position = Position + 'px'
+      $('#about_overlay').css({
+        left: Position
+      })
+      // dim background
+      document.querySelector('div#about_overlay').style.display = 'block'
       if (document.getElementsByClassName('dimmer').length === 0) {
         var elemDiv = document.createElement('div')
         elemDiv.className = 'dimmer'
         document.body.append(elemDiv)
-        document.querySelector('div#about_overlay').style.visibility = 'visible'
+        document.querySelector('div#about_overlay').style.display = 'block'
         document.querySelector('div.dimmer').addEventListener('click', function () {
-          document.querySelector('div#about_overlay').style.visibility = 'hidden'
+          document.querySelector('div#about_overlay').style.display = 'none'
           document.querySelector('div.dimmer').remove()
         })
       } else {
@@ -95,7 +107,6 @@ export default {
     setTimeout(function () {
       document.querySelector('.matrixLoading').remove()
     }, 350)
-
     var checkPhone = function () {
       var iDevices = [
         'iPad Simulator',
@@ -114,21 +125,25 @@ export default {
         return false
       }
     }
-
     var isPhone = checkPhone()
-    if (isPhone && window.innerHeight > 415 && window.matchMedia("(orientation: portrait)").matches) {
-      if ((window.outerHeight - window.innerHeight) >= 114) {
-        document.getElementById('Matrix').style.height = '84vh'
-        document.getElementById('container').style.height = '87%'
+    var hDiff = (window.outerHeight - window.innerHeight)
+    // document.getElementById('res').innerHTML = 'updated! '
+    // document.getElementById('hd').innerHTML = ' hDiff: ' + hDiff
+    if (isPhone && window.innerHeight > 315) {
+      if (Math.abs(hDiff) >= 114) {
+        // document.getElementById('hd').innerHTML = ' hDiff:  ' + hDiff
+        // document.getElementById('header').style.backgroundColor = 'Hotpink'
+        document.getElementById('Matrix').style.height = '88vh'
         document.getElementById('about_overlay').style.maxHeight = '80vh'
-        document.getElementById('content').style.maxHeight = '80vh'
+        document.getElementById('container').style.maxHeight = '80vh'
         window.scrollTo(0, 0)
       } else {
-        document.getElementById('Matrix').style.height = '98vh'
-        document.getElementById('container').style.height = '90%'
-        document.getElementById('about_overlay').style.maxHeight = '90vh'
-        document.getElementById('content').style.maxHeight = '95vh'
-        window.scrollTo(0, 9)
+        // document.getElementById('hd').innerHTML = ' hDiff:  ' + hDiff
+        // document.getElementById('header').setAttribute('style', '')
+        document.getElementById('Matrix').setAttribute('style', '')
+        document.getElementById('about_overlay').setAttribute('style', '')
+        document.getElementById('container').setAttribute('style', '')
+        // window.scrollTo(0, 9)
       }
     }
   },
@@ -151,22 +166,28 @@ export default {
         return false
       }
     }
-
     var isPhone = checkPhone()
     window.addEventListener('resize', function () {
-      if (isPhone && window.innerHeight > 415 && window.matchMedia("(orientation: portrait)").matches) {
-        if ((window.outerHeight - window.innerHeight) >= 40) {
-          document.getElementById('Matrix').style.height = '84vh'
-          document.getElementById('container').style.height = '87%'
+      var hDiff = window.outerHeight - window.innerHeight
+      // document.getElementById('res').innerHTML = 'resized! '
+      // document.getElementById('hd').innerHTML = ' hDiff: ' + hDiff
+      if (isPhone && window.innerHeight > 300) {
+        if ((Math.abs(hDiff) <= 200) && (Math.abs(hDiff) >= 50)) {
+          // document.getElementById('res').innerHTML = 'resized! '
+          // document.getElementById('hd').innerHTML = ' hDiff: ' + hDiff
+          // document.getElementById('header').style.backgroundColor = 'DeepPink'
+          document.getElementById('Matrix').style.height = '88vh'
           document.getElementById('about_overlay').style.maxHeight = '80vh'
-          document.getElementById('content').style.maxHeight = '80vh'
+          document.getElementById('container').style.maxHeight = '80vh'
           window.scrollTo(0, 0)
         } else {
-          document.getElementById('Matrix').style.height = '98vh'
-          document.getElementById('container').style.height = '90%'
-          document.getElementById('about_overlay').style.maxHeight = '90vh'
-          document.getElementById('content').style.maxHeight = '95vh'
-          window.scrollTo(0, 9)
+          // document.getElementById('res').innerHTML = 'also resized! '
+          // document.getElementById('hd').innerHTML = ' hDiff: ' + hDiff
+          // document.getElementById('header').setAttribute('style', '')
+          document.getElementById('Matrix').setAttribute('style', '')
+          document.getElementById('about_overlay').setAttribute('style', '')
+          document.getElementById('container').setAttribute('style', '')
+          // window.scrollTo(0, 9)
         }
       }
     })
@@ -195,8 +216,8 @@ export default {
 
 /* Christian's work */
 #Matrix{
-  height: 98vh;
-  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) 9px;
+  height: 99vh;
+  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) calc(6px + 0.1vh);
   background-size: calc(40px + 1.5vw) calc(40px + 1.5vw);
   text-align: center;
 }
@@ -208,9 +229,12 @@ export default {
     }
     #header {
         padding: 2px 22px;
-        /* height:5em; */
+        height: 4em;
+        min-height: calc(48px + 1.5vw);
     }
-
+    #header span {
+      display: inline;
+    }
     div.no_match h3 {
         font-weight:400;
     }
@@ -227,7 +251,6 @@ export default {
         background: #c0c0c0;
         padding: 6px;
         height: 90%;
-        width: 98vw;
         margin: 0 auto;
     }
     /* Wide aspect ratio */
@@ -238,12 +261,16 @@ export default {
             height: 90%;
         }
     }
-
+    @media screen and (max-height: 420px) and (max-aspect-ratio: 15/4) and (min-aspect-ratio: 8/5) {
+      #Matrix {
+        height: 88vh;
+      }
+    }
     @media screen and (orientation:landscape) and (max-width : 1024px){
         #container {
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            height: 85%;
+            height: 89%;
         }
         #about_matrix{
           margin-bottom: 11px;
@@ -255,7 +282,7 @@ export default {
         #container {
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(5, 1fr);
-            height: 92%;
+            height: 88%;
         }
     }
     @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {
@@ -302,11 +329,6 @@ export default {
     @media screen and (min-width: 320px) {
         #Matrix .cell {
             font-size: calc(8px + 6 * ((100vw - 320px) / 680));
-        }
-    }
-    @media screen and (min-width: 1000px) {
-        #Matrix .cell {
-            font-size: 16px;
         }
     }
     /* Alignment */
