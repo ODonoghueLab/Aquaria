@@ -39,7 +39,11 @@
 
 <script>
 
-import { detect } from 'detect-browser'
+const featureDetection = {
+  supportsSceneViewer: /(android)/i.test(navigator.userAgent),
+  supportsQuickLook: document.createElement('a').relList.supports('ar'),
+  supportsMixedReality: /(Windows NT 10.0)/i.test(navigator.userAgent)
+}
 
 // instance of https://github.com/ODonoghueLab/aquariaExport
 const MODEL_SERVER = 'https://ie.csiro.au/services/aquaria-export'
@@ -117,8 +121,8 @@ export default {
       dataReceived: false,
       pdbId: 'none',
       proteinId: 'none',
-      quickLook: false,
-      sceneViewer: false,
+      quickLook: featureDetection.supportsQuickLook,
+      sceneViewer: featureDetection.supportsSceneViewer,
       features: null,
       featureTrack: -1,
       isOpen: false,
@@ -150,18 +154,6 @@ export default {
         this.featureTrack = -1
       }
     }
-
-    // platform detection
-    const browser = detect()
-    if (browser.os === 'iOS' || (browser.os === 'Mac OS' && browser.name === 'safari')) {
-      // Since iOS 13, iPad Safari reports as MacOS Safari, so it must be treated same as iOS to support AR on iPad
-      // will fall back to USDZ download if used on actual MacOS Safari
-      this.quickLook = true
-    } else if (browser.os === 'Android OS' && browser.name === 'chrome') {
-      // @TODO consider behaviour for non-Chrome browsers on Android
-      this.sceneViewer = true
-    }
-    // otherwise the default behaviour (download .glb) will be used
   },
   methods: {
     downloadGltf: function () {
