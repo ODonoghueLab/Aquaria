@@ -16,7 +16,7 @@ function createFeatureUI() {
 
 function updateFeatureTabTitle(preferredProteinName) {
 	if (preferredProteinName !== "unknown") {
-		$("#featureExplanation").text(" for " + preferredProteinName);
+		// $("#featureExplanation").text(" for " + preferredProteinName);
 	}
 };
 
@@ -27,7 +27,7 @@ var updateFeatureUI = function(featureList) {
 	$("#featurelist div").remove(); // remove old contents
 //	$("#featureExplanation").text(" Loading...");
 //	$("#featureCounter").html("<img src='/images/89.GIF'/>").show();
-	
+
 	// draw axis ruler
 	AQUARIA.showMatchingStructures.drawAxisRuler("featurelist");
 
@@ -35,130 +35,283 @@ var updateFeatureUI = function(featureList) {
 	featureCount = 0;
 	groupCount = 0;
 	var clusters = [];
-	for ( var key in featureSet) {
-		clusters.push(featureSet[key]);
-	}
-
-
-	var featureDiv = d3.select("#featurelist").append("div").attr("id",
-			"featureContainer");
-
-	featureDiv
-			.selectAll("div")
-			.data(clusters)
-			.enter()
-			.append("div")
-			.attr("class", "track")
-			.html(
-					function(d) {
-						if (d.Type != ''){
-							return "<p><b>"
-								+ d.Category
-								+ "</b> ("
-								+ d.Type.replace(/_/g, " ")
-								+ ") <span class='source'>"
-								+ d.Server
-								+ "</span></p>";
-						} else {
-							return "<p><b>"
-								+ d.Category
-								+ "</b> <span class='source'>"
-								+ d.Server
-								+ "</span></p>";							
-						}
-					}).each(drawTrack);
+	var addedFeatures = [];
+	var orderedFeatures = [];
+	//Group by feature source
+	  var groupedFeatures = _.groupBy(featureSet, function(feature) {
+		return feature.Server;
+	  });
 	
-//	if (AQUARIA.preferred_protein_name !== "unknown") {
-//		updateFeatureTabTitle(AQUARIA.preferred_protein_name);
-		$("#featureCounter").show();
-		if (featureCount > 0) {
-			$("#featureCounter").text(featureCount);
-			$("#featureCounter").digits();
-//			$("#waitForFeatures").hide();
-			var scrollToggle = "<p id='scrollToggle'><a href='javascript:$(\"#featureContainer\").toggleClass(\"noscroll\");'>Toggle scrolling</a></p>";
-			$("#featureContainer").append(scrollToggle);
-		}
-//		else { $("#featureCounter").html("<img src='/images/89.GIF'/>"); }
-//	}
-
-var document_observer = new MutationObserver( function (mutations) {
-	// `mutations` is an array of mutations that occurred
-	// `me` is the MutationObserver instance
-	if($(location).attr('href').includes("json")){
-	  mutations.forEach(function(mutation) {
-		if (mutation.attributeName !== 'style') {
-		  return none;
-		}
-		else{
-		  var currentValue = mutation.target.style.display;
-		  if (currentValue == "none") {
-			console.log("THIS IS CHANGED")
-			pdb_chain_observer.observe(document.getElementById("waitingFrame"), {
-			  attributes:    true,
-			  attributeFilter: ["style"]
-			})
+	//Store as an object 
+	  groupedFeatures = Object.keys(groupedFeatures).map(function(key) {
+		return [String(key), groupedFeatures[key]];
+	  });
+	
+	  for ( var key in featureSet) {
+			clusters.push(featureSet[key]);
+	  }
+	
+	//Reorder grouped features
+	if((window.localStorage.getItem("featureOrder")) && (window.localStorage.getItem("featureOrder").split(",").length >= groupedFeatures.length)){
+	  var featureOrder = window.localStorage.getItem("featureOrder").split(",")
+	  for ( var key in featureOrder){
+		for(var k = 0; k < groupedFeatures.length; k++){
+		  if(groupedFeatures[k][0] == featureOrder[key]){
+			orderedFeatures[key] = groupedFeatures[k]
 		  }
 		}
-		})
+	  }
+	  groupedFeatures = orderedFeatures
+	}
+	
+	
+	  var featureDiv = d3.select("#featurelist").append("div").attr("id", "featureContainer").append("div").attr("id", "groupedFeatures")
+  
+	  for ( var key in groupedFeatures) {
+	  //Feature Collection Header
+	  var featureHeader = featureDiv.append("div").attr("id", groupedFeatures[key][0]).attr("class", "featureCollection")
+	  if(groupedFeatures[key][0] == "UniProt" || groupedFeatures[key][0] == "CATH" || groupedFeatures[key][0] == "SNAP2" || groupedFeatures[key][0] == "PredictProtein"){
+		featureHeader = featureHeader.html("<div class='featureHeader'><p class='expand'>►</p><p class='featureName'>" + groupedFeatures[key][0] + "</p><div class='info'>?</div></div><span class='tooltiptext'>" + groupedFeatures[key][1][0]["About"] + "</span>")
+	  }
+	  else{
+		featureHeader = featureHeader.html("<div class='featureHeader'><p class='expand'>►</p><p class='featureName'>" + groupedFeatures[key][0] + "</p><div class='info'>?</div><button id='remove' class='featureButtons'>Remove</button></div><span class='tooltiptext'>" + groupedFeatures[key][1][0]["About"] +"</span>")
+	  }
+		//Feature tracks
+		featureHeader.append("div").attr("class", "featureTrack")
+				.selectAll("div")
+				.data(groupedFeatures[key][1])
+				.enter()
+				.append("div")
+				.attr("class", "track")
+				.html(
+						function(d) {
+							if (d.Type != ''){
+							  if(d.Server == "UniProt" || d.Server == "PredictProtein" || d.Server == "CATH" || d.Server == "SNAP2"){
+								  var source = "Curated Features"
+				  }
+				  else{
+					source = d.Server
+				  }
+								return "<p style='font-size: calc(9px + 0.1vw);'><b>"
+									+ d.Category
+									+ "</b> ("
+									+ d.Type.replace(/_/g, " ")
+									+ ") <span class='source'>"
+									+ source
+									+ "</span></p>";
+							} else {
+								if(d.Server == "UniProt" || d.Server == "PredictProtein" || d.Server == "CATH" || d.Server == "SNAP2"){
+									source = "Curated Features"
+				  }
+				  else{
+					source = d.Server
+				  }
+								return "<p><b>"
+									+ d.Category
+									+ "</b> <span class='source'>"
+									+ source
+									+ "</span></p>";
+							}
+			  }).each(drawTrack);
+			  
+	//	if (AQUARIA.preferred_protein_name !== "unknown") {
+	//		updateFeatureTabTitle(AQUARIA.preferred_protein_name);
+	  }
+	  $("#featureCounter").show();
+			if (featureCount > 0) {
+				$("#featureCounter").text(featureCount);
+				$("#featureCounter").digits();
+	//			$("#waitForFeatures").hide();
+				var scrollToggle = "<p id='scrollToggle'><a href='javascript:$(\"#featureContainer\").toggleClass(\"noscroll\");'>Toggle scrolling</a></p>";
+				$("#featureContainer").append(scrollToggle);
+			}
+			else{
+				$("#featureCounter").text(featureCount);
+			}
+	//		else { $("#featureCounter").html("<img src='/images/89.GIF'/>"); }
+	//	}
+	
+	//Following scripts displays the external URL features on structure
+  
+	//Style featureHeader elements
+	d3.selectAll('.expand').attr("style", "font-size: calc(9px + 0.2vw);color: #848484;margin: 10px -7px 0px 0px;")
+	d3.selectAll("#remove")
+	.on("click", function(){
+	  $(this).parent().parent().remove()
+	  })
+	$("#groupedFeatures").sortable({axis: 'y'})
+	$(".featureTrack").sortable({axis: 'y'}).css({"cursor": "move"})
+	$("#groupedFeatures").disableSelection()
+	$(".featureHeader").on("click", function () {
+		var content = $(this).parent().children().eq(2)
+		var notThis = $('div[class*="active"]').not(this)
+	
+		notThis.children().eq(0).text("►")
+		notThis.next("div").slideUp("slow");
+		notThis.children("button").css({"visibility": "hidden"})
+		notThis.removeClass("active")
+	
+		content.slideToggle('slow')
+		if(content.is(":visible")){
+		  $(this).addClass("active")
+		}
+			  if ($(this).children().eq(0).text() == '►') {
+			$(this).children().eq(0).text("▼")
+			$(this).children("button").css({"visibility": "visible"})
+		  } else {
+			$(this).children().eq(0).text("►")
+			$(this).children("button").css({"visibility": "hidden"})
+		  }
+		});
+	var timer;
+	$(".featureHeader").on({
+	  mouseenter: function () {
+		$(this).css({"background-color":"#BEBEBE", "cursor": "pointer"})
+	  },
+	  mouseleave: function () {
+		$(this).css({"background-color":"#cccccc"})
+	  },
+	  mousedown: function(){
+		var that = this
+		timer = setTimeout(function(){
+		  $(that).css({"cursor": "move"})
+		}, 500);
+	  },
+	  mouseup: function(){
+		$(this).css({"cursor": "pointer"})
+	  }
+	})
+	$('.info').find('span:contains("undefined")').parent().remove()
+	d3.selectAll(".info").on({
+		mouseenter: function () {
+      $(this).css({"background-color":"orange", "color": "white"})
+      $(this).parent().parent().children("span.tooltiptext").css({"visibility" : "visible"})
+		},
+		mouseleave: function () {
+      $(this).css({"background-color":"white", "color": "black"})
+      $(this).parent().parent().children("span.tooltiptext").css({"visibility" : "hidden"})
 	  }
 	});
 
-	var pdb_chain_observer = new MutationObserver(function (m, me) {
-	  m.forEach( function(mut) {
-		if (mut.attributeName !== 'style') return;
-		var currentValue = mut.target.style.display;
-		if (currentValue == "none") {
-		  var custom_feature = $("svg#s_0_0")
-		  var oid = custom_feature.attr("id").split("_")[2];
-		  // AQUARIA.panel3d.blankApplet(true, "Loading feature...")                
-		  // AQUARIA.panel3d.blankApplet(false)
-		  passFeature(clusters[0], oid);
-		  d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-		  d3.select("svg.loaded").classed("loaded", false);
-		  custom_feature.attr("class", "loaded");	
-
-		  me.disconnect();     // stop observing
-
-		}
-	  })
+	$(".tooltiptext").on({
+		mouseenter: function () {
+      $(this).css({"visibility" : "visible"})
+    },
+    mouseleave: function () {
+      $(this).css({"visibility" : "hidden"})
+	  }
+  	})
+	
+	//Store ordering of feature source
+	var featureOrder = new MutationObserver( function (mutations) {
+	  var sources = $('#groupedFeatures .featureCollection').map(function(){
+		return $(this).attr('id');
+		}).get();
+		localStorage.setItem("featureOrder", sources);
 	})
-		
+	featureOrder.observe(document.getElementById("groupedFeatures"), {
+	  attributes:    true,
+	  childList: true
+	  });
+  
+	// d3.selectAll("#share").on("click", function() {
+	// 	var dummy = document.createElement('input'),
+	//   text = window.location.href;
+	//   document.body.appendChild(dummy);
+	//   dummy.value = text;
+	//   dummy.select();
+	//   document.execCommand('copy');
+	//   document.body.removeChild(dummy);
+	// })
 
-  // start observing structure change
-  document_observer.observe(document.getElementById("loading-message"), {
-	attributes:    true,
-	attributeFilter: ["style"],
-	characterDataOldValue: true 
-  });
-}
+  //On external features scripts show features
+// 	if($("svg#s_0_0").parent().parent().parent().attr("id") === "Added Features"){
+//       	var custom_feature = $("svg#s_0_0")
+// 		var oid = custom_feature.attr("id").split("_")[2];
+// 		passFeature(clusters[0], oid);
+// 		d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+// 		d3.select("svg.loaded").classed("loaded", false);
+// 		custom_feature.attr("class", "loaded");
+//   }
 
-function drawTrack(datum, i) { 
+	var document_observer = new MutationObserver( function (mutations) {
+		// `mutations` is an array of mutations that occurred
+		// `me` is the MutationObserver instance
+		if($(location).attr('href').includes("json")){
+		  mutations.forEach(function(mutation) {
+			if (mutation.attributeName !== 'style') {
+			  return none;
+			}
+			else{
+			  var currentValue = mutation.target.style.display;
+			  if (currentValue == "none") {
+				///console.log("THIS IS CHANGED")
+				pdb_chain_observer.observe(document.getElementById("waitingFrame"), {
+				  attributes:    true,
+				  attributeFilter: ["style"]
+				})
+			  }
+			}
+			})
+		  }
+		})
+  
+	  var pdb_chain_observer = new MutationObserver(function (m, me) {
+		m.forEach( function(mut) {
+		  if (mut.attributeName !== 'style') return;
+		  var currentValue = mut.target.style.display;
+		  if (currentValue == "none") {
+			clusters.forEach(function(c){
+				if(c.Server == "Added Features"){
+					addedFeatures.push(c)
+				}
+			})
+			var custom_feature = $('[id="Added Features"]').children().eq(2).children().eq(0).find("svg")
+			custom_feature.attr("class", "loaded");
+			var oid = custom_feature.attr("id").split("_")[2];
+			// AQUARIA.panel3d.blankApplet(true, "Loading feature...")
+			// AQUARIA.panel3d.blankApplet(false)
+			passFeature(addedFeatures[0], oid);
+			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+			d3.select("svg.loaded").classed("loaded", false);
+  
+			me.disconnect();     // stop observing
+  
+		  }
+		})
+	  })
+  
+  
+  //   start observing structure change
+	document_observer.observe(document.getElementById("loading-message"), {
+	  attributes:    true,
+	  attributeFilter: ["style"],
+	  characterDataOldValue: true
+	});
+};
+
+
+function drawTrack(datum, i) {
 	var features = datum.Tracks;
 
 	for ( var o in features) {
-		
+
 		d3
 				.select(this)
 				.append("svg")
-				.attr("width", width - AQUARIA.margin.left - 40)
+				.attr("width", width + AQUARIA.margin.left)
 				.attr("height", 25)
-				.attr("viewBox", "0 0 " + (width - AQUARIA.margin.left - 40) + " 25")
+				.attr("viewBox", "0 0 " + (width + AQUARIA.margin.left) + " 25")
 				.attr("preserveAspectRatio", "none")
 				.attr("id", "s_" + groupCount + "_" + o)
 				.attr("title",
 						"Click to load feature into 3D view; hover over features to see detailed info.")
-				
-				.on("click", function() { 
+
+				.on("click", function() {
 					if(d3.select(this).attr("class") == "loaded") { // deselect feature (it's already displayed)
 						d3.select("svg.loaded").classed("loaded", false);
 						AQUARIA.panel3d.blankApplet(true, "Removing feature...")
 						AQUARIA.panel3d.blankApplet(false)
-
-						// Stu hack to detect feature changes
-						if (typeof AQUARIA.onFeatureChange === 'function') {
-							AQUARIA.onFeatureChange(null, 0);
-						}
-
 						removeCurrentAnnotationFrom3DViewer();
 					}
 					else { //console.log("clicked to display feature");
@@ -189,7 +342,7 @@ function drawTrack(datum, i) {
 					.attr("height", 25)
 					.attr("class", "bg")
 					.attr("fill", "none");
-		
+
 			d3.select("svg#s_" + groupCount + "_" + o)
 				.append("g")
 					.attr("transform", "translate(" + AQUARIA.margin.left + ",0)")
@@ -234,7 +387,7 @@ function drawTrack(datum, i) {
 	groupCount++;
 }
 
-function createMouseOverCallback(feature) { 
+function createMouseOverCallback(feature) {
 	return function() {
 		var ID = d3.select(this).attr("id");
 		d3.select(this).call(mouseoverFeature, feature, ID);
@@ -243,14 +396,8 @@ function createMouseOverCallback(feature) {
 
 function passFeature(trk, nr, elmt) {
 
-		// Stu hack to detect feature changes
-		if (typeof AQUARIA.onFeatureChange === 'function') {
-			AQUARIA.onFeatureChange(trk, nr);
-		}
+		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
 
-		console.log("featurelist.passFeature " + trk.Category + " " + trk.Type
-				+ ", Track " + nr, trk); //console.log(elmt);
-		
 		sentAnnotationTo3DViewer(trk, parseInt(nr));
 
 }
@@ -292,19 +439,19 @@ function showAnnotation(f, eid) {
 	} else {
 		balloon = balloon + "Residues "+f.start+"-"+f.end;
 	}
-		
+
 	balloon = balloon + ")<br/>"
-			+ f.desc + "</p>" 
+			+ f.desc + "</p>"
 			+ urlhtml + "</div>";
 	d3.select("body")
 		.append("div")
 			.attr("class", "popup")
 			.html(balloon);
-	
-	var popheight = $("div.popup").innerHeight(); 
- 
+
+	var popheight = $("div.popup").innerHeight();
+
 	var fpos = $("#" + eid).offset();
-	var fwidth = $("#" + eid).attr("width"); 
+	var fwidth = $("#" + eid).attr("width");
 
 	var bleft = parseInt(fpos.left + fwidth / 2 - 160);
 	var btop = parseInt(fpos.top - popheight);
@@ -314,10 +461,10 @@ function showAnnotation(f, eid) {
 		"top" : btop + "px"
 	}).fadeIn(600);
 
-	$("span.x").click(function() { 
+	$("span.x").click(function() {
 		$("div.popup").fadeOut();
 	});
-	
+
 	$("div.popup").hover(function() {
 		clearTimeout(s);
 	}, function() {
@@ -351,7 +498,7 @@ function removeCurrentAnnotationFrom3DViewer() {
 /**
  * send the annotation track to the 3D viewer
  */
-function sentAnnotationTo3DViewer(annotations, trackNumber) { 
+function sentAnnotationTo3DViewer(annotations, trackNumber) {
 
 	// default is to send of all track lines unless trackNumber has been
 	// specified
@@ -383,6 +530,9 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 	var featureURLtexts = new Array();
 	var featureCategories = {};
 	var lastColour = '#ffffff';
+	if(annotations != undefined){
+
+
 	if (annotations.featureColours && annotations.featureColours.length > 0) {
 	  lastColour = annotations.featureColours[0];
 	}
@@ -394,21 +544,21 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 				// 0.3 o
 				var alphaColor = "#4d"
 						+ annotations.Tracks[trackNumber][j].color.substring(1);
-			}				
+			}
 		  if (annotations.Tracks[trackNumber][j].color) {
 //		    lastColour = annotations.Tracks[trackNumber][j].color;
 	        featureColours.push(annotations.Tracks[trackNumber][j].color);
 			}
 	    else {
         featureColours.push(lastColour);
-	          
+
 	    }
-	          
+
 //				else {
 //	        featureColours.push(annotations.Tracks[trackNumber][j].color);
-//				  
+//
 //				}
-				
+
 			featureNames.push(annotations.Tracks[trackNumber][j].label);
 			featureDescriptions.push(annotations.Tracks[trackNumber][j].desc);
 			featurePositions.push(annotations.Tracks[trackNumber][j].start
@@ -432,13 +582,14 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 		"id" : annotations.ProteinID,
 		"annotationName" : annotations.Category
 	};
-	
+
 	currentAnnotationsIn3DViewer.push(annotationToAdd);
 	// API call
 	AQUARIA.panel3d.addAnnotation(annotationToAdd.id[0],
 					annotationToAdd.annotationName, featureColours,
 					featureNames, featureDescriptions, featurePositions,
 					featureURLs, featureURLtexts);
+	}
 }
 
 module.exports.updateFeatureUI = updateFeatureUI;
