@@ -23,13 +23,13 @@
         <button v-if="quickLook" class="xr-item default-button" @click="isOpen = false; openInQuickLook()">Open in AR Quick Look</button>
 
         <!-- Send to PlayStation -->
-        <button class="xr-item default-button" @click="isOpen = false; psvrExport()">Send to PSVR</button>
+        <button v-if="psvrEnabled" class="xr-item default-button" @click="isOpen = false; psvrExport()">Send to PSVR</button>
 
         <!-- Send to HEVS -->
         <button v-if="hevsPlatform" class="xr-item default-button" @click="isOpen = false; hevsExport()">Send to HEVS</button>
 
         <!-- Advanced Viewer (Debug) -->
-        <button class="xr-item default-button" @click="isOpen = false; openInAdvancedViewer()">Open in Advanced Viewer</button>
+        <button v-if="advancedViewerEnabled" class="xr-item default-button" @click="isOpen = false; openInAdvancedViewer()">Open in Advanced Viewer</button>
 
       </div>
     </div>
@@ -39,17 +39,19 @@
 
 <script>
 
-const featureDetection = {
-  supportsSceneViewer: /(android)/i.test(navigator.userAgent),
-  supportsQuickLook: document.createElement('a').relList.supports('ar'),
-  supportsMixedReality: /(Windows NT 10.0)/i.test(navigator.userAgent)
-}
-
 // instance of https://github.com/ODonoghueLab/aquariaExport
 const MODEL_SERVER = 'https://ie.csiro.au/services/aquaria-export'
 
 // instance of https://bitbucket.csiro.au/scm/~and490/aquaria-export-preview
 const ADVANCED_VIEWER = 'https://ie.csiro.au/apps/aquaria-export-preview'
+
+const search = new URLSearchParams(location.search)
+
+const featureDetection = {
+  supportsSceneViewer: /(android)/i.test(navigator.userAgent),
+  supportsQuickLook: document.createElement('a').relList.supports('ar'),
+  supportsMixedReality: /(Windows NT 10.0)/i.test(navigator.userAgent)
+}
 
 function exportFeatures (features) {
   return features.map(f => ({
@@ -126,7 +128,9 @@ export default {
       features: null,
       featureTrack: -1,
       isOpen: false,
-      hevsPlatform: (new URLSearchParams(location.search)).get('HEVS')
+      hevsPlatform: search.get('HEVS'),
+      psvrEnabled: !!search.get('PSVR'),
+      advancedViewerEnabled: !!search.get('dev')
     }
   },
   mounted: function () {
