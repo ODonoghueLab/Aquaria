@@ -24,10 +24,10 @@
         </a>
 
         <!-- PlayStation -->
-        <button class="xr-item default-button" v-bind:disabled="features === null" @click="isOpen = false; psvrExport()">Send to PSVR</button>
+        <button class="xr-item default-button" @click="isOpen = false; psvrExport()">Send to PSVR</button>
 
         <!-- HEVS -->
-        <button class="xr-item default-button" v-bind:disabled="true" @click="hevsExport()">Send to HEVS</button>
+        <button v-if="hevsPlatform" class="xr-item default-button" @click="isOpen = false; hevsExport()">Send to HEVS</button>
       </div>
     </div>
   </div>
@@ -68,7 +68,9 @@ export default {
       quickLook: false,
       sceneViewer: false,
       features: null,
-      isOpen: false
+      featureTrack: -1,
+      isOpen: false,
+      hevsPlatform: (new URLSearchParams(location.search)).get('HEVS')
     }
   },
   mounted: function () {
@@ -89,9 +91,11 @@ export default {
     // detect changes to current features
     window.AQUARIA.onFeatureChange = (features, trackNo) => {
       if (features) {
-        this.features = features.Tracks[trackNo]
+        this.features = features
+        this.featureTrack = trackNo
       } else {
         this.features = null
+        this.featureTrack = -1
       }
     }
 
@@ -116,7 +120,7 @@ export default {
     query () {
       const query = []
       if (this.features) {
-        query.push(encodeFeatures(this.features))
+        query.push(encodeFeatures(this.features.Tracks[this.featureTrack]))
       }
       if (query.length > 0) {
         return `?${query.join('&')}`
@@ -143,21 +147,28 @@ export default {
   },
   methods: {
     psvrExport: async function () {
-      const result = await fetch(`${MODEL_SERVER}/psvr`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ protein: this.proteinId, pdb: this.pdbId, features: exportFeatures(this.features) })
+      // @TODO: send all features from topmost collection
+      window.AQUARIA.remote.sendToPSVR(`${this.baseUri}.gltf`, this.features, `${this.proteinId}.${this.pdbId}`, (err, response) => {
+        if (err) {
+          console.warn(`sendToPSVR error${response !== null ? `, PSVR response [${response}]` : ', No PSVR response'}`)
+          console.dir(err)
+          alert(`Send to PSVR failed (${err.message || 'Unknown error'})`)
+        } else {
+          console.log(`sendToPSVR success, PSVR response [${response}]`)
+        }
       })
-      if (result.status !== 200) {
-        alert('PSVR Error')
-      } else {
-        console.debug(`PSVR Success. Returned: ${await result.text()}`)
-      }
     },
     hevsExport: function () {
-      alert('coming soon!')
+      // @TODO: send all features from topmost collection
+      window.AQUARIA.remote.sendToHEVS(`${this.baseUri}.gltf`, this.features, this.hevsPlatform, (err) => {
+        if (err) {
+          console.warn('sendToHEVS error')
+          console.dir(err)
+          alert(`Send to HEVS failed (${err.message || 'Unknown error'})`)
+        } else {
+          console.log('sendToHEVS success')
+        }
+      })
     }
   }
 }
