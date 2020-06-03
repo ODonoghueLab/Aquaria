@@ -1,8 +1,13 @@
 var cache = require('../common/cache')();
 
+var handlePredictProtein = require('./handlePredictProtein')
+var handleSnap2 = require('./handleSnap2')
+var handleCath = require('./handleCath')
+
 var servers = [
 		{
-			"Server" : 'External Features (JSON)',
+			"id": 'features',
+			"Server" : 'Added Features',
 			"URL" : '',
 			"Categories" : {
 				"default" : {
@@ -10,6 +15,22 @@ var servers = [
 					"color" : "single_color"
 				}
 			}
+		},
+		{
+			"id": 'PredictProtein',
+			"Server": 'PredictProtein',
+			"URL": 'https://api.predictprotein.org/v1/results/molart/',
+		},
+		{
+			"id": 'SNAP2',
+			"Server": 'SNAP2',
+			"URL": 'https://rostlab.org/services/aquaria/snap4aquaria/json.php?uniprotAcc=',
+		},
+		{
+			"id": 'CATH',
+			"Server": 'CATH',
+			"URL": 'http://www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
+			// ?content-type=application/json
 		},
 //		{
 //			"Server" : 'InterPro',
@@ -26,7 +47,8 @@ var servers = [
 //			}
 //		},
 		{
-			"Server" : 'Uniprot',
+			"id": "UniprotFeatures",
+			"Server" : 'UniProt',
 			"URL" : 'http://uniprot.org/uniprot',
 			"Categories" : {
 				"Region" : {
@@ -153,7 +175,7 @@ var add_external_annotation = function(primary_accession, json_object, ann, das_
 	var ann_key = das_server + "|:|" + categorytype[0] + "|:|" + categorytype[1];
 	var ann_track = ann["track"] || "multi_track";
 	var ann_color = ann["color"] || "single_color";
-	
+
 	for ( var i = 0; i < ann.Features.length; i++) {
 		var f = ann.Features[i];
 
@@ -174,13 +196,40 @@ var add_external_annotation = function(primary_accession, json_object, ann, das_
 			feat_color = feature_colors[djb2Code(feat_label, feature_colors.length)];
 		}
 
-		if (typeof f.Residues == "object"){
-			// assume array
-			feat_start = parseInt( f.Residues[0]);
-			feat_end = parseInt( f.Residues[1]);
+		var setResidueRange = function(resRange){
+			var res = resRange.toString().split("-")
+			if (res.length > 1){
+			  feat_start = parseInt( res[0]);
+			  feat_end = parseInt( res[1]);
+			}
+			else{
+			  feat_start = parseInt( res[0]);
+			  feat_end = parseInt( res[0]);
+			}
+		  }
+	  
+		  var apiConvert = function(Residues){
+			if(Residues.length < 1){
+			  setResidueRange(Residues[0])
+			}
+			else{
+			  Residues.forEach(function(r){
+			  setResidueRange(r)
+				})
+			}
+		}
+	  
+		if (typeof f.Residues === "object"){
+      if(das_server === "PredictProtein"){
+        apiConvert(f.Residues)
+      }
+      else{
+        feat_start = parseInt( f.Residues[0]);
+			  feat_end = parseInt( f.Residues[1]);
+      }
 		} else if (typeof f.Residue !== 'undefined'){
-	        feat_start = parseInt( f.Residue);
-	        feat_end = parseInt( f.Residue);
+			feat_start = parseInt( f.Residue);
+			feat_end = parseInt( f.Residue);
 		} else {
 			feat_start = parseInt( f.Residues);
 			feat_end = parseInt( f.Residues);
@@ -370,7 +419,7 @@ function optimizeColors(category, multitracks) {
 /**
  * cluster region features into tracks with non-overlapping features
  */
-function clusterRegions(sequence_annotations, categories) {
+function clusterRegions(sequence_annotations, categories, aboutFeaturesource) {
 	var clusters = new Array();
 
 	for (var annotation in sequence_annotations) {
@@ -425,6 +474,7 @@ function clusterRegions(sequence_annotations, categories) {
 
 			clusters.push({
 				"ProteinID" : sequence_annotations[annotation]["ProteinID"],
+				"About"	: aboutFeaturesource,
 				"Server" : sequence_annotations[annotation]["Server"],
 				"Class" : {
 					track : sequence_annotations[annotation]["track"],
@@ -440,6 +490,7 @@ function clusterRegions(sequence_annotations, categories) {
 			// single-line features
 			clusters.push({
 				"ProteinID" : sequence_annotations[annotation]["ProteinID"],
+				"About"	: aboutFeaturesource,
 				"Server" : sequence_annotations[annotation]["Server"],
 				"Class" : sequence_annotations[annotation]["track"],
 				"Category" : sequence_annotations[annotation]["Category"],
@@ -513,20 +564,62 @@ function resetDASAnnotations() {
 	aggregatedAnnotations = new Array();
 }
 
-function fetch_annotations(primary_accession,  
+function getAllFeatureNamesRequested(primary_accession){
+	let features = []
+
+	// URL
+	if(getUrlParameter("features") != ''){
+		features.push("features");
+	};
+
+
+	// Uniprot
+	if(getUrlParameter("UniprotFeatures") != ''){
+		features.push("UniprotFeatures");
+	};
+
+
+	// PredictProtein
+	if(getUrlParameter("PredictProtein") != ''){
+		features.push("PredictProtein");
+	};
+
+	// Snap2
+	if(getUrlParameter("SNAP2") != ''){
+		features.push("SNAP2");
+	};
+
+
+	features.push('CATH')
+
+
+	// Cath
+
+	// BindPredict
+
+
+	return (features)
+}
+
+function fetch_annotations(primary_accession,
 		featureCallback) {
-	
+
 	// reset annotations
 
-	// blah blah HANDLE CACHE HERE
+	// HANDLE CACHE HERE
+
+	// let keys = getAllFeatureParameterKeys(primary_accession)
+	/*
 	var key = "FEATURE_" + primary_accession + getUrlParameter("features");
+
 	var cacheValue = cache.read(key);
 
 	if (cacheValue) {
 		// return cache result for immediate display
 		featureCallback(cacheValue);
 	}
-	
+	*/
+
 	// get fresh set of annotations as well
 	console.log("fetch_features.fetch_annotations: reset DAS annotations");
 	resetDASAnnotations();
@@ -535,27 +628,192 @@ function fetch_annotations(primary_accession,
 			featureCallback);
 };
 
+var axios = require('axios');
+
+function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallback){
+	let featuresFromExtServer = {};
+
+	axios({
+		method: 'get',
+		url: url,
+	})
+	.then(function (response) {
+		// handle success
+		// console.log("Success");
+		// console.log(response.data);
+		console.log("fetch_features.getJsonFromUrl data recieved successfully for " + primary_accession )
+		// featuresFromExtServer['status'] = "success";
+		// featuresFromExtServer['data'] = response.data;
+
+		if (requestedFeature == 'PredictProtein'){
+			// convert feature first
+			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet)
+		}
+		if (requestedFeature == 'SNAP2'){
+			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet)
+		}
+		if (requestedFeature == 'CATH'){
+			// console.log("####################### Cath features obtained successfully! ")
+			// console.log(response.data)
+			handleCath(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback)
+		}
+
+		// return featuresFromExtServer
+	})
+	.catch(function (error) {
+		// handle error
+		console.log("###################### Error " + requestedFeature);
+		console.log(error);
+
+
+		finishServer(new Array(), primary_accession,
+			featureCallback)
+
+		// return featuresFromExtServer
+	});
+
+
+	return featuresFromExtServer
+}
+
+
+
+var StorageLRU = require('storage-lru').StorageLRU;
+var asyncify = require('storage-lru').asyncify;
+// var lru = new StorageLRU(asyncify(localStorage));
+
+var lru = new StorageLRU(
+    asyncify(localStorage),
+    {
+        revalidateFn: function(key, callback) {
+            var newValue = someFunctionToRefetchFromSomewhere(key); // most likely be async
+            callback(null, newValue); // make sure callback is invoked
+        }
+    });
+
+
 /**
  * Process the next annotation resource and add their annotations
  */
-var processNextServer = function(primary_accession,  
+var processNextServer = function(primary_accession,
 		featureCallback) {
 
 	currentServer += 1;
 	isFetchingData = true;
+
 	// get DAS servers first
 	if (currentServer < servers.length) {
-		isFetchingFromServer = servers[currentServer]['Server'];
 
-		console.log("fetch_features.processNextServer isFetchingFromServer =", isFetchingFromServer);
+			// is feature requested by user
+
+		console.log("fetch_features.processNextServer isFetchingFromServer = ", servers[currentServer]['Server']);
+
+		if (servers[currentServer]['Server'] == "Added Features"){
+			// check URL for json url
+			try {
+				checkURLForFeatures(primary_accession, servers[currentServer], featureCallback);
+			} catch (error) {
+				console.error(error);
+			}
+			finally {
+				processNextServer(primary_accession,
+					featureCallback);
+			}
+		}
+		else if (servers[currentServer]['Server'] == "UniProt"){
+
+			// fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
+			lru.getItem(primary_accession + '_' + servers[currentServer]['Server'], {json: false}, function (err, value) {
+
+				if (err) {
+					// something went wrong, for example, can't deserialize
+					console.log('^^ Failed to fetch item: err=', err);
+					fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
+					featureCallback(aggregatedAnnotations);
+				}
+				else{
+					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['Server'] )
+					finishServer(JSON.parse(value), primary_accession, featureCallback)
+					featureCallback(aggregatedAnnotations);
+				}
+
+			});
+
+		}
+		else if (servers[currentServer]['id'] == 'PredictProtein'){
+
+			lru.getItem(primary_accession + '_' + servers[currentServer]['id'], {}, function (err, value) {
+
+				if (err) {
+				    // something went wrong, for example, can't deserialize
+				    console.log('^^ Failed to fetch item: err=', err);
+					getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
+					featureCallback(aggregatedAnnotations);
+				}
+				else{
+					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['id'] )
+					console.log(typeof JSON.parse(value))
+					finishServer(JSON.parse(value), primary_accession, featureCallback)
+					featureCallback(aggregatedAnnotations);
+				}
+
+			});
+
+
+		}
+		else if (servers[currentServer]['id'] == 'SNAP2'){
+
+			lru.getItem(primary_accession + '_' + servers[currentServer]['id'], {json: false}, function (err, value) {
+
+				if (err) {
+				    // something went wrong, for example, can't deserialize
+				    console.log('^^ Failed to fetch item: err=', err);
+					getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
+					featureCallback(aggregatedAnnotations);
+
+				}
+				else{
+					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['id'] )
+					finishServer(JSON.parse(value), primary_accession, featureCallback)
+					featureCallback(aggregatedAnnotations);
+				}
+
+
+			});
+
+		}
+		else if (servers[currentServer]['id'] == 'CATH'){
+			console.log('############################ Requesting Cath features')
+
+			lru.getItem(primary_accession + '_' + servers[currentServer]['id'], {json: false}, function (err, value) {
+
+				if (err) {
+					// something went wrong, for example, can't deserialize
+					console.log('^^ Failed to fetch item: err=', err);
+					getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet)
+					featureCallback(aggregatedAnnotations);
+				}
+				else{
+					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['id'] )
+					finishServer(JSON.parse(value), primary_accession, featureCallback)
+					featureCallback(aggregatedAnnotations);
+				}
+
+
+			});
+
+
+		}
+
+
+		/* isFetchingFromServer = servers[currentServer]['Server'];
 		if (isFetchingFromServer == "External Features (JSON)"){
 			// check URL for json url
 			checkURLForFeatures(primary_accession, servers[currentServer], featureCallback);
-
 		} else if (isFetchingFromServer == "Uniprot"){
 			console.log("fetch_features.processNextServer process " + isFetchingFromServer);
 			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
-		}
+		} */
 	}
 	else {
 		console.log("fetch_features.processNextServer finish DAS");
@@ -569,13 +827,121 @@ var finishServer = function(clustered_annotations, primary_accession,
 		  featureCallback) {
 
 	// add to existing annotation record
-	aggregatedAnnotations.push.apply(aggregatedAnnotations,
-			clustered_annotations);
+	try{
+		aggregatedAnnotations.push.apply(aggregatedAnnotations,
+				clustered_annotations);
+	}
+	catch(error){
+		console.log("Error during pushing")
+		console.log(error)
+	}
+
 
 	// get next server
-	processNextServer(primary_accession,  
+	processNextServer(primary_accession,
 			featureCallback);
 };
+
+
+
+
+
+const Ajv = require('ajv');
+function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featureCallback, featureId){
+
+	const ajv = new Ajv({
+  		verbose: true
+	});
+
+	var schema = {
+		"type": "object",
+		"minProperties": 1,
+		"properties":{
+			"About": {
+				"type": "object",
+				"properties": {
+					"Title": {"type": "string"},
+					"DOI": {"type": "string"},
+					"Description": {"type": "string"},
+					"Sequence_hash": {"type": "string"},
+				},
+				additionalProperties: false,
+			},
+			additionalProperties: false,
+		},
+		"patternProperties": {
+			"^.+$": {
+				"type": "object",
+				"properties": {
+					"Features": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"Name": {'type': "string"},
+								'Residue': {
+									'type': "integer",
+									'minimum': 1,
+								},
+								'Residues': {
+									'type': 'array',
+									'items':{
+										'type': ['integer',
+										'string'],
+										'minimum': 1,
+									},
+									"minItems": 1,
+								},
+								'Color': {'type': 'string'},
+								'Description': {'type': 'string'},
+								'Connected': {'type': ['boolean', 'array']}
+							},
+							additionalProperties: false,
+							"required": ["Name"],
+							'oneOf': [
+								{'required': ['Residue']},
+								{'required': ['Residues']},
+							],
+
+						},
+						minProperties: 1,
+					},
+					"Source": {"type": "string"},
+					"URL": {"type": "string"},
+					"Description": {"type": "string"},
+					additionalProperties: false,
+				},
+				"required": ['Features'],
+				additionalProperties: false,
+			},
+		},
+		additionalProperties: false
+	}
+
+	var isValid = ajv.validate(schema, convertedFeatureSet);
+
+	if (isValid){
+		// continue
+		console.log("fetch_features.validateAquariaFeatureSet appending validated features " + 'PredictProtein')
+
+		parseFeatures(primary_accession, '', featureId,featureCallback, convertedFeatureSet, '')
+		// finishServer(convertedFeatureSet, primary_accession, featureCallback);
+	}
+	else {
+		// cannot display these features
+		console.log("fetch_features.validateAquariaFeatureSet " + ajv.errorsText())
+		finishServer(new Array(), primary_accession,
+			featureCallback);
+	}
+
+	// ajv.addMetaSchema(require());
+	// console.log(ajv.validate(schema, convertedFeatureSet).errors)
+	// console.log('ERRORS: ', this.ajv.errors)
+	//return (isValid)
+}
+
+
+
 
 // cross Domain access to obtain additional features
 function createCORSRequest(method, url) {
@@ -601,11 +967,12 @@ function createCORSRequest(method, url) {
  * https://docs.google.com/document/d/1wFJjdyl1OASnsBNkUzUx4ME8YhVybhIWCTr3Z1fBEWQ/pub
  */
 function parseUniprot(xml) {
+
 	var data = {};
 	$(xml).find("feature").each(function() {
 		var type = capitaliseFirstLetter($(this).attr("type"));
 		var feature = {};
-		
+
 		switch(type) {
 		case "Helix":
 //			feature.Color = "#568AB5";
@@ -620,11 +987,11 @@ function parseUniprot(xml) {
 //			type = "Secondary Structure";
 			return;
 			break;
-			
+
 		}
-		
+
 		if (!hasOwnProperty(data, type)) {
-			data[type] = {"Source" : "Uniprot", "URL" : "https://www.uniprot.org", "Features" : []};
+			data[type] = {"Source" : "UniProt", "URL" : "https://www.uniprot.org", "Features" : []};
 			if (type == "Sequence variant" ||
 					type == "Mutagenesis site" ||
 					type == "Modified residue" ||
@@ -632,10 +999,10 @@ function parseUniprot(xml) {
 				data[type]["Color"] = feature_colors[djb2Code(type.replace(/_/g, ' '), feature_colors.length)];
 			}
 		}
-		
+
 		// feature description (optional)
 		var description = $(this).attr("description") || "";
-		
+
 		// feature name (optional)
 		var name = undefined;
 		var original = $(this).find("original");
@@ -646,7 +1013,7 @@ function parseUniprot(xml) {
 				name += " > " + variation.first().text();
 			}
 		};
-		
+
 		var residues = [];
 		var loc = $(this).find("location");
 		loc.each(function() {	// each location can be either a single position or a range
@@ -654,7 +1021,7 @@ function parseUniprot(xml) {
 			var pos = $(this).children().map(function() {
 				return $(this).attr("position");
 			}).get();
-			
+
 			residues = residues.concat(pos);
 		});
 		if (residues.length == 1) {
@@ -662,37 +1029,136 @@ function parseUniprot(xml) {
 		} else {
 			feature["Residues"] = residues;
 		}
-		
+
 		feature["Name"] = name || description;
 		feature["Description"] = name ? description : "";
-		
+
 		data[type]["Features"].push(feature);
 	});
-	
+
 	return data;
-	
+
 }
 
-function parseFeatures(primary_accession, categories, server, featureCallback, data){
+function parseFeatures(primary_accession, categories, server, featureCallback, data, sourceURL){
 	var sequence_annotations = {};
+	var aboutSource = {};
+	var description = "";
+	if (server === "PredictProtein"){
+		// console.log(" +++++++++++++++++++++++++ " + data)
+	}
 	for (var category in data) {
 		  if (data.hasOwnProperty(category)) {
-			add_external_annotation(primary_accession, sequence_annotations, data[category], server , category);
+			if (category === "About"){
+				var aboutSource = data[category];
+				for (var attr in aboutSource) {
+					if(attr === "Title"){
+            			description = description.concat("<h3 class='infoHeader'><b>" + aboutSource[attr] + "</b></h3>")
+					}
+					else if (attr === "DOI"){
+						description = "<a href=" + aboutSource[attr] + ">" + description + "</a>"
+						description = description.concat("</br>")
+					}
+          			else if (attr === "Description"){
+						description = description.concat("<p>" + aboutSource[attr] + "</p>")
+					}
+					else{
+						description = description.concat("<p>" + aboutSource[attr] + "</p>")
+          			}
+				}
+			}
+			else if (server === "UniProt"){
+				description = "For each protein, <a href='https://www.uniprot.org/'>UniProt</a> provides a comprehensive set of \
+				carefully curated features, typically including domains, sequence variants, post-translational modifications (PTMs), \
+				active sites, and binding sites."
+			}
+			else if (server === "PredictProtein"){
+				description = "<a href='https://predictprotein.org/'>PredictProtein</a> provides computational predictions of \
+				structural annotations, such as \
+				<a href='https://rostlab.org/owiki/index.php/PredictProtein_-_Documentation#Secondary_structure_.28PROF.29'>\
+				secondary structures</a>, \
+				<a href='https://rostlab.org/owiki/index.php/NORSp_-_predictor_of_NOn-Regular_Secondary_Structure'> \
+				non-regular secondary structures </a>, \
+				<a href='https://rostlab.org/owiki/index.php/PredictProtein_-_Documentation#Solvent_accessibility_.28PHDacc.29'>\
+				solvent accessibility</a>, <a href='https://rostlab.org/owiki/index.php/Metadisorder'> intrinsically disordered regions \
+				</a>, <a href='https://rostlab.org/owiki/index.php/PROFbval'> residue mobility </a> and \
+				<a href='https://github.com/Rostlab/ConSurf'> evolutionary conservation of amino acid positions </a>. \
+				Additionally, predictions may also be included for \
+				<a href='https://rostlab.org/owiki/index.php/PROFphd_-_Secondary_Structure,_Solvent_Accessibility_and_Transmembrane_Helices_Prediction'> \
+				transmembrane helices </a>, trans-membrane beta barrel structures, disulphide bridges and \
+				<a href='https://rostlab.org/owiki/index.php/PredictProtein_-_Documentation#Contact_Prediction_.28PROFcon.29'>\
+				inter-residue contacts</a>."
+			}
+			else if (server === "SNAP2"){
+				description = "<a href='https://www.rostlab.org/services/snap/'>SNAP2</a> provides computational predictions of the \
+				effect of amino acid changes upon protein function."
+			}
+			else if (server === "CATH") {
+				description = "<a href='http://www.cathdb.info/wiki'>CATH</a> provides domain information for proteins based on \
+				functional similarity (‘FunFams’), as well as domains based only on structural similarity (‘CATH superfamilies’). \
+				CATH provides extensive information for each domain, including functional annotations, species diversity, and enzyme \
+				classifications."
+			}
+			else{
+				description = description
+			}
+
+			if (category !== "About"){
+				add_external_annotation(primary_accession, sequence_annotations, data[category], server , category);
+			}
 		  }
 	}
-	var clustered_annotations = clusterRegions(sequence_annotations, categories);
+	if(description === ""){
+		description = description.concat("<p>This feature collection currently has no description. To add one, ask the author of the JSON file below to add an ‘About’ property (described <a href='http://bit.ly/aquaria-features'>here</a>).</p>")
+	}
+	else{
+		description = description.concat("<p><a href='" + sourceURL + "'>Source</a></p>")
+	}
+	var clustered_annotations = clusterRegions(sequence_annotations, categories, description);
 
-	finishServer(clustered_annotations, primary_accession, featureCallback);
+	lru.setItem(
+    primary_accession + '_' + server,    // key
+    clustered_annotations, // obj value
+    {             // options
+        json: true,
+        cacheControl:'max-age=300,stale-while-revalidate=86400'
+    }, function (err) {
+        if (err) {
+            // something went wrong. Item not saved.
+            console.log('^^^ Failed to save item: err=', err);
+        }
+		else{
+			console.log("^^^ saved item ", primary_accession + '_' + server)
+		}
+		finishServer(clustered_annotations, primary_accession, featureCallback);
+	}
+	);
+
 }
 
 function checkURLForFeatures(primary_accession, server, featureCallback){
 	var url = getUrlParameter("features");
 	if (url){
-	  $.getJSON( url, function (responseJSON) { //After load, parse data returned by xhr.responseText
-			parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, responseJSON);
-	    });
+		axios({
+			method: 'get',
+			url: url
+		  })
+		.then(function (responseJSON) {
+			if(typeof(responseJSON["data"]) != "object"){
+				processNextServer(primary_accession,
+					featureCallback);
+			}
+			else{
+				parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, responseJSON["data"], url)
+			}
+		})
+		//$.getJSON( url, function (responseJSON) { //After load, parse data returned by xhr.responseText
+		// parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, responseJSON, url);
+		// });
 	} else {
-		finishServer(new Array(), primary_accession,  
+		// finishServer(new Array(), primary_accession,
+		// 	featureCallback);
+		processNextServer(primary_accession,
 			featureCallback);
 	}
 }
@@ -705,21 +1171,21 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 
 	console.log("fetch_features.fetch_uniprot fetching features from uniprot...");
 	url = "https://www.uniprot.org/uniprot/" + primary_accession + ".xml";
-	$.ajax({url : url, 
+	$.ajax({url : url,
 			type: "GET",
 			dataType: "xml",
 			error: function() {
 				data = AQUARIA.remote.get_features(window.location.pathname.split('/')[1], function(orgNames) {
 				  // console.log("features.displayOrgSynonyms: " + orgNames[0].Features)
-				  parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, JSON.parse(orgNames[0].Features))
+				  parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, JSON.parse(orgNames[0].Features), url)
 				})
 			  },
 			success: function(xml) {
 				data = parseUniprot(xml);
-				parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data)
+				parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url)
 			}
 	});
-	
+
 };
 
 module.exports = fetch_annotations;

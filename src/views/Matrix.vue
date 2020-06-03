@@ -46,7 +46,24 @@ export default {
     }
   },
   beforeMount () {
-    var numStructures = [0, 2, 2, 2, 0, 0, 0, 0, 0, 25, 357, 495, 117, 0]
+    // var numStructures = [0, 2, 2, 2, 0, 0, 0, 0, 0, 25, 357, 495, 117, 0]
+    // var numStructures = [2, 0, 35, 0, 0, 0, 0, 3, 0, 0, 4, 678, 528, 134]
+    var allStructures, matchingStructures
+    function csvJSON (csv) {
+      var lines = csv.split('\n')
+      var result = []
+      var headers = lines[0].split(',')
+      for (var i = 1; i < lines.length; i++) {
+        var obj = {}
+        var currentline = lines[i].split(',')
+        for (var j = 0; j < headers.length; j++) {
+          obj[headers[j]] = currentline[j]
+        }
+        result.push(obj)
+      }
+      return JSON.stringify(result)
+    }
+
     var url = ''
     if (window.location.pathname.split('/')[1] === 'SARS-CoV-2' || window.location.pathname.split('/')[1] === 'covid19') {
       url = window.location.protocol + '//' + window.location.hostname + ':8010/2697049'
@@ -58,13 +75,32 @@ export default {
       url: url
     })
       .then(response => {
-        this.structures = JSON.parse(response.data.primary_accessions)
+        allStructures = JSON.parse(response.data.primary_accessions)
         // this.organismSynonyms = this.structures.OrgSynonyms
-        for (let index = 0; index < this.structures.length; index++) {
-          this.structures[index].count = numStructures[index]
-          this.totalStructures = this.totalStructures + numStructures[index]
+        for (let index = 0; index < allStructures.length; index++) {
+          allStructures[index].count = 0
+          if (allStructures[index].PDB_chain_hash != null) {
+            var purl = window.location.protocol + '//' + window.location.hostname + ':8010/' + allStructures[index].primary_accession + '.csv'
+            axios({
+              method: 'get',
+              url: purl
+            })
+              .then(response => {
+                matchingStructures = csvJSON(response.data)
+                matchingStructures = JSON.parse(matchingStructures)
+                for (var i = 0; i < matchingStructures.length; i++) {
+                  allStructures[index].count = allStructures[index].count + parseInt(matchingStructures[i]['cluster size'])
+                }
+                console.log('THIS IS TEXT', allStructures[index].count, allStructures[index].primary_accession)
+                // this.totalStructures = this.totalStructures + this.structures[index].count
+              })
+          }
+          // this.totalStructures = this.totalStructures + numStructures[index]
         }
+        this.structures = allStructures
       })
+
+    this.structures = allStructures
   },
   methods: {
     redirect: function (primaryAccession) {
@@ -105,7 +141,9 @@ export default {
   },
   updated () {
     setTimeout(function () {
-      document.querySelector('.matrixLoading').remove()
+      if (document.querySelector('.matrixLoading')) {
+        document.querySelector('.matrixLoading').remove()
+      }
     }, 350)
     var checkPhone = function () {
       var iDevices = [

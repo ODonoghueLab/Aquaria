@@ -3,116 +3,146 @@
 ///////// sidebar information panels ////////////
 
 function updatePDBPanel(PDBData, commonName, score) {
-	if(PDBData) {
-		var molecule_name, pdbid, chain, acc;
-		console.log("textpanels.updatePDBPanel updating PDB info", PDBData);
-		pdbid = PDBData.pdb_id;
-		chain = PDBData.pdb_chain;
-		acc = PDBData.Accession;
-		//author's names
-		var auth, journal, ypub;
-		if (PDBData.authors) {
-			if ( PDBData.authors.indexOf(",") == -1){ auth = PDBData.authors; }	//single author
-			else {
-				var authorlist = PDBData.authors.split(", "); //console.log(authorlist.toString());
-				for (n in authorlist) { //strip off initials
-					var patrn = /[A-Z]+(?=\(\d\)|\.|$)/;
-					var initial = authorlist[n].match(patrn); //console.log(authorlist[n]+", initial: "+initial);
-					var authName = authorlist[n].substring(0, authorlist[n].indexOf(" "+initial));  
-					authorlist[n] = authName; //console.log("authName["+n+"]: "+authName);
-				}  
-				//console.log(authorlist.toString());
+	var molecule_name, pdbid, chain, acc;
+	console.log("textpanels.updatePDBPanel updating PDB info", PDBData);
+	pdbid = PDBData.pdb_id;
+	chain = PDBData.pdb_chain;
+	acc = PDBData.Accession;
+	//author's names
+	var auth, journal, ypub;
+	var citation = JSON.parse(PDBData.citation);
+	var doi;
 
-				if (authorlist.length == 1) { auth = authorlist[0]; }
-				if (authorlist.length == 2) { auth = authorlist[0] + " & "+ authorlist[1]; }
-				else {
-					auth = authorlist[0] + " et al.";
-				}
-			}	
-		}	   
-		if (PDBData.citation) {
-
-			journal = PDBData.citation.match(/^.*?\s\d{4}/).toString(); //console.log("Journal: "+journal);
-			ypub = journal.substring(journal.length-4); //console.log("Year: "+ypub);
-			var jourNm = journal.substring(0, journal.indexOf(ypub));
-			//strip out periods
-			jourNm = jourNm.replace("."," ");
-		}
-		
-		if( PDBData.Molecule != null ){
-			molecule_name = PDBData.Molecule;
-			console.log("textpanels.updatePDBPanel molecule: "+molecule_name);
-		}
-		//strip out stuff in parentheses
-		if (typeof(molecule_name) !== "undefined" ) { 
-			if(molecule_name.indexOf("(") != -1) {	   
-				molecule_name = molecule_name.substring(0, molecule_name.indexOf("("));   
-			}
-		}
-		var method = PDBData.Experimental_Method;
-		if(PDBData.Resolution != null)	{
-			method += " at "+ PDBData.Resolution + " &Aring; resolution";
-		} else {
-			console.log("textpanels.updatePDBPanel error: no resolution specified");
-		}
-		//Assemble the "About PDB [...]" description
-		if (PDBData.title) {
-			$("#description #reference_title").text(PDBData.title);
-			$("#description #reference_title").show();
-		}
-		else {
-			$("#description #reference_title").hide();
-
-		}
-		$("#description #reference_link").show();
-		if (jourNm && auth) {
-			$("#description #reference_link a").text(auth + ", "+ jourNm + " ("+ypub+")");
-		}
-		else if (auth){
-			$("#description #reference_link a").text(auth);
-		}
-		else {
-			$("#description #reference_link").hide();
-		}
-		$("#description #reference_link a").attr("href", "http://www.ncbi.nlm.nih.gov/pubmed/"+PDBData.PubMed_ID);
-		$("#description #reference_link a").attr("target", "_blank");
-		$("#description #reference_link a").attr("title", "Go to PubMed");
-		$("#description p.reference_abstract").remove();
-		if (PDBData.abstract ) {
-			$("#description #reference_link").after('<p class="reference_abstract"><strong>Abstract: </strong>'+PDBData.abstract+'</p>');
-		}
-		//$("#description p.reference_abstract").html(");
-		if (method) {
-			$("#description #method span.text").html(method);	
-			$("#description #method").show();	
-		}
-		else {
-			$("#description #method").hide();	
-		}
-		
-		updatePDBChain(pdbid, chain, score, PDBData.Organism[PDBData.Accession]);
-		
-		//$("#description p.reference_abstract").trigger("updateEvent");
-		$("p.reference_abstract").expander({ 
-			slicePoint: 600,
-			expandText: '[+]',
-			userCollapseText: '[&ndash;]', 
-			// onSlice: function() { console.log("Sliced "+this); },
-			afterExpand: function() { //console.log("afterExpand: aligning "+$(this));
-				$(this).children(".details").attr("style","display: inline;");
-			}
-
-		});	
-		
-		//update ABOUT PDB title
-		// $("#description h3 span.explanation").html("<a href='http://www.rcsb.org/pdb/explore.do?structureId="+ pdbid +"' title='Go to PDB'>PDB "+pdbid+"</a>");
-		$("#gallery h3 span.explanation").html("<a href='http://www.rcsb.org/pdb/explore.do?structureId="+ pdbid +"' title='Go to PDB'>PDB "+pdbid+"</a>");
-
-
-		$("#aboutPDBHider").show();
-		AQUARIA.blankPanel("#aboutPDB", false);
+	if(citation.DOI){
+		doi = citation.DOI
 	}
-	else { console.log("textpanels.updatePDBPanel error: PDBData not available"); }
+
+	if (citation.Authors) {
+		if ( citation.Authors.indexOf(",") == -1){ auth = citation.Authors; }	//single author
+		else {
+			var authorlist = citation.Authors.split(", "); //console.log(authorlist.toString());
+			for (n in authorlist) { //strip off initials
+				var patrn = /[A-Z]+(?=\(\d\)|\.|$)/;
+				var initial = authorlist[n].match(patrn); //console.log(authorlist[n]+", initial: "+initial);
+				var authName = authorlist[n].substring(0, authorlist[n].indexOf(" "+initial));  
+				authorlist[n] = authName; //console.log("authName["+n+"]: "+authName);
+			}  
+			//console.log(authorlist.toString());
+
+			if (authorlist.length == 1) { auth = authorlist[0]; }
+			if (authorlist.length == 2) { auth = authorlist[0] + " & "+ authorlist[1]; }
+			else {
+				auth = authorlist[0] + " et al.";
+			}
+		}	
+	}	   
+	if (citation.Journal) {
+		journal = citation.Journal;
+		ypub = citation.Year;
+	}
+	
+	if( PDBData.Molecule != null ){
+		molecule_name = PDBData.Molecule;
+		console.log("textpanels.updatePDBPanel molecule: "+molecule_name);
+	}
+	//strip out stuff in parentheses
+	if (typeof(molecule_name) !== "undefined" ) { 
+		if(molecule_name.indexOf("(") != -1) {	   
+			molecule_name = molecule_name.substring(0, molecule_name.indexOf("("));   
+		}
+	}
+	
+	//Assemble the "About PDB [...]" description
+	if (PDBData.title) {
+		$("#aboutPDBHider").show()
+		$("#description #reference_title").text(PDBData.title);
+		$("#description #reference_title").show();
+	}
+	else {
+		$("#description #reference_title").hide();
+
+	}
+	$("#description #reference_link").show();
+	if (journal && auth && doi && citation.PubMed_ID) {
+		$("#description #reference_link").html(auth + ", <a href='http://www.ncbi.nlm.nih.gov/pubmed/"+ citation.PubMed_ID +"' title='Go to PubMed' target='_blank'>"+ citation.Title + "</a>, \n <a href='http://doi.org/" + doi + "' title='Go to publication' target='_blank'>" + journal + " (" + ypub + ")</a>");
+	}
+	else if (journal && auth && citation.PubMed_ID) {
+		$("#description #reference_link").html(auth + ", <a href='http://www.ncbi.nlm.nih.gov/pubmed/"+ citation.PubMed_ID +"' title='Go to PubMed' target='_blank'>"+ citation.Title + "</a>, " + journal + " ("+ypub+")");
+	}
+	else if (journal && auth) {
+		$("#description #reference_link").html(auth + ", " + citation.Title + ", " + journal + " ("+ypub+")");
+	}
+	else if (auth){
+		$("#description #reference_link").text(auth);
+	}
+	else {
+		$("#description #reference_link").hide();
+	}
+	$("#description p.reference_abstract").remove();
+
+
+	if(PDBData.classification) {
+		$("#classification").html("<a href='https://www.rcsb.org/search?q=struct_keywords.pdbx_keywords:" + PDBData.classification + "' target='_blank'>" + PDBData.classification + "</a>") 
+		$("#classification").show()
+	}
+	else{
+		$("#classification").hide()
+	}
+	
+	var small_molecules = JSON.parse(PDBData.small_molecules)
+
+	if(Object.keys(small_molecules).length > 0 ) {
+		$("#description #small_molecules span.text").html("")
+		Object.keys(small_molecules).forEach(function (key){
+			$("#description #small_molecules span.text").append("<a title='"+ small_molecules[key] + "' href='https://www.rcsb.org/ligand/" + key + "'  target='_blank'>"  + key + "</a>, ");	
+		});
+		var x = $("#description #small_molecules span.text").html().substring(0,$("#description #small_molecules span.text").html().length - 2);
+		$("#description #small_molecules span.text").html(x)
+		// .substring(0, a.length-2)
+	}
+	else{
+		$("#description #small_molecules").hide();	
+	}
+
+	var method = PDBData.Experimental_Method;
+	
+	if (method) {
+		$("#description #method span.text").html(method);	
+		$("#description #method").show();	
+	}
+	else {
+		$("#description #method").hide();	
+	}
+
+	if(PDBData.Resolution != null || PDBData.Resolution != undefined)	{
+		$("#description #resolution span.text").html(PDBData.Resolution + " &Aring;");
+		$("#description #resolution span.text").show()
+	} else {
+		$("#description #resolution").hide()
+	}
+
+	$("#description #pdb span.text").html("<a href='https://www.wwpdb.org/pdb?id=pdb_" + pdbid + "' target='_blank'>" + pdbid + "</a>");
+	$("#description #pdb span.text").show()
+	
+	updatePDBChain(pdbid, chain, score, PDBData.Organism[PDBData.Accession], PDBData.Organism[PDBData.Organism[PDBData.Accession]]);
+	
+	//$("#description p.reference_abstract").trigger("updateEvent");
+	$("p.reference_abstract").expander({ 
+		slicePoint: 600,
+		expandText: '[+]',
+		userCollapseText: '[&ndash;]', 
+		// onSlice: function() { console.log("Sliced "+this); },
+		afterExpand: function() { //console.log("afterExpand: aligning "+$(this));
+			$(this).children(".details").attr("style","display: inline;");
+		}
+
+	});	
+	
+	//update ABOUT PDB title
+	$("#description h3 span.explanation").html("<a href='http://www.rcsb.org/pdb/explore.do?structureId="+ pdbid +"' title='Go to PDB' target='_blank'>PDB "+pdbid+"</a>");
+
+	AQUARIA.blankPanel("#aboutPDB", false);
+
 }
 
 function updatePDBChain(pdbId, chainId, score, organism) {

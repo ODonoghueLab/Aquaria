@@ -113,7 +113,7 @@ ShowMatchingStructures.prototype.addCluster = function(cluster) {
 ShowMatchingStructures.prototype.finishedLoading = function() {
 	var structureCount = totalStructures(this.clusters);
 	console.log('ShowMatchingStructures.finishedLoading', structureCount + " structures total!");
-	$("#structureexplanation").html(" in PDB <span class='counter'>" + structureCount + "</span>");
+	$("#structureexplanation").html("<span class='counter'>" + structureCount + "</span>");
 	$("#structurematches h3 span.counter, div.container svg g.expandable text").digits();
 	
 };
