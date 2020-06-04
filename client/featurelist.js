@@ -143,25 +143,27 @@ var updateFeatureUI = function(featureList) {
 	$(".featureTrack").sortable({axis: 'y'}).css({"cursor": "move"})
 	$("#groupedFeatures").disableSelection()
 	$(".featureHeader").on("click", function () {
-		var content = $(this).parent().children().eq(2)
-		var notThis = $('div[class*="active"]').not(this)
-	
-		notThis.children().eq(0).text("►")
-		notThis.next("div").slideUp("slow");
-		notThis.children("button").css({"visibility": "hidden"})
-		notThis.removeClass("active")
-	
+		var content = $(this).parent().children().eq(2)	
 		content.slideToggle('slow')
+
 		if(content.is(":visible")){
 		  $(this).addClass("active")
 		}
-			  if ($(this).children().eq(0).text() == '►') {
+		if ($(this).children().eq(0).text() == '►') {
 			$(this).children().eq(0).text("▼")
 			$(this).children("button").css({"visibility": "visible"})
-		  } else {
+		} else {
 			$(this).children().eq(0).text("►")
 			$(this).children("button").css({"visibility": "hidden"})
-		  }
+		}
+
+		var notThis = $('div[class*="active"]').not(this)
+	
+		notThis.children().eq(0).text("►")
+		notThis.parent().children().eq(2).slideUp("slow");
+		notThis.children("button").css({"visibility": "hidden"})
+		notThis.removeClass("active")
+
 		});
 	var timer;
 	$(".featureHeader").on({

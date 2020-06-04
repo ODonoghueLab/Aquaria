@@ -91,7 +91,6 @@ export default {
                 for (var i = 0; i < matchingStructures.length; i++) {
                   allStructures[index].count = allStructures[index].count + parseInt(matchingStructures[i]['cluster size'])
                 }
-                console.log('THIS IS TEXT', allStructures[index].count, allStructures[index].primary_accession)
                 // this.totalStructures = this.totalStructures + this.structures[index].count
               })
           }
