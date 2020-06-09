@@ -94,6 +94,35 @@ function openInSceneViewer (protein, pdb, features) {
   link.click()
 }
 
+function openInPSVR (protein, pdb, features) {
+  // @TODO: send all features from topmost collection
+  const uri = getExportUri(protein, pdb, 'gltf')
+  window.AQUARIA.remote.sendToPSVR(uri, features, `${protein}.${pdb}`, (err, response) => {
+    if (err) {
+      console.warn(`sendToPSVR error${response !== null ? `, PSVR response [${response}]` : ', No PSVR response'}`)
+      console.dir(err)
+      alert(`Send to PSVR failed (${err.message || 'Unknown error'})`)
+    } else {
+      console.log(`sendToPSVR success, PSVR response [${response}]`)
+    }
+  })
+}
+
+function openInHEVS (protein, pdb, features, platform) {
+  // @TODO: send all features from topmost collection
+  const uri = getExportUri(protein, pdb, 'glb')
+  window.AQUARIA.remote.sendToHEVS(uri, features, `${protein}.${pdb}`, platform, (err, assetId) => {
+    if (err) {
+      console.warn('sendToHEVS error')
+      console.dir(err)
+      alert(`Send to HEVS failed (${err.message || 'Unknown error'})`)
+    } else {
+      console.log(`sendToHEVS success, asset ID is ${assetId}`)
+      // @TODO store asset ID, this is our link for things like changing active feature
+    }
+  })
+}
+
 function openInAdvancedViewer (protein, pdb) {
   const link = document.createElement('a')
   link.href = `${ADVANCED_VIEWER}?protein=${protein}&pdb=${pdb}`
@@ -173,28 +202,10 @@ export default {
       openInSceneViewer(this.proteinId, this.pdbId, this.features ? exportFeatures(this.features.Tracks[this.featureTrack]) : null)
     },
     psvrExport: async function () {
-      // @TODO: send all features from topmost collection
-      window.AQUARIA.remote.sendToPSVR(`${this.baseUri}.gltf`, this.features, `${this.proteinId}.${this.pdbId}`, (err, response) => {
-        if (err) {
-          console.warn(`sendToPSVR error${response !== null ? `, PSVR response [${response}]` : ', No PSVR response'}`)
-          console.dir(err)
-          alert(`Send to PSVR failed (${err.message || 'Unknown error'})`)
-        } else {
-          console.log(`sendToPSVR success, PSVR response [${response}]`)
-        }
-      })
+      openInPSVR(this.proteinId, this.pdbId, this.features)
     },
     hevsExport: function () {
-      // @TODO: send all features from topmost collection
-      window.AQUARIA.remote.sendToHEVS(`${this.baseUri}.gltf`, this.features, this.hevsPlatform, (err) => {
-        if (err) {
-          console.warn('sendToHEVS error')
-          console.dir(err)
-          alert(`Send to HEVS failed (${err.message || 'Unknown error'})`)
-        } else {
-          console.log('sendToHEVS success')
-        }
-      })
+      openInHEVS(this.proteinId, this.pdbId, this.features, this.hevsPlatform)
     },
     openInAdvancedViewer: function () {
       openInAdvancedViewer(this.proteinId, this.pdbId)
