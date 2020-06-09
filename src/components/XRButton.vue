@@ -1,3 +1,111 @@
+<script>
+
+/**
+  * NOTE: All XR export operations are now run on-demand and do not need to be prepared ahead-of-time,
+  * so hacking into Vue reactivity as per XRButtonComponent.mounted may no longer be strictly necessary.
+  * However, all required info for XR export functions (e.g. feature server content, top feature server, current feature track,
+  * current sequence, current structure, current chain etc) should be available, ideally without hacks, globals or localstorage.
+  * Consider storing larger state info (like parsed features) in importable singletons 'let features = {}; export default features;',
+  * while properly integrating smaller state (e.g. current feature track) into Vue reactivity (fed into XRButtonComponent as properties).
+  * Server-side parsing of features (except perhaps 'Added Features') combined with HTTP (not WebSocket) delivery and appropriate
+  * caching headers should render localStorage caching unecessary, improve client performance, and simplify client code
+  **/
+
+import * as XR from '../utils/XRUtils'
+
+const search = new URLSearchParams(location.search)
+
+const XRButtonComponent = {
+  name: 'XRButton',
+  components: {},
+  data: () => {
+    return {
+      dataReceived: false,
+      pdbId: 'none',
+      proteinId: 'none',
+      quickLook: XR.Platform.supportsQuickLook,
+      sceneViewer: XR.Platform.supportsSceneViewer,
+      feature: null,
+      featureTrack: -1,
+      isOpen: false,
+      hevsPlatform: search.get('HEVS'),
+      hevsAsset: null,
+      psvrEnabled: !!search.get('PSVR'),
+      advancedViewerEnabled: !!search.get('dev')
+    }
+  },
+  mounted: function () {
+    // shim the chainSelected function to detect changes
+    let chainSelectionOriginal
+    const chainSelectionProxy = (accession, pdb, chain) => {
+      chainSelectionOriginal(accession, pdb, chain)
+      this.proteinId = accession
+      this.pdbId = pdb
+      this.dataReceived = true
+    }
+    if (window.AQUARIA.chainSelected !== chainSelectionProxy) {
+      chainSelectionOriginal = window.AQUARIA.chainSelected
+      window.AQUARIA.chainSelected = chainSelectionProxy
+    }
+
+    // detect changes to current feature
+    window.AQUARIA.onFeatureChange = (feature, trackNo) => {
+      if (feature) {
+        this.feature = feature
+        this.featureTrack = trackNo
+      } else {
+        this.feature = null
+        this.featureTrack = -1
+      }
+    }
+  },
+  computed: {
+    currentFeatureTrack: function () {
+      return this.feature ? XR.exportFeatureTrack(this.feature.Tracks[this.featureTrack]) : null
+    }
+  },
+  methods: {
+    downloadGltf: function () {
+      XR.download(this.proteinId, this.pdbId, 'glb', this.currentFeatureTrack, `${this.proteinId}${this.pdbId}.glb`)
+    },
+    downloadUsd: function () {
+      XR.download(this.proteinId, this.pdbId, 'usdz', this.currentFeatureTrack, `${this.proteinId}${this.pdbId}.usdz`)
+    },
+    openInQuickLook: function () {
+      XR.openInQuickLook(this.proteinId, this.pdbId, this.currentFeatureTrack)
+    },
+    openInSceneViewer: function () {
+      XR.openInSceneViewer(this.proteinId, this.pdbId, this.currentFeatureTrack)
+    },
+    psvrExport: async function () {
+      try {
+        const response = await XR.openInPSVR(this.proteinId, this.pdbId, XR.retrieveTopFeatureCollection(this.proteinId))
+        console.log(`sendToPSVR success, PSVR response [${response}]`)
+      } catch (err) {
+        console.warn('sendToPSVR error')
+        console.dir(err)
+        alert(`Send to PSVR failed (${err.message || 'Unknown error'})`)
+      }
+    },
+    hevsExport: async function () {
+      try {
+        this.hevsAsset = await XR.openInHEVS(this.proteinId, this.pdbId, XR.retrieveTopFeatureCollection(this.proteinId), this.hevsPlatform)
+        console.log(`sendToHEVS success, asset ID is ${this.hevsAsset}`)
+      } catch (err) {
+        console.warn('sendToHEVS error')
+        console.dir(err)
+        alert(`Send to HEVS failed (${err.message || 'Unknown error'})`)
+      }
+    },
+    openInAdvancedViewer: function () {
+      XR.openInAdvancedViewer(this.proteinId, this.pdbId)
+    }
+  }
+}
+
+export default XRButtonComponent
+</script>
+
 <template>
 <div>
   <img v-if="this.dataReceived && !this.isOpen" @click="isOpen = true" class="xr-menu-button" src="/images/ar-button.png">
@@ -36,183 +144,6 @@
   </div>
 </div>
 </template>
-
-<script>
-
-// instance of https://github.com/ODonoghueLab/aquariaExport
-const MODEL_SERVER = 'https://ie.csiro.au/services/aquaria-export'
-
-// instance of https://bitbucket.csiro.au/scm/~and490/aquaria-export-preview
-const ADVANCED_VIEWER = 'https://ie.csiro.au/apps/aquaria-export-preview'
-
-const search = new URLSearchParams(location.search)
-
-const featureDetection = {
-  supportsSceneViewer: /(android)/i.test(navigator.userAgent),
-  supportsQuickLook: document.createElement('a').relList.supports('ar'),
-  supportsMixedReality: /(Windows NT 10.0)/i.test(navigator.userAgent)
-}
-
-function exportFeatures (features) {
-  return features.map(f => ({
-    c: f.color,
-    n: f.name,
-    s: f.start,
-    e: f.end,
-    d: f.desc
-  }))
-}
-
-function download (url, filename) {
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  link.click()
-}
-
-function openInQuickLook (protein, pdb, features) {
-  // https://developer.apple.com/documentation/arkit/previewing_a_model_with_ar_quick_look
-  const link = document.createElement('a')
-  link.href = getExportUri(protein, pdb, 'usdz', features)
-  link.rel = 'ar'
-  link.appendChild(document.createElement('img')) // this is required
-  link.click()
-}
-
-function openInSceneViewer (protein, pdb, features) {
-  // https://developers.google.com/ar/develop/java/scene-viewer
-  // @TODO: give thought to what the appropriate fallback URI is
-  const pkg = 'com.google.android.googlequicksearchbox' // Scene Viewer including non-AR fallback is now built into Google Search
-  const action = 'android.intent.action.VIEW'
-  const file = getExportUri(protein, pdb, 'glb', features) // server generated file URI
-  const title = `${protein}.${pdb}` // title to be displayed
-  const mode = 'ar_preferred' // default to AR view if available, fall back to a 3D model view if AR not supported or Google Play Services for AR not installed
-  const fallback = 'https://developers.google.com/ar' // this will only be visited if Google Search pkg is out of date or unavailable
-  const uri = `intent://arvr.google.com/scene-viewer/1.0?file=${file}&mode=${mode}&title=${title}#Intent;scheme=https;package=${pkg};action=${action};S.browser_fallback_url=${fallback};end;`
-  const link = document.createElement('a')
-  link.href = uri
-  link.click()
-}
-
-function openInPSVR (protein, pdb, features) {
-  // @TODO: send all features from topmost collection
-  const uri = getExportUri(protein, pdb, 'gltf')
-  window.AQUARIA.remote.sendToPSVR(uri, features, `${protein}.${pdb}`, (err, response) => {
-    if (err) {
-      console.warn(`sendToPSVR error${response !== null ? `, PSVR response [${response}]` : ', No PSVR response'}`)
-      console.dir(err)
-      alert(`Send to PSVR failed (${err.message || 'Unknown error'})`)
-    } else {
-      console.log(`sendToPSVR success, PSVR response [${response}]`)
-    }
-  })
-}
-
-function openInHEVS (protein, pdb, features, platform) {
-  // @TODO: send all features from topmost collection
-  const uri = getExportUri(protein, pdb, 'glb')
-  window.AQUARIA.remote.sendToHEVS(uri, features, `${protein}.${pdb}`, platform, (err, assetId) => {
-    if (err) {
-      console.warn('sendToHEVS error')
-      console.dir(err)
-      alert(`Send to HEVS failed (${err.message || 'Unknown error'})`)
-    } else {
-      console.log(`sendToHEVS success, asset ID is ${assetId}`)
-      // @TODO store asset ID, this is our link for things like changing active feature
-    }
-  })
-}
-
-function openInAdvancedViewer (protein, pdb) {
-  const link = document.createElement('a')
-  link.href = `${ADVANCED_VIEWER}?protein=${protein}&pdb=${pdb}`
-  link.target = '_'
-  link.click()
-}
-
-function getExportUri (protein, pdb, format, bakedFeatures = null) {
-  // instance of https://github.com/ODonoghueLab/aquariaExport
-  const base = `${MODEL_SERVER}/${protein}/${pdb}.${format}`
-  const query = new URLSearchParams()
-  if (bakedFeatures) {
-    for (const feature in bakedFeatures) {
-      query.append('f', JSON.stringify(feature))
-    }
-  }
-  const queryString = query.toString()
-  if (queryString) return `${base}?${query}`
-  return base
-}
-
-export default {
-  name: 'XRButton',
-  components: {},
-  data: () => {
-    return {
-      dataReceived: false,
-      pdbId: 'none',
-      proteinId: 'none',
-      quickLook: featureDetection.supportsQuickLook,
-      sceneViewer: featureDetection.supportsSceneViewer,
-      features: null,
-      featureTrack: -1,
-      isOpen: false,
-      hevsPlatform: search.get('HEVS'),
-      psvrEnabled: !!search.get('PSVR'),
-      advancedViewerEnabled: !!search.get('dev')
-    }
-  },
-  mounted: function () {
-    // shim the chainSelected function to detect changes
-    // @TODO: integrate rest of Aquaria into Vue reactivity so hacks like this aren't necessary
-    let chainSelectionOriginal
-    const chainSelectionProxy = (accession, pdb, chain) => {
-      chainSelectionOriginal(accession, pdb, chain)
-      this.proteinId = accession
-      this.pdbId = pdb
-      this.dataReceived = true
-    }
-    if (window.AQUARIA.chainSelected !== chainSelectionProxy) {
-      chainSelectionOriginal = window.AQUARIA.chainSelected
-      window.AQUARIA.chainSelected = chainSelectionProxy
-    }
-
-    // detect changes to current features
-    window.AQUARIA.onFeatureChange = (features, trackNo) => {
-      if (features) {
-        this.features = features
-        this.featureTrack = trackNo
-      } else {
-        this.features = null
-        this.featureTrack = -1
-      }
-    }
-  },
-  methods: {
-    downloadGltf: function () {
-      download(getExportUri(this.proteinId, this.pdbId, 'glb', this.features ? exportFeatures(this.features.Tracks[this.featureTrack]) : null), `${this.proteinId}${this.pdbId}.glb`)
-    },
-    downloadUsd: function () {
-      download(getExportUri(this.proteinId, this.pdbId, 'usdz', this.features ? exportFeatures(this.features.Tracks[this.featureTrack]) : null), `${this.proteinId}${this.pdbId}.usdz`)
-    },
-    openInQuickLook: function () {
-      openInQuickLook(this.proteinId, this.pdbId, this.features ? exportFeatures(this.features.Tracks[this.featureTrack]) : null)
-    },
-    openInSceneViewer: function () {
-      openInSceneViewer(this.proteinId, this.pdbId, this.features ? exportFeatures(this.features.Tracks[this.featureTrack]) : null)
-    },
-    psvrExport: async function () {
-      openInPSVR(this.proteinId, this.pdbId, this.features)
-    },
-    hevsExport: function () {
-      openInHEVS(this.proteinId, this.pdbId, this.features, this.hevsPlatform)
-    },
-    openInAdvancedViewer: function () {
-      openInAdvancedViewer(this.proteinId, this.pdbId)
-    }
-  }
-}
-</script>
 
 <style scoped>
 
