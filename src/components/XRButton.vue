@@ -91,7 +91,6 @@ const XRButtonComponent = {
       this.isOpen = true
       const autoXRData = XR.prepareAutoXR(this.proteinId, this.pdbId, this.currentFeatureTrack)
       const url = location.search ? `${location.href}&xr=${autoXRData}` : `${location.href}?xr=${autoXRData}`
-      console.log(url)
       // need to wait for canvas to render (its behind a v-if)
       this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url))
     },
