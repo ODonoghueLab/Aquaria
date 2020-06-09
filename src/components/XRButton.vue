@@ -12,8 +12,30 @@
   **/
 
 import * as XR from '../utils/XRUtils'
+import QRCode from 'qrcode'
 
 const search = new URLSearchParams(location.search)
+
+/** automatic XR (QR redirect)
+ * @TODO a more robust solution would be to flag xr=true and use rest of existing params to reconstruct export URL
+ * benefits include:
+ *   - ability to easily redirect to auto-XR from non-Aquaria sources (won't need to know the implementation detail of constructing export URLs)
+ *   - likely shorter URLs (aka simpler QR code, no limit on number of features)
+ * challenges include:
+ *   - not enough state contained in the regular URL yet (e.g. active feature/track)
+ *   - are all required params available near instantly for full export URI construction? Don't want to keep a user waiting on a load screen pre-XR
+ **/
+if (search.has('xr')) {
+  // parse auto XR details
+  const uri = search.get('xr')
+
+  // remove the auto XR tag from search params, one time operation
+  search.delete('xr')
+  history.replaceState(null, '', `${location.pathname}?${search.toString()}`)
+
+  // perform auto XR action
+  XR.invokeAutoXR(uri)
+}
 
 const XRButtonComponent = {
   name: 'XRButton',
@@ -61,10 +83,21 @@ const XRButtonComponent = {
   },
   computed: {
     currentFeatureTrack: function () {
-      return this.feature ? XR.exportFeatureTrack(this.feature.Tracks[this.featureTrack]) : null
+      return this.feature ? this.feature.Tracks[this.featureTrack] : null
     }
   },
   methods: {
+    open: function () {
+      this.isOpen = true
+      const autoXRData = XR.prepareAutoXR(this.proteinId, this.pdbId, this.currentFeatureTrack)
+      const url = location.search ? `${location.href}&xr=${autoXRData}` : `${location.href}?xr=${autoXRData}`
+      console.log(url)
+      // need to wait for canvas to render (its behind a v-if)
+      this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url))
+    },
+    close: function () {
+      this.isOpen = false
+    },
     downloadGltf: function () {
       XR.download(this.proteinId, this.pdbId, 'glb', this.currentFeatureTrack, `${this.proteinId}${this.pdbId}.glb`)
     },
@@ -108,36 +141,39 @@ export default XRButtonComponent
 
 <template>
 <div>
-  <img v-if="this.dataReceived && !this.isOpen" @click="isOpen = true" class="xr-menu-button" src="/images/ar-button.png">
+  <img v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" src="/images/ar-button.png">
   <div class="column xr-modal" v-if="isOpen">
     <div class="column inner-modal">
       <div class="row modal-header">
         <div></div>
         <h1>XR Options</h1>
-        <button @click="isOpen = false">X</button>
+        <button @click="close()">X</button>
       </div>
       <div class="column modal-content">
 
         <!-- Download (GLTF) -->
-        <button class="xr-item default-button" @click="isOpen = false; downloadGltf()">Download GLTF (.glb)</button>
+        <button class="xr-item default-button" @click="close(); downloadGltf()">Download GLTF (.glb)</button>
 
         <!-- Download (USD) -->
-        <button class="xr-item default-button" @click="isOpen = false; downloadUsd()">Download USD (.usdz)</button>
+        <button class="xr-item default-button" @click="close(); downloadUsd()">Download USD (.usdz)</button>
 
         <!-- Scene Viewer -->
-        <button v-if="sceneViewer" class="xr-item default-button" @click="isOpen = false; openInSceneViewer()">Open in Scene Viewer</button>
+        <button v-if="sceneViewer" class="xr-item default-button" @click="close(); openInSceneViewer()">Open in Scene Viewer</button>
 
         <!-- AR Quick Look (iOS) -->
-        <button v-if="quickLook" class="xr-item default-button" @click="isOpen = false; openInQuickLook()">Open in AR Quick Look</button>
+        <button v-if="quickLook" class="xr-item default-button" @click="close(); openInQuickLook()">Open in AR Quick Look</button>
 
         <!-- Send to PlayStation -->
-        <button v-if="psvrEnabled" class="xr-item default-button" @click="isOpen = false; psvrExport()">Send to PSVR</button>
+        <button v-if="psvrEnabled" class="xr-item default-button" @click="close(); psvrExport()">Send to PSVR</button>
 
         <!-- Send to HEVS -->
-        <button v-if="hevsPlatform" class="xr-item default-button" @click="isOpen = false; hevsExport()">Send to HEVS</button>
+        <button v-if="hevsPlatform" class="xr-item default-button" @click="close(); hevsExport()">Send to HEVS</button>
 
         <!-- Advanced Viewer (Debug) -->
-        <button v-if="advancedViewerEnabled" class="xr-item default-button" @click="isOpen = false; openInAdvancedViewer()">Open in Advanced Viewer</button>
+        <button v-if="advancedViewerEnabled" class="xr-item default-button" @click="close(); openInAdvancedViewer()">Open in Advanced Viewer</button>
+
+        <!-- QR Code (Auto XR) -->
+        <canvas class="xr-qr" ref="qr"></canvas>
 
       </div>
     </div>
@@ -255,6 +291,11 @@ export default XRButtonComponent
     margin-left: 65px;
     margin-top: 10px;
     cursor: pointer;
+  }
+
+  .xr-qr {
+    max-width: 200px;
+    max-height: 200px;
   }
 
 </style>

@@ -4,6 +4,8 @@ const MODEL_SERVER = 'https://ie.csiro.au/services/aquaria-export'
 // instance of https://bitbucket.csiro.au/scm/~and490/aquaria-export-preview
 const ADVANCED_VIEWER = 'https://ie.csiro.au/apps/aquaria-export-preview'
 
+const MAX_QR_FEATURES = 45
+
 /**
  * Information about platform XR support
  */
@@ -31,19 +33,6 @@ export function retrieveTopFeatureCollection (sequence) {
   return retrieveFeatureCollection(sequence, topFeatureCollectionKey)
 }
 
-/**
- * Convert a single feature track to Aquaria Export's baked feature format
- */
-export function exportFeatureTrack (track) {
-  return track.map(f => ({
-    c: f.color,
-    n: f.name,
-    s: f.start,
-    e: f.end,
-    d: f.desc
-  }))
-}
-
 export function download (protein, pdb, format, featureTrackToBake) {
   const link = document.createElement('a')
   link.href = getExportUri(protein, pdb, format, featureTrackToBake)
@@ -52,27 +41,14 @@ export function download (protein, pdb, format, featureTrackToBake) {
 }
 
 export function openInQuickLook (protein, pdb, featureTrackToBake) {
-  // https://developer.apple.com/documentation/arkit/previewing_a_model_with_ar_quick_look
-  const link = document.createElement('a')
-  link.href = getExportUri(protein, pdb, 'usdz', featureTrackToBake)
-  link.rel = 'ar'
-  link.appendChild(document.createElement('img')) // this is required
-  link.click()
+  const uri = getExportUri(protein, pdb, 'usdz', featureTrackToBake)
+  openUriInQuickLook(uri)
 }
 
 export function openInSceneViewer (protein, pdb, featureTrackToBake) {
-  // https://developers.google.com/ar/develop/java/scene-viewer
-  // @TODO: give thought to what the appropriate fallback URI is
-  const pkg = 'com.google.android.googlequicksearchbox' // Scene Viewer including non-AR fallback is now built into Google Search
-  const action = 'android.intent.action.VIEW'
-  const file = getExportUri(protein, pdb, 'glb', featureTrackToBake) // server generated file URI
+  const uri = getExportUri(protein, pdb, 'glb', featureTrackToBake)
   const title = `${protein}.${pdb}` // title to be displayed
-  const mode = 'ar_preferred' // default to AR view if available, fall back to a 3D model view if AR not supported or Google Play Services for AR not installed
-  const fallback = 'https://developers.google.com/ar' // this will only be visited if Google Search pkg is out of date or unavailable
-  const uri = `intent://arvr.google.com/scene-viewer/1.0?file=${file}&mode=${mode}&title=${title}#Intent;scheme=https;package=${pkg};action=${action};S.browser_fallback_url=${fallback};end;`
-  const link = document.createElement('a')
-  link.href = uri
-  link.click()
+  openUriInSceneViewer(uri, title)
 }
 
 export function openInPSVR (protein, pdb, features) {
@@ -115,11 +91,65 @@ export function getExportUri (protein, pdb, format, featureTrackToBake = null) {
   const base = `${MODEL_SERVER}/${protein}/${pdb}.${format}`
   const query = new URLSearchParams()
   if (featureTrackToBake) {
-    for (const feature in featureTrackToBake) {
-      query.append('f', JSON.stringify(feature))
-    }
+    const featureQuery = featureTrackToBake.map(feature => {
+      let encodedFeature = `${feature.color.replace('#', '')}-${feature.start}`
+      if (feature.start !== feature.end) encodedFeature = `${encodedFeature}-${feature.end}`
+      return encodedFeature
+    })
+    query.append('f', featureQuery.join(','))
   }
   const queryString = query.toString()
   if (queryString) return `${base}?${query}`
   return base
+}
+
+/**
+ * Prepare the data required to invoke auto-xr later
+ * @returns {string}
+ */
+export function prepareAutoXR (protein, pdb, featureTrackToBake = null) {
+  // data is currently just a URI with a special token to be replaced by the appropriate format
+  // NOTE: too many features will break the QR code. Truncate to avoid
+  const features = (featureTrackToBake && featureTrackToBake.length > MAX_QR_FEATURES)
+    ? featureTrackToBake.slice(0, MAX_QR_FEATURES)
+    : featureTrackToBake
+
+  const uri = getExportUri(protein, pdb, '$FORMAT', features)
+  return uri
+}
+
+/**
+ * Parse the auto-xr data and immediately invoke XR appropriately
+ * @param {string} data
+ */
+export function invokeAutoXR (data) {
+  // data is currently just a URI with a special token to be replaced by the appropriate format
+  if (featureDetection.supportsQuickLook) {
+    openUriInQuickLook(data.replace('$FORMAT', 'usdz'))
+  } else if (featureDetection.supportsSceneViewer) {
+    // @TODO: better title required here
+    openUriInSceneViewer(data.replace('$FORMAT', 'glb'), 'Aquaria Auto-XR')
+  }
+}
+
+function openUriInSceneViewer (uri, title) {
+  // https://developers.google.com/ar/develop/java/scene-viewer
+  // @TODO: give thought to what the appropriate fallback URI is
+  const pkg = 'com.google.android.googlequicksearchbox' // Scene Viewer including non-AR fallback is now built into Google Search
+  const action = 'android.intent.action.VIEW'
+  const mode = 'ar_preferred' // default to AR view if available, fall back to a 3D model view if AR not supported or Google Play Services for AR not installed
+  const fallback = 'https://developers.google.com/ar' // this will only be visited if Google Search pkg is out of date or unavailable
+  const fullUri = `intent://arvr.google.com/scene-viewer/1.0?file=${uri}&mode=${mode}&title=${title}#Intent;scheme=https;package=${pkg};action=${action};S.browser_fallback_url=${fallback};end;`
+  const link = document.createElement('a')
+  link.href = fullUri
+  link.click()
+}
+
+function openUriInQuickLook (uri) {
+  // https://developer.apple.com/documentation/arkit/previewing_a_model_with_ar_quick_look
+  const link = document.createElement('a')
+  link.href = uri
+  link.rel = 'ar'
+  link.appendChild(document.createElement('img')) // this is required
+  link.click()
 }
