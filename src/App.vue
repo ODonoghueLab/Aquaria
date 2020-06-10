@@ -12,6 +12,16 @@
 
 <script>
 import axios from 'axios'
+import { screenshot } from './utils/Screenshot'
+
+// @TODO consider how best to expose screenshot feature in UI
+window.ss = async (resX, resY, bgColor, bgAlpha) => {
+  const url = await screenshot(resX, resY, bgColor, bgAlpha)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'aq_screenshot.png'
+  link.click()
+}
 
 export default {
   name: 'App',
