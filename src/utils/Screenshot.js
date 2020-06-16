@@ -19,9 +19,12 @@ export function screenshot (resX, resY, bgColor, bgAlpha) {
   const clearAlpha = renderer.getClearColor()
   const target = renderer.getRenderTarget()
   const background = scene.background
+  const fog = { near: scene.fog.near, far: scene.fog.far }
 
   // configure new state
   scene.background = null
+  scene.fog.near = -Infinity
+  scene.fog.far = Infinity
   renderer.setClearColor(bgColor, bgAlpha)
   renderer.setRenderTarget(screenshotTarget)
 
@@ -35,6 +38,8 @@ export function screenshot (resX, resY, bgColor, bgAlpha) {
   renderer.setRenderTarget(target)
   renderer.setClearColor(clearColor, clearAlpha)
   scene.background = background
+  scene.fog.near = fog.near
+  scene.fog.far = fog.far
 
   const canvas = pixelDataToCanvas(data, resX, resY)
   return canvasToPng(canvas)
