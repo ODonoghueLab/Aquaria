@@ -21,16 +21,18 @@ export { featureDetection as Platform }
  * Note: 'Added Features' is a special server representing external features
  */
 export function retrieveFeatureCollection (sequence, server) {
-  return JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
+  const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
+  return { featureSets, name: server }
 }
 
-/**
- * Retrieve the feature collection (from local storage) for a given sequence corresponding to the topmost server in the features list
- */
-export function retrieveTopFeatureCollection (sequence) {
-  const featureOrder = localStorage.getItem('featureOrder').split(',')
-  const topFeatureCollectionKey = featureOrder[0]
-  return retrieveFeatureCollection(sequence, topFeatureCollectionKey)
+export function getFeatureIndices (collection, featureSet, featureTrack) {
+  // determine active feature set/track indices (can't use object equality, collection has likely been in and out of localStorage)
+  let featureSetIndex = 0
+  const featureTrackIndex = Math.max(featureTrack, 0)
+  featureSetIndex = Math.max(collection.featureSets.findIndex(fs => {
+    return fs.Type === featureSet.Type && fs.Category === featureSet.Category
+  }), 0)
+  return [featureSetIndex, featureTrackIndex]
 }
 
 export function download (protein, pdb, format, featureTrackToBake) {
@@ -51,32 +53,39 @@ export function openInSceneViewer (protein, pdb, featureTrackToBake) {
   openUriInSceneViewer(uri, title)
 }
 
-export function openInPSVR (protein, pdb, features) {
+export function openInPSVR (protein, pdb, collection) {
   return new Promise((resolve, reject) => {
     const uri = getExportUri(protein, pdb, 'gltf')
-    window.AQUARIA.remote.sendToPSVR(uri, features, `${protein}.${pdb}`, (err, response) => {
+    window.AQUARIA.remote.sendToPSVR(uri, `${protein}.${pdb}`, collection, (err, response) => {
       if (err) reject(err)
       else resolve(response)
     })
   })
 }
 
-export function openInHEVS (protein, pdb, features, platform) {
+export function openInHEVS (platform, protein, pdb) {
   return new Promise((resolve, reject) => {
     const uri = getExportUri(protein, pdb, 'glb')
-    window.AQUARIA.remote.sendToHEVS(uri, features, `${protein}.${pdb}`, platform, (err, assetId) => {
-      if (err) reject(err)
+    window.AQUARIA.remote.sendToHEVS(platform, uri, `${protein}.${pdb}`, (err, assetId) => {
+      if (err) return reject(err)
       else resolve(assetId)
     })
   })
 }
 
-export function updateHEVSAsset (assetId, patchData) {
+export async function updateHEVSFeature (platform, asset, collection, featureSetIndex, trackIndex, skip) {
   return new Promise((resolve, reject) => {
-    window.AQUARIA.remote.updateHEVSAsset(assetId, patchData, (err) => {
-      if (err) reject(err)
-      else resolve()
-    })
+    if (collection) {
+      window.AQUARIA.remote.setHEVSFeature(platform, asset, collection, featureSetIndex, trackIndex, skip, (err) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    } else {
+      window.AQUARIA.remote.clearHEVSFeature(platform, asset, (err) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    }
   })
 }
 
