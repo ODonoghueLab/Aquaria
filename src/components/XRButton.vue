@@ -37,6 +37,9 @@ if (search.has('xr')) {
   XR.invokeAutoXR(uri)
 }
 
+// used to avoid hitting localstorage all the time, as this is not performant
+const COLLECTION_CACHE = {}
+
 const XRButtonComponent = {
   name: 'XRButton',
   components: {},
@@ -47,11 +50,14 @@ const XRButtonComponent = {
       proteinId: 'none',
       quickLook: XR.Platform.supportsQuickLook,
       sceneViewer: XR.Platform.supportsSceneViewer,
-      feature: null,
+      featuresActive: false,
+      featureSet: null,
       featureTrack: -1,
+      featureCollection: null,
       isOpen: false,
       hevsPlatform: search.get('HEVS'),
       hevsAsset: null,
+      hevsUploadedCollections: [],
       psvrEnabled: !!search.get('PSVR'),
       advancedViewerEnabled: !!search.get('dev')
     }
@@ -61,6 +67,8 @@ const XRButtonComponent = {
     let chainSelectionOriginal
     const chainSelectionProxy = (accession, pdb, chain) => {
       chainSelectionOriginal(accession, pdb, chain)
+      this.hevsAsset = null
+      this.hevsUploadedCollections = []
       this.proteinId = accession
       this.pdbId = pdb
       this.dataReceived = true
@@ -71,19 +79,29 @@ const XRButtonComponent = {
     }
 
     // detect changes to current feature
-    window.AQUARIA.onFeatureChange = (feature, trackNo) => {
-      if (feature) {
-        this.feature = feature
+    window.AQUARIA.onFeatureChange = (featureSet, trackNo) => {
+      if (featureSet) {
+        this.featuresActive = true
+        this.featureSet = featureSet
         this.featureTrack = trackNo
+        if (!COLLECTION_CACHE[featureSet.Server]) { // avoid uncessary localstorage loads
+          COLLECTION_CACHE[featureSet.Server] = XR.retrieveFeatureCollection(this.proteinId, featureSet.Server)
+        }
+        this.featureCollection = COLLECTION_CACHE[featureSet.Server]
       } else {
-        this.feature = null
+        this.featuresActive = false
+        this.featureSet = null
         this.featureTrack = -1
+        this.featureCollection = null
       }
+
+      // update HEVS if connected
+      if (this.hevsPlatform && this.hevsAsset) this.hevsFeatureUpdate()
     }
   },
   computed: {
     currentFeatureTrack: function () {
-      return this.feature ? this.feature.Tracks[this.featureTrack] : null
+      return this.featuresActive ? this.featureSet.Tracks[this.featureTrack] : null
     }
   },
   methods: {
@@ -111,22 +129,49 @@ const XRButtonComponent = {
     },
     psvrExport: async function () {
       try {
-        const response = await XR.openInPSVR(this.proteinId, this.pdbId, XR.retrieveTopFeatureCollection(this.proteinId))
-        console.log(`sendToPSVR success, PSVR response [${response}]`)
+        // default to top collection in list if no active feature
+        const collection = this.featureCollection || XR.retrieveFeatureCollection(this.proteinId, localStorage.getItem('featureOrder').split(',')[0])
+        console.log(`[PSVR] Exporting Asset w/ ${this.featureCollection ? 'ACTIVE' : 'DEFAULT/FIRST'} collection [${collection.name}]`)
+        const response = await XR.openInPSVR(this.proteinId, this.pdbId, collection)
+        console.log(`[PSVR] Transfer successful, PSVR Response: [${response}]`)
       } catch (err) {
-        console.warn('sendToPSVR error')
+        console.warn('[PSVR] Transfer error')
         console.dir(err)
         alert(`Send to PSVR failed (${err.message || 'Unknown error'})`)
       }
     },
     hevsExport: async function () {
       try {
-        this.hevsAsset = await XR.openInHEVS(this.proteinId, this.pdbId, XR.retrieveTopFeatureCollection(this.proteinId), this.hevsPlatform)
-        console.log(`sendToHEVS success, asset ID is ${this.hevsAsset}`)
+        console.log('[HEVS] Exporting Asset')
+        this.hevsAsset = await XR.openInHEVS(this.hevsPlatform, this.proteinId, this.pdbId)
+        console.log(`[HEVS] Transfer successful, HEVS Asset ID: [${this.hevsAsset}]`)
+        if (this.featuresActive) this.hevsFeatureUpdate()
       } catch (err) {
-        console.warn('sendToHEVS error')
+        console.warn('[HEVS] Transfer error')
         console.dir(err)
         alert(`Send to HEVS failed (${err.message || 'Unknown error'})`)
+      }
+    },
+    hevsFeatureUpdate: async function () {
+      try {
+        if (this.featuresActive) {
+          const [featureSetIndex, featureTrackIndex] = XR.getFeatureIndices(this.featureCollection, this.featureSet, this.featureTrack)
+
+          // prevent duplicate HEVS uploads by passing and extra param
+          const skip = this.hevsUploadedCollections.includes(this.featureCollection.name)
+          if (!skip) this.hevsUploadedCollections.push(this.featureCollection.name) // skip next time
+
+          console.log(`[HEVS] Updating Feature Info [${this.featureCollection.name} | Set ${featureSetIndex} | Track ${featureTrackIndex}]${(skip ? '(SKIPPING DATA UPLOAD)' : '')}`)
+
+          XR.updateHEVSFeature(this.hevsPlatform, this.hevsAsset, this.featureCollection, featureSetIndex, featureTrackIndex, skip)
+        } else {
+          console.log('[HEVS] Clearing Feature Info')
+          XR.updateHEVSFeature(this.hevsPlatform, this.hevsAsset, null, null, null)
+        }
+        console.log('[HEVS] Feature update OK')
+      } catch (err) {
+        console.warn('[HEVS] Feature update error')
+        console.dir(err)
       }
     },
     openInAdvancedViewer: function () {
@@ -166,7 +211,7 @@ export default XRButtonComponent
         <button v-if="psvrEnabled" class="xr-item default-button" @click="close(); psvrExport()">Send to PSVR</button>
 
         <!-- Send to HEVS -->
-        <button v-if="hevsPlatform" class="xr-item default-button" @click="close(); hevsExport()">Send to HEVS</button>
+        <button v-if="hevsPlatform" :disabled="!!hevsAsset" class="xr-item default-button" @click="close(); hevsExport()">{{hevsAsset ? 'Connected to HEVS' : 'Send to HEVS'}}</button>
 
         <!-- Advanced Viewer (Debug) -->
         <button v-if="advancedViewerEnabled" class="xr-item default-button" @click="close(); openInAdvancedViewer()">Open in Advanced Viewer</button>
