@@ -1,121 +1,46 @@
-<template>
-<div>
-  <img v-if="this.dataReceived && !this.isOpen" @click="isOpen = true" class="xr-menu-button" src="/images/ar-button.png">
-  <div class="column xr-modal" v-if="isOpen">
-    <div class="column inner-modal">
-      <div class="row modal-header">
-        <div></div>
-        <h1>XR Options</h1>
-        <button @click="isOpen = false">X</button>
-      </div>
-      <div class="column modal-content">
-
-        <!-- Download (GLTF) -->
-        <button class="xr-item default-button" @click="isOpen = false; downloadGltf()">Download GLTF (.glb)</button>
-
-        <!-- Download (USD) -->
-        <button class="xr-item default-button" @click="isOpen = false; downloadUsd()">Download USD (.usdz)</button>
-
-        <!-- Scene Viewer -->
-        <button v-if="sceneViewer" class="xr-item default-button" @click="isOpen = false; openInSceneViewer()">Open in Scene Viewer</button>
-
-        <!-- AR Quick Look (iOS) -->
-        <button v-if="quickLook" class="xr-item default-button" @click="isOpen = false; openInQuickLook()">Open in AR Quick Look</button>
-
-        <!-- Send to PlayStation -->
-        <button v-if="psvrEnabled" class="xr-item default-button" @click="isOpen = false; psvrExport()">Send to PSVR</button>
-
-        <!-- Send to HEVS -->
-        <button v-if="hevsPlatform" class="xr-item default-button" @click="isOpen = false; hevsExport()">Send to HEVS</button>
-
-        <!-- Advanced Viewer (Debug) -->
-        <button v-if="advancedViewerEnabled" class="xr-item default-button" @click="isOpen = false; openInAdvancedViewer()">Open in Advanced Viewer</button>
-
-      </div>
-    </div>
-  </div>
-</div>
-</template>
-
 <script>
 
-// instance of https://github.com/ODonoghueLab/aquariaExport
-const MODEL_SERVER = 'https://ie.csiro.au/services/aquaria-export'
+/**
+  * NOTE: All XR export operations are now run on-demand and do not need to be prepared ahead-of-time,
+  * so hacking into Vue reactivity as per XRButtonComponent.mounted may no longer be strictly necessary.
+  * However, all required info for XR export functions (e.g. feature server content, top feature server, current feature track,
+  * current sequence, current structure, current chain etc) should be available, ideally without hacks, globals or localstorage.
+  * Consider storing larger state info (like parsed features) in importable singletons 'let features = {}; export default features;',
+  * while properly integrating smaller state (e.g. current feature track) into Vue reactivity (fed into XRButtonComponent as properties).
+  * Server-side parsing of features (except perhaps 'Added Features') combined with HTTP (not WebSocket) delivery and appropriate
+  * caching headers should render localStorage caching unecessary, improve client performance, and simplify client code
+  **/
 
-// instance of https://bitbucket.csiro.au/scm/~and490/aquaria-export-preview
-const ADVANCED_VIEWER = 'https://ie.csiro.au/apps/aquaria-export-preview'
+import * as XR from '../utils/XRUtils'
+import QRCode from 'qrcode'
 
 const search = new URLSearchParams(location.search)
 
-const featureDetection = {
-  supportsSceneViewer: /(android)/i.test(navigator.userAgent),
-  supportsQuickLook: document.createElement('a').relList.supports('ar'),
-  supportsMixedReality: /(Windows NT 10.0)/i.test(navigator.userAgent)
+/** automatic XR (QR redirect)
+ * @TODO a more robust solution would be to flag xr=true and use rest of existing params to reconstruct export URL
+ * benefits include:
+ *   - ability to easily redirect to auto-XR from non-Aquaria sources (won't need to know the implementation detail of constructing export URLs)
+ *   - likely shorter URLs (aka simpler QR code, no limit on number of features)
+ * challenges include:
+ *   - not enough state contained in the regular URL yet (e.g. active feature/track)
+ *   - are all required params available near instantly for full export URI construction? Don't want to keep a user waiting on a load screen pre-XR
+ **/
+if (search.has('xr')) {
+  // parse auto XR details
+  const uri = search.get('xr')
+
+  // remove the auto XR tag from search params, one time operation
+  search.delete('xr')
+  history.replaceState(null, '', `${location.pathname}?${search.toString()}`)
+
+  // perform auto XR action
+  XR.invokeAutoXR(uri)
 }
 
-function exportFeatures (features) {
-  return features.map(f => ({
-    c: f.color,
-    n: f.name,
-    s: f.start,
-    e: f.end,
-    d: f.desc
-  }))
-}
+// used to avoid hitting localstorage all the time, as this is not performant
+const COLLECTION_CACHE = {}
 
-function download (url, filename) {
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  link.click()
-}
-
-function openInQuickLook (protein, pdb, features) {
-  // https://developer.apple.com/documentation/arkit/previewing_a_model_with_ar_quick_look
-  const link = document.createElement('a')
-  link.href = getExportUri(protein, pdb, 'usdz', features)
-  link.rel = 'ar'
-  link.appendChild(document.createElement('img')) // this is required
-  link.click()
-}
-
-function openInSceneViewer (protein, pdb, features) {
-  // https://developers.google.com/ar/develop/java/scene-viewer
-  // @TODO: give thought to what the appropriate fallback URI is
-  const pkg = 'com.google.android.googlequicksearchbox' // Scene Viewer including non-AR fallback is now built into Google Search
-  const action = 'android.intent.action.VIEW'
-  const file = getExportUri(protein, pdb, 'glb', features) // server generated file URI
-  const title = `${protein}.${pdb}` // title to be displayed
-  const mode = 'ar_preferred' // default to AR view if available, fall back to a 3D model view if AR not supported or Google Play Services for AR not installed
-  const fallback = 'https://developers.google.com/ar' // this will only be visited if Google Search pkg is out of date or unavailable
-  const uri = `intent://arvr.google.com/scene-viewer/1.0?file=${file}&mode=${mode}&title=${title}#Intent;scheme=https;package=${pkg};action=${action};S.browser_fallback_url=${fallback};end;`
-  const link = document.createElement('a')
-  link.href = uri
-  link.click()
-}
-
-function openInAdvancedViewer (protein, pdb) {
-  const link = document.createElement('a')
-  link.href = `${ADVANCED_VIEWER}?protein=${protein}&pdb=${pdb}`
-  link.target = '_'
-  link.click()
-}
-
-function getExportUri (protein, pdb, format, bakedFeatures = null) {
-  // instance of https://github.com/ODonoghueLab/aquariaExport
-  const base = `${MODEL_SERVER}/${protein}/${pdb}.${format}`
-  const query = new URLSearchParams()
-  if (bakedFeatures) {
-    for (const feature in bakedFeatures) {
-      query.append('f', JSON.stringify(feature))
-    }
-  }
-  const queryString = query.toString()
-  if (queryString) return `${base}?${query}`
-  return base
-}
-
-export default {
+const XRButtonComponent = {
   name: 'XRButton',
   components: {},
   data: () => {
@@ -123,22 +48,27 @@ export default {
       dataReceived: false,
       pdbId: 'none',
       proteinId: 'none',
-      quickLook: featureDetection.supportsQuickLook,
-      sceneViewer: featureDetection.supportsSceneViewer,
-      features: null,
+      quickLook: XR.Platform.supportsQuickLook,
+      sceneViewer: XR.Platform.supportsSceneViewer,
+      featuresActive: false,
+      featureSet: null,
       featureTrack: -1,
+      featureCollection: null,
       isOpen: false,
       hevsPlatform: search.get('HEVS'),
+      hevsAsset: null,
+      hevsUploadedCollections: [],
       psvrEnabled: !!search.get('PSVR'),
       advancedViewerEnabled: !!search.get('dev')
     }
   },
   mounted: function () {
     // shim the chainSelected function to detect changes
-    // @TODO: integrate rest of Aquaria into Vue reactivity so hacks like this aren't necessary
     let chainSelectionOriginal
     const chainSelectionProxy = (accession, pdb, chain) => {
       chainSelectionOriginal(accession, pdb, chain)
+      this.hevsAsset = null
+      this.hevsUploadedCollections = []
       this.proteinId = accession
       this.pdbId = pdb
       this.dataReceived = true
@@ -148,60 +78,152 @@ export default {
       window.AQUARIA.chainSelected = chainSelectionProxy
     }
 
-    // detect changes to current features
-    window.AQUARIA.onFeatureChange = (features, trackNo) => {
-      if (features) {
-        this.features = features
+    // detect changes to current feature
+    window.AQUARIA.onFeatureChange = (featureSet, trackNo) => {
+      if (featureSet) {
+        this.featuresActive = true
+        this.featureSet = featureSet
         this.featureTrack = trackNo
+        if (!COLLECTION_CACHE[featureSet.Server]) { // avoid uncessary localstorage loads
+          COLLECTION_CACHE[featureSet.Server] = XR.retrieveFeatureCollection(this.proteinId, featureSet.Server)
+        }
+        this.featureCollection = COLLECTION_CACHE[featureSet.Server]
       } else {
-        this.features = null
+        this.featuresActive = false
+        this.featureSet = null
         this.featureTrack = -1
+        this.featureCollection = null
       }
+
+      // update HEVS if connected
+      if (this.hevsPlatform && this.hevsAsset) this.hevsFeatureUpdate()
+    }
+  },
+  computed: {
+    currentFeatureTrack: function () {
+      return this.featuresActive ? this.featureSet.Tracks[this.featureTrack] : null
     }
   },
   methods: {
+    open: function () {
+      this.isOpen = true
+      const autoXRData = XR.prepareAutoXR(this.proteinId, this.pdbId, this.currentFeatureTrack)
+      const url = location.search ? `${location.href}&xr=${autoXRData}` : `${location.href}?xr=${autoXRData}`
+      // need to wait for canvas to render (its behind a v-if)
+      this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url))
+    },
+    close: function () {
+      this.isOpen = false
+    },
     downloadGltf: function () {
-      download(getExportUri(this.proteinId, this.pdbId, 'glb', this.features ? exportFeatures(this.features.Tracks[this.featureTrack]) : null), `${this.proteinId}${this.pdbId}.glb`)
+      XR.download(this.proteinId, this.pdbId, 'glb', this.currentFeatureTrack, `${this.proteinId}${this.pdbId}.glb`)
     },
     downloadUsd: function () {
-      download(getExportUri(this.proteinId, this.pdbId, 'usdz', this.features ? exportFeatures(this.features.Tracks[this.featureTrack]) : null), `${this.proteinId}${this.pdbId}.usdz`)
+      XR.download(this.proteinId, this.pdbId, 'usdz', this.currentFeatureTrack, `${this.proteinId}${this.pdbId}.usdz`)
     },
     openInQuickLook: function () {
-      openInQuickLook(this.proteinId, this.pdbId, this.features ? exportFeatures(this.features.Tracks[this.featureTrack]) : null)
+      XR.openInQuickLook(this.proteinId, this.pdbId, this.currentFeatureTrack)
     },
     openInSceneViewer: function () {
-      openInSceneViewer(this.proteinId, this.pdbId, this.features ? exportFeatures(this.features.Tracks[this.featureTrack]) : null)
+      XR.openInSceneViewer(this.proteinId, this.pdbId, this.currentFeatureTrack)
     },
     psvrExport: async function () {
-      // @TODO: send all features from topmost collection
-      window.AQUARIA.remote.sendToPSVR(`${this.baseUri}.gltf`, this.features, `${this.proteinId}.${this.pdbId}`, (err, response) => {
-        if (err) {
-          console.warn(`sendToPSVR error${response !== null ? `, PSVR response [${response}]` : ', No PSVR response'}`)
-          console.dir(err)
-          alert(`Send to PSVR failed (${err.message || 'Unknown error'})`)
-        } else {
-          console.log(`sendToPSVR success, PSVR response [${response}]`)
-        }
-      })
+      try {
+        // default to top collection in list if no active feature
+        const collection = this.featureCollection || XR.retrieveFeatureCollection(this.proteinId, localStorage.getItem('featureOrder').split(',')[0])
+        console.log(`[PSVR] Exporting Asset w/ ${this.featureCollection ? 'ACTIVE' : 'DEFAULT/FIRST'} collection [${collection.name}]`)
+        const response = await XR.openInPSVR(this.proteinId, this.pdbId, collection)
+        console.log(`[PSVR] Transfer successful, PSVR Response: [${response}]`)
+      } catch (err) {
+        console.warn('[PSVR] Transfer error')
+        console.dir(err)
+        alert(`Send to PSVR failed (${err.message || 'Unknown error'})`)
+      }
     },
-    hevsExport: function () {
-      // @TODO: send all features from topmost collection
-      window.AQUARIA.remote.sendToHEVS(`${this.baseUri}.gltf`, this.features, this.hevsPlatform, (err) => {
-        if (err) {
-          console.warn('sendToHEVS error')
-          console.dir(err)
-          alert(`Send to HEVS failed (${err.message || 'Unknown error'})`)
+    hevsExport: async function () {
+      try {
+        console.log('[HEVS] Exporting Asset')
+        this.hevsAsset = await XR.openInHEVS(this.hevsPlatform, this.proteinId, this.pdbId)
+        console.log(`[HEVS] Transfer successful, HEVS Asset ID: [${this.hevsAsset}]`)
+        if (this.featuresActive) this.hevsFeatureUpdate()
+      } catch (err) {
+        console.warn('[HEVS] Transfer error')
+        console.dir(err)
+        alert(`Send to HEVS failed (${err.message || 'Unknown error'})`)
+      }
+    },
+    hevsFeatureUpdate: async function () {
+      try {
+        if (this.featuresActive) {
+          const [featureSetIndex, featureTrackIndex] = XR.getFeatureIndices(this.featureCollection, this.featureSet, this.featureTrack)
+
+          // prevent duplicate HEVS uploads by passing and extra param
+          const skip = this.hevsUploadedCollections.includes(this.featureCollection.name)
+          if (!skip) this.hevsUploadedCollections.push(this.featureCollection.name) // skip next time
+
+          console.log(`[HEVS] Updating Feature Info [${this.featureCollection.name} | Set ${featureSetIndex} | Track ${featureTrackIndex}]${(skip ? '(SKIPPING DATA UPLOAD)' : '')}`)
+
+          XR.updateHEVSFeature(this.hevsPlatform, this.hevsAsset, this.featureCollection, featureSetIndex, featureTrackIndex, skip)
         } else {
-          console.log('sendToHEVS success')
+          console.log('[HEVS] Clearing Feature Info')
+          XR.updateHEVSFeature(this.hevsPlatform, this.hevsAsset, null, null, null)
         }
-      })
+        console.log('[HEVS] Feature update OK')
+      } catch (err) {
+        console.warn('[HEVS] Feature update error')
+        console.dir(err)
+      }
     },
     openInAdvancedViewer: function () {
-      openInAdvancedViewer(this.proteinId, this.pdbId)
+      XR.openInAdvancedViewer(this.proteinId, this.pdbId)
     }
   }
 }
+
+export default XRButtonComponent
 </script>
+
+<template>
+<div>
+  <img v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" src="/images/ar-button.png">
+  <div class="column xr-modal" v-if="isOpen">
+    <div class="column inner-modal">
+      <div class="row modal-header">
+        <div></div>
+        <h1>XR Options</h1>
+        <button @click="close()">X</button>
+      </div>
+      <div class="column modal-content">
+
+        <!-- Download (GLTF) -->
+        <button class="xr-item default-button" @click="close(); downloadGltf()">Download GLTF (.glb)</button>
+
+        <!-- Download (USD) -->
+        <button class="xr-item default-button" @click="close(); downloadUsd()">Download USD (.usdz)</button>
+
+        <!-- Scene Viewer -->
+        <button v-if="sceneViewer" class="xr-item default-button" @click="close(); openInSceneViewer()">Open in Scene Viewer</button>
+
+        <!-- AR Quick Look (iOS) -->
+        <button v-if="quickLook" class="xr-item default-button" @click="close(); openInQuickLook()">Open in AR Quick Look</button>
+
+        <!-- Send to PlayStation -->
+        <button v-if="psvrEnabled" class="xr-item default-button" @click="close(); psvrExport()">Send to PSVR</button>
+
+        <!-- Send to HEVS -->
+        <button v-if="hevsPlatform" :disabled="!!hevsAsset" class="xr-item default-button" @click="close(); hevsExport()">{{hevsAsset ? 'Connected to HEVS' : 'Send to HEVS'}}</button>
+
+        <!-- Advanced Viewer (Debug) -->
+        <button v-if="advancedViewerEnabled" class="xr-item default-button" @click="close(); openInAdvancedViewer()">Open in Advanced Viewer</button>
+
+        <!-- QR Code (Auto XR) -->
+        <canvas class="xr-qr" ref="qr"></canvas>
+
+      </div>
+    </div>
+  </div>
+</div>
+</template>
 
 <style scoped>
 
@@ -313,6 +335,11 @@ export default {
     margin-left: 65px;
     margin-top: 10px;
     cursor: pointer;
+  }
+
+  .xr-qr {
+    max-width: 200px;
+    max-height: 200px;
   }
 
 </style>
