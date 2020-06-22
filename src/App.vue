@@ -7,6 +7,7 @@
       </div>
       <div id="loading_overlay"> LOADING<span id="myspan"></span></div>
       </div>
+      <div id="superFamCharts" style="display: none">
   </div>
 </template>
 

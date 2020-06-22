@@ -11,9 +11,9 @@
           <a v-bind:href="[structure.count > 0 ? redirect(structure.primary_accession) : '']" :style="[structure.count > 0 ? {'cursor': 'pointer'} : {'pointer-events': 'none', 'cursor': 'none'}]" target="_blank" class='link'>
           <h3>{{structure.synonym}}</h3>
           <picture>
-             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w']" type="image/webp" sizes="33vw">
-             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w']"  type="image/jpeg" sizes="33vw">
-             <img v-bind:src="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg']"/>
+             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/unknown-structure_1000.png, ../images/covid19/unknown-structure_500.png, ../images/covid19/unknown-structure_250.png' : '../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w']" type="image/webp" sizes="33vw">
+             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/unknown-structure_1000.png, ../images/covid19/unknown-structure_500.png, ../images/covid19/unknown-structure_250.png' : '../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w']"  type="image/jpeg" sizes="33vw">
+             <img v-bind:src="[structure.count < 1 ? '../images/covid19/unknown-structure_1000.png, ../images/covid19/unknown-structure_500.png, ../images/covid19/unknown-structure_250.png' : '../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg']"/>
            </picture>
           <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]">{{structure.count}} matching structures</p>
           </a>
