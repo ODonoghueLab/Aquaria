@@ -5,15 +5,18 @@
           <!-- <span id="res">resized?</span>
           <span id="hd"> hDiff</span> -->
           <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
+          <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
+          <img src= "../assets/img/submenu.png" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
     </div>
+     <iframe id="slide" src='../COVID/index.html'></iframe>
      <div id="container">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
           <a v-bind:href="[structure.count > 0 ? redirect(structure.primary_accession) : '']" :style="[structure.count > 0 ? {'cursor': 'pointer'} : {'pointer-events': 'none', 'cursor': 'none'}]" target="_blank" class='link'>
           <h3>{{structure.synonym}}</h3>
           <picture>
-             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w']" type="image/webp" sizes="33vw">
-             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w']"  type="image/jpeg" sizes="33vw">
-             <img v-bind:src="[structure.count < 1 ? '../images/covid19/no-structure-1s.png' : '../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg']"/>
+             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/unknown-structure_1000.png, ../images/covid19/unknown-structure_500.png, ../images/covid19/unknown-structure_250.png' : '../images/covid19/WEBP/' + structure.primary_accession + '.webp 2000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w1000.webp 1000w, ../images/covid19/WEBP/' + structure.primary_accession + '_w500.webp 500w']" type="image/webp" sizes="33vw">
+             <source v-bind:srcset="[structure.count < 1 ? '../images/covid19/unknown-structure_1000.png, ../images/covid19/unknown-structure_500.png, ../images/covid19/unknown-structure_250.png' : '../images/covid19/JPEG/' + structure.primary_accession + '.jpg 2000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg 1000w, ../images/covid19/JPEG/' + structure.primary_accession + '_w500.jpg 500w']"  type="image/jpeg" sizes="33vw">
+             <img v-bind:src="[structure.count < 1 ? '../images/covid19/unknown-structure_1000.png, ../images/covid19/unknown-structure_500.png, ../images/covid19/unknown-structure_250.png' : '../images/covid19/JPEG/' + structure.primary_accession + '_w1000.jpg']"/>
            </picture>
           <p :style="[structure.count == 0 ? {'color': 'grey'} : {'color': '#3a3a3a'}]">{{structure.count}} matching structures</p>
           </a>
@@ -42,7 +45,30 @@ export default {
       structures: null,
       organism: null,
       clicked: false,
-      totalStructures: 0
+      totalStructures: 0,
+      value3: 'not selected',
+      selected3: false,
+      option5: {
+        layout: {
+          backgroundColor: '#999999',
+          selectedBackgroundColor: 'orange',
+          selectedColor: 'white',
+          color: 'white',
+          fontFamily: 'Lucida Grande',
+          fontWeightSelected: 'normal'
+        },
+        size: {
+          height: 2,
+          width: 7,
+          padding: 0.25,
+          fontSize: 0.70,
+          'border-radius': '15px'
+        },
+        items: {
+          preSelected: 'Grid',
+          labels: [{ name: 'Grid' }, { name: 'Genome' }]
+        }
+      }
     }
   },
   beforeMount () {
@@ -102,6 +128,16 @@ export default {
     this.structures = allStructures
   },
   methods: {
+    updateMap: function (value) {
+      if (value === 'Genome') {
+        document.getElementById('container').style.display = 'none'
+        document.getElementById('slide').style.display = 'block'
+      } else {
+        document.getElementById('container').style.display = 'grid'
+        document.getElementById('slide').style.display = 'none'
+      }
+      console.log(value)
+    },
     redirect: function (primaryAccession) {
       // THIS GOES BACK TO AQUARIA.WS
       let redirectionPort = ':8009/'
@@ -404,5 +440,12 @@ export default {
         top: 5%;
         z-index:1;
         font-size: inherit;
+    }
+
+    iframe#slide{
+      display: none;
+      height:90%;
+      width: 100%;
+      border: none;
     }
 </style>

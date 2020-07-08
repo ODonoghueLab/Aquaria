@@ -1,8 +1,13 @@
-var cache = require('../common/cache')();
 
-var handlePredictProtein = require('./handlePredictProtein')
-var handleSnap2 = require('./handleSnap2')
-var handleCath = require('./handleCath')
+
+var axios = require('axios');
+const Ajv = require('ajv');
+
+var handlePredictProtein = require('./handlePredictProtein');
+var handleSnap2 = require('./handleSnap2');
+var handleCath = require('./handleCath');
+var handleCath_covid = require('./handleCath_covid');
+
 
 var servers = [
 		{
@@ -30,6 +35,7 @@ var servers = [
 			"id": 'CATH',
 			"Server": 'CATH',
 			"URL": 'http://www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
+			"URL_covid": "http://test.aquaria.ws/covid19cath/",
 			// ?content-type=application/json
 		},
 //		{
@@ -207,7 +213,7 @@ var add_external_annotation = function(primary_accession, json_object, ann, das_
 			  feat_end = parseInt( res[0]);
 			}
 		  }
-	  
+
 		  var apiConvert = function(Residues){
 			if(Residues.length < 1){
 			  setResidueRange(Residues[0])
@@ -218,7 +224,7 @@ var add_external_annotation = function(primary_accession, json_object, ann, das_
 				})
 			}
 		}
-	  
+
 		if (typeof f.Residues === "object"){
       if(das_server === "PredictProtein"){
         apiConvert(f.Residues)
@@ -419,12 +425,20 @@ function optimizeColors(category, multitracks) {
 /**
  * cluster region features into tracks with non-overlapping features
  */
-function clusterRegions(sequence_annotations, categories, aboutFeaturesource) {
+function clusterRegions(sequence_annotations, categories, aboutFeaturesource, hcDataObj) {
 	var clusters = new Array();
+
+	//sequence_annotations.forEach(function(annotation, annotation_i){
+
+	// let annotation_counter = 0;
 
 	for (var annotation in sequence_annotations) {
 
+
+
 		var feat_class = sequence_annotations[annotation]["track"];//categories[filter_key]["track"];
+
+
 		if (feat_class == "multi_track") {
 			// multi-line features
 
@@ -503,6 +517,71 @@ function clusterRegions(sequence_annotations, categories, aboutFeaturesource) {
 			console.log("ERROR: Feature class not known");
 		}
 	}
+
+
+	let counter_goEc = 0;
+	for (let i =0; i< clusters.length; i++){
+		// console.log('A track set is ');
+		// console.log(clusters[i]);
+
+		if (clusters[i].Tracks[0][0].desc.match(/CATH/i)){
+			for (let j = 0; j<clusters[i].Tracks[0].length; j++){
+
+				// pos_hcDataArr = counter_goEc
+				// dataArr_hc[0]
+
+
+				if(typeof hcDataObj != "undefined" &&  hcDataObj != null &&  hcDataObj.hasOwnProperty(clusters[i].Tracks[0][0].name)){
+					console.log(hcDataObj[clusters[i].Tracks[0][0].name]);
+
+				}
+
+				if (hcDataObj.hasOwnProperty(clusters[i].Tracks[0][j].name) ){
+					clusters[i].Tracks[0][j]['hc_go'] = hcDataObj[clusters[i].Tracks[0][j].name].go;
+
+					clusters[i].Tracks[0][j]['hc_ec'] = hcDataObj[clusters[i].Tracks[0][j].name].ec;
+
+					clusters[i].Tracks[0][j]['hc_species'] = hcDataObj[clusters[i].Tracks[0][j].name].species;
+
+
+					clusters[i].Tracks[0][j].label = clusters[i].Tracks[0][j].label.split(/\$\$/)[0];
+				}
+
+
+
+				//  hcDataObj[cluster] dataArr_hc[counter_goEc];
+				//counter_goEc = counter_goEc + 1;
+
+				//clusters[i].Tracks[0][j]['hc_ec'] = dataArr_hc[counter_goEc];
+				//counter_goEc = counter_goEc + 1;
+
+				//clusters[i].Tracks[0][j]['hc_species'] = dataArr_hc[counter_goEc];
+				//counter_goEc = counter_goEc + 1;
+			}
+		}
+	}
+
+	//console.log('$$$ clusters');
+	//console.log(clusters);
+
+	/* clusters.forEach(function(item, i){
+		console.log("A track is");
+		console.log(item.Tracks);
+
+		if (item.Tracks[0][0].desc.match(/CATH/i)){
+
+			item.Tracks[0].forEach(function(aTrack, aTrack_i){
+
+			});
+
+		}
+
+
+
+		// if (item.Tracks[0].desc)
+	});
+	*/
+
 	return clusters;
 }
 
@@ -604,22 +683,6 @@ function getAllFeatureNamesRequested(primary_accession){
 function fetch_annotations(primary_accession,
 		featureCallback) {
 
-	// reset annotations
-
-	// HANDLE CACHE HERE
-
-	// let keys = getAllFeatureParameterKeys(primary_accession)
-	/*
-	var key = "FEATURE_" + primary_accession + getUrlParameter("features");
-
-	var cacheValue = cache.read(key);
-
-	if (cacheValue) {
-		// return cache result for immediate display
-		featureCallback(cacheValue);
-	}
-	*/
-
 	// get fresh set of annotations as well
 	console.log("fetch_features.fetch_annotations: reset DAS annotations");
 	resetDASAnnotations();
@@ -628,7 +691,7 @@ function fetch_annotations(primary_accession,
 			featureCallback);
 };
 
-var axios = require('axios');
+
 
 function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallback){
 	let featuresFromExtServer = {};
@@ -650,12 +713,20 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet)
 		}
 		if (requestedFeature == 'SNAP2'){
+			console.log(response);
 			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet)
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
 			// console.log(response.data)
-			handleCath(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback)
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
+
+
+		}
+		if (requestedFeature == 'CathCovid'){
+			console.log("!!!! The cath covid response data is ");
+			console.log(response);
+			handleCath_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
 		}
 
 		// return featuresFromExtServer
@@ -678,18 +749,6 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 
 
 
-var StorageLRU = require('storage-lru').StorageLRU;
-var asyncify = require('storage-lru').asyncify;
-// var lru = new StorageLRU(asyncify(localStorage));
-
-var lru = new StorageLRU(
-    asyncify(localStorage),
-    {
-        revalidateFn: function(key, callback) {
-            var newValue = someFunctionToRefetchFromSomewhere(key); // most likely be async
-            callback(null, newValue); // make sure callback is invoked
-        }
-    });
 
 
 /**
@@ -722,103 +781,53 @@ var processNextServer = function(primary_accession,
 		}
 		else if (servers[currentServer]['Server'] == "UniProt"){
 
-			// fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
-			lru.getItem(primary_accession + '_' + servers[currentServer]['Server'], {json: false}, function (err, value) {
 
-				if (err) {
-					// something went wrong, for example, can't deserialize
-					console.log('^^ Failed to fetch item: err=', err);
-					fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
-					featureCallback(aggregatedAnnotations);
-				}
-				else{
-					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['Server'] )
-					finishServer(JSON.parse(value), primary_accession, featureCallback)
-					featureCallback(aggregatedAnnotations);
-				}
-
-			});
+			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
+			featureCallback(aggregatedAnnotations);
 
 		}
 		else if (servers[currentServer]['id'] == 'PredictProtein'){
 
-			lru.getItem(primary_accession + '_' + servers[currentServer]['id'], {}, function (err, value) {
 
-				if (err) {
-				    // something went wrong, for example, can't deserialize
-				    console.log('^^ Failed to fetch item: err=', err);
-					getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
-					featureCallback(aggregatedAnnotations);
-				}
-				else{
-					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['id'] )
-					console.log(typeof JSON.parse(value))
-					finishServer(JSON.parse(value), primary_accession, featureCallback)
-					featureCallback(aggregatedAnnotations);
-				}
+			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
+			featureCallback(aggregatedAnnotations);
 
-			});
 
 
 		}
 		else if (servers[currentServer]['id'] == 'SNAP2'){
 
-			lru.getItem(primary_accession + '_' + servers[currentServer]['id'], {json: false}, function (err, value) {
 
-				if (err) {
-				    // something went wrong, for example, can't deserialize
-				    console.log('^^ Failed to fetch item: err=', err);
-					getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
-					featureCallback(aggregatedAnnotations);
-
-				}
-				else{
-					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['id'] )
-					finishServer(JSON.parse(value), primary_accession, featureCallback)
-					featureCallback(aggregatedAnnotations);
-				}
+			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
+			featureCallback(aggregatedAnnotations);
 
 
-			});
 
 		}
 		else if (servers[currentServer]['id'] == 'CATH'){
 			console.log('############################ Requesting Cath features')
 
-			lru.getItem(primary_accession + '_' + servers[currentServer]['id'], {json: false}, function (err, value) {
+			if (primary_accession == 'P0DTC1' || primary_accession == 'P0DTC2'|| primary_accession == 'P0DTC7' || primary_accession == 'P0DTD1'){
+				// console.log("!!!!!!!!!! A COVID PROTEIN ENCOUNTERED");
+				getJsonFromUrl('CathCovid',servers[currentServer]['URL_covid'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
+				// handleCath_covid(primary_accession);
+	 		}
+			else {
+				// console.log('^^ Failed to fetch item: err=', err);
+				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet)
+				featureCallback(aggregatedAnnotations);
+			}
 
-				if (err) {
-					// something went wrong, for example, can't deserialize
-					console.log('^^ Failed to fetch item: err=', err);
-					getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet)
-					featureCallback(aggregatedAnnotations);
-				}
-				else{
-					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['id'] )
-					finishServer(JSON.parse(value), primary_accession, featureCallback)
-					featureCallback(aggregatedAnnotations);
-				}
-
-
-			});
 
 
 		}
 
 
-		/* isFetchingFromServer = servers[currentServer]['Server'];
-		if (isFetchingFromServer == "External Features (JSON)"){
-			// check URL for json url
-			checkURLForFeatures(primary_accession, servers[currentServer], featureCallback);
-		} else if (isFetchingFromServer == "Uniprot"){
-			console.log("fetch_features.processNextServer process " + isFetchingFromServer);
-			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
-		} */
+
 	}
 	else {
 		console.log("fetch_features.processNextServer finish DAS");
-		var key = "FEATURE_" + primary_accession + getUrlParameter("features");
-		cache.write(key, aggregatedAnnotations);
+
 		featureCallback(aggregatedAnnotations);
 	}
 };
@@ -846,8 +855,8 @@ var finishServer = function(clustered_annotations, primary_accession,
 
 
 
-const Ajv = require('ajv');
-function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featureCallback, featureId){
+
+function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featureCallback, featureId, cathDataArr_hc){
 
 	const ajv = new Ajv({
   		verbose: true
@@ -924,12 +933,12 @@ function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featu
 		// continue
 		console.log("fetch_features.validateAquariaFeatureSet appending validated features " + 'PredictProtein')
 
-		parseFeatures(primary_accession, '', featureId,featureCallback, convertedFeatureSet, '')
+		parseFeatures(primary_accession, '', featureId,featureCallback, convertedFeatureSet, '', cathDataArr_hc);
 		// finishServer(convertedFeatureSet, primary_accession, featureCallback);
 	}
 	else {
 		// cannot display these features
-		console.log("fetch_features.validateAquariaFeatureSet " + ajv.errorsText())
+		console.log("fetch_features.validateAquariaFeatureSet " + ajv.errorsText());
 		finishServer(new Array(), primary_accession,
 			featureCallback);
 	}
@@ -1040,13 +1049,11 @@ function parseUniprot(xml) {
 
 }
 
-function parseFeatures(primary_accession, categories, server, featureCallback, data, sourceURL){
+function parseFeatures(primary_accession, categories, server, featureCallback, data, sourceURL, cathDataArr_hc){
 	var sequence_annotations = {};
 	var aboutSource = {};
 	var description = "";
-	if (server === "PredictProtein"){
-		// console.log(" +++++++++++++++++++++++++ " + data)
-	}
+
 	for (var category in data) {
 		  if (data.hasOwnProperty(category)) {
 			if (category === "About"){
@@ -1114,25 +1121,14 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 	else{
 		description = description.concat("<p><a href='" + sourceURL + "'>Source</a></p>")
 	}
-	var clustered_annotations = clusterRegions(sequence_annotations, categories, description);
 
-	lru.setItem(
-    primary_accession + '_' + server,    // key
-    clustered_annotations, // obj value
-    {             // options
-        json: true,
-        cacheControl:'max-age=300,stale-while-revalidate=86400'
-    }, function (err) {
-        if (err) {
-            // something went wrong. Item not saved.
-            console.log('^^^ Failed to save item: err=', err);
-        }
-		else{
-			console.log("^^^ saved item ", primary_accession + '_' + server)
-		}
-		finishServer(clustered_annotations, primary_accession, featureCallback);
-	}
-	);
+	var clustered_annotations = clusterRegions(sequence_annotations, categories, description, cathDataArr_hc);
+
+
+	// console.log("The clustered annotations are: ");
+	// console.log(clustered_annotations);
+
+	finishServer(clustered_annotations, primary_accession, featureCallback);
 
 }
 

@@ -6,7 +6,9 @@ import App from './App'
 import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
 import 'vue-material/dist/vue-material.min.css'
 import VueMq from 'vue-mq'
+import ToggleSwitch from 'vuejs-toggle-switch'
 
+Vue.use(ToggleSwitch)
 Vue.use(MdButton)
 Vue.use(MdContent)
 Vue.use(MdTabs)

@@ -41,16 +41,16 @@ var updateFeatureUI = function(featureList) {
 	  var groupedFeatures = _.groupBy(featureSet, function(feature) {
 		return feature.Server;
 	  });
-	
-	//Store as an object 
+
+	//Store as an object
 	  groupedFeatures = Object.keys(groupedFeatures).map(function(key) {
 		return [String(key), groupedFeatures[key]];
 	  });
-	
+
 	  for ( var key in featureSet) {
 			clusters.push(featureSet[key]);
 	  }
-	
+
 	//Reorder grouped features
 	if((window.localStorage.getItem("featureOrder")) && (window.localStorage.getItem("featureOrder").split(",").length >= groupedFeatures.length)){
 	  var featureOrder = window.localStorage.getItem("featureOrder").split(",")
@@ -63,10 +63,10 @@ var updateFeatureUI = function(featureList) {
 	  }
 	  groupedFeatures = orderedFeatures
 	}
-	
-	
+
+
 	  var featureDiv = d3.select("#featurelist").append("div").attr("id", "featureContainer").append("div").attr("id", "groupedFeatures")
-  
+
 	  for ( var key in groupedFeatures) {
 	  //Feature Collection Header
 	  var featureHeader = featureDiv.append("div").attr("id", groupedFeatures[key][0]).attr("class", "featureCollection")
@@ -113,7 +113,7 @@ var updateFeatureUI = function(featureList) {
 									+ "</span></p>";
 							}
 			  }).each(drawTrack);
-			  
+
 	//	if (AQUARIA.preferred_protein_name !== "unknown") {
 	//		updateFeatureTabTitle(AQUARIA.preferred_protein_name);
 	  }
@@ -130,9 +130,9 @@ var updateFeatureUI = function(featureList) {
 			}
 	//		else { $("#featureCounter").html("<img src='/images/89.GIF'/>"); }
 	//	}
-	
+
 	//Following scripts displays the external URL features on structure
-  
+
 	//Style featureHeader elements
 	d3.selectAll('.expand').attr("style", "font-size: calc(9px + 0.2vw);color: #848484;margin: 10px -7px 0px 0px;")
 	d3.selectAll("#remove")
@@ -143,7 +143,7 @@ var updateFeatureUI = function(featureList) {
 	$(".featureTrack").sortable({axis: 'y'}).css({"cursor": "move"})
 	$("#groupedFeatures").disableSelection()
 	$(".featureHeader").on("click", function () {
-		var content = $(this).parent().children().eq(2)	
+		var content = $(this).parent().children().eq(2)
 		content.slideToggle('slow')
 
 		if(content.is(":visible")){
@@ -158,7 +158,7 @@ var updateFeatureUI = function(featureList) {
 		}
 
 		var notThis = $('div[class*="active"]').not(this)
-	
+
 		notThis.children().eq(0).text("►")
 		notThis.parent().children().eq(2).slideUp("slow");
 		notThis.children("button").css({"visibility": "hidden"})
@@ -202,8 +202,8 @@ var updateFeatureUI = function(featureList) {
     mouseleave: function () {
       $(this).css({"visibility" : "hidden"})
 	  }
-  	})
-	
+  })
+
 	//Store ordering of feature source
 	var featureOrder = new MutationObserver( function (mutations) {
 	  var sources = $('#groupedFeatures .featureCollection').map(function(){
@@ -215,7 +215,7 @@ var updateFeatureUI = function(featureList) {
 	  attributes:    true,
 	  childList: true
 	  });
-  
+
 	// d3.selectAll("#share").on("click", function() {
 	// 	var dummy = document.createElement('input'),
 	//   text = window.location.href;
@@ -257,7 +257,7 @@ var updateFeatureUI = function(featureList) {
 			})
 		  }
 		})
-  
+
 	  var pdb_chain_observer = new MutationObserver(function (m, me) {
 		m.forEach( function(mut) {
 		  if (mut.attributeName !== 'style') return;
@@ -269,21 +269,22 @@ var updateFeatureUI = function(featureList) {
 				}
 			})
 			var custom_feature = $('[id="Added Features"]').children().eq(2).children().eq(0).find("svg")
-			custom_feature.attr("class", "loaded");
-			var oid = custom_feature.attr("id").split("_")[2];
-			// AQUARIA.panel3d.blankApplet(true, "Loading feature...")
-			// AQUARIA.panel3d.blankApplet(false)
-			passFeature(addedFeatures[0], oid);
-			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-			d3.select("svg.loaded").classed("loaded", false);
-  
-			me.disconnect();     // stop observing
-  
+			if(custom_feature.length > 0){
+				custom_feature.attr("class", "loaded");
+				var oid = custom_feature.attr("id").split("_")[2];
+				// AQUARIA.panel3d.blankApplet(true, "Loading feature...")
+				// AQUARIA.panel3d.blankApplet(false)
+				passFeature(addedFeatures[0], oid);
+				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+				d3.select("svg.loaded").classed("loaded", false);
+	
+				me.disconnect();     // stop observing
+			}
 		  }
 		})
 	  })
-  
-  
+
+
   //   start observing structure change
 	document_observer.observe(document.getElementById("loading-message"), {
 	  attributes:    true,
@@ -294,9 +295,17 @@ var updateFeatureUI = function(featureList) {
 
 
 function drawTrack(datum, i) {
+
+	// console.log(datum.Tracks);
+
 	var features = datum.Tracks;
 
+
+	if (datum.Server == 'CATH'){
+		console.log(datum.Tracks);
+	}
 	for ( var o in features) {
+
 
 		d3
 				.select(this)
@@ -314,12 +323,6 @@ function drawTrack(datum, i) {
 						d3.select("svg.loaded").classed("loaded", false);
 						AQUARIA.panel3d.blankApplet(true, "Removing feature...")
 						AQUARIA.panel3d.blankApplet(false)
-
-            // Stu hack to detect feature changes
-            if (typeof AQUARIA.onFeatureChange === 'function') {
-              AQUARIA.onFeatureChange(null, 0);
-            }
-
 						removeCurrentAnnotationFrom3DViewer();
 					}
 					else { //console.log("clicked to display feature");
@@ -327,6 +330,9 @@ function drawTrack(datum, i) {
 						AQUARIA.panel3d.blankApplet(true, "Loading feature...")
 						AQUARIA.panel3d.blankApplet(false)
 						passFeature(datum, oid, this);
+						console.log("Datum");
+						console.log(datum);
+						// console.log(oid);
 						d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 						d3.select("svg.loaded").classed("loaded", false);
 						d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
@@ -362,6 +368,9 @@ function drawTrack(datum, i) {
 					.attr("class", "insertion");
 					// add features
 		for ( var p in features[o]) {
+			// console.log("p is ");
+			// console.log(p);
+
 			featureCount++;
 			d3
 					.select("#s_" + groupCount + "_" + o + " g")
@@ -397,6 +406,7 @@ function drawTrack(datum, i) {
 
 function createMouseOverCallback(feature) {
 	return function() {
+		// console.log(">>>>>>>>>> over here ....???");
 		var ID = d3.select(this).attr("id");
 		d3.select(this).call(mouseoverFeature, feature, ID);
 	};
@@ -404,12 +414,7 @@ function createMouseOverCallback(feature) {
 
 function passFeature(trk, nr, elmt) {
 
-		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
-
-    // Stu hack to detect feature changes
-    if (typeof AQUARIA.onFeatureChange === 'function') {
-      AQUARIA.onFeatureChange(trk, nr);
-    }
+		console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
 
 		sentAnnotationTo3DViewer(trk, parseInt(nr));
 
@@ -424,15 +429,129 @@ function mouseoverFeature(el, f, eid) {
 
 }
 
+function moveTheDiv(){
+	return new Promise(function(resolve, reject){
+		let aSuperFamFeature = document.getElementById('superFamCharts_0_go');
+		document.getElementById('superFamCharts').append(aSuperFamFeature);
+	});
+}
+
 function mouseoutFeature(el, eid) {
+
+
 	clearTimeout(t);
 	d3.select("#" + eid).attr("stroke-width", "0px");
 	s = setTimeout(function() {
-		$("div.popup").fadeOut();
+
+		moveTheDiv().then(function(){
+			$("div.popup").fadeOut();
+		})
+		.catch(function(error){
+				$("div.popup").fadeOut();
+		});
+
+
+
+
 	}, 500);
 }
 
+function createANewDiv_hcNoData(divId){
+	let newDiv = document.createElement('div');
+	newDiv.id = divId;
+	newDiv.style = "width: 100px; height: 100px; margin: 0 auto; background-color: white;";
+	document.getElementById('superFamCharts').append(newDiv);
+}
+
+function doThePlotting_v2(divId, theSeriesData_inner, theSeriesData_outer, theTitle, theSize_inner, labelCol_inner, labelDist_inner, innerSize_outer, name_inner, name_outer, labelCol_outer){
+	return new Promise(function(resolve, reject){
+		try{
+			let newDiv = document.createElement('div');
+			newDiv.id = divId;
+			newDiv.style = "width: 100px; height: 100px; margin: 0 auto";
+			document.getElementById('superFamCharts').append(newDiv);
+
+			// First add new Div.
+			Highcharts.chart(divId, {
+			    chart: {
+			        type: 'pie',
+					margin: 0
+			    },
+			    title: {
+			        text: theTitle
+			    }, /*
+			    subtitle: {
+			        text: 'Source: <a href="http://statcounter.com" target="_blank">statcounter.com</a>'
+			    },*/
+			    plotOptions: {
+			        pie: {
+			            shadow: false,
+			            center: ['50%', '50%']
+			        }
+			    },
+			    tooltip: {
+			        valueSuffix: '%'
+			    },
+			    series: [{
+			        name: name_inner,
+			        data: theSeriesData_inner,
+			        size: theSize_inner,
+			        dataLabels: {
+						enabled: false,
+			            formatter: function () {
+			                return this.y > 3 ? this.point.name : null;
+			            },
+			            color: labelCol_inner,
+			            distance: labelDist_inner
+			        }
+			    }, {
+			        name: name_outer,
+			        data: theSeriesData_outer,
+			        // size: '80%',
+			        innerSize: innerSize_outer,
+			        dataLabels: {
+						enabled: false,
+			            formatter: function () {
+			                // display only if larger than 1
+			                return this.y > 1 ? '<b>' + this.point.name + ':</b> ' +
+			                    this.y + '%' : null;
+			            },
+						color: labelCol_outer
+			        },
+			        id: 'versions'
+			    }],
+			    responsive: {
+			        rules: [{
+			            condition: {
+			                maxWidth: 100
+			            },
+			            chartOptions: {
+			                series: [{
+			                }, {
+			                    id: 'versions',
+			                    dataLabels: {
+			                        enabled: false
+			                    }
+			                }]
+			            }
+			        }]
+			    }
+			});
+			resolve();
+		}
+		catch(error){
+			console.log("Highcharts error");
+			console.log(error);
+		}
+
+
+	});
+}
+
+var Highcharts = require('./highstocks.js');
+
 function showAnnotation(f, eid) {
+	// console.log(eid);
 	// console.log("Hovered "+f.name+" "+f.start+"-"+f.end+": "+f.desc);
 	var urlhtml = "";
 	if (f.urls.length > 0) {
@@ -445,7 +564,7 @@ function showAnnotation(f, eid) {
 		urlhtml += "</p>";
 	}
 	$("div.popup").remove();
-	var balloon = "<div class='balloon'><span class='x'>&nbsp;</span><p>"
+	var balloon = "<div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
 			+ f.label + " (";
 	if (f.start == f.end){
 		balloon = balloon + "Residue "+f.start;
@@ -453,13 +572,32 @@ function showAnnotation(f, eid) {
 		balloon = balloon + "Residues "+f.start+"-"+f.end;
 	}
 
-	balloon = balloon + ")<br/>"
-			+ f.desc + "</p>"
+	// balloon = balloon.append(f.desc);
+	balloon = balloon + ")<br/>" // "</div>"
+		 	+ f.desc + "</p>"
 			+ urlhtml + "</div>";
+		/* 	console.log("The urlhtml is " + urlhtml);
+			console.log("The f.desc is " + f.desc); */
+
+	// let theSuperFam = document.getElementById('superFamCharts_0_go'); // .cloneNode(true); //.getElementsByTagName('svg')[0];
+	// console.log("The superfam is "+ theSuperFam);
+
+
+
 	d3.select("body")
 		.append("div")
 			.attr("class", "popup")
 			.html(balloon);
+			// .append(theSuperFam);
+
+	// document.getElementById('balloon').append(theSuperFam);
+
+	if (f.hasOwnProperty('hc_go') && f.hasOwnProperty('hc_ec') && f.hasOwnProperty('hc_species')){
+		handleCathPopups(f).then(function(){
+			updateTheStyleOfHc();
+		});
+	}
+
 
 	var popheight = $("div.popup").innerHeight();
 
@@ -471,7 +609,8 @@ function showAnnotation(f, eid) {
 
 	$("div.popup").css({
 		"left" : bleft + "px",
-		"top" : btop + "px"
+		"top" : btop + "px",
+		"width": "470px"
 	}).fadeIn(600);
 
 	$("span.x").click(function() {
@@ -488,6 +627,133 @@ function showAnnotation(f, eid) {
 
 }
 
+function handleCathPopups(f){
+	return new Promise(function(resolve, reject){
+		// handle this one.
+		if (typeof f.hc_go !== 'undefined' && f.hc_go.hasOwnProperty('data') && f.hc_go.data.hasOwnProperty('series') && f.hc_go.data.series.length >= 2){
+			doThePlotting_v2('hc_go_div', f.hc_go.data.series[0].data, f.hc_go.data.series[1].data, '', f.hc_go.data.series[0].size, f.hc_go.data.series[0].dataLabels.color, f.hc_go.data.series[0].dataLabels.dist, f.hc_go.data.series[1].innerSize, f.hc_go.data.series[0].name, f.hc_go.data.series[1].name, f.hc_go.data.series[1].dataLabels.color).then(function(){
+				document.getElementById('hc_go').prepend(document.getElementById('hc_go_div'));
+			})
+			.catch(function(error){
+				if (!document.getElementById('hc_go_noData')){
+					// create element
+					createANewDiv_hcNoData('hc_go_noData');
+				}
+
+				document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
+				document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <center> No data</center>';
+				console.log('featureslist.showAnnotation ERROR ' + error);
+			});
+		}
+		else{
+			// no data.
+
+			if (!document.getElementById('hc_go_noData')){
+				// create element
+				createANewDiv_hcNoData('hc_go_noData');
+			}
+
+			document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
+			document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <center> No data</center>';
+			// document.getElementById('hc_go_div').style['background-color'] = "white";
+		}
+
+		if (typeof f.hc_ec !== 'undefined' &&  f.hc_ec.hasOwnProperty('data') && f.hc_ec.data.hasOwnProperty('series') && f.hc_ec.data.series.length >= 2){
+			doThePlotting_v2('hc_ec_div', f.hc_ec.data.series[0].data, f.hc_ec.data.series[1].data, '', f.hc_ec.data.series[0].size, f.hc_ec.data.series[0].dataLabels.color, f.hc_ec.data.series[0].dataLabels.dist, f.hc_ec.data.series[1].innerSize, f.hc_ec.data.series[0].name, f.hc_ec.data.series[1].name, f.hc_ec.data.series[1].dataLabels.color).then(function(){
+				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_div'));
+			})
+			.catch(function(error){
+				if (!document.getElementById('hc_ec_noData')){
+					// create element
+					createANewDiv_hcNoData('hc_ec_noData');
+				}
+
+				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
+				document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <center> No data</center>';
+				console.log('featureslist.showAnnotation ERROR ' + error);
+			});
+		}
+		else{
+			// no data
+			// document.getElementById('hc_ec').innerHTML = document.getElementById('hc_ec').innerHTML + ' <br> No data';
+			if (!document.getElementById('hc_ec_noData')){
+				// create element
+				createANewDiv_hcNoData('hc_ec_noData');
+			}
+
+			document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
+			document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <center> No data</center>';
+		}
+
+		if (typeof f.hc_species !== 'undefined' &&  f.hc_species.hasOwnProperty('data') && f.hc_species.data.hasOwnProperty('series') && f.hc_species.data.series.length >= 2){
+
+			doThePlotting_v2('hc_species_div', f.hc_species.data.series[0].data, f.hc_species.data.series[1].data, '', f.hc_species.data.series[0].size, f.hc_species.data.series[0].dataLabels.color, f.hc_species.data.series[0].dataLabels.dist, f.hc_species.data.series[1].innerSize, f.hc_species.data.series[0].name, f.hc_species.data.series[1].name, f.hc_species.data.series[1].dataLabels.color).then(function(){
+				document.getElementById('hc_species').prepend(document.getElementById('hc_species_div'));
+			})
+			.catch(function(error){
+
+				if (!document.getElementById('hc_species_noData')){
+					// create element
+					createANewDiv_hcNoData('hc_species_noData');
+				}
+
+				document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
+				document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <center> No data</center>';
+
+
+				console.log('featureslist.showAnnotation ERROR ' + error);
+			});
+		}
+		else {
+			// no data
+			// document.getElementById('hc_species').innerHTML = document.getElementById('hc_species').innerHTML + ' <br> No data';
+			if (!document.getElementById('hc_species_noData')){
+				// create element
+				createANewDiv_hcNoData('hc_species_noData');
+			}
+
+			document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
+			document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <center> No data</center>';
+		}
+
+		resolve();
+	});
+}
+
+function updateTheStyleOfHc(){
+	let hcSeriesGroup = document.getElementsByClassName("highcharts-pie-series");
+	//console.log("The highcharts series group are: ");
+	//console.log(hcSeriesGroup);
+	// console.log(hcSeriesGroup.children('path'));
+
+	for (let key in hcSeriesGroup){
+		if (hcSeriesGroup.hasOwnProperty(key)){
+			/* hcSeriesGroup[key].childNodes.forEach(function(item, i){
+				console.log("The item is");
+				console.log(item);
+			}); */
+
+			let thePaths = hcSeriesGroup[key].getElementsByTagName("path");
+			// console.log("The paths are");
+			// console.log(thePaths);
+
+
+			for (let pathKey in thePaths){
+				if (thePaths.hasOwnProperty(pathKey)){
+					// console.log('The path is ');
+					//console.log(thePaths[pathKey]);
+					// console.log(thePaths[pathKey].getAttribute('fill'));
+
+					let theColor = thePaths[pathKey].getAttribute('fill');
+
+					thePaths[pathKey].removeAttribute('fill');
+					thePaths[pathKey].setAttribute('style', "fill:" + theColor);
+				}
+			}
+		}
+	}
+}
+
 // DAS annotation handling
 
 var currentAnnotationsIn3DViewer = new Array();
@@ -500,6 +766,7 @@ function removeCurrentAnnotationFrom3DViewer() {
 
 	if (currentAnnotationsIn3DViewer !== undefined) {
 		for ( var i in currentAnnotationsIn3DViewer) {
+
 			// API call
 			AQUARIA.panel3d.removeAnnotation(currentAnnotationsIn3DViewer[i].id,
 					currentAnnotationsIn3DViewer[i].annotationName);
