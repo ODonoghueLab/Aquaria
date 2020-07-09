@@ -34,8 +34,8 @@ var servers = [
 		{
 			"id": 'CATH',
 			"Server": 'CATH',
-			"URL": 'http://www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
-			"URL_covid": "http://test.aquaria.ws/covid19cath/",
+			"URL": window.location.protocol + '//www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
+			"URL_covid": window.location.origin + "/covid19cath/",
 			// ?content-type=application/json
 		},
 //		{

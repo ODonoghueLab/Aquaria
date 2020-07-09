@@ -6,7 +6,6 @@
           <span id="hd"> hDiff</span> -->
           <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
           <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
-          <img src= "../assets/img/submenu.png" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
     </div>
      <iframe id="slide" src='../COVID/index.html'></iframe>
      <div id="container">
@@ -136,7 +135,6 @@ export default {
         document.getElementById('container').style.display = 'grid'
         document.getElementById('slide').style.display = 'none'
       }
-      console.log(value)
     },
     redirect: function (primaryAccession) {
       // THIS GOES BACK TO AQUARIA.WS
