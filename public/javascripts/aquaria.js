@@ -1,4 +1,4 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 //var idrViewer;
 //var structure;
 
@@ -2012,7 +2012,7 @@ window.ATL_JQ_PAGE_PROPS = {
   }
 };
 //};
-},{"./IDRPanel":1,"./applet3DPanel":2,"./featurelist":5,"./fetch_features":7,"./joleculePanel":11,"./pv3DPanel":12,"./show_matching_structures":15,"./topten":16,"dnode":100,"domready":102,"molecular-control-toolkit-js":137,"shoe":169}],4:[function(require,module,exports){
+},{"./IDRPanel":1,"./applet3DPanel":2,"./featurelist":5,"./fetch_features":7,"./joleculePanel":13,"./pv3DPanel":16,"./show_matching_structures":17,"./topten":18,"dnode":94,"domready":96,"molecular-control-toolkit-js":127,"shoe":139}],4:[function(require,module,exports){
 var Cluster = require('../shared/cluster');
 
 var ClusterRenderer = function(cluster, rank, xScale, width, height, onTextClick, onClusterItemClick) {
@@ -2309,7 +2309,7 @@ ClusterRenderer.prototype.mouseout = function(d, that) {
 };
 
 module.exports = ClusterRenderer;
-},{"../shared/cluster":184}],5:[function(require,module,exports){
+},{"../shared/cluster":146}],5:[function(require,module,exports){
 var featureSet;
 var width;
 var height;
@@ -2456,24 +2456,26 @@ var updateFeatureUI = function(featureList) {
 	$("#groupedFeatures").disableSelection()
 	$(".featureHeader").on("click", function () {
 		var content = $(this).parent().children().eq(2)
-		var notThis = $('div[class*="active"]').not(this)
-
-		notThis.children().eq(0).text("►")
-		notThis.next("div").slideUp("slow");
-		notThis.children("button").css({"visibility": "hidden"})
-		notThis.removeClass("active")
-
 		content.slideToggle('slow')
+
 		if(content.is(":visible")){
 		  $(this).addClass("active")
 		}
-			  if ($(this).children().eq(0).text() == '►') {
+		if ($(this).children().eq(0).text() == '►') {
 			$(this).children().eq(0).text("▼")
 			$(this).children("button").css({"visibility": "visible"})
-		  } else {
+		} else {
 			$(this).children().eq(0).text("►")
 			$(this).children("button").css({"visibility": "hidden"})
-		  }
+		}
+
+		var notThis = $('div[class*="active"]').not(this)
+
+		notThis.children().eq(0).text("►")
+		notThis.parent().children().eq(2).slideUp("slow");
+		notThis.children("button").css({"visibility": "hidden"})
+		notThis.removeClass("active")
+
 		});
 	var timer;
 	$(".featureHeader").on({
@@ -2512,7 +2514,7 @@ var updateFeatureUI = function(featureList) {
     mouseleave: function () {
       $(this).css({"visibility" : "hidden"})
 	  }
-  	})
+  })
 
 	//Store ordering of feature source
 	var featureOrder = new MutationObserver( function (mutations) {
@@ -2579,16 +2581,17 @@ var updateFeatureUI = function(featureList) {
 				}
 			})
 			var custom_feature = $('[id="Added Features"]').children().eq(2).children().eq(0).find("svg")
-			custom_feature.attr("class", "loaded");
-			var oid = custom_feature.attr("id").split("_")[2];
-			// AQUARIA.panel3d.blankApplet(true, "Loading feature...")
-			// AQUARIA.panel3d.blankApplet(false)
-			passFeature(addedFeatures[0], oid);
-			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-			d3.select("svg.loaded").classed("loaded", false);
-
-			me.disconnect();     // stop observing
-
+			if(custom_feature.length > 0){
+				custom_feature.attr("class", "loaded");
+				var oid = custom_feature.attr("id").split("_")[2];
+				// AQUARIA.panel3d.blankApplet(true, "Loading feature...")
+				// AQUARIA.panel3d.blankApplet(false)
+				passFeature(addedFeatures[0], oid);
+				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+				d3.select("svg.loaded").classed("loaded", false);
+	
+				me.disconnect();     // stop observing
+			}
 		  }
 		})
 	  })
@@ -2604,9 +2607,17 @@ var updateFeatureUI = function(featureList) {
 
 
 function drawTrack(datum, i) {
+
+	// console.log(datum.Tracks);
+
 	var features = datum.Tracks;
 
+
+	if (datum.Server == 'CATH'){
+		console.log(datum.Tracks);
+	}
 	for ( var o in features) {
+
 
 		d3
 				.select(this)
@@ -2623,13 +2634,7 @@ function drawTrack(datum, i) {
 					if(d3.select(this).attr("class") == "loaded") { // deselect feature (it's already displayed)
 						d3.select("svg.loaded").classed("loaded", false);
 						AQUARIA.panel3d.blankApplet(true, "Removing feature...")
-            AQUARIA.panel3d.blankApplet(false)
-
-            // Stu hack to detect feature changes
-            if (typeof AQUARIA.onFeatureChange === 'function') {
-              AQUARIA.onFeatureChange(null, 0);
-            }
-
+						AQUARIA.panel3d.blankApplet(false)
 						removeCurrentAnnotationFrom3DViewer();
 					}
 					else { //console.log("clicked to display feature");
@@ -2637,6 +2642,9 @@ function drawTrack(datum, i) {
 						AQUARIA.panel3d.blankApplet(true, "Loading feature...")
 						AQUARIA.panel3d.blankApplet(false)
 						passFeature(datum, oid, this);
+						console.log("Datum");
+						console.log(datum);
+						// console.log(oid);
 						d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 						d3.select("svg.loaded").classed("loaded", false);
 						d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
@@ -2672,6 +2680,9 @@ function drawTrack(datum, i) {
 					.attr("class", "insertion");
 					// add features
 		for ( var p in features[o]) {
+			// console.log("p is ");
+			// console.log(p);
+
 			featureCount++;
 			d3
 					.select("#s_" + groupCount + "_" + o + " g")
@@ -2707,6 +2718,7 @@ function drawTrack(datum, i) {
 
 function createMouseOverCallback(feature) {
 	return function() {
+		// console.log(">>>>>>>>>> over here ....???");
 		var ID = d3.select(this).attr("id");
 		d3.select(this).call(mouseoverFeature, feature, ID);
 	};
@@ -2714,12 +2726,7 @@ function createMouseOverCallback(feature) {
 
 function passFeature(trk, nr, elmt) {
 
-		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
-
-    // Stu hack to detect feature changes
-    if (typeof AQUARIA.onFeatureChange === 'function') {
-      AQUARIA.onFeatureChange(trk, nr);
-    }
+		console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
 
 		sentAnnotationTo3DViewer(trk, parseInt(nr));
 
@@ -2734,15 +2741,129 @@ function mouseoverFeature(el, f, eid) {
 
 }
 
+function moveTheDiv(){
+	return new Promise(function(resolve, reject){
+		let aSuperFamFeature = document.getElementById('superFamCharts_0_go');
+		document.getElementById('superFamCharts').append(aSuperFamFeature);
+	});
+}
+
 function mouseoutFeature(el, eid) {
+
+
 	clearTimeout(t);
 	d3.select("#" + eid).attr("stroke-width", "0px");
 	s = setTimeout(function() {
-		$("div.popup").fadeOut();
+
+		moveTheDiv().then(function(){
+			$("div.popup").fadeOut();
+		})
+		.catch(function(error){
+				$("div.popup").fadeOut();
+		});
+
+
+
+
 	}, 500);
 }
 
+function createANewDiv_hcNoData(divId){
+	let newDiv = document.createElement('div');
+	newDiv.id = divId;
+	newDiv.style = "width: 100px; height: 100px; margin: 0 auto; background-color: white;";
+	document.getElementById('superFamCharts').append(newDiv);
+}
+
+function doThePlotting_v2(divId, theSeriesData_inner, theSeriesData_outer, theTitle, theSize_inner, labelCol_inner, labelDist_inner, innerSize_outer, name_inner, name_outer, labelCol_outer){
+	return new Promise(function(resolve, reject){
+		try{
+			let newDiv = document.createElement('div');
+			newDiv.id = divId;
+			newDiv.style = "width: 100px; height: 100px; margin: 0 auto";
+			document.getElementById('superFamCharts').append(newDiv);
+
+			// First add new Div.
+			Highcharts.chart(divId, {
+			    chart: {
+			        type: 'pie',
+					margin: 0
+			    },
+			    title: {
+			        text: theTitle
+			    }, /*
+			    subtitle: {
+			        text: 'Source: <a href="http://statcounter.com" target="_blank">statcounter.com</a>'
+			    },*/
+			    plotOptions: {
+			        pie: {
+			            shadow: false,
+			            center: ['50%', '50%']
+			        }
+			    },
+			    tooltip: {
+			        valueSuffix: '%'
+			    },
+			    series: [{
+			        name: name_inner,
+			        data: theSeriesData_inner,
+			        size: theSize_inner,
+			        dataLabels: {
+						enabled: false,
+			            formatter: function () {
+			                return this.y > 3 ? this.point.name : null;
+			            },
+			            color: labelCol_inner,
+			            distance: labelDist_inner
+			        }
+			    }, {
+			        name: name_outer,
+			        data: theSeriesData_outer,
+			        // size: '80%',
+			        innerSize: innerSize_outer,
+			        dataLabels: {
+						enabled: false,
+			            formatter: function () {
+			                // display only if larger than 1
+			                return this.y > 1 ? '<b>' + this.point.name + ':</b> ' +
+			                    this.y + '%' : null;
+			            },
+						color: labelCol_outer
+			        },
+			        id: 'versions'
+			    }],
+			    responsive: {
+			        rules: [{
+			            condition: {
+			                maxWidth: 100
+			            },
+			            chartOptions: {
+			                series: [{
+			                }, {
+			                    id: 'versions',
+			                    dataLabels: {
+			                        enabled: false
+			                    }
+			                }]
+			            }
+			        }]
+			    }
+			});
+			resolve();
+		}
+		catch(error){
+			console.log("Highcharts error");
+			console.log(error);
+		}
+
+
+	});
+}
+
+var Highcharts = require('./highstocks.js');
+
 function showAnnotation(f, eid) {
+	// console.log(eid);
 	// console.log("Hovered "+f.name+" "+f.start+"-"+f.end+": "+f.desc);
 	var urlhtml = "";
 	if (f.urls.length > 0) {
@@ -2755,7 +2876,7 @@ function showAnnotation(f, eid) {
 		urlhtml += "</p>";
 	}
 	$("div.popup").remove();
-	var balloon = "<div class='balloon'><span class='x'>&nbsp;</span><p>"
+	var balloon = "<div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
 			+ f.label + " (";
 	if (f.start == f.end){
 		balloon = balloon + "Residue "+f.start;
@@ -2763,13 +2884,32 @@ function showAnnotation(f, eid) {
 		balloon = balloon + "Residues "+f.start+"-"+f.end;
 	}
 
-	balloon = balloon + ")<br/>"
-			+ f.desc + "</p>"
+	// balloon = balloon.append(f.desc);
+	balloon = balloon + ")<br/>" // "</div>"
+		 	+ f.desc + "</p>"
 			+ urlhtml + "</div>";
+		/* 	console.log("The urlhtml is " + urlhtml);
+			console.log("The f.desc is " + f.desc); */
+
+	// let theSuperFam = document.getElementById('superFamCharts_0_go'); // .cloneNode(true); //.getElementsByTagName('svg')[0];
+	// console.log("The superfam is "+ theSuperFam);
+
+
+
 	d3.select("body")
 		.append("div")
 			.attr("class", "popup")
 			.html(balloon);
+			// .append(theSuperFam);
+
+	// document.getElementById('balloon').append(theSuperFam);
+
+	if (f.hasOwnProperty('hc_go') && f.hasOwnProperty('hc_ec') && f.hasOwnProperty('hc_species')){
+		handleCathPopups(f).then(function(){
+			updateTheStyleOfHc();
+		});
+	}
+
 
 	var popheight = $("div.popup").innerHeight();
 
@@ -2781,7 +2921,8 @@ function showAnnotation(f, eid) {
 
 	$("div.popup").css({
 		"left" : bleft + "px",
-		"top" : btop + "px"
+		"top" : btop + "px",
+		"width": "470px"
 	}).fadeIn(600);
 
 	$("span.x").click(function() {
@@ -2798,6 +2939,133 @@ function showAnnotation(f, eid) {
 
 }
 
+function handleCathPopups(f){
+	return new Promise(function(resolve, reject){
+		// handle this one.
+		if (typeof f.hc_go !== 'undefined' && f.hc_go.hasOwnProperty('data') && f.hc_go.data.hasOwnProperty('series') && f.hc_go.data.series.length >= 2){
+			doThePlotting_v2('hc_go_div', f.hc_go.data.series[0].data, f.hc_go.data.series[1].data, '', f.hc_go.data.series[0].size, f.hc_go.data.series[0].dataLabels.color, f.hc_go.data.series[0].dataLabels.dist, f.hc_go.data.series[1].innerSize, f.hc_go.data.series[0].name, f.hc_go.data.series[1].name, f.hc_go.data.series[1].dataLabels.color).then(function(){
+				document.getElementById('hc_go').prepend(document.getElementById('hc_go_div'));
+			})
+			.catch(function(error){
+				if (!document.getElementById('hc_go_noData')){
+					// create element
+					createANewDiv_hcNoData('hc_go_noData');
+				}
+
+				document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
+				document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <center> No data</center>';
+				console.log('featureslist.showAnnotation ERROR ' + error);
+			});
+		}
+		else{
+			// no data.
+
+			if (!document.getElementById('hc_go_noData')){
+				// create element
+				createANewDiv_hcNoData('hc_go_noData');
+			}
+
+			document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
+			document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <center> No data</center>';
+			// document.getElementById('hc_go_div').style['background-color'] = "white";
+		}
+
+		if (typeof f.hc_ec !== 'undefined' &&  f.hc_ec.hasOwnProperty('data') && f.hc_ec.data.hasOwnProperty('series') && f.hc_ec.data.series.length >= 2){
+			doThePlotting_v2('hc_ec_div', f.hc_ec.data.series[0].data, f.hc_ec.data.series[1].data, '', f.hc_ec.data.series[0].size, f.hc_ec.data.series[0].dataLabels.color, f.hc_ec.data.series[0].dataLabels.dist, f.hc_ec.data.series[1].innerSize, f.hc_ec.data.series[0].name, f.hc_ec.data.series[1].name, f.hc_ec.data.series[1].dataLabels.color).then(function(){
+				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_div'));
+			})
+			.catch(function(error){
+				if (!document.getElementById('hc_ec_noData')){
+					// create element
+					createANewDiv_hcNoData('hc_ec_noData');
+				}
+
+				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
+				document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <center> No data</center>';
+				console.log('featureslist.showAnnotation ERROR ' + error);
+			});
+		}
+		else{
+			// no data
+			// document.getElementById('hc_ec').innerHTML = document.getElementById('hc_ec').innerHTML + ' <br> No data';
+			if (!document.getElementById('hc_ec_noData')){
+				// create element
+				createANewDiv_hcNoData('hc_ec_noData');
+			}
+
+			document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
+			document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <center> No data</center>';
+		}
+
+		if (typeof f.hc_species !== 'undefined' &&  f.hc_species.hasOwnProperty('data') && f.hc_species.data.hasOwnProperty('series') && f.hc_species.data.series.length >= 2){
+
+			doThePlotting_v2('hc_species_div', f.hc_species.data.series[0].data, f.hc_species.data.series[1].data, '', f.hc_species.data.series[0].size, f.hc_species.data.series[0].dataLabels.color, f.hc_species.data.series[0].dataLabels.dist, f.hc_species.data.series[1].innerSize, f.hc_species.data.series[0].name, f.hc_species.data.series[1].name, f.hc_species.data.series[1].dataLabels.color).then(function(){
+				document.getElementById('hc_species').prepend(document.getElementById('hc_species_div'));
+			})
+			.catch(function(error){
+
+				if (!document.getElementById('hc_species_noData')){
+					// create element
+					createANewDiv_hcNoData('hc_species_noData');
+				}
+
+				document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
+				document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <center> No data</center>';
+
+
+				console.log('featureslist.showAnnotation ERROR ' + error);
+			});
+		}
+		else {
+			// no data
+			// document.getElementById('hc_species').innerHTML = document.getElementById('hc_species').innerHTML + ' <br> No data';
+			if (!document.getElementById('hc_species_noData')){
+				// create element
+				createANewDiv_hcNoData('hc_species_noData');
+			}
+
+			document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
+			document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <center> No data</center>';
+		}
+
+		resolve();
+	});
+}
+
+function updateTheStyleOfHc(){
+	let hcSeriesGroup = document.getElementsByClassName("highcharts-pie-series");
+	//console.log("The highcharts series group are: ");
+	//console.log(hcSeriesGroup);
+	// console.log(hcSeriesGroup.children('path'));
+
+	for (let key in hcSeriesGroup){
+		if (hcSeriesGroup.hasOwnProperty(key)){
+			/* hcSeriesGroup[key].childNodes.forEach(function(item, i){
+				console.log("The item is");
+				console.log(item);
+			}); */
+
+			let thePaths = hcSeriesGroup[key].getElementsByTagName("path");
+			// console.log("The paths are");
+			// console.log(thePaths);
+
+
+			for (let pathKey in thePaths){
+				if (thePaths.hasOwnProperty(pathKey)){
+					// console.log('The path is ');
+					//console.log(thePaths[pathKey]);
+					// console.log(thePaths[pathKey].getAttribute('fill'));
+
+					let theColor = thePaths[pathKey].getAttribute('fill');
+
+					thePaths[pathKey].removeAttribute('fill');
+					thePaths[pathKey].setAttribute('style', "fill:" + theColor);
+				}
+			}
+		}
+	}
+}
+
 // DAS annotation handling
 
 var currentAnnotationsIn3DViewer = new Array();
@@ -2810,6 +3078,7 @@ function removeCurrentAnnotationFrom3DViewer() {
 
 	if (currentAnnotationsIn3DViewer !== undefined) {
 		for ( var i in currentAnnotationsIn3DViewer) {
+
 			// API call
 			AQUARIA.panel3d.removeAnnotation(currentAnnotationsIn3DViewer[i].id,
 					currentAnnotationsIn3DViewer[i].annotationName);
@@ -2918,7 +3187,7 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 module.exports.updateFeatureUI = updateFeatureUI;
 module.exports.updateFeatureTabTitle = updateFeatureTabTitle;
 
-},{}],6:[function(require,module,exports){
+},{"./highstocks.js":12}],6:[function(require,module,exports){
 var cache = require('../common/cache')();
 
 var das_servers = [
@@ -3625,12 +3894,17 @@ fetch_das_annotation_from_servers = function(primary_accession,
 	// });
 };
 
-},{"../common/cache":18}],7:[function(require,module,exports){
-var cache = require('../common/cache')();
+},{"../common/cache":20}],7:[function(require,module,exports){
 
-var handlePredictProtein = require('./handlePredictProtein')
-var handleSnap2 = require('./handleSnap2')
-var handleCath = require('./handleCath')
+
+var axios = require('axios');
+const Ajv = require('ajv');
+
+var handlePredictProtein = require('./handlePredictProtein');
+var handleSnap2 = require('./handleSnap2');
+var handleCath = require('./handleCath');
+var handleCath_covid = require('./handleCath_covid');
+
 
 var servers = [
 		{
@@ -3657,7 +3931,8 @@ var servers = [
 		{
 			"id": 'CATH',
 			"Server": 'CATH',
-			"URL": 'http://www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
+			"URL": window.location.protocol + '//www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
+			"URL_covid": window.location.origin + "/covid19cath/",
 			// ?content-type=application/json
 		},
 //		{
@@ -3835,7 +4110,7 @@ var add_external_annotation = function(primary_accession, json_object, ann, das_
 			  feat_end = parseInt( res[0]);
 			}
 		  }
-	  
+
 		  var apiConvert = function(Residues){
 			if(Residues.length < 1){
 			  setResidueRange(Residues[0])
@@ -3846,7 +4121,7 @@ var add_external_annotation = function(primary_accession, json_object, ann, das_
 				})
 			}
 		}
-	  
+
 		if (typeof f.Residues === "object"){
       if(das_server === "PredictProtein"){
         apiConvert(f.Residues)
@@ -4047,12 +4322,20 @@ function optimizeColors(category, multitracks) {
 /**
  * cluster region features into tracks with non-overlapping features
  */
-function clusterRegions(sequence_annotations, categories, aboutFeaturesource) {
+function clusterRegions(sequence_annotations, categories, aboutFeaturesource, hcDataObj) {
 	var clusters = new Array();
+
+	//sequence_annotations.forEach(function(annotation, annotation_i){
+
+	// let annotation_counter = 0;
 
 	for (var annotation in sequence_annotations) {
 
+
+
 		var feat_class = sequence_annotations[annotation]["track"];//categories[filter_key]["track"];
+
+
 		if (feat_class == "multi_track") {
 			// multi-line features
 
@@ -4131,6 +4414,71 @@ function clusterRegions(sequence_annotations, categories, aboutFeaturesource) {
 			console.log("ERROR: Feature class not known");
 		}
 	}
+
+
+	let counter_goEc = 0;
+	for (let i =0; i< clusters.length; i++){
+		// console.log('A track set is ');
+		// console.log(clusters[i]);
+
+		if (clusters[i].Tracks[0][0].desc.match(/CATH/i)){
+			for (let j = 0; j<clusters[i].Tracks[0].length; j++){
+
+				// pos_hcDataArr = counter_goEc
+				// dataArr_hc[0]
+
+
+				if(typeof hcDataObj != "undefined" &&  hcDataObj != null &&  hcDataObj.hasOwnProperty(clusters[i].Tracks[0][0].name)){
+					console.log(hcDataObj[clusters[i].Tracks[0][0].name]);
+
+				}
+
+				if (hcDataObj.hasOwnProperty(clusters[i].Tracks[0][j].name) ){
+					clusters[i].Tracks[0][j]['hc_go'] = hcDataObj[clusters[i].Tracks[0][j].name].go;
+
+					clusters[i].Tracks[0][j]['hc_ec'] = hcDataObj[clusters[i].Tracks[0][j].name].ec;
+
+					clusters[i].Tracks[0][j]['hc_species'] = hcDataObj[clusters[i].Tracks[0][j].name].species;
+
+
+					clusters[i].Tracks[0][j].label = clusters[i].Tracks[0][j].label.split(/\$\$/)[0];
+				}
+
+
+
+				//  hcDataObj[cluster] dataArr_hc[counter_goEc];
+				//counter_goEc = counter_goEc + 1;
+
+				//clusters[i].Tracks[0][j]['hc_ec'] = dataArr_hc[counter_goEc];
+				//counter_goEc = counter_goEc + 1;
+
+				//clusters[i].Tracks[0][j]['hc_species'] = dataArr_hc[counter_goEc];
+				//counter_goEc = counter_goEc + 1;
+			}
+		}
+	}
+
+	//console.log('$$$ clusters');
+	//console.log(clusters);
+
+	/* clusters.forEach(function(item, i){
+		console.log("A track is");
+		console.log(item.Tracks);
+
+		if (item.Tracks[0][0].desc.match(/CATH/i)){
+
+			item.Tracks[0].forEach(function(aTrack, aTrack_i){
+
+			});
+
+		}
+
+
+
+		// if (item.Tracks[0].desc)
+	});
+	*/
+
 	return clusters;
 }
 
@@ -4232,22 +4580,6 @@ function getAllFeatureNamesRequested(primary_accession){
 function fetch_annotations(primary_accession,
 		featureCallback) {
 
-	// reset annotations
-
-	// HANDLE CACHE HERE
-
-	// let keys = getAllFeatureParameterKeys(primary_accession)
-	/*
-	var key = "FEATURE_" + primary_accession + getUrlParameter("features");
-
-	var cacheValue = cache.read(key);
-
-	if (cacheValue) {
-		// return cache result for immediate display
-		featureCallback(cacheValue);
-	}
-	*/
-
 	// get fresh set of annotations as well
 	console.log("fetch_features.fetch_annotations: reset DAS annotations");
 	resetDASAnnotations();
@@ -4256,7 +4588,7 @@ function fetch_annotations(primary_accession,
 			featureCallback);
 };
 
-var axios = require('axios');
+
 
 function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallback){
 	let featuresFromExtServer = {};
@@ -4278,12 +4610,20 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet)
 		}
 		if (requestedFeature == 'SNAP2'){
+			console.log(response);
 			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet)
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
 			// console.log(response.data)
-			handleCath(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback)
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
+
+
+		}
+		if (requestedFeature == 'CathCovid'){
+			console.log("!!!! The cath covid response data is ");
+			console.log(response);
+			handleCath_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
 		}
 
 		// return featuresFromExtServer
@@ -4306,18 +4646,6 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 
 
 
-var StorageLRU = require('storage-lru').StorageLRU;
-var asyncify = require('storage-lru').asyncify;
-// var lru = new StorageLRU(asyncify(localStorage));
-
-var lru = new StorageLRU(
-    asyncify(localStorage),
-    {
-        revalidateFn: function(key, callback) {
-            var newValue = someFunctionToRefetchFromSomewhere(key); // most likely be async
-            callback(null, newValue); // make sure callback is invoked
-        }
-    });
 
 
 /**
@@ -4350,103 +4678,53 @@ var processNextServer = function(primary_accession,
 		}
 		else if (servers[currentServer]['Server'] == "UniProt"){
 
-			// fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
-			lru.getItem(primary_accession + '_' + servers[currentServer]['Server'], {json: false}, function (err, value) {
 
-				if (err) {
-					// something went wrong, for example, can't deserialize
-					console.log('^^ Failed to fetch item: err=', err);
-					fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
-					featureCallback(aggregatedAnnotations);
-				}
-				else{
-					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['Server'] )
-					finishServer(JSON.parse(value), primary_accession, featureCallback)
-					featureCallback(aggregatedAnnotations);
-				}
-
-			});
+			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
+			featureCallback(aggregatedAnnotations);
 
 		}
 		else if (servers[currentServer]['id'] == 'PredictProtein'){
 
-			lru.getItem(primary_accession + '_' + servers[currentServer]['id'], {}, function (err, value) {
 
-				if (err) {
-				    // something went wrong, for example, can't deserialize
-				    console.log('^^ Failed to fetch item: err=', err);
-					getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
-					featureCallback(aggregatedAnnotations);
-				}
-				else{
-					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['id'] )
-					console.log(typeof JSON.parse(value))
-					finishServer(JSON.parse(value), primary_accession, featureCallback)
-					featureCallback(aggregatedAnnotations);
-				}
+			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
+			featureCallback(aggregatedAnnotations);
 
-			});
 
 
 		}
 		else if (servers[currentServer]['id'] == 'SNAP2'){
 
-			lru.getItem(primary_accession + '_' + servers[currentServer]['id'], {json: false}, function (err, value) {
 
-				if (err) {
-				    // something went wrong, for example, can't deserialize
-				    console.log('^^ Failed to fetch item: err=', err);
-					getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
-					featureCallback(aggregatedAnnotations);
-
-				}
-				else{
-					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['id'] )
-					finishServer(JSON.parse(value), primary_accession, featureCallback)
-					featureCallback(aggregatedAnnotations);
-				}
+			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
+			featureCallback(aggregatedAnnotations);
 
 
-			});
 
 		}
 		else if (servers[currentServer]['id'] == 'CATH'){
 			console.log('############################ Requesting Cath features')
 
-			lru.getItem(primary_accession + '_' + servers[currentServer]['id'], {json: false}, function (err, value) {
+			if (primary_accession == 'P0DTC1' || primary_accession == 'P0DTC2'|| primary_accession == 'P0DTC7' || primary_accession == 'P0DTD1'){
+				// console.log("!!!!!!!!!! A COVID PROTEIN ENCOUNTERED");
+				getJsonFromUrl('CathCovid',servers[currentServer]['URL_covid'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
+				// handleCath_covid(primary_accession);
+	 		}
+			else {
+				// console.log('^^ Failed to fetch item: err=', err);
+				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet)
+				featureCallback(aggregatedAnnotations);
+			}
 
-				if (err) {
-					// something went wrong, for example, can't deserialize
-					console.log('^^ Failed to fetch item: err=', err);
-					getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet)
-					featureCallback(aggregatedAnnotations);
-				}
-				else{
-					console.log('fetch_features.processNextServer Found in cache ', servers[currentServer]['id'] )
-					finishServer(JSON.parse(value), primary_accession, featureCallback)
-					featureCallback(aggregatedAnnotations);
-				}
-
-
-			});
 
 
 		}
 
 
-		/* isFetchingFromServer = servers[currentServer]['Server'];
-		if (isFetchingFromServer == "External Features (JSON)"){
-			// check URL for json url
-			checkURLForFeatures(primary_accession, servers[currentServer], featureCallback);
-		} else if (isFetchingFromServer == "Uniprot"){
-			console.log("fetch_features.processNextServer process " + isFetchingFromServer);
-			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
-		} */
+
 	}
 	else {
 		console.log("fetch_features.processNextServer finish DAS");
-		var key = "FEATURE_" + primary_accession + getUrlParameter("features");
-		cache.write(key, aggregatedAnnotations);
+
 		featureCallback(aggregatedAnnotations);
 	}
 };
@@ -4474,8 +4752,8 @@ var finishServer = function(clustered_annotations, primary_accession,
 
 
 
-const Ajv = require('ajv');
-function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featureCallback, featureId){
+
+function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featureCallback, featureId, cathDataArr_hc){
 
 	const ajv = new Ajv({
   		verbose: true
@@ -4552,12 +4830,12 @@ function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featu
 		// continue
 		console.log("fetch_features.validateAquariaFeatureSet appending validated features " + 'PredictProtein')
 
-		parseFeatures(primary_accession, '', featureId,featureCallback, convertedFeatureSet, '')
+		parseFeatures(primary_accession, '', featureId,featureCallback, convertedFeatureSet, '', cathDataArr_hc);
 		// finishServer(convertedFeatureSet, primary_accession, featureCallback);
 	}
 	else {
 		// cannot display these features
-		console.log("fetch_features.validateAquariaFeatureSet " + ajv.errorsText())
+		console.log("fetch_features.validateAquariaFeatureSet " + ajv.errorsText());
 		finishServer(new Array(), primary_accession,
 			featureCallback);
 	}
@@ -4668,13 +4946,11 @@ function parseUniprot(xml) {
 
 }
 
-function parseFeatures(primary_accession, categories, server, featureCallback, data, sourceURL){
+function parseFeatures(primary_accession, categories, server, featureCallback, data, sourceURL, cathDataArr_hc){
 	var sequence_annotations = {};
 	var aboutSource = {};
 	var description = "";
-	if (server === "PredictProtein"){
-		// console.log(" +++++++++++++++++++++++++ " + data)
-	}
+
 	for (var category in data) {
 		  if (data.hasOwnProperty(category)) {
 			if (category === "About"){
@@ -4742,25 +5018,14 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 	else{
 		description = description.concat("<p><a href='" + sourceURL + "'>Source</a></p>")
 	}
-	var clustered_annotations = clusterRegions(sequence_annotations, categories, description);
 
-	lru.setItem(
-    primary_accession + '_' + server,    // key
-    clustered_annotations, // obj value
-    {             // options
-        json: true,
-        cacheControl:'max-age=300,stale-while-revalidate=86400'
-    }, function (err) {
-        if (err) {
-            // something went wrong. Item not saved.
-            console.log('^^^ Failed to save item: err=', err);
-        }
-		else{
-			console.log("^^^ saved item ", primary_accession + '_' + server)
-		}
-		finishServer(clustered_annotations, primary_accession, featureCallback);
-	}
-	);
+	var clustered_annotations = clusterRegions(sequence_annotations, categories, description, cathDataArr_hc);
+
+
+	// console.log("The clustered annotations are: ");
+	// console.log(clustered_annotations);
+
+	finishServer(clustered_annotations, primary_accession, featureCallback);
 
 }
 
@@ -4817,7 +5082,8 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 };
 
 module.exports = fetch_annotations;
-},{"../common/cache":18,"./handleCath":8,"./handlePredictProtein":9,"./handleSnap2":10,"ajv":19,"axios":62,"storage-lru":171}],8:[function(require,module,exports){
+
+},{"./handleCath":8,"./handleCath_covid":9,"./handlePredictProtein":10,"./handleSnap2":11,"ajv":21,"axios":63}],8:[function(require,module,exports){
 const url = require('highcharts');
 
  module.exports = function (jsonObj1, getFeatures, validateAgainstSchema, primary_accession, featureCallback){
@@ -5120,7 +5386,253 @@ function addToConvertedFeature(convertedFeatures, featureKey, aFeature){
 
 	return (convertedFeatures)
 }
-},{"axios":62,"highcharts":106}],9:[function(require,module,exports){
+},{"axios":63,"highcharts":100}],9:[function(require,module,exports){
+var cathFunctions = require('./handleCath.js');
+
+
+module.exports = function(jsonObj1, getFeatures, validateAgainstSchema, primary_accession, featureCallback){
+
+	// Stage 1:
+	let convertedFeatures = {};
+	let dataArr_hc = [];
+	let hcDataObj = {};// {name}{ec|go|species} = data.
+	let featureNames = [];
+	let ancestorDataObj = {}; // {superFam} => [class, arch, top, homo, classId, archId, topId, homoId];
+
+	let funFamFeatureSet = [];
+	let superFamFeatureSet = [];
+
+
+
+	if (!jsonObj1 || jsonObj1 === null || !jsonObj1.hasOwnProperty('data') || jsonObj1.data === null ||  Object.getOwnPropertyNames(jsonObj1.data).length < 1) { // || jsonObj1.data.length < 1){
+
+		validateAgainstSchema(convertedFeatures, primary_accession, featureCallback, 'CATH');
+	}
+
+	parseAndSendMultipleRequests(jsonObj1).then(function(thePromises){
+		console.log("The residues are:: : : ");
+		console.log(thePromises.residues);
+		Promise.all(thePromises.promisesGo).then(function(theData){
+			return new Promise(function(resolve, reject){
+				cathFunctions.handlePromiseData_hc(theData, dataArr_hc).then(function(){
+					resolve();
+				})
+			});
+
+		})
+		.then(function(){
+			return new Promise(function(resolve, reject){
+				Promise.all(thePromises.ancestor).then(function(ancestorData){
+					cathFunctions.handlePromiseData_ancestor(ancestorData, ancestorDataObj).then(function(){
+						resolve();
+					});
+
+				});
+			});
+		})
+		.then(function(){
+			// Superfamilies
+			return new Promise(function(resolve, reject){
+				Promise.all(thePromises.cathDomains).then(function(superFamRequests){
+
+					console.log("The dataArrHc is - in the next then() ");
+					console.log(dataArr_hc);
+
+					console.log("The ancestor data is");
+					console.log(ancestorDataObj);
+
+					cathFunctions.handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancestorDataObj, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet).then(function(resObj){
+						superFamFeatureSet = resObj.superFamFeatureSet;
+						convertedFeatures = resObj.convertedFeatures;
+						resolve();
+					});
+
+				});
+			});
+		})
+		.then(function(){
+			return new Promise(function(resolve, reject){
+				console.log("$$$$$$$$ ");
+				console.log(thePromises.funfamIds);
+				handleData_ff(thePromises.funfamIds, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet, funFamFeatureSet, convertedFeatures).then(function(){
+					resolve()
+				});
+			});
+		})
+		.then(function(){
+
+			validateAgainstSchema(convertedFeatures, primary_accession, featureCallback, 'CATH', hcDataObj);
+		})
+		.catch(function(error){
+			console.log(" ============= There is an error with CATH features ");
+			console.log(error);
+
+			validateAgainstSchema(convertedFeatures, primary_accession, featureCallback, 'CATH', null);
+		});
+	});
+	// parse object.
+
+		// Send the multiple requests.
+}
+
+function handleData_ff(funFamData, dataArr_hc, hcDataObj, residues_, superFamFeatureSet, funFamFeatureSet, convertedFeatures){
+	return new Promise(function(resolve, reject){
+		let keyFunFam = "Functional families (CATH-FunFams)";
+
+		funFamData.forEach(function(funFam_id, i){
+
+
+			let aFunFamFeature = {};
+
+			aFunFamFeature['Name'] = '<span class=\"popupTitle\"> <i>CATH Functional Family</i>: ' + funFam_id + "</span>";
+
+			hcDataObj = cathFunctions.handleEcGoSpecies(dataArr_hc, i, aFunFamFeature['Name'], hcDataObj);
+
+			let funFamFeat_res = cathFunctions.handleResidues_funFam(residues_[i], superFamFeatureSet, aFunFamFeature['Name']);
+
+			if (Object.keys(funFamFeat_res).length > 0){
+				// add to set.
+				funFamFeatureSet = funFamFeatureSet.concat(funFamFeat_res);
+
+			}
+
+			if (i == (funFamData.length - 1)){
+				convertedFeatures[keyFunFam] = {};
+				convertedFeatures[keyFunFam]["Features"] = funFamFeatureSet;
+				console.log("@@@@@@@@@@ ");
+				console.log(funFamFeatureSet);
+				resolve();
+			}
+
+		});
+	});
+
+}
+function parseAndSendMultipleRequests(jsonObj1){
+
+
+	return new Promise(function(resolve, reject){
+
+		console.log(Object.getOwnPropertyNames(jsonObj1.data));
+
+		let residuesBySfFf = [];
+		let promises_superfamilyId = [];
+		let funFamIds = [];
+
+		let promises_ancestors = [];
+		let promises_go = [];
+
+		let encounteredRes_str = [];
+
+
+		Object.getOwnPropertyNames(jsonObj1.data).forEach(function(item, i){
+			// console.log("Object " + item);
+
+			if (item != 'id' && item != '_id'){
+				// console.log("########### " + item);
+				jsonObj1.data[item].forEach(function(feature, feature_i){
+
+					let sf_ff_id = {};
+					let residues = []; // list of lists.
+
+					console.log("Features ");
+					console.log(feature);
+
+					if (feature.hasOwnProperty('match-id') && (feature.hasOwnProperty('resolved') )){ // || feature.hasOwnProperty('Discontiguous'))) {
+
+						// extract superfam id, funfam id & residues
+						sf_ff_id = extractFunfamSuperfam(feature['match-id']);
+						funFamIds.push(sf_ff_id.funfam_id);
+
+						// console.log(sf_ff_id);
+						residues = extractResidues(feature['resolved']);
+						console.log("In the main function, residues");
+						console.log(residues);
+
+						if (!encounteredRes_str.includes(JSON.stringify(residues))) {
+
+							// Add promises;
+							promises_superfamilyId.push(cathFunctions.getFromLocation(cathFunctions.url_superfamInfo(sf_ff_id.superfam_id)));
+
+
+							residuesBySfFf.push(residues)
+							// Add residues
+							encounteredRes_str.push(JSON.stringify(residues));
+
+							promises_go.push(cathFunctions.getFromLocation(cathFunctions.url_go(sf_ff_id.superfam_id)));
+							promises_go.push(cathFunctions.getFromLocation(cathFunctions.url_ec(sf_ff_id.superfam_id)));
+							promises_go.push(cathFunctions.getFromLocation(cathFunctions.url_species(sf_ff_id.superfam_id)));
+
+							promises_ancestors.push(cathFunctions.getFromLocation(cathFunctions.url_ancestors(sf_ff_id.superfam_id)));
+
+						}
+					}
+
+
+
+					if (feature_i == (jsonObj1.data[item].length - 1)){
+
+						resolve({'cathDomains': promises_superfamilyId, 'residues': residuesBySfFf, 'promisesGo': promises_go, 'ancestor': promises_ancestors, funfamIds: funFamIds});
+					}
+				});
+
+
+			}
+		});
+	});
+
+
+}
+
+
+function extractResidues(arrResidues){
+	let convertedResArr = [];
+
+	let resStart = -1;
+	let resEnd = -1;
+
+	arrResidues.forEach(function(item, i){
+		arrResidues[i].forEach(function(val, val_i){
+			if (val_i%2 == 0){
+				resStart = val;
+			}
+			if (val_i%2 == 1){
+				resEnd = val;
+			}
+
+			if (val_i%2 == 1){
+				convertedResArr.push(resStart + "-" + resEnd);
+				console.log('here!');
+			}
+		})
+	});
+
+
+	return (convertedResArr);
+
+}
+
+function extractFunfamSuperfam(strWithInfo){
+
+	let arr = strWithInfo.split(/\-/);
+	// console.log("### The funfam superfam info is");
+	// console.log(arr);
+
+	let superfam_id = null;
+	let funFam_id = null;
+	if (arr.length > 0 ){
+		superfam_id = arr[0];
+	}
+
+	if (arr.length >= 2){
+		funfam_id = arr[1] + "-" + arr[2];
+	}
+
+	return ({'funfam_id': funfam_id, 'superfam_id': superfam_id})
+
+}
+
+},{"./handleCath.js":8}],10:[function(require,module,exports){
 const url = require('url');
 
 module.exports = function (jsonObj, primary_accession, featureCallback, validateAgainstSchema){
@@ -5265,7 +5777,7 @@ function handleTheEvidences(evidencesArr){
 	return ({source: featureSet_source, url: featureSet_url})
 }
 
-},{"url":179}],10:[function(require,module,exports){
+},{"url":174}],11:[function(require,module,exports){
 const url = require('url');
 
 /* Remove additionalProperties & convert string-numbers to numbers */
@@ -5309,7 +5821,687 @@ module.exports = function (jsonObj, primary_accession, featureCallback, validate
 
 // module.exports = { handleSnap2 };
 
-},{"url":179}],11:[function(require,module,exports){
+},{"url":174}],12:[function(require,module,exports){
+/*
+ Highstock JS v8.1.0 (2020-05-05)
+
+ (c) 2009-2018 Torstein Honsi
+
+ License: www.highcharts.com/license
+*/
+(function(S,P){"object"===typeof module&&module.exports?(P["default"]=P,module.exports=S.document?P(S):P):"function"===typeof define&&define.amd?define("highcharts/highstock",function(){return P(S)}):(S.Highcharts&&S.Highcharts.error(16,!0),S.Highcharts=P(S))})("undefined"!==typeof window?window:this,function(S){function P(k,g,H,v){k.hasOwnProperty(g)||(k[g]=v.apply(null,H))}var A={};P(A,"parts/Globals.js",[],function(){var k="undefined"!==typeof S?S:"undefined"!==typeof window?window:{},g=k.document,
+H=k.navigator&&k.navigator.userAgent||"",v=g&&g.createElementNS&&!!g.createElementNS("http://www.w3.org/2000/svg","svg").createSVGRect,K=/(edge|msie|trident)/i.test(H)&&!k.opera,G=-1!==H.indexOf("Firefox"),N=-1!==H.indexOf("Chrome"),M=G&&4>parseInt(H.split("Firefox/")[1],10);return{product:"Highcharts",version:"8.1.0",deg2rad:2*Math.PI/360,doc:g,hasBidiBug:M,hasTouch:!!k.TouchEvent,isMS:K,isWebKit:-1!==H.indexOf("AppleWebKit"),isFirefox:G,isChrome:N,isSafari:!N&&-1!==H.indexOf("Safari"),isTouchDevice:/(Mobile|Android|Windows Phone)/.test(H),
+SVG_NS:"http://www.w3.org/2000/svg",chartCount:0,seriesTypes:{},symbolSizes:{},svg:v,win:k,marginNames:["plotTop","marginRight","marginBottom","plotLeft"],noop:function(){},charts:[],dateFormats:{}}});P(A,"parts/Utilities.js",[A["parts/Globals.js"]],function(k){function g(){var b,d=arguments,n={},x=function(b,d){"object"!==typeof b&&(b={});T(d,function(n,a){!H(n,!0)||q(n)||t(n)?b[a]=d[a]:b[a]=x(b[a]||{},n)});return b};!0===d[0]&&(n=d[1],d=Array.prototype.slice.call(d,2));var a=d.length;for(b=0;b<
+a;b++)n=x(n,d[b]);return n}function H(b,d){return!!b&&"object"===typeof b&&(!d||!z(b))}function v(b,d,n){var x;D(d)?f(n)?b.setAttribute(d,n):b&&b.getAttribute&&((x=b.getAttribute(d))||"class"!==d||(x=b.getAttribute(d+"Name"))):T(d,function(d,n){b.setAttribute(n,d)});return x}function K(){for(var b=arguments,d=b.length,n=0;n<d;n++){var x=b[n];if("undefined"!==typeof x&&null!==x)return x}}function G(b,d){if(!b)return d;var n=b.split(".").reverse();if(1===n.length)return d[b];for(b=n.pop();"undefined"!==
+typeof b&&"undefined"!==typeof d&&null!==d;)d=d[b],b=n.pop();return d}k.timers=[];var N=k.charts,M=k.doc,y=k.win,I=k.error=function(b,d,n,x){var a=r(b),c=a?"Highcharts error #"+b+": www.highcharts.com/errors/"+b+"/":b.toString(),e=function(){if(d)throw Error(c);y.console&&console.log(c)};if("undefined"!==typeof x){var f="";a&&(c+="?");T(x,function(b,d){f+="\n"+d+": "+b;a&&(c+=encodeURI(d)+"="+encodeURI(b))});c+=f}n?Z(n,"displayError",{code:b,message:c,params:x},e):e()},J=function(){function b(b,d,
+n){this.options=d;this.elem=b;this.prop=n}b.prototype.dSetter=function(){var b=this.paths,d=b&&b[0];b=b&&b[1];var n=[],x=this.now||0;if(1!==x&&d&&b)if(d.length===b.length&&1>x)for(var a=0;a<b.length;a++){for(var c=d[a],e=b[a],f=[],m=0;m<e.length;m++){var u=c[m],p=e[m];f[m]="number"===typeof u&&"number"===typeof p&&("A"!==e[0]||4!==m&&5!==m)?u+x*(p-u):p}n.push(f)}else n=b;else n=this.toD||[];this.elem.attr("d",n,void 0,!0)};b.prototype.update=function(){var b=this.elem,d=this.prop,n=this.now,x=this.options.step;
+if(this[d+"Setter"])this[d+"Setter"]();else b.attr?b.element&&b.attr(d,n,null,!0):b.style[d]=n+this.unit;x&&x.call(b,n,this)};b.prototype.run=function(b,d,n){var x=this,a=x.options,c=function(b){return c.stopped?!1:x.step(b)},e=y.requestAnimationFrame||function(b){setTimeout(b,13)},f=function(){for(var b=0;b<k.timers.length;b++)k.timers[b]()||k.timers.splice(b--,1);k.timers.length&&e(f)};b!==d||this.elem["forceAnimate:"+this.prop]?(this.startTime=+new Date,this.start=b,this.end=d,this.unit=n,this.now=
+this.start,this.pos=0,c.elem=this.elem,c.prop=this.prop,c()&&1===k.timers.push(c)&&e(f)):(delete a.curAnim[this.prop],a.complete&&0===Object.keys(a.curAnim).length&&a.complete.call(this.elem))};b.prototype.step=function(b){var d=+new Date,n=this.options,x=this.elem,a=n.complete,c=n.duration,e=n.curAnim;if(x.attr&&!x.element)b=!1;else if(b||d>=c+this.startTime){this.now=this.end;this.pos=1;this.update();var f=e[this.prop]=!0;T(e,function(b){!0!==b&&(f=!1)});f&&a&&a.call(x);b=!1}else this.pos=n.easing((d-
+this.startTime)/c),this.now=this.start+(this.end-this.start)*this.pos,this.update(),b=!0;return b};b.prototype.initPath=function(b,d,n){function x(b,d){for(;b.length<h;){var n=b[0],x=d[h-b.length];x&&"M"===n[0]&&(b[0]="C"===x[0]?["C",n[1],n[2],n[1],n[2],n[1],n[2]]:["L",n[1],n[2]]);b.unshift(n);f&&b.push(b[b.length-1])}}function a(b,d){for(;b.length<h;)if(d=b[b.length/m-1].slice(),"C"===d[0]&&(d[1]=d[5],d[2]=d[6]),f){var n=b[b.length/m].slice();b.splice(b.length/2,0,d,n)}else b.push(d)}var c=b.startX,
+e=b.endX;d=d&&d.slice();n=n.slice();var f=b.isArea,m=f?2:1;if(!d)return[n,n];if(c&&e){for(b=0;b<c.length;b++)if(c[b]===e[0]){var u=b;break}else if(c[0]===e[e.length-c.length+b]){u=b;var p=!0;break}else if(c[c.length-1]===e[e.length-c.length+b]){u=c.length-b;break}"undefined"===typeof u&&(d=[])}if(d.length&&r(u)){var h=n.length+u*m;p?(x(d,n),a(n,d)):(x(n,d),a(d,n))}return[d,n]};b.prototype.fillSetter=function(){b.prototype.strokeSetter.apply(this,arguments)};b.prototype.strokeSetter=function(){this.elem.attr(this.prop,
+k.color(this.start).tweenTo(k.color(this.end),this.pos),null,!0)};return b}();k.Fx=J;k.merge=g;var E=k.pInt=function(b,d){return parseInt(b,d||10)},D=k.isString=function(b){return"string"===typeof b},z=k.isArray=function(b){b=Object.prototype.toString.call(b);return"[object Array]"===b||"[object Array Iterator]"===b};k.isObject=H;var t=k.isDOMElement=function(b){return H(b)&&"number"===typeof b.nodeType},q=k.isClass=function(b){var d=b&&b.constructor;return!(!H(b,!0)||t(b)||!d||!d.name||"Object"===
+d.name)},r=k.isNumber=function(b){return"number"===typeof b&&!isNaN(b)&&Infinity>b&&-Infinity<b},h=k.erase=function(b,d){for(var n=b.length;n--;)if(b[n]===d){b.splice(n,1);break}},f=k.defined=function(b){return"undefined"!==typeof b&&null!==b};k.attr=v;var a=k.splat=function(b){return z(b)?b:[b]},l=k.syncTimeout=function(b,d,n){if(0<d)return setTimeout(b,d,n);b.call(0,n);return-1},e=k.clearTimeout=function(b){f(b)&&clearTimeout(b)},c=k.extend=function(b,d){var n;b||(b={});for(n in d)b[n]=d[n];return b};
+k.pick=K;var m=k.css=function(b,d){k.isMS&&!k.svg&&d&&"undefined"!==typeof d.opacity&&(d.filter="alpha(opacity="+100*d.opacity+")");c(b.style,d)},u=k.createElement=function(b,d,n,x,a){b=M.createElement(b);d&&c(b,d);a&&m(b,{padding:"0",border:"none",margin:"0"});n&&m(b,n);x&&x.appendChild(b);return b},L=k.extendClass=function(b,d){var n=function(){};n.prototype=new b;c(n.prototype,d);return n},F=k.pad=function(b,d,n){return Array((d||2)+1-String(b).replace("-","").length).join(n||"0")+b},w=k.relativeLength=
+function(b,d,n){return/%$/.test(b)?d*parseFloat(b)/100+(n||0):parseFloat(b)},p=k.wrap=function(b,d,n){var x=b[d];b[d]=function(){var b=Array.prototype.slice.call(arguments),d=arguments,a=this;a.proceed=function(){x.apply(a,arguments.length?arguments:d)};b.unshift(x);b=n.apply(this,b);a.proceed=null;return b}},C=k.format=function(b,d,n){var x="{",a=!1,c=[],e=/f$/,f=/\.([0-9])/,m=k.defaultOptions.lang,u=n&&n.time||k.time;for(n=n&&n.numberFormatter||W;b;){var p=b.indexOf(x);if(-1===p)break;var h=b.slice(0,
+p);if(a){h=h.split(":");x=G(h.shift()||"",d);if(h.length&&"number"===typeof x)if(h=h.join(":"),e.test(h)){var Q=parseInt((h.match(f)||["","-1"])[1],10);null!==x&&(x=n(x,Q,m.decimalPoint,-1<h.indexOf(",")?m.thousandsSep:""))}else x=u.dateFormat(h,x);c.push(x)}else c.push(h);b=b.slice(p+1);x=(a=!a)?"}":"{"}c.push(b);return c.join("")},O=k.getMagnitude=function(b){return Math.pow(10,Math.floor(Math.log(b)/Math.LN10))},B=k.normalizeTickInterval=function(b,d,n,x,a){var c=b;n=K(n,1);var e=b/n;d||(d=a?[1,
+1.2,1.5,2,2.5,3,4,5,6,8,10]:[1,2,2.5,5,10],!1===x&&(1===n?d=d.filter(function(b){return 0===b%1}):.1>=n&&(d=[1/n])));for(x=0;x<d.length&&!(c=d[x],a&&c*n>=b||!a&&e<=(d[x]+(d[x+1]||d[x]))/2);x++);return c=R(c*n,-Math.round(Math.log(.001)/Math.LN10))},d=k.stableSort=function(b,d){var n=b.length,x,a;for(a=0;a<n;a++)b[a].safeI=a;b.sort(function(b,n){x=d(b,n);return 0===x?b.safeI-n.safeI:x});for(a=0;a<n;a++)delete b[a].safeI},b=k.arrayMin=function(b){for(var d=b.length,n=b[0];d--;)b[d]<n&&(n=b[d]);return n},
+n=k.arrayMax=function(b){for(var d=b.length,n=b[0];d--;)b[d]>n&&(n=b[d]);return n},x=k.destroyObjectProperties=function(b,d){T(b,function(n,x){n&&n!==d&&n.destroy&&n.destroy();delete b[x]})},Q=k.discardElement=function(b){var d=k.garbageBin;d||(d=u("div"));b&&d.appendChild(b);d.innerHTML=""},R=k.correctFloat=function(b,d){return parseFloat(b.toPrecision(d||14))},X=k.setAnimation=function(b,d){d.renderer.globalAnimation=K(b,d.options.chart.animation,!0)},U=k.animObject=function(b){return H(b)?g(b):
+{duration:b?500:0}},V=k.timeUnits={millisecond:1,second:1E3,minute:6E4,hour:36E5,day:864E5,week:6048E5,month:24192E5,year:314496E5},W=k.numberFormat=function(b,d,n,x){b=+b||0;d=+d;var a=k.defaultOptions.lang,c=(b.toString().split(".")[1]||"").split("e")[0].length,e=b.toString().split("e");if(-1===d)d=Math.min(c,20);else if(!r(d))d=2;else if(d&&e[1]&&0>e[1]){var f=d+ +e[1];0<=f?(e[0]=(+e[0]).toExponential(f).split("e")[0],d=f):(e[0]=e[0].split(".")[0]||0,b=20>d?(e[0]*Math.pow(10,e[1])).toFixed(d):
+0,e[1]=0)}var m=(Math.abs(e[1]?e[0]:b)+Math.pow(10,-Math.max(d,c)-1)).toFixed(d);c=String(E(m));f=3<c.length?c.length%3:0;n=K(n,a.decimalPoint);x=K(x,a.thousandsSep);b=(0>b?"-":"")+(f?c.substr(0,f)+x:"");b+=c.substr(f).replace(/(\d{3})(?=\d)/g,"$1"+x);d&&(b+=n+m.slice(-d));e[1]&&0!==+b&&(b+="e"+e[1]);return b};Math.easeInOutSine=function(b){return-.5*(Math.cos(Math.PI*b)-1)};var aa=k.getStyle=function(b,d,n){if("width"===d)return d=Math.min(b.offsetWidth,b.scrollWidth),n=b.getBoundingClientRect&&
+b.getBoundingClientRect().width,n<d&&n>=d-1&&(d=Math.floor(n)),Math.max(0,d-k.getStyle(b,"padding-left")-k.getStyle(b,"padding-right"));if("height"===d)return Math.max(0,Math.min(b.offsetHeight,b.scrollHeight)-k.getStyle(b,"padding-top")-k.getStyle(b,"padding-bottom"));y.getComputedStyle||I(27,!0);if(b=y.getComputedStyle(b,void 0))b=b.getPropertyValue(d),K(n,"opacity"!==d)&&(b=E(b));return b},Y=k.inArray=function(b,d,n){return d.indexOf(b,n)},fa=k.find=Array.prototype.find?function(b,d){return b.find(d)}:
+function(b,d){var n,x=b.length;for(n=0;n<x;n++)if(d(b[n],n))return b[n]};k.keys=Object.keys;var ba=k.offset=function(b){var d=M.documentElement;b=b.parentElement||b.parentNode?b.getBoundingClientRect():{top:0,left:0};return{top:b.top+(y.pageYOffset||d.scrollTop)-(d.clientTop||0),left:b.left+(y.pageXOffset||d.scrollLeft)-(d.clientLeft||0)}},ca=k.stop=function(b,d){for(var n=k.timers.length;n--;)k.timers[n].elem!==b||d&&d!==k.timers[n].prop||(k.timers[n].stopped=!0)},T=k.objectEach=function(b,d,n){for(var x in b)Object.hasOwnProperty.call(b,
+x)&&d.call(n||b[x],b[x],x,b)};T({map:"map",each:"forEach",grep:"filter",reduce:"reduce",some:"some"},function(b,d){k[d]=function(d){return Array.prototype[b].apply(d,[].slice.call(arguments,1))}});var ha=k.addEvent=function(b,d,n,x){void 0===x&&(x={});var a=b.addEventListener||k.addEventListenerPolyfill;var c="function"===typeof b&&b.prototype?b.prototype.protoEvents=b.prototype.protoEvents||{}:b.hcEvents=b.hcEvents||{};k.Point&&b instanceof k.Point&&b.series&&b.series.chart&&(b.series.chart.runTrackerClick=
+!0);a&&a.call(b,d,n,!1);c[d]||(c[d]=[]);c[d].push({fn:n,order:"number"===typeof x.order?x.order:Infinity});c[d].sort(function(b,d){return b.order-d.order});return function(){A(b,d,n)}},A=k.removeEvent=function(b,d,n){function x(d,n){var x=b.removeEventListener||k.removeEventListenerPolyfill;x&&x.call(b,d,n,!1)}function a(n){var a;if(b.nodeName){if(d){var c={};c[d]=!0}else c=n;T(c,function(b,d){if(n[d])for(a=n[d].length;a--;)x(d,n[d][a].fn)})}}var c;["protoEvents","hcEvents"].forEach(function(e,f){var m=
+(f=f?b:b.prototype)&&f[e];m&&(d?(c=m[d]||[],n?(m[d]=c.filter(function(b){return n!==b.fn}),x(d,n)):(a(m),m[d]=[])):(a(m),f[e]={}))})},Z=k.fireEvent=function(b,d,n,x){var a;n=n||{};if(M.createEvent&&(b.dispatchEvent||b.fireEvent)){var e=M.createEvent("Events");e.initEvent(d,!0,!0);c(e,n);b.dispatchEvent?b.dispatchEvent(e):b.fireEvent(d,e)}else n.target||c(n,{preventDefault:function(){n.defaultPrevented=!0},target:b,type:d}),function(d,x){void 0===d&&(d=[]);void 0===x&&(x=[]);var c=0,e=0,f=d.length+
+x.length;for(a=0;a<f;a++)!1===(d[c]?x[e]?d[c].order<=x[e].order?d[c++]:x[e++]:d[c++]:x[e++]).fn.call(b,n)&&n.preventDefault()}(b.protoEvents&&b.protoEvents[d],b.hcEvents&&b.hcEvents[d]);x&&!n.defaultPrevented&&x.call(b,n)},ia=k.animate=function(b,d,n){var x,a="",c,e;if(!H(n)){var f=arguments;n={duration:f[2],easing:f[3],complete:f[4]}}r(n.duration)||(n.duration=400);n.easing="function"===typeof n.easing?n.easing:Math[n.easing]||Math.easeInOutSine;n.curAnim=g(d);T(d,function(f,m){ca(b,m);e=new J(b,
+n,m);c=null;"d"===m&&z(d.d)?(e.paths=e.initPath(b,b.pathArray,d.d),e.toD=d.d,x=0,c=1):b.attr?x=b.attr(m):(x=parseFloat(aa(b,m))||0,"opacity"!==m&&(a="px"));c||(c=f);c&&c.match&&c.match("px")&&(c=c.replace(/px/g,""));e.run(x,c,a)})},ja=k.seriesType=function(b,d,n,x,a){var c=k.getOptions(),e=k.seriesTypes;c.plotOptions[b]=g(c.plotOptions[d],n);e[b]=L(e[d]||function(){},x);e[b].prototype.type=b;a&&(e[b].prototype.pointClass=L(k.Point,a));return e[b]},ea=k.uniqueKey=function(){var b=Math.random().toString(36).substring(2,
+9),d=0;return function(){return"highcharts-"+b+"-"+d++}}(),P=k.isFunction=function(b){return"function"===typeof b};y.jQuery&&(y.jQuery.fn.highcharts=function(){var b=[].slice.call(arguments);if(this[0])return b[0]?(new (k[D(b[0])?b.shift():"Chart"])(this[0],b[0],b[1]),this):N[v(this[0],"data-highcharts-chart")]});return{Fx:k.Fx,addEvent:ha,animate:ia,animObject:U,arrayMax:n,arrayMin:b,attr:v,clamp:function(b,d,n){return b>d?b<n?b:n:d},clearTimeout:e,correctFloat:R,createElement:u,css:m,defined:f,
+destroyObjectProperties:x,discardElement:Q,erase:h,error:I,extend:c,extendClass:L,find:fa,fireEvent:Z,format:C,getMagnitude:O,getNestedProperty:G,getStyle:aa,inArray:Y,isArray:z,isClass:q,isDOMElement:t,isFunction:P,isNumber:r,isObject:H,isString:D,merge:g,normalizeTickInterval:B,numberFormat:W,objectEach:T,offset:ba,pad:F,pick:K,pInt:E,relativeLength:w,removeEvent:A,seriesType:ja,setAnimation:X,splat:a,stableSort:d,stop:ca,syncTimeout:l,timeUnits:V,uniqueKey:ea,wrap:p}});P(A,"parts/Color.js",[A["parts/Globals.js"],
+A["parts/Utilities.js"]],function(k,g){var H=g.isNumber,v=g.merge,K=g.pInt;g=function(){function g(k){this.parsers=[{regex:/rgba\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]?(?:\.[0-9]+)?)\s*\)/,parse:function(g){return[K(g[1]),K(g[2]),K(g[3]),parseFloat(g[4],10)]}},{regex:/rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)/,parse:function(g){return[K(g[1]),K(g[2]),K(g[3]),1]}}];this.rgba=[];if(!(this instanceof g))return new g(k);this.init(k)}g.parse=function(k){return new g(k)};
+g.prototype.init=function(k){var v,y;if((this.input=k=g.names[k&&k.toLowerCase?k.toLowerCase():""]||k)&&k.stops)this.stops=k.stops.map(function(y){return new g(y[1])});else{if(k&&k.charAt&&"#"===k.charAt()){var I=k.length;k=parseInt(k.substr(1),16);7===I?v=[(k&16711680)>>16,(k&65280)>>8,k&255,1]:4===I&&(v=[(k&3840)>>4|(k&3840)>>8,(k&240)>>4|k&240,(k&15)<<4|k&15,1])}if(!v)for(y=this.parsers.length;y--&&!v;){var J=this.parsers[y];(I=J.regex.exec(k))&&(v=J.parse(I))}}this.rgba=v||[]};g.prototype.get=
+function(k){var g=this.input,y=this.rgba;if("undefined"!==typeof this.stops){var I=v(g);I.stops=[].concat(I.stops);this.stops.forEach(function(y,g){I.stops[g]=[I.stops[g][0],y.get(k)]})}else I=y&&H(y[0])?"rgb"===k||!k&&1===y[3]?"rgb("+y[0]+","+y[1]+","+y[2]+")":"a"===k?y[3]:"rgba("+y.join(",")+")":g;return I};g.prototype.brighten=function(k){var g,y=this.rgba;if(this.stops)this.stops.forEach(function(y){y.brighten(k)});else if(H(k)&&0!==k)for(g=0;3>g;g++)y[g]+=K(255*k),0>y[g]&&(y[g]=0),255<y[g]&&
+(y[g]=255);return this};g.prototype.setOpacity=function(g){this.rgba[3]=g;return this};g.prototype.tweenTo=function(g,k){var y=this.rgba,v=g.rgba;v.length&&y&&y.length?(g=1!==v[3]||1!==y[3],k=(g?"rgba(":"rgb(")+Math.round(v[0]+(y[0]-v[0])*(1-k))+","+Math.round(v[1]+(y[1]-v[1])*(1-k))+","+Math.round(v[2]+(y[2]-v[2])*(1-k))+(g?","+(v[3]+(y[3]-v[3])*(1-k)):"")+")"):k=g.input||"none";return k};g.names={white:"#ffffff",black:"#000000"};return g}();k.Color=g;k.color=g.parse;return k.Color});P(A,"parts/SVGElement.js",
+[A["parts/Color.js"],A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g,H){var v=g.deg2rad,K=g.doc,G=g.hasTouch,N=g.isFirefox,M=g.noop,y=g.svg,I=g.SVG_NS,J=g.win,E=H.animate,D=H.animObject,z=H.attr,t=H.createElement,q=H.css,r=H.defined,h=H.erase,f=H.extend,a=H.fireEvent,l=H.inArray,e=H.isArray,c=H.isFunction,m=H.isNumber,u=H.isString,L=H.merge,F=H.objectEach,w=H.pick,p=H.pInt,C=H.stop,O=H.uniqueKey;H=function(){function B(){this.height=this.element=void 0;this.opacity=1;this.renderer=void 0;
+this.SVG_NS=I;this.symbolCustomAttribs="x y width height r start end innerR anchorX anchorY rounded".split(" ");this.textProps="color cursor direction fontFamily fontSize fontStyle fontWeight lineHeight textAlign textDecoration textOutline textOverflow width".split(" ");this.width=void 0}B.prototype._defaultGetter=function(d){d=w(this[d+"Value"],this[d],this.element?this.element.getAttribute(d):null,0);/^[\-0-9\.]+$/.test(d)&&(d=parseFloat(d));return d};B.prototype._defaultSetter=function(d,b,n){n.setAttribute(b,
+d)};B.prototype.add=function(d){var b=this.renderer,n=this.element;d&&(this.parentGroup=d);this.parentInverted=d&&d.inverted;"undefined"!==typeof this.textStr&&b.buildText(this);this.added=!0;if(!d||d.handleZ||this.zIndex)var x=this.zIndexSetter();x||(d?d.element:b.box).appendChild(n);if(this.onAdd)this.onAdd();return this};B.prototype.addClass=function(d,b){var n=b?"":this.attr("class")||"";d=(d||"").split(/ /g).reduce(function(b,d){-1===n.indexOf(d)&&b.push(d);return b},n?[n]:[]).join(" ");d!==
+n&&this.attr("class",d);return this};B.prototype.afterSetters=function(){this.doTransform&&(this.updateTransform(),this.doTransform=!1)};B.prototype.align=function(d,b,n){var x,a={};var c=this.renderer;var e=c.alignedObjects;var f,m;if(d){if(this.alignOptions=d,this.alignByTranslate=b,!n||u(n))this.alignTo=x=n||"renderer",h(e,this),e.push(this),n=void 0}else d=this.alignOptions,b=this.alignByTranslate,x=this.alignTo;n=w(n,c[x],c);x=d.align;c=d.verticalAlign;e=(n.x||0)+(d.x||0);var p=(n.y||0)+(d.y||
+0);"right"===x?f=1:"center"===x&&(f=2);f&&(e+=(n.width-(d.width||0))/f);a[b?"translateX":"x"]=Math.round(e);"bottom"===c?m=1:"middle"===c&&(m=2);m&&(p+=(n.height-(d.height||0))/m);a[b?"translateY":"y"]=Math.round(p);this[this.placed?"animate":"attr"](a);this.placed=!0;this.alignAttr=a;return this};B.prototype.alignSetter=function(d){var b={left:"start",center:"middle",right:"end"};b[d]&&(this.alignValue=d,this.element.setAttribute("text-anchor",b[d]))};B.prototype.animate=function(d,b,n){var x=D(w(b,
+this.renderer.globalAnimation,!0));w(K.hidden,K.msHidden,K.webkitHidden,!1)&&(x.duration=0);0!==x.duration?(n&&(x.complete=n),E(this,d,x)):(this.attr(d,void 0,n),F(d,function(b,d){x.step&&x.step.call(this,b,{prop:d,pos:1})},this));return this};B.prototype.applyTextOutline=function(d){var b=this.element,n;-1!==d.indexOf("contrast")&&(d=d.replace(/contrast/g,this.renderer.getContrast(b.style.fill)));d=d.split(" ");var x=d[d.length-1];if((n=d[0])&&"none"!==n&&g.svg){this.fakeTS=!0;d=[].slice.call(b.getElementsByTagName("tspan"));
+this.ySetter=this.xSetter;n=n.replace(/(^[\d\.]+)(.*?)$/g,function(b,d,n){return 2*d+n});this.removeTextOutline(d);var a=b.textContent?/^[\u0591-\u065F\u066A-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/.test(b.textContent):!1;var c=b.firstChild;d.forEach(function(d,e){0===e&&(d.setAttribute("x",b.getAttribute("x")),e=b.getAttribute("y"),d.setAttribute("y",e||0),null===e&&b.setAttribute("y",0));e=d.cloneNode(!0);z(a&&!N?d:e,{"class":"highcharts-text-outline",fill:x,stroke:x,"stroke-width":n,"stroke-linejoin":"round"});
+b.insertBefore(e,c)});a&&N&&d[0]&&(d=d[0].cloneNode(!0),d.textContent=" ",b.insertBefore(d,c))}};B.prototype.attr=function(d,b,n,x){var a=this.element,c,e=this,f,m,u=this.symbolCustomAttribs;if("string"===typeof d&&"undefined"!==typeof b){var p=d;d={};d[p]=b}"string"===typeof d?e=(this[d+"Getter"]||this._defaultGetter).call(this,d,a):(F(d,function(b,n){f=!1;x||C(this,n);this.symbolName&&-1!==l(n,u)&&(c||(this.symbolAttr(d),c=!0),f=!0);!this.rotation||"x"!==n&&"y"!==n||(this.doTransform=!0);f||(m=
+this[n+"Setter"]||this._defaultSetter,m.call(this,b,n,a),!this.styledMode&&this.shadows&&/^(width|height|visibility|x|y|d|transform|cx|cy|r)$/.test(n)&&this.updateShadows(n,b,m))},this),this.afterSetters());n&&n.call(this);return e};B.prototype.clip=function(d){return this.attr("clip-path",d?"url("+this.renderer.url+"#"+d.id+")":"none")};B.prototype.crisp=function(d,b){b=b||d.strokeWidth||0;var n=Math.round(b)%2/2;d.x=Math.floor(d.x||this.x||0)+n;d.y=Math.floor(d.y||this.y||0)+n;d.width=Math.floor((d.width||
+this.width||0)-2*n);d.height=Math.floor((d.height||this.height||0)-2*n);r(d.strokeWidth)&&(d.strokeWidth=b);return d};B.prototype.complexColor=function(d,b,n){var x=this.renderer,c,f,m,u,p,h,w,l,C,B,t=[],q;a(this.renderer,"complexColor",{args:arguments},function(){d.radialGradient?f="radialGradient":d.linearGradient&&(f="linearGradient");if(f){m=d[f];p=x.gradients;h=d.stops;C=n.radialReference;e(m)&&(d[f]=m={x1:m[0],y1:m[1],x2:m[2],y2:m[3],gradientUnits:"userSpaceOnUse"});"radialGradient"===f&&C&&
+!r(m.gradientUnits)&&(u=m,m=L(m,x.getRadialAttr(C,u),{gradientUnits:"userSpaceOnUse"}));F(m,function(b,d){"id"!==d&&t.push(d,b)});F(h,function(b){t.push(b)});t=t.join(",");if(p[t])B=p[t].attr("id");else{m.id=B=O();var a=p[t]=x.createElement(f).attr(m).add(x.defs);a.radAttr=u;a.stops=[];h.forEach(function(b){0===b[1].indexOf("rgba")?(c=k.parse(b[1]),w=c.get("rgb"),l=c.get("a")):(w=b[1],l=1);b=x.createElement("stop").attr({offset:b[0],"stop-color":w,"stop-opacity":l}).add(a);a.stops.push(b)})}q="url("+
+x.url+"#"+B+")";n.setAttribute(b,q);n.gradient=t;d.toString=function(){return q}}})};B.prototype.css=function(d){var b=this.styles,n={},x=this.element,a="",c=!b,e=["textOutline","textOverflow","width"];d&&d.color&&(d.fill=d.color);b&&F(d,function(d,x){b&&b[x]!==d&&(n[x]=d,c=!0)});if(c){b&&(d=f(b,n));if(d)if(null===d.width||"auto"===d.width)delete this.textWidth;else if("text"===x.nodeName.toLowerCase()&&d.width)var m=this.textWidth=p(d.width);this.styles=d;m&&!y&&this.renderer.forExport&&delete d.width;
+if(x.namespaceURI===this.SVG_NS){var u=function(b,d){return"-"+d.toLowerCase()};F(d,function(b,d){-1===e.indexOf(d)&&(a+=d.replace(/([A-Z])/g,u)+":"+b+";")});a&&z(x,"style",a)}else q(x,d);this.added&&("text"===this.element.nodeName&&this.renderer.buildText(this),d&&d.textOutline&&this.applyTextOutline(d.textOutline))}return this};B.prototype.dashstyleSetter=function(d){var b=this["stroke-width"];"inherit"===b&&(b=1);if(d=d&&d.toLowerCase()){var n=d.replace("shortdashdotdot","3,1,1,1,1,1,").replace("shortdashdot",
+"3,1,1,1").replace("shortdot","1,1,").replace("shortdash","3,1,").replace("longdash","8,3,").replace(/dot/g,"1,3,").replace("dash","4,3,").replace(/,$/,"").split(",");for(d=n.length;d--;)n[d]=""+p(n[d])*w(b,NaN);d=n.join(",").replace(/NaN/g,"none");this.element.setAttribute("stroke-dasharray",d)}};B.prototype.destroy=function(){var d=this,b=d.element||{},n=d.renderer,x=n.isSVG&&"SPAN"===b.nodeName&&d.parentGroup||void 0,a=b.ownerSVGElement;b.onclick=b.onmouseout=b.onmouseover=b.onmousemove=b.point=
+null;C(d);if(d.clipPath&&a){var c=d.clipPath;[].forEach.call(a.querySelectorAll("[clip-path],[CLIP-PATH]"),function(b){-1<b.getAttribute("clip-path").indexOf(c.element.id)&&b.removeAttribute("clip-path")});d.clipPath=c.destroy()}if(d.stops){for(a=0;a<d.stops.length;a++)d.stops[a].destroy();d.stops.length=0;d.stops=void 0}d.safeRemoveChild(b);for(n.styledMode||d.destroyShadows();x&&x.div&&0===x.div.childNodes.length;)b=x.parentGroup,d.safeRemoveChild(x.div),delete x.div,x=b;d.alignTo&&h(n.alignedObjects,
+d);F(d,function(b,n){d[n]&&d[n].parentGroup===d&&d[n].destroy&&d[n].destroy();delete d[n]})};B.prototype.destroyShadows=function(){(this.shadows||[]).forEach(function(d){this.safeRemoveChild(d)},this);this.shadows=void 0};B.prototype.destroyTextPath=function(d,b){var n=d.getElementsByTagName("text")[0];if(n){if(n.removeAttribute("dx"),n.removeAttribute("dy"),b.element.setAttribute("id",""),this.textPathWrapper&&n.getElementsByTagName("textPath").length){for(d=this.textPathWrapper.element.childNodes;d.length;)n.appendChild(d[0]);
+n.removeChild(this.textPathWrapper.element)}}else if(d.getAttribute("dx")||d.getAttribute("dy"))d.removeAttribute("dx"),d.removeAttribute("dy");this.textPathWrapper&&(this.textPathWrapper=this.textPathWrapper.destroy())};B.prototype.dSetter=function(d,b,n){e(d)&&("string"===typeof d[0]&&(d=this.renderer.pathToSegments(d)),this.pathArray=d,d=d.reduce(function(b,d,n){return d&&d.join?(n?b+" ":"")+d.join(" "):(d||"").toString()},""));/(NaN| {2}|^$)/.test(d)&&(d="M 0 0");this[b]!==d&&(n.setAttribute(b,
+d),this[b]=d)};B.prototype.fadeOut=function(d){var b=this;b.animate({opacity:0},{duration:w(d,150),complete:function(){b.attr({y:-9999}).hide()}})};B.prototype.fillSetter=function(d,b,n){"string"===typeof d?n.setAttribute(b,d):d&&this.complexColor(d,b,n)};B.prototype.getBBox=function(d,b){var n,x=this.renderer,a=this.element,e=this.styles,m=this.textStr,u=x.cache,p=x.cacheKeys,h=a.namespaceURI===this.SVG_NS;b=w(b,this.rotation,0);var l=x.styledMode?a&&B.prototype.getStyle.call(a,"font-size"):e&&e.fontSize;
+if(r(m)){var C=m.toString();-1===C.indexOf("<")&&(C=C.replace(/[0-9]/g,"0"));C+=["",b,l,this.textWidth,e&&e.textOverflow,e&&e.fontWeight].join()}C&&!d&&(n=u[C]);if(!n){if(h||x.forExport){try{var F=this.fakeTS&&function(b){[].forEach.call(a.querySelectorAll(".highcharts-text-outline"),function(d){d.style.display=b})};c(F)&&F("none");n=a.getBBox?f({},a.getBBox()):{width:a.offsetWidth,height:a.offsetHeight};c(F)&&F("")}catch(ba){""}if(!n||0>n.width)n={width:0,height:0}}else n=this.htmlGetBBox();x.isSVG&&
+(d=n.width,x=n.height,h&&(n.height=x={"11px,17":14,"13px,20":16}[e&&e.fontSize+","+Math.round(x)]||x),b&&(e=b*v,n.width=Math.abs(x*Math.sin(e))+Math.abs(d*Math.cos(e)),n.height=Math.abs(x*Math.cos(e))+Math.abs(d*Math.sin(e))));if(C&&0<n.height){for(;250<p.length;)delete u[p.shift()];u[C]||p.push(C);u[C]=n}}return n};B.prototype.getStyle=function(d){return J.getComputedStyle(this.element||this,"").getPropertyValue(d)};B.prototype.hasClass=function(d){return-1!==(""+this.attr("class")).split(" ").indexOf(d)};
+B.prototype.hide=function(d){d?this.attr({y:-9999}):this.attr({visibility:"hidden"});return this};B.prototype.htmlGetBBox=function(){return{height:0,width:0,x:0,y:0}};B.prototype.init=function(d,b){this.element="span"===b?t(b):K.createElementNS(this.SVG_NS,b);this.renderer=d;a(this,"afterInit")};B.prototype.invert=function(d){this.inverted=d;this.updateTransform();return this};B.prototype.on=function(d,b){var n,x,a=this.element,c;G&&"click"===d?(a.ontouchstart=function(b){n=b.touches[0].clientX;x=
+b.touches[0].clientY},a.ontouchend=function(d){n&&4<=Math.sqrt(Math.pow(n-d.changedTouches[0].clientX,2)+Math.pow(x-d.changedTouches[0].clientY,2))||b.call(a,d);c=!0;d.preventDefault()},a.onclick=function(d){c||b.call(a,d)}):a["on"+d]=b;return this};B.prototype.opacitySetter=function(d,b,n){this[b]=d;n.setAttribute(b,d)};B.prototype.removeClass=function(d){return this.attr("class",(""+this.attr("class")).replace(u(d)?new RegExp(" ?"+d+" ?"):d,""))};B.prototype.removeTextOutline=function(d){for(var b=
+d.length,n;b--;)n=d[b],"highcharts-text-outline"===n.getAttribute("class")&&h(d,this.element.removeChild(n))};B.prototype.safeRemoveChild=function(d){var b=d.parentNode;b&&b.removeChild(d)};B.prototype.setRadialReference=function(d){var b=this.element.gradient&&this.renderer.gradients[this.element.gradient];this.element.radialReference=d;b&&b.radAttr&&b.animate(this.renderer.getRadialAttr(d,b.radAttr));return this};B.prototype.setTextPath=function(d,b){var n=this.element,x={textAnchor:"text-anchor"},
+a=!1,c=this.textPathWrapper,e=!c;b=L(!0,{enabled:!0,attributes:{dy:-5,startOffset:"50%",textAnchor:"middle"}},b);var f=b.attributes;if(d&&b&&b.enabled){c&&null===c.element.parentNode?(e=!0,c=c.destroy()):c&&this.removeTextOutline.call(c.parentGroup,[].slice.call(n.getElementsByTagName("tspan")));this.options&&this.options.padding&&(f.dx=-this.options.padding);c||(this.textPathWrapper=c=this.renderer.createElement("textPath"),a=!0);var u=c.element;(b=d.element.getAttribute("id"))||d.element.setAttribute("id",
+b=O());if(e)for(d=n.getElementsByTagName("tspan");d.length;)d[0].setAttribute("y",0),m(f.dx)&&d[0].setAttribute("x",-f.dx),u.appendChild(d[0]);a&&c&&c.add({element:this.text?this.text.element:n});u.setAttributeNS("http://www.w3.org/1999/xlink","href",this.renderer.url+"#"+b);r(f.dy)&&(u.parentNode.setAttribute("dy",f.dy),delete f.dy);r(f.dx)&&(u.parentNode.setAttribute("dx",f.dx),delete f.dx);F(f,function(b,d){u.setAttribute(x[d]||d,b)});n.removeAttribute("transform");this.removeTextOutline.call(c,
+[].slice.call(n.getElementsByTagName("tspan")));this.text&&!this.renderer.styledMode&&this.attr({fill:"none","stroke-width":0});this.applyTextOutline=this.updateTransform=M}else c&&(delete this.updateTransform,delete this.applyTextOutline,this.destroyTextPath(n,d),this.updateTransform(),this.options&&this.options.rotation&&this.applyTextOutline(this.options.style.textOutline));return this};B.prototype.shadow=function(d,b,n){var x=[],a=this.element,c=!1,e=this.oldShadowOptions;var m={color:"#000000",
+offsetX:1,offsetY:1,opacity:.15,width:3};var u;!0===d?u=m:"object"===typeof d&&(u=f(m,d));u&&(u&&e&&F(u,function(b,d){b!==e[d]&&(c=!0)}),c&&this.destroyShadows(),this.oldShadowOptions=u);if(!u)this.destroyShadows();else if(!this.shadows){var p=u.opacity/u.width;var h=this.parentInverted?"translate(-1,-1)":"translate("+u.offsetX+", "+u.offsetY+")";for(m=1;m<=u.width;m++){var w=a.cloneNode(!1);var l=2*u.width+1-2*m;z(w,{stroke:d.color||"#000000","stroke-opacity":p*m,"stroke-width":l,transform:h,fill:"none"});
+w.setAttribute("class",(w.getAttribute("class")||"")+" highcharts-shadow");n&&(z(w,"height",Math.max(z(w,"height")-l,0)),w.cutHeight=l);b?b.element.appendChild(w):a.parentNode&&a.parentNode.insertBefore(w,a);x.push(w)}this.shadows=x}return this};B.prototype.show=function(d){return this.attr({visibility:d?"inherit":"visible"})};B.prototype.strokeSetter=function(d,b,n){this[b]=d;this.stroke&&this["stroke-width"]?(B.prototype.fillSetter.call(this,this.stroke,"stroke",n),n.setAttribute("stroke-width",
+this["stroke-width"]),this.hasStroke=!0):"stroke-width"===b&&0===d&&this.hasStroke?(n.removeAttribute("stroke"),this.hasStroke=!1):this.renderer.styledMode&&this["stroke-width"]&&(n.setAttribute("stroke-width",this["stroke-width"]),this.hasStroke=!0)};B.prototype.strokeWidth=function(){if(!this.renderer.styledMode)return this["stroke-width"]||0;var d=this.getStyle("stroke-width"),b=0;if(d.indexOf("px")===d.length-2)b=p(d);else if(""!==d){var n=K.createElementNS(I,"rect");z(n,{width:d,"stroke-width":0});
+this.element.parentNode.appendChild(n);b=n.getBBox().width;n.parentNode.removeChild(n)}return b};B.prototype.symbolAttr=function(d){var b=this;"x y r start end width height innerR anchorX anchorY clockwise".split(" ").forEach(function(n){b[n]=w(d[n],b[n])});b.attr({d:b.renderer.symbols[b.symbolName](b.x,b.y,b.width,b.height,b)})};B.prototype.textSetter=function(d){d!==this.textStr&&(delete this.textPxLength,this.textStr=d,this.added&&this.renderer.buildText(this))};B.prototype.titleSetter=function(d){var b=
+this.element.getElementsByTagName("title")[0];b||(b=K.createElementNS(this.SVG_NS,"title"),this.element.appendChild(b));b.firstChild&&b.removeChild(b.firstChild);b.appendChild(K.createTextNode(String(w(d,"")).replace(/<[^>]*>/g,"").replace(/&lt;/g,"<").replace(/&gt;/g,">")))};B.prototype.toFront=function(){var d=this.element;d.parentNode.appendChild(d);return this};B.prototype.translate=function(d,b){return this.attr({translateX:d,translateY:b})};B.prototype.updateShadows=function(d,b,n){var x=this.shadows;
+if(x)for(var a=x.length;a--;)n.call(x[a],"height"===d?Math.max(b-(x[a].cutHeight||0),0):"d"===d?this.d:b,d,x[a])};B.prototype.updateTransform=function(){var d=this.translateX||0,b=this.translateY||0,n=this.scaleX,x=this.scaleY,a=this.inverted,c=this.rotation,e=this.matrix,f=this.element;a&&(d+=this.width,b+=this.height);d=["translate("+d+","+b+")"];r(e)&&d.push("matrix("+e.join(",")+")");a?d.push("rotate(90) scale(-1,1)"):c&&d.push("rotate("+c+" "+w(this.rotationOriginX,f.getAttribute("x"),0)+" "+
+w(this.rotationOriginY,f.getAttribute("y")||0)+")");(r(n)||r(x))&&d.push("scale("+w(n,1)+" "+w(x,1)+")");d.length&&f.setAttribute("transform",d.join(" "))};B.prototype.visibilitySetter=function(d,b,n){"inherit"===d?n.removeAttribute(b):this[b]!==d&&n.setAttribute(b,d);this[b]=d};B.prototype.xGetter=function(d){"circle"===this.element.nodeName&&("x"===d?d="cx":"y"===d&&(d="cy"));return this._defaultGetter(d)};B.prototype.zIndexSetter=function(d,b){var n=this.renderer,x=this.parentGroup,a=(x||n).element||
+n.box,c=this.element,e=!1;n=a===n.box;var f=this.added;var m;r(d)?(c.setAttribute("data-z-index",d),d=+d,this[b]===d&&(f=!1)):r(this[b])&&c.removeAttribute("data-z-index");this[b]=d;if(f){(d=this.zIndex)&&x&&(x.handleZ=!0);b=a.childNodes;for(m=b.length-1;0<=m&&!e;m--){x=b[m];f=x.getAttribute("data-z-index");var u=!r(f);if(x!==c)if(0>d&&u&&!n&&!m)a.insertBefore(c,b[m]),e=!0;else if(p(f)<=d||u&&(!r(d)||0<=d))a.insertBefore(c,b[m+1]||null),e=!0}e||(a.insertBefore(c,b[n?3:0]||null),e=!0)}return e};return B}();
+H.prototype["stroke-widthSetter"]=H.prototype.strokeSetter;H.prototype.yGetter=H.prototype.xGetter;H.prototype.matrixSetter=H.prototype.rotationOriginXSetter=H.prototype.rotationOriginYSetter=H.prototype.rotationSetter=H.prototype.scaleXSetter=H.prototype.scaleYSetter=H.prototype.translateXSetter=H.prototype.translateYSetter=H.prototype.verticalAlignSetter=function(a,d){this[d]=a;this.doTransform=!0};g.SVGElement=H;return g.SVGElement});P(A,"parts/SvgRenderer.js",[A["parts/Color.js"],A["parts/Globals.js"],
+A["parts/SVGElement.js"],A["parts/Utilities.js"]],function(k,g,H,v){var K=k.parse,G=v.addEvent,N=v.attr,M=v.createElement,y=v.css,I=v.defined,J=v.destroyObjectProperties,E=v.extend,D=v.isArray,z=v.isNumber,t=v.isObject,q=v.isString,r=v.merge,h=v.objectEach,f=v.pick,a=v.pInt,l=v.removeEvent,e=v.splat,c=v.uniqueKey,m=g.charts,u=g.deg2rad,L=g.doc,F=g.isFirefox,w=g.isMS,p=g.isWebKit;v=g.noop;var C=g.svg,O=g.SVG_NS,B=g.symbolSizes,d=g.win;k=g.SVGRenderer=function(){this.init.apply(this,arguments)};E(k.prototype,
+{Element:H,SVG_NS:O,init:function(b,n,x,a,c,e,f){var m=this.createElement("svg").attr({version:"1.1","class":"highcharts-root"});f||m.css(this.getStyle(a));a=m.element;b.appendChild(a);N(b,"dir","ltr");-1===b.innerHTML.indexOf("xmlns")&&N(a,"xmlns",this.SVG_NS);this.isSVG=!0;this.box=a;this.boxWrapper=m;this.alignedObjects=[];this.url=(F||p)&&L.getElementsByTagName("base").length?d.location.href.split("#")[0].replace(/<[^>]*>/g,"").replace(/([\('\)])/g,"\\$1").replace(/ /g,"%20"):"";this.createElement("desc").add().element.appendChild(L.createTextNode("Created with Highcharts 8.1.0"));
+this.defs=this.createElement("defs").add();this.allowHTML=e;this.forExport=c;this.styledMode=f;this.gradients={};this.cache={};this.cacheKeys=[];this.imgCount=0;this.setSize(n,x,!1);var u;F&&b.getBoundingClientRect&&(n=function(){y(b,{left:0,top:0});u=b.getBoundingClientRect();y(b,{left:Math.ceil(u.left)-u.left+"px",top:Math.ceil(u.top)-u.top+"px"})},n(),this.unSubPixelFix=G(d,"resize",n))},definition:function(b){function d(b,n){var x;e(b).forEach(function(b){var c=a.createElement(b.tagName),e={};
+h(b,function(b,d){"tagName"!==d&&"children"!==d&&"textContent"!==d&&(e[d]=b)});c.attr(e);c.add(n||a.defs);b.textContent&&c.element.appendChild(L.createTextNode(b.textContent));d(b.children||[],c);x=c});return x}var a=this;return d(b)},getStyle:function(b){return this.style=E({fontFamily:'"Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif',fontSize:"12px"},b)},setStyle:function(b){this.boxWrapper.css(this.getStyle(b))},isHidden:function(){return!this.boxWrapper.getBBox().width},destroy:function(){var b=
+this.defs;this.box=null;this.boxWrapper=this.boxWrapper.destroy();J(this.gradients||{});this.gradients=null;b&&(this.defs=b.destroy());this.unSubPixelFix&&this.unSubPixelFix();return this.alignedObjects=null},createElement:function(b){var d=new this.Element;d.init(this,b);return d},draw:v,getRadialAttr:function(b,d){return{cx:b[0]-b[2]/2+d.cx*b[2],cy:b[1]-b[2]/2+d.cy*b[2],r:d.r*b[2]}},truncate:function(b,d,a,c,e,f,m){var n=this,x=b.rotation,u,p=c?1:0,h=(a||c).length,w=h,l=[],C=function(b){d.firstChild&&
+d.removeChild(d.firstChild);b&&d.appendChild(L.createTextNode(b))},F=function(x,f){f=f||x;if("undefined"===typeof l[f])if(d.getSubStringLength)try{l[f]=e+d.getSubStringLength(0,c?f+1:f)}catch(ea){""}else n.getSpanWidth&&(C(m(a||c,x)),l[f]=e+n.getSpanWidth(b,d));return l[f]},Q;b.rotation=0;var R=F(d.textContent.length);if(Q=e+R>f){for(;p<=h;)w=Math.ceil((p+h)/2),c&&(u=m(c,w)),R=F(w,u&&u.length-1),p===h?p=h+1:R>f?h=w-1:p=w;0===h?C(""):a&&h===a.length-1||C(u||m(a||c,w))}c&&c.splice(0,w);b.actualWidth=
+R;b.rotation=x;return Q},escapes:{"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"},buildText:function(b){var d=b.element,x=this,c=x.forExport,e=f(b.textStr,"").toString(),m=-1!==e.indexOf("<"),u=d.childNodes,p,w=N(d,"x"),l=b.styles,F=b.textWidth,B=l&&l.lineHeight,r=l&&l.textOutline,t=l&&"ellipsis"===l.textOverflow,q=l&&"nowrap"===l.whiteSpace,z=l&&l.fontSize,g,k=u.length;l=F&&!b.added&&this.box;var D=function(b){var n;x.styledMode||(n=/(px|em)$/.test(b&&b.style.fontSize)?b.style.fontSize:
+z||x.style.fontSize||12);return B?a(B):x.fontMetrics(n,b.getAttribute("style")?b:d).h},E=function(b,d){h(x.escapes,function(n,a){d&&-1!==d.indexOf(n)||(b=b.toString().replace(new RegExp(n,"g"),a))});return b},v=function(b,d){var n=b.indexOf("<");b=b.substring(n,b.indexOf(">")-n);n=b.indexOf(d+"=");if(-1!==n&&(n=n+d.length+1,d=b.charAt(n),'"'===d||"'"===d))return b=b.substring(n+1),b.substring(0,b.indexOf(d))},I=/<br.*?>/g;var J=[e,t,q,B,r,z,F].join();if(J!==b.textCache){for(b.textCache=J;k--;)d.removeChild(u[k]);
+m||r||t||F||-1!==e.indexOf(" ")&&(!q||I.test(e))?(l&&l.appendChild(d),m?(e=x.styledMode?e.replace(/<(b|strong)>/g,'<span class="highcharts-strong">').replace(/<(i|em)>/g,'<span class="highcharts-emphasized">'):e.replace(/<(b|strong)>/g,'<span style="font-weight:bold">').replace(/<(i|em)>/g,'<span style="font-style:italic">'),e=e.replace(/<a/g,"<span").replace(/<\/(b|strong|i|em|a)>/g,"</span>").split(I)):e=[e],e=e.filter(function(b){return""!==b}),e.forEach(function(n,a){var e=0,f=0;n=n.replace(/^\s+|\s+$/g,
+"").replace(/<span/g,"|||<span").replace(/<\/span>/g,"</span>|||");var m=n.split("|||");m.forEach(function(n){if(""!==n||1===m.length){var u={},h=L.createElementNS(x.SVG_NS,"tspan"),l,Q;(l=v(n,"class"))&&N(h,"class",l);if(l=v(n,"style"))l=l.replace(/(;| |^)color([ :])/,"$1fill$2"),N(h,"style",l);(Q=v(n,"href"))&&!c&&(N(h,"onclick",'location.href="'+Q+'"'),N(h,"class","highcharts-anchor"),x.styledMode||y(h,{cursor:"pointer"}));n=E(n.replace(/<[a-zA-Z\/](.|\n)*?>/g,"")||" ");if(" "!==n){h.appendChild(L.createTextNode(n));
+e?u.dx=0:a&&null!==w&&(u.x=w);N(h,u);d.appendChild(h);!e&&g&&(!C&&c&&y(h,{display:"block"}),N(h,"dy",D(h)));if(F){var R=n.replace(/([^\^])-/g,"$1- ").split(" ");u=!q&&(1<m.length||a||1<R.length);Q=0;var B=D(h);if(t)p=x.truncate(b,h,n,void 0,0,Math.max(0,F-parseInt(z||12,10)),function(b,d){return b.substring(0,d)+"\u2026"});else if(u)for(;R.length;)R.length&&!q&&0<Q&&(h=L.createElementNS(O,"tspan"),N(h,{dy:B,x:w}),l&&N(h,"style",l),h.appendChild(L.createTextNode(R.join(" ").replace(/- /g,"-"))),d.appendChild(h)),
+x.truncate(b,h,null,R,0===Q?f:0,F,function(b,d){return R.slice(0,d).join(" ").replace(/- /g,"-")}),f=b.actualWidth,Q++}e++}}});g=g||d.childNodes.length}),t&&p&&b.attr("title",E(b.textStr,["&lt;","&gt;"])),l&&l.removeChild(d),r&&b.applyTextOutline&&b.applyTextOutline(r)):d.appendChild(L.createTextNode(E(e)))}},getContrast:function(b){b=K(b).rgba;b[0]*=1;b[1]*=1.2;b[2]*=.5;return 459<b[0]+b[1]+b[2]?"#000000":"#FFFFFF"},button:function(b,d,a,c,e,f,m,u,h,p){var n=this.label(b,d,a,h,void 0,void 0,p,void 0,
+"button"),x=0,l=this.styledMode;n.attr(r({padding:8,r:2},e));if(!l){e=r({fill:"#f7f7f7",stroke:"#cccccc","stroke-width":1,style:{color:"#333333",cursor:"pointer",fontWeight:"normal"}},e);var C=e.style;delete e.style;f=r(e,{fill:"#e6e6e6"},f);var F=f.style;delete f.style;m=r(e,{fill:"#e6ebf5",style:{color:"#000000",fontWeight:"bold"}},m);var Q=m.style;delete m.style;u=r(e,{style:{color:"#cccccc"}},u);var R=u.style;delete u.style}G(n.element,w?"mouseover":"mouseenter",function(){3!==x&&n.setState(1)});
+G(n.element,w?"mouseout":"mouseleave",function(){3!==x&&n.setState(x)});n.setState=function(b){1!==b&&(n.state=x=b);n.removeClass(/highcharts-button-(normal|hover|pressed|disabled)/).addClass("highcharts-button-"+["normal","hover","pressed","disabled"][b||0]);l||n.attr([e,f,m,u][b||0]).css([C,F,Q,R][b||0])};l||n.attr(e).css(E({cursor:"default"},C));return n.on("click",function(b){3!==x&&c.call(n,b)})},crispLine:function(b,d,a){void 0===a&&(a="round");var n=b[0],x=b[1];n[1]===x[1]&&(n[1]=x[1]=Math[a](n[1])-
+d%2/2);n[2]===x[2]&&(n[2]=x[2]=Math[a](n[2])+d%2/2);return b},path:function(b){var d=this.styledMode?{}:{fill:"none"};D(b)?d.d=b:t(b)&&E(d,b);return this.createElement("path").attr(d)},circle:function(b,d,a){b=t(b)?b:"undefined"===typeof b?{}:{x:b,y:d,r:a};d=this.createElement("circle");d.xSetter=d.ySetter=function(b,d,n){n.setAttribute("c"+d,b)};return d.attr(b)},arc:function(b,d,a,c,e,f){t(b)?(c=b,d=c.y,a=c.r,b=c.x):c={innerR:c,start:e,end:f};b=this.symbol("arc",b,d,a,a,c);b.r=a;return b},rect:function(b,
+d,a,c,e,f){e=t(b)?b.r:e;var n=this.createElement("rect");b=t(b)?b:"undefined"===typeof b?{}:{x:b,y:d,width:Math.max(a,0),height:Math.max(c,0)};this.styledMode||("undefined"!==typeof f&&(b.strokeWidth=f,b=n.crisp(b)),b.fill="none");e&&(b.r=e);n.rSetter=function(b,d,a){n.r=b;N(a,{rx:b,ry:b})};n.rGetter=function(){return n.r};return n.attr(b)},setSize:function(b,d,a){var n=this.alignedObjects,c=n.length;this.width=b;this.height=d;for(this.boxWrapper.animate({width:b,height:d},{step:function(){this.attr({viewBox:"0 0 "+
+this.attr("width")+" "+this.attr("height")})},duration:f(a,!0)?void 0:0});c--;)n[c].align()},g:function(b){var d=this.createElement("g");return b?d.attr({"class":"highcharts-"+b}):d},image:function(b,n,a,c,e,f){var x={preserveAspectRatio:"none"},m=function(b,d){b.setAttributeNS?b.setAttributeNS("http://www.w3.org/1999/xlink","href",d):b.setAttribute("hc-svg-href",d)},u=function(d){m(h.element,b);f.call(h,d)};1<arguments.length&&E(x,{x:n,y:a,width:c,height:e});var h=this.createElement("image").attr(x);
+f?(m(h.element,"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="),x=new d.Image,G(x,"load",u),x.src=b,x.complete&&u({})):m(h.element,b);return h},symbol:function(b,d,a,c,e,u){var n=this,x=/^url\((.*?)\)$/,h=x.test(b),p=!h&&(this.symbols[b]?b:"circle"),w=p&&this.symbols[p],l;if(w){"number"===typeof d&&(l=w.call(this.symbols,Math.round(d||0),Math.round(a||0),c,e,u));var C=this.path(l);n.styledMode||C.attr("fill","none");E(C,{symbolName:p,x:d,y:a,width:c,height:e});u&&E(C,
+u)}else if(h){var F=b.match(x)[1];C=this.image(F);C.imgwidth=f(B[F]&&B[F].width,u&&u.width);C.imgheight=f(B[F]&&B[F].height,u&&u.height);var Q=function(){C.attr({width:C.width,height:C.height})};["width","height"].forEach(function(b){C[b+"Setter"]=function(b,d){var n={},a=this["img"+d],c="width"===d?"translateX":"translateY";this[d]=b;I(a)&&(u&&"within"===u.backgroundSize&&this.width&&this.height&&(a=Math.round(a*Math.min(this.width/this.imgwidth,this.height/this.imgheight))),this.element&&this.element.setAttribute(d,
+a),this.alignByTranslate||(n[c]=((this[d]||0)-a)/2,this.attr(n)))}});I(d)&&C.attr({x:d,y:a});C.isImg=!0;I(C.imgwidth)&&I(C.imgheight)?Q():(C.attr({width:0,height:0}),M("img",{onload:function(){var b=m[n.chartIndex];0===this.width&&(y(this,{position:"absolute",top:"-999em"}),L.body.appendChild(this));B[F]={width:this.width,height:this.height};C.imgwidth=this.width;C.imgheight=this.height;C.element&&Q();this.parentNode&&this.parentNode.removeChild(this);n.imgCount--;if(!n.imgCount&&b&&!b.hasLoaded)b.onload()},
+src:F}),this.imgCount++)}return C},symbols:{circle:function(b,d,a,c){return this.arc(b+a/2,d+c/2,a/2,c/2,{start:.5*Math.PI,end:2.5*Math.PI,open:!1})},square:function(b,d,a,c){return[["M",b,d],["L",b+a,d],["L",b+a,d+c],["L",b,d+c],["Z"]]},triangle:function(b,d,a,c){return[["M",b+a/2,d],["L",b+a,d+c],["L",b,d+c],["Z"]]},"triangle-down":function(b,d,a,c){return[["M",b,d],["L",b+a,d],["L",b+a/2,d+c],["Z"]]},diamond:function(b,d,a,c){return[["M",b+a/2,d],["L",b+a,d+c/2],["L",b+a/2,d+c],["L",b,d+c/2],["Z"]]},
+arc:function(b,d,a,c,e){var n=e.start,x=e.r||a,m=e.r||c||a,u=e.end-.001;a=e.innerR;c=f(e.open,.001>Math.abs(e.end-e.start-2*Math.PI));var h=Math.cos(n),p=Math.sin(n),w=Math.cos(u);u=Math.sin(u);n=f(e.longArc,.001>e.end-n-Math.PI?0:1);x=[["M",b+x*h,d+m*p],["A",x,m,0,n,f(e.clockwise,1),b+x*w,d+m*u]];I(a)&&x.push(c?["M",b+a*w,d+a*u]:["L",b+a*w,d+a*u],["A",a,a,0,n,I(e.clockwise)?1-e.clockwise:0,b+a*h,d+a*p]);c||x.push(["Z"]);return x},callout:function(b,d,a,c,e){var n=Math.min(e&&e.r||0,a,c),x=n+6,f=
+e&&e.anchorX;e=e&&e.anchorY;var m=[["M",b+n,d],["L",b+a-n,d],["C",b+a,d,b+a,d,b+a,d+n],["L",b+a,d+c-n],["C",b+a,d+c,b+a,d+c,b+a-n,d+c],["L",b+n,d+c],["C",b,d+c,b,d+c,b,d+c-n],["L",b,d+n],["C",b,d,b,d,b+n,d]];f&&f>a?e>d+x&&e<d+c-x?m.splice(3,1,["L",b+a,e-6],["L",b+a+6,e],["L",b+a,e+6],["L",b+a,d+c-n]):m.splice(3,1,["L",b+a,c/2],["L",f,e],["L",b+a,c/2],["L",b+a,d+c-n]):f&&0>f?e>d+x&&e<d+c-x?m.splice(7,1,["L",b,e+6],["L",b-6,e],["L",b,e-6],["L",b,d+n]):m.splice(7,1,["L",b,c/2],["L",f,e],["L",b,c/2],
+["L",b,d+n]):e&&e>c&&f>b+x&&f<b+a-x?m.splice(5,1,["L",f+6,d+c],["L",f,d+c+6],["L",f-6,d+c],["L",b+n,d+c]):e&&0>e&&f>b+x&&f<b+a-x&&m.splice(1,1,["L",f-6,d],["L",f,d-6],["L",f+6,d],["L",a-n,d]);return m}},clipRect:function(b,d,a,e){var n=c()+"-",x=this.createElement("clipPath").attr({id:n}).add(this.defs);b=this.rect(b,d,a,e,0).add(x);b.id=n;b.clipPath=x;b.count=0;return b},text:function(b,d,a,c){var n={};if(c&&(this.allowHTML||!this.forExport))return this.html(b,d,a);n.x=Math.round(d||0);a&&(n.y=Math.round(a));
+I(b)&&(n.text=b);b=this.createElement("text").attr(n);c||(b.xSetter=function(b,d,n){var a=n.getElementsByTagName("tspan"),c=n.getAttribute(d),e;for(e=0;e<a.length;e++){var x=a[e];x.getAttribute(d)===c&&x.setAttribute(d,b)}n.setAttribute(d,b)});return b},fontMetrics:function(b,n){b=!this.styledMode&&/px/.test(b)||!d.getComputedStyle?b||n&&n.style&&n.style.fontSize||this.style&&this.style.fontSize:n&&H.prototype.getStyle.call(n,"font-size");b=/px/.test(b)?a(b):12;n=24>b?b+3:Math.round(1.2*b);return{h:n,
+b:Math.round(.8*n),f:b}},rotCorr:function(b,d,a){var n=b;d&&a&&(n=Math.max(n*Math.cos(d*u),4));return{x:-b/3*Math.sin(d*u),y:n}},pathToSegments:function(b){for(var d=[],a=[],c={A:8,C:7,H:2,L:3,M:3,Q:5,S:5,T:3,V:2},e=0;e<b.length;e++)q(a[0])&&z(b[e])&&a.length===c[a[0].toUpperCase()]&&b.splice(e,0,a[0].replace("M","L").replace("m","l")),"string"===typeof b[e]&&(a.length&&d.push(a.slice(0)),a.length=0),a.push(b[e]);d.push(a.slice(0));return d},label:function(b,d,a,c,e,f,m,u,h){var n=this,x=n.styledMode,
+p=n.g("button"!==h&&"label"),w=p.text=n.text("",0,0,m).attr({zIndex:1}),C,F={width:0,height:0,x:0,y:0},Q=F,B=0,L=3,t=0,O,q,R,X,g,k={},y,D,U=/^url\((.*?)\)$/.test(c),v=x||U,W=function(){return x?C.strokeWidth()%2/2:(y?parseInt(y,10):0)%2/2};h&&p.addClass("highcharts-"+h);var V=function(){var b=w.element.style,d={};Q=z(O)&&z(q)&&!g||!I(w.textStr)?F:w.getBBox();p.width=(O||Q.width||0)+2*L+t;p.height=(q||Q.height||0)+2*L;D=L+Math.min(n.fontMetrics(b&&b.fontSize,w).b,Q.height||Infinity);v&&(C||(p.box=
+C=n.symbols[c]||U?n.symbol(c):n.rect(),C.addClass(("button"===h?"":"highcharts-label-box")+(h?" highcharts-"+h+"-box":"")),C.add(p),b=W(),d.x=b,d.y=(u?-D:0)+b),d.width=Math.round(p.width),d.height=Math.round(p.height),C.attr(E(d,k)),k={})};var J=function(){var b=t+L;var d=u?0:D;I(O)&&Q&&("center"===g||"right"===g)&&(b+={center:.5,right:1}[g]*(O-Q.width));if(b!==w.x||d!==w.y)w.attr("x",b),w.hasBoxWidthChanged&&(Q=w.getBBox(!0),V()),"undefined"!==typeof d&&w.attr("y",d);w.x=b;w.y=d};var M=function(b,
+d){C?C.attr(b,d):k[b]=d};p.onAdd=function(){w.add(p);p.attr({text:b||0===b?b:"",x:d,y:a});C&&I(e)&&p.attr({anchorX:e,anchorY:f})};p.widthSetter=function(b){O=z(b)?b:null};p.heightSetter=function(b){q=b};p["text-alignSetter"]=function(b){g=b};p.paddingSetter=function(b){I(b)&&b!==L&&(L=p.padding=b,J())};p.paddingLeftSetter=function(b){I(b)&&b!==t&&(t=b,J())};p.alignSetter=function(b){b={left:0,center:.5,right:1}[b];b!==B&&(B=b,Q&&p.attr({x:R}))};p.textSetter=function(b){"undefined"!==typeof b&&w.attr({text:b});
+V();J()};p["stroke-widthSetter"]=function(b,d){b&&(v=!0);y=this["stroke-width"]=b;M(d,b)};x?p.rSetter=function(b,d){M(d,b)}:p.strokeSetter=p.fillSetter=p.rSetter=function(b,d){"r"!==d&&("fill"===d&&b&&(v=!0),p[d]=b);M(d,b)};p.anchorXSetter=function(b,d){e=p.anchorX=b;M(d,Math.round(b)-W()-R)};p.anchorYSetter=function(b,d){f=p.anchorY=b;M(d,b-X)};p.xSetter=function(b){p.x=b;B&&(b-=B*((O||Q.width)+2*L),p["forceAnimate:x"]=!0);R=Math.round(b);p.attr("translateX",R)};p.ySetter=function(b){X=p.y=Math.round(b);
+p.attr("translateY",X)};p.isLabel=!0;var G=p.css;m={css:function(b){if(b){var d={};b=r(b);p.textProps.forEach(function(n){"undefined"!==typeof b[n]&&(d[n]=b[n],delete b[n])});w.css(d);var n="fontSize"in d||"fontWeight"in d;if("width"in d||n)V(),n&&J()}return G.call(p,b)},getBBox:function(){return{width:Q.width+2*L,height:Q.height+2*L,x:Q.x-L,y:Q.y-L}},destroy:function(){l(p.element,"mouseenter");l(p.element,"mouseleave");w&&w.destroy();C&&(C=C.destroy());H.prototype.destroy.call(p);p=n=w=V=J=M=null}};
+p.on=function(b,d){var n=w&&"SPAN"===w.element.tagName?w:void 0;if(n){var a=function(a){("mouseenter"===b||"mouseleave"===b)&&a.relatedTarget instanceof Element&&(p.element.contains(a.relatedTarget)||n.element.contains(a.relatedTarget))||d.call(p.element,a)};n.on(b,a)}H.prototype.on.call(p,b,a||d);return p};x||(m.shadow=function(b){b&&(V(),C&&C.shadow(b));return p});return E(p,m)}});g.Renderer=k});P(A,"parts/Html.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.attr,v=g.createElement,
+K=g.css,G=g.defined,N=g.extend,M=g.pick,y=g.pInt,I=k.isFirefox,J=k.isMS,E=k.isWebKit,D=k.SVGElement;g=k.SVGRenderer;var z=k.win;N(D.prototype,{htmlCss:function(t){var q="SPAN"===this.element.tagName&&t&&"width"in t,r=M(q&&t.width,void 0);if(q){delete t.width;this.textWidth=r;var h=!0}t&&"ellipsis"===t.textOverflow&&(t.whiteSpace="nowrap",t.overflow="hidden");this.styles=N(this.styles,t);K(this.element,t);h&&this.htmlUpdateTransform();return this},htmlGetBBox:function(){var t=this.element;return{x:t.offsetLeft,
+y:t.offsetTop,width:t.offsetWidth,height:t.offsetHeight}},htmlUpdateTransform:function(){if(this.added){var t=this.renderer,q=this.element,r=this.translateX||0,h=this.translateY||0,f=this.x||0,a=this.y||0,l=this.textAlign||"left",e={left:0,center:.5,right:1}[l],c=this.styles,m=c&&c.whiteSpace;K(q,{marginLeft:r,marginTop:h});!t.styledMode&&this.shadows&&this.shadows.forEach(function(a){K(a,{marginLeft:r+1,marginTop:h+1})});this.inverted&&[].forEach.call(q.childNodes,function(a){t.invertChild(a,q)});
+if("SPAN"===q.tagName){c=this.rotation;var u=this.textWidth&&y(this.textWidth),L=[c,l,q.innerHTML,this.textWidth,this.textAlign].join(),F;(F=u!==this.oldTextWidth)&&!(F=u>this.oldTextWidth)&&((F=this.textPxLength)||(K(q,{width:"",whiteSpace:m||"nowrap"}),F=q.offsetWidth),F=F>u);F&&(/[ \-]/.test(q.textContent||q.innerText)||"ellipsis"===q.style.textOverflow)?(K(q,{width:u+"px",display:"block",whiteSpace:m||"normal"}),this.oldTextWidth=u,this.hasBoxWidthChanged=!0):this.hasBoxWidthChanged=!1;L!==this.cTT&&
+(m=t.fontMetrics(q.style.fontSize,q).b,!G(c)||c===(this.oldRotation||0)&&l===this.oldAlign||this.setSpanRotation(c,e,m),this.getSpanCorrection(!G(c)&&this.textPxLength||q.offsetWidth,m,e,c,l));K(q,{left:f+(this.xCorr||0)+"px",top:a+(this.yCorr||0)+"px"});this.cTT=L;this.oldRotation=c;this.oldAlign=l}}else this.alignOnAdd=!0},setSpanRotation:function(t,q,r){var h={},f=this.renderer.getTransformKey();h[f]=h.transform="rotate("+t+"deg)";h[f+(I?"Origin":"-origin")]=h.transformOrigin=100*q+"% "+r+"px";
+K(this.element,h)},getSpanCorrection:function(t,q,r){this.xCorr=-t*r;this.yCorr=-q}});N(g.prototype,{getTransformKey:function(){return J&&!/Edge/.test(z.navigator.userAgent)?"-ms-transform":E?"-webkit-transform":I?"MozTransform":z.opera?"-o-transform":""},html:function(t,q,r){var h=this.createElement("span"),f=h.element,a=h.renderer,l=a.isSVG,e=function(a,e){["opacity","visibility"].forEach(function(c){a[c+"Setter"]=function(f,m,u){var p=a.div?a.div.style:e;D.prototype[c+"Setter"].call(this,f,m,u);
+p&&(p[m]=f)}});a.addedSetters=!0};h.textSetter=function(a){a!==f.innerHTML&&(delete this.bBox,delete this.oldTextWidth);this.textStr=a;f.innerHTML=M(a,"");h.doTransform=!0};l&&e(h,h.element.style);h.xSetter=h.ySetter=h.alignSetter=h.rotationSetter=function(a,e){"align"===e&&(e="textAlign");h[e]=a;h.doTransform=!0};h.afterSetters=function(){this.doTransform&&(this.htmlUpdateTransform(),this.doTransform=!1)};h.attr({text:t,x:Math.round(q),y:Math.round(r)}).css({position:"absolute"});a.styledMode||h.css({fontFamily:this.style.fontFamily,
+fontSize:this.style.fontSize});f.style.whiteSpace="nowrap";h.css=h.htmlCss;l&&(h.add=function(c){var m=a.box.parentNode,u=[];if(this.parentGroup=c){var l=c.div;if(!l){for(;c;)u.push(c),c=c.parentGroup;u.reverse().forEach(function(a){function c(c,e){a[e]=c;"translateX"===e?C.left=c+"px":C.top=c+"px";a.doTransform=!0}var f=H(a.element,"class");l=a.div=a.div||v("div",f?{className:f}:void 0,{position:"absolute",left:(a.translateX||0)+"px",top:(a.translateY||0)+"px",display:a.display,opacity:a.opacity,
+pointerEvents:a.styles&&a.styles.pointerEvents},l||m);var C=l.style;N(a,{classSetter:function(a){return function(c){this.element.setAttribute("class",c);a.className=c}}(l),on:function(){u[0].div&&h.on.apply({element:u[0].div},arguments);return a},translateXSetter:c,translateYSetter:c});a.addedSetters||e(a)})}}else l=m;l.appendChild(f);h.added=!0;h.alignOnAdd&&h.htmlUpdateTransform();return h});return h}})});P(A,"parts/Tick.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.clamp,
+v=g.correctFloat,K=g.defined,G=g.destroyObjectProperties,N=g.extend,M=g.fireEvent,y=g.isNumber,I=g.merge,J=g.objectEach,E=g.pick,D=k.deg2rad;g=function(){function z(t,q,r,h,f){this.isNewLabel=this.isNew=!0;this.axis=t;this.pos=q;this.type=r||"";this.parameters=f||{};this.tickmarkOffset=this.parameters.tickmarkOffset;this.options=this.parameters.options;M(this,"init");r||h||this.addLabel()}z.prototype.addLabel=function(){var t=this,q=t.axis,r=q.options,h=q.chart,f=q.categories,a=q.logarithmic,l=q.names,
+e=t.pos,c=E(t.options&&t.options.labels,r.labels),m=q.tickPositions,u=e===m[0],L=e===m[m.length-1];l=this.parameters.category||(f?E(f[e],l[e],e):e);var F=t.label;f=(!c.step||1===c.step)&&1===q.tickInterval;m=m.info;var w,p;if(q.dateTime&&m){var C=h.time.resolveDTLFormat(r.dateTimeLabelFormats[!r.grid&&m.higherRanks[e]||m.unitName]);var O=C.main}t.isFirst=u;t.isLast=L;t.formatCtx={axis:q,chart:h,isFirst:u,isLast:L,dateTimeLabelFormat:O,tickPositionInfo:m,value:a?v(a.lin2log(l)):l,pos:e};r=q.labelFormatter.call(t.formatCtx,
+this.formatCtx);if(p=C&&C.list)t.shortenLabel=function(){for(w=0;w<p.length;w++)if(F.attr({text:q.labelFormatter.call(N(t.formatCtx,{dateTimeLabelFormat:p[w]}))}),F.getBBox().width<q.getSlotWidth(t)-2*E(c.padding,5))return;F.attr({text:""})};f&&q._addedPlotLB&&q.isXAxis&&t.moveLabel(r,c);K(F)||t.movedLabel?F&&F.textStr!==r&&!f&&(!F.textWidth||c.style&&c.style.width||F.styles.width||F.css({width:null}),F.attr({text:r}),F.textPxLength=F.getBBox().width):(t.label=F=t.createLabel({x:0,y:0},r,c),t.rotation=
+0)};z.prototype.createLabel=function(t,q,r){var h=this.axis,f=h.chart;if(t=K(q)&&r.enabled?f.renderer.text(q,t.x,t.y,r.useHTML).add(h.labelGroup):null)f.styledMode||t.css(I(r.style)),t.textPxLength=t.getBBox().width;return t};z.prototype.destroy=function(){G(this,this.axis)};z.prototype.getPosition=function(t,q,r,h){var f=this.axis,a=f.chart,l=h&&a.oldChartHeight||a.chartHeight;t={x:t?v(f.translate(q+r,null,null,h)+f.transB):f.left+f.offset+(f.opposite?(h&&a.oldChartWidth||a.chartWidth)-f.right-f.left:
+0),y:t?l-f.bottom+f.offset-(f.opposite?f.height:0):v(l-f.translate(q+r,null,null,h)-f.transB)};t.y=H(t.y,-1E5,1E5);M(this,"afterGetPosition",{pos:t});return t};z.prototype.getLabelPosition=function(t,q,r,h,f,a,l,e){var c=this.axis,m=c.transA,u=c.isLinked&&c.linkedParent?c.linkedParent.reversed:c.reversed,L=c.staggerLines,F=c.tickRotCorr||{x:0,y:0},w=f.y,p=h||c.reserveSpaceDefault?0:-c.labelOffset*("center"===c.labelAlign?.5:1),C={};K(w)||(w=0===c.side?r.rotation?-8:-r.getBBox().height:2===c.side?
+F.y+8:Math.cos(r.rotation*D)*(F.y-r.getBBox(!1,0).height/2));t=t+f.x+p+F.x-(a&&h?a*m*(u?-1:1):0);q=q+w-(a&&!h?a*m*(u?1:-1):0);L&&(r=l/(e||1)%L,c.opposite&&(r=L-r-1),q+=c.labelOffset/L*r);C.x=t;C.y=Math.round(q);M(this,"afterGetLabelPosition",{pos:C,tickmarkOffset:a,index:l});return C};z.prototype.getLabelSize=function(){return this.label?this.label.getBBox()[this.axis.horiz?"height":"width"]:0};z.prototype.getMarkPath=function(t,q,r,h,f,a){return a.crispLine([["M",t,q],["L",t+(f?0:-r),q+(f?r:0)]],
+h)};z.prototype.handleOverflow=function(t){var q=this.axis,r=q.options.labels,h=t.x,f=q.chart.chartWidth,a=q.chart.spacing,l=E(q.labelLeft,Math.min(q.pos,a[3]));a=E(q.labelRight,Math.max(q.isRadial?0:q.pos+q.len,f-a[1]));var e=this.label,c=this.rotation,m={left:0,center:.5,right:1}[q.labelAlign||e.attr("align")],u=e.getBBox().width,L=q.getSlotWidth(this),F=L,w=1,p,C={};if(c||"justify"!==E(r.overflow,"justify"))0>c&&h-m*u<l?p=Math.round(h/Math.cos(c*D)-l):0<c&&h+m*u>a&&(p=Math.round((f-h)/Math.cos(c*
+D)));else if(f=h+(1-m)*u,h-m*u<l?F=t.x+F*(1-m)-l:f>a&&(F=a-t.x+F*m,w=-1),F=Math.min(L,F),F<L&&"center"===q.labelAlign&&(t.x+=w*(L-F-m*(L-Math.min(u,F)))),u>F||q.autoRotation&&(e.styles||{}).width)p=F;p&&(this.shortenLabel?this.shortenLabel():(C.width=Math.floor(p)+"px",(r.style||{}).textOverflow||(C.textOverflow="ellipsis"),e.css(C)))};z.prototype.moveLabel=function(t,q){var r=this,h=r.label,f=!1,a=r.axis,l=a.reversed,e=a.chart.inverted;h&&h.textStr===t?(r.movedLabel=h,f=!0,delete r.label):J(a.ticks,
+function(a){f||a.isNew||a===r||!a.label||a.label.textStr!==t||(r.movedLabel=a.label,f=!0,a.labelPos=r.movedLabel.xy,delete a.label)});if(!f&&(r.labelPos||h)){var c=r.labelPos||h.xy;h=e?c.x:l?0:a.width+a.left;a=e?l?a.width+a.left:0:c.y;r.movedLabel=r.createLabel({x:h,y:a},t,q);r.movedLabel&&r.movedLabel.attr({opacity:0})}};z.prototype.render=function(t,q,r){var h=this.axis,f=h.horiz,a=this.pos,l=E(this.tickmarkOffset,h.tickmarkOffset);a=this.getPosition(f,a,l,q);l=a.x;var e=a.y;h=f&&l===h.pos+h.len||
+!f&&e===h.pos?-1:1;r=E(r,1);this.isActive=!0;this.renderGridLine(q,r,h);this.renderMark(a,r,h);this.renderLabel(a,q,r,t);this.isNew=!1;M(this,"afterRender")};z.prototype.renderGridLine=function(t,q,r){var h=this.axis,f=h.options,a=this.gridLine,l={},e=this.pos,c=this.type,m=E(this.tickmarkOffset,h.tickmarkOffset),u=h.chart.renderer,L=c?c+"Grid":"grid",F=f[L+"LineWidth"],w=f[L+"LineColor"];f=f[L+"LineDashStyle"];a||(h.chart.styledMode||(l.stroke=w,l["stroke-width"]=F,f&&(l.dashstyle=f)),c||(l.zIndex=
+1),t&&(q=0),this.gridLine=a=u.path().attr(l).addClass("highcharts-"+(c?c+"-":"")+"grid-line").add(h.gridGroup));if(a&&(r=h.getPlotLinePath({value:e+m,lineWidth:a.strokeWidth()*r,force:"pass",old:t})))a[t||this.isNew?"attr":"animate"]({d:r,opacity:q})};z.prototype.renderMark=function(t,q,r){var h=this.axis,f=h.options,a=h.chart.renderer,l=this.type,e=l?l+"Tick":"tick",c=h.tickSize(e),m=this.mark,u=!m,L=t.x;t=t.y;var F=E(f[e+"Width"],!l&&h.isXAxis?1:0);f=f[e+"Color"];c&&(h.opposite&&(c[0]=-c[0]),u&&
+(this.mark=m=a.path().addClass("highcharts-"+(l?l+"-":"")+"tick").add(h.axisGroup),h.chart.styledMode||m.attr({stroke:f,"stroke-width":F})),m[u?"attr":"animate"]({d:this.getMarkPath(L,t,c[0],m.strokeWidth()*r,h.horiz,a),opacity:q}))};z.prototype.renderLabel=function(t,q,r,h){var f=this.axis,a=f.horiz,l=f.options,e=this.label,c=l.labels,m=c.step;f=E(this.tickmarkOffset,f.tickmarkOffset);var u=!0,L=t.x;t=t.y;e&&y(L)&&(e.xy=t=this.getLabelPosition(L,t,e,a,c,f,h,m),this.isFirst&&!this.isLast&&!E(l.showFirstLabel,
+1)||this.isLast&&!this.isFirst&&!E(l.showLastLabel,1)?u=!1:!a||c.step||c.rotation||q||0===r||this.handleOverflow(t),m&&h%m&&(u=!1),u&&y(t.y)?(t.opacity=r,e[this.isNewLabel?"attr":"animate"](t),this.isNewLabel=!1):(e.attr("y",-9999),this.isNewLabel=!0))};z.prototype.replaceMovedLabel=function(){var t=this.label,q=this.axis,r=q.reversed,h=this.axis.chart.inverted;if(t&&!this.isNew){var f=h?t.xy.x:r?q.left:q.width+q.left;r=h?r?q.width+q.top:q.top:t.xy.y;t.animate({x:f,y:r,opacity:0},void 0,t.destroy);
+delete this.label}q.isDirty=!0;this.label=this.movedLabel;delete this.movedLabel};return z}();k.Tick=g;return k.Tick});P(A,"parts/Time.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.defined,v=g.error,K=g.extend,G=g.isObject,N=g.merge,M=g.objectEach,y=g.pad,I=g.pick,J=g.splat,E=g.timeUnits,D=k.win;g=function(){function z(t){this.options={};this.variableTimezone=this.useUTC=!1;this.Date=D.Date;this.getTimezoneOffset=this.timezoneOffsetFunction();this.update(t)}z.prototype.get=
+function(t,q){if(this.variableTimezone||this.timezoneOffset){var r=q.getTime(),h=r-this.getTimezoneOffset(q);q.setTime(h);t=q["getUTC"+t]();q.setTime(r);return t}return this.useUTC?q["getUTC"+t]():q["get"+t]()};z.prototype.set=function(t,q,r){if(this.variableTimezone||this.timezoneOffset){if("Milliseconds"===t||"Seconds"===t||"Minutes"===t)return q["setUTC"+t](r);var h=this.getTimezoneOffset(q);h=q.getTime()-h;q.setTime(h);q["setUTC"+t](r);t=this.getTimezoneOffset(q);h=q.getTime()+t;return q.setTime(h)}return this.useUTC?
+q["setUTC"+t](r):q["set"+t](r)};z.prototype.update=function(t){var q=I(t&&t.useUTC,!0);this.options=t=N(!0,this.options||{},t);this.Date=t.Date||D.Date||Date;this.timezoneOffset=(this.useUTC=q)&&t.timezoneOffset;this.getTimezoneOffset=this.timezoneOffsetFunction();this.variableTimezone=!(q&&!t.getTimezoneOffset&&!t.timezone)};z.prototype.makeTime=function(t,q,r,h,f,a){if(this.useUTC){var l=this.Date.UTC.apply(0,arguments);var e=this.getTimezoneOffset(l);l+=e;var c=this.getTimezoneOffset(l);e!==c?
+l+=c-e:e-36E5!==this.getTimezoneOffset(l-36E5)||k.isSafari||(l-=36E5)}else l=(new this.Date(t,q,I(r,1),I(h,0),I(f,0),I(a,0))).getTime();return l};z.prototype.timezoneOffsetFunction=function(){var t=this,q=this.options,r=D.moment;if(!this.useUTC)return function(h){return 6E4*(new Date(h.toString())).getTimezoneOffset()};if(q.timezone){if(r)return function(h){return 6E4*-r.tz(h,q.timezone).utcOffset()};v(25)}return this.useUTC&&q.getTimezoneOffset?function(h){return 6E4*q.getTimezoneOffset(h.valueOf())}:
+function(){return 6E4*(t.timezoneOffset||0)}};z.prototype.dateFormat=function(t,q,r){var h;if(!H(q)||isNaN(q))return(null===(h=k.defaultOptions.lang)||void 0===h?void 0:h.invalidDate)||"";t=I(t,"%Y-%m-%d %H:%M:%S");var f=this;h=new this.Date(q);var a=this.get("Hours",h),l=this.get("Day",h),e=this.get("Date",h),c=this.get("Month",h),m=this.get("FullYear",h),u=k.defaultOptions.lang,L=null===u||void 0===u?void 0:u.weekdays,F=null===u||void 0===u?void 0:u.shortWeekdays;h=K({a:F?F[l]:L[l].substr(0,3),
+A:L[l],d:y(e),e:y(e,2," "),w:l,b:u.shortMonths[c],B:u.months[c],m:y(c+1),o:c+1,y:m.toString().substr(2,2),Y:m,H:y(a),k:a,I:y(a%12||12),l:a%12||12,M:y(this.get("Minutes",h)),p:12>a?"AM":"PM",P:12>a?"am":"pm",S:y(h.getSeconds()),L:y(Math.floor(q%1E3),3)},k.dateFormats);M(h,function(a,c){for(;-1!==t.indexOf("%"+c);)t=t.replace("%"+c,"function"===typeof a?a.call(f,q):a)});return r?t.substr(0,1).toUpperCase()+t.substr(1):t};z.prototype.resolveDTLFormat=function(t){return G(t,!0)?t:(t=J(t),{main:t[0],from:t[1],
+to:t[2]})};z.prototype.getTimeTicks=function(t,q,r,h){var f=this,a=[],l={};var e=new f.Date(q);var c=t.unitRange,m=t.count||1,u;h=I(h,1);if(H(q)){f.set("Milliseconds",e,c>=E.second?0:m*Math.floor(f.get("Milliseconds",e)/m));c>=E.second&&f.set("Seconds",e,c>=E.minute?0:m*Math.floor(f.get("Seconds",e)/m));c>=E.minute&&f.set("Minutes",e,c>=E.hour?0:m*Math.floor(f.get("Minutes",e)/m));c>=E.hour&&f.set("Hours",e,c>=E.day?0:m*Math.floor(f.get("Hours",e)/m));c>=E.day&&f.set("Date",e,c>=E.month?1:Math.max(1,
+m*Math.floor(f.get("Date",e)/m)));if(c>=E.month){f.set("Month",e,c>=E.year?0:m*Math.floor(f.get("Month",e)/m));var L=f.get("FullYear",e)}c>=E.year&&f.set("FullYear",e,L-L%m);c===E.week&&(L=f.get("Day",e),f.set("Date",e,f.get("Date",e)-L+h+(L<h?-7:0)));L=f.get("FullYear",e);h=f.get("Month",e);var F=f.get("Date",e),w=f.get("Hours",e);q=e.getTime();f.variableTimezone&&(u=r-q>4*E.month||f.getTimezoneOffset(q)!==f.getTimezoneOffset(r));q=e.getTime();for(e=1;q<r;)a.push(q),q=c===E.year?f.makeTime(L+e*m,
+0):c===E.month?f.makeTime(L,h+e*m):!u||c!==E.day&&c!==E.week?u&&c===E.hour&&1<m?f.makeTime(L,h,F,w+e*m):q+c*m:f.makeTime(L,h,F+e*m*(c===E.day?1:7)),e++;a.push(q);c<=E.hour&&1E4>a.length&&a.forEach(function(a){0===a%18E5&&"000000000"===f.dateFormat("%H%M%S%L",a)&&(l[a]="day")})}a.info=K(t,{higherRanks:l,totalRange:c*m});return a};z.defaultOptions={Date:void 0,getTimezoneOffset:void 0,timezone:void 0,timezoneOffset:0,useUTC:!0};return z}();k.Time=g;return k.Time});P(A,"parts/Options.js",[A["parts/Globals.js"],
+A["parts/Time.js"],A["parts/Color.js"],A["parts/Utilities.js"]],function(k,g,H,v){H=H.parse;var K=v.merge;k.defaultOptions={colors:"#7cb5ec #434348 #90ed7d #f7a35c #8085e9 #f15c80 #e4d354 #2b908f #f45b5b #91e8e1".split(" "),symbols:["circle","diamond","square","triangle","triangle-down"],lang:{loading:"Loading...",months:"January February March April May June July August September October November December".split(" "),shortMonths:"Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" "),weekdays:"Sunday Monday Tuesday Wednesday Thursday Friday Saturday".split(" "),
+decimalPoint:".",numericSymbols:"kMGTPE".split(""),resetZoom:"Reset zoom",resetZoomTitle:"Reset zoom level 1:1",thousandsSep:" "},global:{},time:g.defaultOptions,chart:{styledMode:!1,borderRadius:0,colorCount:10,defaultSeriesType:"line",ignoreHiddenSeries:!0,spacing:[10,10,15,10],resetZoomButton:{theme:{zIndex:6},position:{align:"right",x:-10,y:10}},width:null,height:null,borderColor:"#335cad",backgroundColor:"#ffffff",plotBorderColor:"#cccccc"},title:{text:"Chart title",align:"center",margin:15,
+widthAdjust:-44},subtitle:{text:"",align:"center",widthAdjust:-44},caption:{margin:15,text:"",align:"left",verticalAlign:"bottom"},plotOptions:{},labels:{style:{position:"absolute",color:"#333333"}},legend:{enabled:!0,align:"center",alignColumns:!0,layout:"horizontal",labelFormatter:function(){return this.name},borderColor:"#999999",borderRadius:0,navigation:{activeColor:"#003399",inactiveColor:"#cccccc"},itemStyle:{color:"#333333",cursor:"pointer",fontSize:"12px",fontWeight:"bold",textOverflow:"ellipsis"},
+itemHoverStyle:{color:"#000000"},itemHiddenStyle:{color:"#cccccc"},shadow:!1,itemCheckboxStyle:{position:"absolute",width:"13px",height:"13px"},squareSymbol:!0,symbolPadding:5,verticalAlign:"bottom",x:0,y:0,title:{style:{fontWeight:"bold"}}},loading:{labelStyle:{fontWeight:"bold",position:"relative",top:"45%"},style:{position:"absolute",backgroundColor:"#ffffff",opacity:.5,textAlign:"center"}},tooltip:{enabled:!0,animation:k.svg,borderRadius:3,dateTimeLabelFormats:{millisecond:"%A, %b %e, %H:%M:%S.%L",
+second:"%A, %b %e, %H:%M:%S",minute:"%A, %b %e, %H:%M",hour:"%A, %b %e, %H:%M",day:"%A, %b %e, %Y",week:"Week from %A, %b %e, %Y",month:"%B %Y",year:"%Y"},footerFormat:"",padding:8,snap:k.isTouchDevice?25:10,headerFormat:'<span style="font-size: 10px">{point.key}</span><br/>',pointFormat:'<span style="color:{point.color}">\u25cf</span> {series.name}: <b>{point.y}</b><br/>',backgroundColor:H("#f7f7f7").setOpacity(.85).get(),borderWidth:1,shadow:!0,style:{color:"#333333",cursor:"default",fontSize:"12px",
+whiteSpace:"nowrap"}},credits:{enabled:!0,href:"https://www.highcharts.com?credits",position:{align:"right",x:-10,verticalAlign:"bottom",y:-5},style:{cursor:"pointer",color:"#999999",fontSize:"9px"},text:"Highcharts.com"}};k.setOptions=function(g){k.defaultOptions=K(!0,k.defaultOptions,g);(g.time||g.global)&&k.time.update(K(k.defaultOptions.global,k.defaultOptions.time,g.global,g.time));return k.defaultOptions};k.getOptions=function(){return k.defaultOptions};k.defaultPlotOptions=k.defaultOptions.plotOptions;
+k.time=new g(K(k.defaultOptions.global,k.defaultOptions.time));k.dateFormat=function(g,v,M){return k.time.dateFormat(g,v,M)};""});P(A,"parts/Axis.js",[A["parts/Color.js"],A["parts/Globals.js"],A["parts/Tick.js"],A["parts/Utilities.js"]],function(k,g,H,v){var K=v.addEvent,G=v.animObject,N=v.arrayMax,M=v.arrayMin,y=v.clamp,I=v.correctFloat,J=v.defined,E=v.destroyObjectProperties,D=v.error,z=v.extend,t=v.fireEvent,q=v.format,r=v.getMagnitude,h=v.isArray,f=v.isFunction,a=v.isNumber,l=v.isString,e=v.merge,
+c=v.normalizeTickInterval,m=v.objectEach,u=v.pick,L=v.relativeLength,F=v.removeEvent,w=v.splat,p=v.syncTimeout,C=g.defaultOptions,O=g.deg2rad;v=function(){function B(d,b){this.zoomEnabled=this.width=this.visible=this.userOptions=this.translationSlope=this.transB=this.transA=this.top=this.ticks=this.tickRotCorr=this.tickPositions=this.tickmarkOffset=this.tickInterval=this.tickAmount=this.side=this.series=this.right=this.positiveValuesOnly=this.pos=this.pointRangePadding=this.pointRange=this.plotLinesAndBandsGroups=
+this.plotLinesAndBands=this.paddedTicks=this.overlap=this.options=this.oldMin=this.oldMax=this.offset=this.names=this.minPixelPadding=this.minorTicks=this.minorTickInterval=this.min=this.maxLabelLength=this.max=this.len=this.left=this.labelFormatter=this.labelEdge=this.isLinked=this.height=this.hasVisibleSeries=this.hasNames=this.coll=this.closestPointRange=this.chart=this.categories=this.bottom=this.alternateBands=void 0;this.init(d,b)}B.prototype.init=function(d,b){var a=b.isX,c=this;c.chart=d;
+c.horiz=d.inverted&&!c.isZAxis?!a:a;c.isXAxis=a;c.coll=c.coll||(a?"xAxis":"yAxis");t(this,"init",{userOptions:b});c.opposite=b.opposite;c.side=b.side||(c.horiz?c.opposite?0:2:c.opposite?1:3);c.setOptions(b);var e=this.options,p=e.type;c.labelFormatter=e.labels.formatter||c.defaultLabelFormatter;c.userOptions=b;c.minPixelPadding=0;c.reversed=e.reversed;c.visible=!1!==e.visible;c.zoomEnabled=!1!==e.zoomEnabled;c.hasNames="category"===p||!0===e.categories;c.categories=e.categories||c.hasNames;c.names||
+(c.names=[],c.names.keys={});c.plotLinesAndBandsGroups={};c.positiveValuesOnly=!(!c.logarithmic||e.allowNegativeLog);c.isLinked=J(e.linkedTo);c.ticks={};c.labelEdge=[];c.minorTicks={};c.plotLinesAndBands=[];c.alternateBands={};c.len=0;c.minRange=c.userMinRange=e.minRange||e.maxZoom;c.range=e.range;c.offset=e.offset||0;c.max=null;c.min=null;c.crosshair=u(e.crosshair,w(d.options.tooltip.crosshairs)[a?0:1],!1);b=c.options.events;-1===d.axes.indexOf(c)&&(a?d.axes.splice(d.xAxis.length,0,c):d.axes.push(c),
+d[c.coll].push(c));c.series=c.series||[];d.inverted&&!c.isZAxis&&a&&"undefined"===typeof c.reversed&&(c.reversed=!0);c.labelRotation=c.options.labels.rotation;m(b,function(b,d){f(b)&&K(c,d,b)});t(this,"afterInit")};B.prototype.setOptions=function(d){this.options=e(B.defaultOptions,"yAxis"===this.coll&&B.defaultYAxisOptions,[B.defaultTopAxisOptions,B.defaultRightAxisOptions,B.defaultBottomAxisOptions,B.defaultLeftAxisOptions][this.side],e(C[this.coll],d));t(this,"afterSetOptions",{userOptions:d})};
+B.prototype.defaultLabelFormatter=function(){var d=this.axis,b=this.value,a=d.chart.time,c=d.categories,e=this.dateTimeLabelFormat,f=C.lang,m=f.numericSymbols;f=f.numericSymbolMagnitude||1E3;var u=m&&m.length,p=d.options.labels.format;d=d.logarithmic?Math.abs(b):d.tickInterval;var h=this.chart,w=h.numberFormatter;if(p)var l=q(p,this,h);else if(c)l=b;else if(e)l=a.dateFormat(e,b);else if(u&&1E3<=d)for(;u--&&"undefined"===typeof l;)a=Math.pow(f,u+1),d>=a&&0===10*b%a&&null!==m[u]&&0!==b&&(l=w(b/a,-1)+
+m[u]);"undefined"===typeof l&&(l=1E4<=Math.abs(b)?w(b,-1):w(b,-1,void 0,""));return l};B.prototype.getSeriesExtremes=function(){var d=this,b=d.chart,n;t(this,"getSeriesExtremes",null,function(){d.hasVisibleSeries=!1;d.dataMin=d.dataMax=d.threshold=null;d.softThreshold=!d.isXAxis;d.stacking&&d.stacking.buildStacks();d.series.forEach(function(c){if(c.visible||!b.options.chart.ignoreHiddenSeries){var e=c.options,f=e.threshold;d.hasVisibleSeries=!0;d.positiveValuesOnly&&0>=f&&(f=null);if(d.isXAxis){if(e=
+c.xData,e.length){n=c.getXExtremes(e);var x=n.min;var m=n.max;a(x)||x instanceof Date||(e=e.filter(a),n=c.getXExtremes(e),x=n.min,m=n.max);e.length&&(d.dataMin=Math.min(u(d.dataMin,x),x),d.dataMax=Math.max(u(d.dataMax,m),m))}}else if(c=c.applyExtremes(),a(c.dataMin)&&(x=c.dataMin,d.dataMin=Math.min(u(d.dataMin,x),x)),a(c.dataMax)&&(m=c.dataMax,d.dataMax=Math.max(u(d.dataMax,m),m)),J(f)&&(d.threshold=f),!e.softThreshold||d.positiveValuesOnly)d.softThreshold=!1}})});t(this,"afterGetSeriesExtremes")};
+B.prototype.translate=function(d,b,n,c,e,f){var x=this.linkedParent||this,m=1,u=0,p=c?x.oldTransA:x.transA;c=c?x.oldMin:x.min;var h=x.minPixelPadding;e=(x.isOrdinal||x.brokenAxis&&x.brokenAxis.hasBreaks||x.logarithmic&&e)&&x.lin2val;p||(p=x.transA);n&&(m*=-1,u=x.len);x.reversed&&(m*=-1,u-=m*(x.sector||x.len));b?(d=(d*m+u-h)/p+c,e&&(d=x.lin2val(d))):(e&&(d=x.val2lin(d)),d=a(c)?m*(d-c)*p+u+m*h+(a(f)?p*f:0):void 0);return d};B.prototype.toPixels=function(d,b){return this.translate(d,!1,!this.horiz,null,
+!0)+(b?0:this.pos)};B.prototype.toValue=function(d,b){return this.translate(d-(b?0:this.pos),!0,!this.horiz,null,!0)};B.prototype.getPlotLinePath=function(d){function b(b,d,a){if("pass"!==l&&b<d||b>a)l?b=y(b,d,a):q=!0;return b}var n=this,c=n.chart,e=n.left,f=n.top,m=d.old,p=d.value,h=d.translatedValue,w=d.lineWidth,l=d.force,C,F,B,L,r=m&&c.oldChartHeight||c.chartHeight,O=m&&c.oldChartWidth||c.chartWidth,q,z=n.transB;d={value:p,lineWidth:w,old:m,force:l,acrossPanes:d.acrossPanes,translatedValue:h};
+t(this,"getPlotLinePath",d,function(d){h=u(h,n.translate(p,null,null,m));h=y(h,-1E5,1E5);C=B=Math.round(h+z);F=L=Math.round(r-h-z);a(h)?n.horiz?(F=f,L=r-n.bottom,C=B=b(C,e,e+n.width)):(C=e,B=O-n.right,F=L=b(F,f,f+n.height)):(q=!0,l=!1);d.path=q&&!l?null:c.renderer.crispLine([["M",C,F],["L",B,L]],w||1)});return d.path};B.prototype.getLinearTickPositions=function(d,b,a){var n=I(Math.floor(b/d)*d);a=I(Math.ceil(a/d)*d);var c=[],e;I(n+d)===n&&(e=20);if(this.single)return[b];for(b=n;b<=a;){c.push(b);b=
+I(b+d,e);if(b===f)break;var f=b}return c};B.prototype.getMinorTickInterval=function(){var d=this.options;return!0===d.minorTicks?u(d.minorTickInterval,"auto"):!1===d.minorTicks?null:d.minorTickInterval};B.prototype.getMinorTickPositions=function(){var d=this.options,b=this.tickPositions,a=this.minorTickInterval,c=[],e=this.pointRangePadding||0,f=this.min-e;e=this.max+e;var m=e-f;if(m&&m/a<this.len/3){var u=this.logarithmic;if(u)this.paddedTicks.forEach(function(b,d,n){d&&c.push.apply(c,u.getLogTickPositions(a,
+n[d-1],n[d],!0))});else if(this.dateTime&&"auto"===this.getMinorTickInterval())c=c.concat(this.getTimeTicks(this.dateTime.normalizeTimeTickInterval(a),f,e,d.startOfWeek));else for(d=f+(b[0]-f)%a;d<=e&&d!==c[0];d+=a)c.push(d)}0!==c.length&&this.trimTicks(c);return c};B.prototype.adjustForMinRange=function(){var d=this.options,b=this.min,a=this.max,c=this.logarithmic,e,f,m,p,h;this.isXAxis&&"undefined"===typeof this.minRange&&!c&&(J(d.min)||J(d.max)?this.minRange=null:(this.series.forEach(function(b){p=
+b.xData;for(f=h=b.xIncrement?1:p.length-1;0<f;f--)if(m=p[f]-p[f-1],"undefined"===typeof e||m<e)e=m}),this.minRange=Math.min(5*e,this.dataMax-this.dataMin)));if(a-b<this.minRange){var w=this.dataMax-this.dataMin>=this.minRange;var l=this.minRange;var C=(l-a+b)/2;C=[b-C,u(d.min,b-C)];w&&(C[2]=this.logarithmic?this.logarithmic.log2lin(this.dataMin):this.dataMin);b=N(C);a=[b+l,u(d.max,b+l)];w&&(a[2]=c?c.log2lin(this.dataMax):this.dataMax);a=M(a);a-b<l&&(C[0]=a-l,C[1]=u(d.min,a-l),b=N(C))}this.min=b;this.max=
+a};B.prototype.getClosest=function(){var d;this.categories?d=1:this.series.forEach(function(b){var a=b.closestPointRange,c=b.visible||!b.chart.options.chart.ignoreHiddenSeries;!b.noSharedTooltip&&J(a)&&c&&(d=J(d)?Math.min(d,a):a)});return d};B.prototype.nameToX=function(d){var b=h(this.categories),a=b?this.categories:this.names,c=d.options.x;d.series.requireSorting=!1;J(c)||(c=!1===this.options.uniqueNames?d.series.autoIncrement():b?a.indexOf(d.name):u(a.keys[d.name],-1));if(-1===c){if(!b)var e=a.length}else e=
+c;"undefined"!==typeof e&&(this.names[e]=d.name,this.names.keys[d.name]=e);return e};B.prototype.updateNames=function(){var d=this,b=this.names;0<b.length&&(Object.keys(b.keys).forEach(function(d){delete b.keys[d]}),b.length=0,this.minRange=this.userMinRange,(this.series||[]).forEach(function(b){b.xIncrement=null;if(!b.points||b.isDirtyData)d.max=Math.max(d.max,b.xData.length-1),b.processData(),b.generatePoints();b.data.forEach(function(a,c){if(a&&a.options&&"undefined"!==typeof a.name){var n=d.nameToX(a);
+"undefined"!==typeof n&&n!==a.x&&(a.x=n,b.xData[c]=n)}})}))};B.prototype.setAxisTranslation=function(d){var b=this,a=b.max-b.min,c=b.axisPointRange||0,e=0,f=0,m=b.linkedParent,p=!!b.categories,h=b.transA,w=b.isXAxis;if(w||p||c){var C=b.getClosest();m?(e=m.minPointOffset,f=m.pointRangePadding):b.series.forEach(function(d){var a=p?1:w?u(d.options.pointRange,C,0):b.axisPointRange||0,n=d.options.pointPlacement;c=Math.max(c,a);if(!b.single||p)d=d.is("xrange")?!w:w,e=Math.max(e,d&&l(n)?0:a/2),f=Math.max(f,
+d&&"on"===n?0:a)});m=b.ordinal&&b.ordinal.slope&&C?b.ordinal.slope/C:1;b.minPointOffset=e*=m;b.pointRangePadding=f*=m;b.pointRange=Math.min(c,b.single&&p?1:a);w&&(b.closestPointRange=C)}d&&(b.oldTransA=h);b.translationSlope=b.transA=h=b.staticScale||b.len/(a+f||1);b.transB=b.horiz?b.left:b.bottom;b.minPixelPadding=h*e;t(this,"afterSetAxisTranslation")};B.prototype.minFromRange=function(){return this.max-this.range};B.prototype.setTickInterval=function(d){var b=this,n=b.chart,e=b.logarithmic,f=b.options,
+m=b.isXAxis,p=b.isLinked,h=f.maxPadding,w=f.minPadding,l=f.tickInterval,C=f.tickPixelInterval,F=b.categories,B=a(b.threshold)?b.threshold:null,L=b.softThreshold;b.dateTime||F||p||this.getTickAmount();var O=u(b.userMin,f.min);var q=u(b.userMax,f.max);if(p){b.linkedParent=n[b.coll][f.linkedTo];var z=b.linkedParent.getExtremes();b.min=u(z.min,z.dataMin);b.max=u(z.max,z.dataMax);f.type!==b.linkedParent.options.type&&D(11,1,n)}else{if(!L&&J(B))if(b.dataMin>=B)z=B,w=0;else if(b.dataMax<=B){var g=B;h=0}b.min=
+u(O,z,b.dataMin);b.max=u(q,g,b.dataMax)}e&&(b.positiveValuesOnly&&!d&&0>=Math.min(b.min,u(b.dataMin,b.min))&&D(10,1,n),b.min=I(e.log2lin(b.min),16),b.max=I(e.log2lin(b.max),16));b.range&&J(b.max)&&(b.userMin=b.min=O=Math.max(b.dataMin,b.minFromRange()),b.userMax=q=b.max,b.range=null);t(b,"foundExtremes");b.beforePadding&&b.beforePadding();b.adjustForMinRange();!(F||b.axisPointRange||b.stacking&&b.stacking.usePercentage||p)&&J(b.min)&&J(b.max)&&(n=b.max-b.min)&&(!J(O)&&w&&(b.min-=n*w),!J(q)&&h&&(b.max+=
+n*h));a(b.userMin)||(a(f.softMin)&&f.softMin<b.min&&(b.min=O=f.softMin),a(f.floor)&&(b.min=Math.max(b.min,f.floor)));a(b.userMax)||(a(f.softMax)&&f.softMax>b.max&&(b.max=q=f.softMax),a(f.ceiling)&&(b.max=Math.min(b.max,f.ceiling)));L&&J(b.dataMin)&&(B=B||0,!J(O)&&b.min<B&&b.dataMin>=B?b.min=b.options.minRange?Math.min(B,b.max-b.minRange):B:!J(q)&&b.max>B&&b.dataMax<=B&&(b.max=b.options.minRange?Math.max(B,b.min+b.minRange):B));b.tickInterval=b.min===b.max||"undefined"===typeof b.min||"undefined"===
+typeof b.max?1:p&&!l&&C===b.linkedParent.options.tickPixelInterval?l=b.linkedParent.tickInterval:u(l,this.tickAmount?(b.max-b.min)/Math.max(this.tickAmount-1,1):void 0,F?1:(b.max-b.min)*C/Math.max(b.len,C));m&&!d&&b.series.forEach(function(d){d.processData(b.min!==b.oldMin||b.max!==b.oldMax)});b.setAxisTranslation(!0);b.beforeSetTickPositions&&b.beforeSetTickPositions();b.ordinal&&(b.tickInterval=b.ordinal.postProcessTickInterval(b.tickInterval));b.pointRange&&!l&&(b.tickInterval=Math.max(b.pointRange,
+b.tickInterval));d=u(f.minTickInterval,b.dateTime&&b.closestPointRange);!l&&b.tickInterval<d&&(b.tickInterval=d);b.dateTime||b.logarithmic||l||(b.tickInterval=c(b.tickInterval,void 0,r(b.tickInterval),u(f.allowDecimals,.5>b.tickInterval||void 0!==this.tickAmount),!!this.tickAmount));this.tickAmount||(b.tickInterval=b.unsquish());this.setTickPositions()};B.prototype.setTickPositions=function(){var d=this.options,b=d.tickPositions;var a=this.getMinorTickInterval();var c=d.tickPositioner,e=this.hasVerticalPanning(),
+f="colorAxis"===this.coll,m=(f||!e)&&d.startOnTick;e=(f||!e)&&d.endOnTick;this.tickmarkOffset=this.categories&&"between"===d.tickmarkPlacement&&1===this.tickInterval?.5:0;this.minorTickInterval="auto"===a&&this.tickInterval?this.tickInterval/5:a;this.single=this.min===this.max&&J(this.min)&&!this.tickAmount&&(parseInt(this.min,10)===this.min||!1!==d.allowDecimals);this.tickPositions=a=b&&b.slice();!a&&(this.ordinal&&this.ordinal.positions||!((this.max-this.min)/this.tickInterval>Math.max(2*this.len,
+200))?a=this.dateTime?this.getTimeTicks(this.dateTime.normalizeTimeTickInterval(this.tickInterval,d.units),this.min,this.max,d.startOfWeek,this.ordinal&&this.ordinal.positions,this.closestPointRange,!0):this.logarithmic?this.logarithmic.getLogTickPositions(this.tickInterval,this.min,this.max):this.getLinearTickPositions(this.tickInterval,this.min,this.max):(a=[this.min,this.max],D(19,!1,this.chart)),a.length>this.len&&(a=[a[0],a.pop()],a[0]===a[1]&&(a.length=1)),this.tickPositions=a,c&&(c=c.apply(this,
+[this.min,this.max])))&&(this.tickPositions=a=c);this.paddedTicks=a.slice(0);this.trimTicks(a,m,e);this.isLinked||(this.single&&2>a.length&&!this.categories&&!this.series.some(function(b){return b.is("heatmap")&&"between"===b.options.pointPlacement})&&(this.min-=.5,this.max+=.5),b||c||this.adjustTickAmount());t(this,"afterSetTickPositions")};B.prototype.trimTicks=function(d,b,a){var c=d[0],n=d[d.length-1],e=!this.isOrdinal&&this.minPointOffset||0;t(this,"trimTicks");if(!this.isLinked){if(b&&-Infinity!==
+c)this.min=c;else for(;this.min-e>d[0];)d.shift();if(a)this.max=n;else for(;this.max+e<d[d.length-1];)d.pop();0===d.length&&J(c)&&!this.options.tickPositions&&d.push((n+c)/2)}};B.prototype.alignToOthers=function(){var d={},b,a=this.options;!1===this.chart.options.chart.alignTicks||!1===a.alignTicks||!1===a.startOnTick||!1===a.endOnTick||this.logarithmic||this.chart[this.coll].forEach(function(a){var c=a.options;c=[a.horiz?c.left:c.top,c.width,c.height,c.pane].join();a.series.length&&(d[c]?b=!0:d[c]=
+1)});return b};B.prototype.getTickAmount=function(){var d=this.options,b=d.tickAmount,a=d.tickPixelInterval;!J(d.tickInterval)&&!b&&this.len<a&&!this.isRadial&&!this.logarithmic&&d.startOnTick&&d.endOnTick&&(b=2);!b&&this.alignToOthers()&&(b=Math.ceil(this.len/a)+1);4>b&&(this.finalTickAmt=b,b=5);this.tickAmount=b};B.prototype.adjustTickAmount=function(){var d=this.options,b=this.tickInterval,a=this.tickPositions,c=this.tickAmount,e=this.finalTickAmt,f=a&&a.length,m=u(this.threshold,this.softThreshold?
+0:null),p;if(this.hasData()){if(f<c){for(p=this.min;a.length<c;)a.length%2||p===m?a.push(I(a[a.length-1]+b)):a.unshift(I(a[0]-b));this.transA*=(f-1)/(c-1);this.min=d.startOnTick?a[0]:Math.min(this.min,a[0]);this.max=d.endOnTick?a[a.length-1]:Math.max(this.max,a[a.length-1])}else f>c&&(this.tickInterval*=2,this.setTickPositions());if(J(e)){for(b=d=a.length;b--;)(3===e&&1===b%2||2>=e&&0<b&&b<d-1)&&a.splice(b,1);this.finalTickAmt=void 0}}};B.prototype.setScale=function(){var d,b=!1,a=!1;this.series.forEach(function(d){var c;
+b=b||d.isDirtyData||d.isDirty;a=a||(null===(c=d.xAxis)||void 0===c?void 0:c.isDirty)||!1});this.oldMin=this.min;this.oldMax=this.max;this.oldAxisLength=this.len;this.setAxisSize();(d=this.len!==this.oldAxisLength)||b||a||this.isLinked||this.forceRedraw||this.userMin!==this.oldUserMin||this.userMax!==this.oldUserMax||this.alignToOthers()?(this.stacking&&this.stacking.resetStacks(),this.forceRedraw=!1,this.getSeriesExtremes(),this.setTickInterval(),this.oldUserMin=this.userMin,this.oldUserMax=this.userMax,
+this.isDirty||(this.isDirty=d||this.min!==this.oldMin||this.max!==this.oldMax)):this.stacking&&this.stacking.cleanStacks();b&&this.panningState&&(this.panningState.isDirty=!0);t(this,"afterSetScale")};B.prototype.setExtremes=function(d,b,a,c,e){var n=this,f=n.chart;a=u(a,!0);n.series.forEach(function(b){delete b.kdTree});e=z(e,{min:d,max:b});t(n,"setExtremes",e,function(){n.userMin=d;n.userMax=b;n.eventArgs=e;a&&f.redraw(c)})};B.prototype.zoom=function(d,b){var a=this,c=this.dataMin,e=this.dataMax,
+f=this.options,m=Math.min(c,u(f.min,c)),p=Math.max(e,u(f.max,e));d={newMin:d,newMax:b};t(this,"zoom",d,function(b){var d=b.newMin,n=b.newMax;if(d!==a.min||n!==a.max)a.allowZoomOutside||(J(c)&&(d<m&&(d=m),d>p&&(d=p)),J(e)&&(n<m&&(n=m),n>p&&(n=p))),a.displayBtn="undefined"!==typeof d||"undefined"!==typeof n,a.setExtremes(d,n,!1,void 0,{trigger:"zoom"});b.zoomed=!0});return d.zoomed};B.prototype.setAxisSize=function(){var d=this.chart,b=this.options,a=b.offsets||[0,0,0,0],c=this.horiz,e=this.width=Math.round(L(u(b.width,
+d.plotWidth-a[3]+a[1]),d.plotWidth)),f=this.height=Math.round(L(u(b.height,d.plotHeight-a[0]+a[2]),d.plotHeight)),m=this.top=Math.round(L(u(b.top,d.plotTop+a[0]),d.plotHeight,d.plotTop));b=this.left=Math.round(L(u(b.left,d.plotLeft+a[3]),d.plotWidth,d.plotLeft));this.bottom=d.chartHeight-f-m;this.right=d.chartWidth-e-b;this.len=Math.max(c?e:f,0);this.pos=c?b:m};B.prototype.getExtremes=function(){var d=this.logarithmic;return{min:d?I(d.lin2log(this.min)):this.min,max:d?I(d.lin2log(this.max)):this.max,
+dataMin:this.dataMin,dataMax:this.dataMax,userMin:this.userMin,userMax:this.userMax}};B.prototype.getThreshold=function(d){var b=this.logarithmic,a=b?b.lin2log(this.min):this.min;b=b?b.lin2log(this.max):this.max;null===d||-Infinity===d?d=a:Infinity===d?d=b:a>d?d=a:b<d&&(d=b);return this.translate(d,0,1,0,1)};B.prototype.autoLabelAlign=function(d){var b=(u(d,0)-90*this.side+720)%360;d={align:"center"};t(this,"autoLabelAlign",d,function(d){15<b&&165>b?d.align="right":195<b&&345>b&&(d.align="left")});
+return d.align};B.prototype.tickSize=function(d){var b=this.options,a=b["tick"===d?"tickLength":"minorTickLength"],c=u(b["tick"===d?"tickWidth":"minorTickWidth"],"tick"===d&&this.isXAxis&&!this.categories?1:0);if(c&&a){"inside"===b[d+"Position"]&&(a=-a);var e=[a,c]}d={tickSize:e};t(this,"afterTickSize",d);return d.tickSize};B.prototype.labelMetrics=function(){var d=this.tickPositions&&this.tickPositions[0]||0;return this.chart.renderer.fontMetrics(this.options.labels.style&&this.options.labels.style.fontSize,
+this.ticks[d]&&this.ticks[d].label)};B.prototype.unsquish=function(){var d=this.options.labels,b=this.horiz,a=this.tickInterval,c=a,e=this.len/(((this.categories?1:0)+this.max-this.min)/a),f,m=d.rotation,p=this.labelMetrics(),h,w=Number.MAX_VALUE,l,C=this.max-this.min,F=function(b){var d=b/(e||1);d=1<d?Math.ceil(d):1;d*a>C&&Infinity!==b&&Infinity!==e&&C&&(d=Math.ceil(C/a));return I(d*a)};b?(l=!d.staggerLines&&!d.step&&(J(m)?[m]:e<u(d.autoRotationLimit,80)&&d.autoRotation))&&l.forEach(function(b){if(b===
+m||b&&-90<=b&&90>=b){h=F(Math.abs(p.h/Math.sin(O*b)));var d=h+Math.abs(b/360);d<w&&(w=d,f=b,c=h)}}):d.step||(c=F(p.h));this.autoRotation=l;this.labelRotation=u(f,m);return c};B.prototype.getSlotWidth=function(d){var b,c=this.chart,e=this.horiz,f=this.options.labels,m=Math.max(this.tickPositions.length-(this.categories?0:1),1),u=c.margin[3];if(d&&a(d.slotWidth))return d.slotWidth;if(e&&f&&2>(f.step||0))return f.rotation?0:(this.staggerLines||1)*this.len/m;if(!e){d=null===(b=null===f||void 0===f?void 0:
+f.style)||void 0===b?void 0:b.width;if(void 0!==d)return parseInt(d,10);if(u)return u-c.spacing[3]}return.33*c.chartWidth};B.prototype.renderUnsquish=function(){var d=this.chart,b=d.renderer,a=this.tickPositions,c=this.ticks,e=this.options.labels,f=e&&e.style||{},m=this.horiz,u=this.getSlotWidth(),p=Math.max(1,Math.round(u-2*(e.padding||5))),h={},w=this.labelMetrics(),C=e.style&&e.style.textOverflow,F=0;l(e.rotation)||(h.rotation=e.rotation||0);a.forEach(function(b){b=c[b];b.movedLabel&&b.replaceMovedLabel();
+b&&b.label&&b.label.textPxLength>F&&(F=b.label.textPxLength)});this.maxLabelLength=F;if(this.autoRotation)F>p&&F>w.h?h.rotation=this.labelRotation:this.labelRotation=0;else if(u){var B=p;if(!C){var L="clip";for(p=a.length;!m&&p--;){var r=a[p];if(r=c[r].label)r.styles&&"ellipsis"===r.styles.textOverflow?r.css({textOverflow:"clip"}):r.textPxLength>u&&r.css({width:u+"px"}),r.getBBox().height>this.len/a.length-(w.h-w.f)&&(r.specificTextOverflow="ellipsis")}}}h.rotation&&(B=F>.5*d.chartHeight?.33*d.chartHeight:
+F,C||(L="ellipsis"));if(this.labelAlign=e.align||this.autoLabelAlign(this.labelRotation))h.align=this.labelAlign;a.forEach(function(b){var d=(b=c[b])&&b.label,a=f.width,e={};d&&(d.attr(h),b.shortenLabel?b.shortenLabel():B&&!a&&"nowrap"!==f.whiteSpace&&(B<d.textPxLength||"SPAN"===d.element.tagName)?(e.width=B+"px",C||(e.textOverflow=d.specificTextOverflow||L),d.css(e)):d.styles&&d.styles.width&&!e.width&&!a&&d.css({width:null}),delete d.specificTextOverflow,b.rotation=h.rotation)},this);this.tickRotCorr=
+b.rotCorr(w.b,this.labelRotation||0,0!==this.side)};B.prototype.hasData=function(){return this.series.some(function(d){return d.hasData()})||this.options.showEmpty&&J(this.min)&&J(this.max)};B.prototype.addTitle=function(d){var b=this.chart.renderer,a=this.horiz,c=this.opposite,f=this.options.title,m,u=this.chart.styledMode;this.axisTitle||((m=f.textAlign)||(m=(a?{low:"left",middle:"center",high:"right"}:{low:c?"right":"left",middle:"center",high:c?"left":"right"})[f.align]),this.axisTitle=b.text(f.text,
+0,0,f.useHTML).attr({zIndex:7,rotation:f.rotation||0,align:m}).addClass("highcharts-axis-title"),u||this.axisTitle.css(e(f.style)),this.axisTitle.add(this.axisGroup),this.axisTitle.isNew=!0);u||f.style.width||this.isRadial||this.axisTitle.css({width:this.len+"px"});this.axisTitle[d?"show":"hide"](d)};B.prototype.generateTick=function(d){var b=this.ticks;b[d]?b[d].addLabel():b[d]=new H(this,d)};B.prototype.getOffset=function(){var d=this,b=d.chart,a=b.renderer,c=d.options,e=d.tickPositions,f=d.ticks,
+p=d.horiz,h=d.side,w=b.inverted&&!d.isZAxis?[1,0,3,2][h]:h,l,C=0,F=0,B=c.title,r=c.labels,L=0,O=b.axisOffset;b=b.clipOffset;var q=[-1,1,1,-1][h],z=c.className,g=d.axisParent;var k=d.hasData();d.showAxis=l=k||u(c.showEmpty,!0);d.staggerLines=d.horiz&&r.staggerLines;d.axisGroup||(d.gridGroup=a.g("grid").attr({zIndex:c.gridZIndex||1}).addClass("highcharts-"+this.coll.toLowerCase()+"-grid "+(z||"")).add(g),d.axisGroup=a.g("axis").attr({zIndex:c.zIndex||2}).addClass("highcharts-"+this.coll.toLowerCase()+
+" "+(z||"")).add(g),d.labelGroup=a.g("axis-labels").attr({zIndex:r.zIndex||7}).addClass("highcharts-"+d.coll.toLowerCase()+"-labels "+(z||"")).add(g));k||d.isLinked?(e.forEach(function(b,a){d.generateTick(b,a)}),d.renderUnsquish(),d.reserveSpaceDefault=0===h||2===h||{1:"left",3:"right"}[h]===d.labelAlign,u(r.reserveSpace,"center"===d.labelAlign?!0:null,d.reserveSpaceDefault)&&e.forEach(function(b){L=Math.max(f[b].getLabelSize(),L)}),d.staggerLines&&(L*=d.staggerLines),d.labelOffset=L*(d.opposite?
+-1:1)):m(f,function(b,d){b.destroy();delete f[d]});if(B&&B.text&&!1!==B.enabled&&(d.addTitle(l),l&&!1!==B.reserveSpace)){d.titleOffset=C=d.axisTitle.getBBox()[p?"height":"width"];var y=B.offset;F=J(y)?0:u(B.margin,p?5:10)}d.renderLine();d.offset=q*u(c.offset,O[h]?O[h]+(c.margin||0):0);d.tickRotCorr=d.tickRotCorr||{x:0,y:0};a=0===h?-d.labelMetrics().h:2===h?d.tickRotCorr.y:0;F=Math.abs(L)+F;L&&(F=F-a+q*(p?u(r.y,d.tickRotCorr.y+8*q):r.x));d.axisTitleMargin=u(y,F);d.getMaxLabelDimensions&&(d.maxLabelDimensions=
+d.getMaxLabelDimensions(f,e));p=this.tickSize("tick");O[h]=Math.max(O[h],d.axisTitleMargin+C+q*d.offset,F,e&&e.length&&p?p[0]+q*d.offset:0);c=c.offset?0:2*Math.floor(d.axisLine.strokeWidth()/2);b[w]=Math.max(b[w],c);t(this,"afterGetOffset")};B.prototype.getLinePath=function(d){var b=this.chart,a=this.opposite,c=this.offset,e=this.horiz,f=this.left+(a?this.width:0)+c;c=b.chartHeight-this.bottom-(a?this.height:0)+c;a&&(d*=-1);return b.renderer.crispLine([["M",e?this.left:f,e?c:this.top],["L",e?b.chartWidth-
+this.right:f,e?c:b.chartHeight-this.bottom]],d)};B.prototype.renderLine=function(){this.axisLine||(this.axisLine=this.chart.renderer.path().addClass("highcharts-axis-line").add(this.axisGroup),this.chart.styledMode||this.axisLine.attr({stroke:this.options.lineColor,"stroke-width":this.options.lineWidth,zIndex:7}))};B.prototype.getTitlePosition=function(){var d=this.horiz,b=this.left,a=this.top,c=this.len,e=this.options.title,f=d?b:a,m=this.opposite,u=this.offset,p=e.x||0,h=e.y||0,w=this.axisTitle,
+l=this.chart.renderer.fontMetrics(e.style&&e.style.fontSize,w);w=Math.max(w.getBBox(null,0).height-l.h-1,0);c={low:f+(d?0:c),middle:f+c/2,high:f+(d?c:0)}[e.align];b=(d?a+this.height:b)+(d?1:-1)*(m?-1:1)*this.axisTitleMargin+[-w,w,l.f,-w][this.side];d={x:d?c+p:b+(m?this.width:0)+u+p,y:d?b+h-(m?this.height:0)+u:c+h};t(this,"afterGetTitlePosition",{titlePosition:d});return d};B.prototype.renderMinorTick=function(d){var b=this.chart.hasRendered&&a(this.oldMin),c=this.minorTicks;c[d]||(c[d]=new H(this,
+d,"minor"));b&&c[d].isNew&&c[d].render(null,!0);c[d].render(null,!1,1)};B.prototype.renderTick=function(d,b){var c=this.isLinked,e=this.ticks,f=this.chart.hasRendered&&a(this.oldMin);if(!c||d>=this.min&&d<=this.max)e[d]||(e[d]=new H(this,d)),f&&e[d].isNew&&e[d].render(b,!0,-1),e[d].render(b)};B.prototype.render=function(){var d=this,b=d.chart,c=d.logarithmic,e=d.options,f=d.isLinked,u=d.tickPositions,h=d.axisTitle,w=d.ticks,l=d.minorTicks,C=d.alternateBands,F=e.stackLabels,B=e.alternateGridColor,
+L=d.tickmarkOffset,r=d.axisLine,O=d.showAxis,q=G(b.renderer.globalAnimation),z,k;d.labelEdge.length=0;d.overlap=!1;[w,l,C].forEach(function(b){m(b,function(b){b.isActive=!1})});if(d.hasData()||f)d.minorTickInterval&&!d.categories&&d.getMinorTickPositions().forEach(function(b){d.renderMinorTick(b)}),u.length&&(u.forEach(function(b,a){d.renderTick(b,a)}),L&&(0===d.min||d.single)&&(w[-1]||(w[-1]=new H(d,-1,null,!0)),w[-1].render(-1))),B&&u.forEach(function(a,e){k="undefined"!==typeof u[e+1]?u[e+1]+L:
+d.max-L;0===e%2&&a<d.max&&k<=d.max+(b.polar?-L:L)&&(C[a]||(C[a]=new g.PlotLineOrBand(d)),z=a+L,C[a].options={from:c?c.lin2log(z):z,to:c?c.lin2log(k):k,color:B},C[a].render(),C[a].isActive=!0)}),d._addedPlotLB||((e.plotLines||[]).concat(e.plotBands||[]).forEach(function(b){d.addPlotBandOrLine(b)}),d._addedPlotLB=!0);[w,l,C].forEach(function(d){var a,c=[],e=q.duration;m(d,function(b,d){b.isActive||(b.render(d,!1,0),b.isActive=!1,c.push(d))});p(function(){for(a=c.length;a--;)d[c[a]]&&!d[c[a]].isActive&&
+(d[c[a]].destroy(),delete d[c[a]])},d!==C&&b.hasRendered&&e?e:0)});r&&(r[r.isPlaced?"animate":"attr"]({d:this.getLinePath(r.strokeWidth())}),r.isPlaced=!0,r[O?"show":"hide"](O));h&&O&&(e=d.getTitlePosition(),a(e.y)?(h[h.isNew?"attr":"animate"](e),h.isNew=!1):(h.attr("y",-9999),h.isNew=!0));F&&F.enabled&&d.stacking&&d.stacking.renderStackTotals();d.isDirty=!1;t(this,"afterRender")};B.prototype.redraw=function(){this.visible&&(this.render(),this.plotLinesAndBands.forEach(function(d){d.render()}));this.series.forEach(function(d){d.isDirty=
+!0})};B.prototype.getKeepProps=function(){return this.keepProps||B.keepProps};B.prototype.destroy=function(d){var b=this,a=b.plotLinesAndBands,c;t(this,"destroy",{keepEvents:d});d||F(b);[b.ticks,b.minorTicks,b.alternateBands].forEach(function(b){E(b)});if(a)for(d=a.length;d--;)a[d].destroy();"axisLine axisTitle axisGroup gridGroup labelGroup cross scrollbar".split(" ").forEach(function(d){b[d]&&(b[d]=b[d].destroy())});for(c in b.plotLinesAndBandsGroups)b.plotLinesAndBandsGroups[c]=b.plotLinesAndBandsGroups[c].destroy();
+m(b,function(d,a){-1===b.getKeepProps().indexOf(a)&&delete b[a]})};B.prototype.drawCrosshair=function(d,b){var a=this.crosshair,c=u(a.snap,!0),e,f=this.cross,m=this.chart;t(this,"drawCrosshair",{e:d,point:b});d||(d=this.cross&&this.cross.e);if(this.crosshair&&!1!==(J(b)||!c)){c?J(b)&&(e=u("colorAxis"!==this.coll?b.crosshairPos:null,this.isXAxis?b.plotX:this.len-b.plotY)):e=d&&(this.horiz?d.chartX-this.pos:this.len-d.chartY+this.pos);if(J(e)){var p={value:b&&(this.isXAxis?b.x:u(b.stackY,b.y)),translatedValue:e};
+m.polar&&z(p,{isCrosshair:!0,chartX:d&&d.chartX,chartY:d&&d.chartY,point:b});p=this.getPlotLinePath(p)||null}if(!J(p)){this.hideCrosshair();return}c=this.categories&&!this.isRadial;f||(this.cross=f=m.renderer.path().addClass("highcharts-crosshair highcharts-crosshair-"+(c?"category ":"thin ")+a.className).attr({zIndex:u(a.zIndex,2)}).add(),m.styledMode||(f.attr({stroke:a.color||(c?k.parse("#ccd6eb").setOpacity(.25).get():"#cccccc"),"stroke-width":u(a.width,1)}).css({"pointer-events":"none"}),a.dashStyle&&
+f.attr({dashstyle:a.dashStyle})));f.show().attr({d:p});c&&!a.width&&f.attr({"stroke-width":this.transA});this.cross.e=d}else this.hideCrosshair();t(this,"afterDrawCrosshair",{e:d,point:b})};B.prototype.hideCrosshair=function(){this.cross&&this.cross.hide();t(this,"afterHideCrosshair")};B.prototype.hasVerticalPanning=function(){var d,b;return/y/.test((null===(b=null===(d=this.chart.options.chart)||void 0===d?void 0:d.panning)||void 0===b?void 0:b.type)||"")};B.defaultOptions={dateTimeLabelFormats:{millisecond:{main:"%H:%M:%S.%L",
+range:!1},second:{main:"%H:%M:%S",range:!1},minute:{main:"%H:%M",range:!1},hour:{main:"%H:%M",range:!1},day:{main:"%e. %b"},week:{main:"%e. %b"},month:{main:"%b '%y"},year:{main:"%Y"}},endOnTick:!1,labels:{enabled:!0,indentation:10,x:0,style:{color:"#666666",cursor:"default",fontSize:"11px"}},maxPadding:.01,minorTickLength:2,minorTickPosition:"outside",minPadding:.01,showEmpty:!0,startOfWeek:1,startOnTick:!1,tickLength:10,tickPixelInterval:100,tickmarkPlacement:"between",tickPosition:"outside",title:{align:"middle",
+style:{color:"#666666"}},type:"linear",minorGridLineColor:"#f2f2f2",minorGridLineWidth:1,minorTickColor:"#999999",lineColor:"#ccd6eb",lineWidth:1,gridLineColor:"#e6e6e6",tickColor:"#ccd6eb"};B.defaultYAxisOptions={endOnTick:!0,maxPadding:.05,minPadding:.05,tickPixelInterval:72,showLastLabel:!0,labels:{x:-8},startOnTick:!0,title:{rotation:270,text:"Values"},stackLabels:{allowOverlap:!1,enabled:!1,crop:!0,overflow:"justify",formatter:function(){var d=this.axis.chart.numberFormatter;return d(this.total,
+-1)},style:{color:"#000000",fontSize:"11px",fontWeight:"bold",textOutline:"1px contrast"}},gridLineWidth:1,lineWidth:0};B.defaultLeftAxisOptions={labels:{x:-15},title:{rotation:270}};B.defaultRightAxisOptions={labels:{x:15},title:{rotation:90}};B.defaultBottomAxisOptions={labels:{autoRotation:[-45],x:0},margin:15,title:{rotation:0}};B.defaultTopAxisOptions={labels:{autoRotation:[-45],x:0},margin:15,title:{rotation:0}};B.keepProps="extKey hcEvents names series userMax userMin".split(" ");return B}();
+g.Axis=v;return g.Axis});P(A,"parts/DateTimeAxis.js",[A["parts/Axis.js"],A["parts/Utilities.js"]],function(k,g){var H=g.addEvent,v=g.getMagnitude,K=g.normalizeTickInterval,G=g.timeUnits,N=function(){function g(g){this.axis=g}g.prototype.normalizeTimeTickInterval=function(g,k){var y=k||[["millisecond",[1,2,5,10,20,25,50,100,200,500]],["second",[1,2,5,10,15,30]],["minute",[1,2,5,10,15,30]],["hour",[1,2,3,4,6,8,12]],["day",[1,2]],["week",[1,2]],["month",[1,2,3,4,6]],["year",null]];k=y[y.length-1];var E=
+G[k[0]],D=k[1],z;for(z=0;z<y.length&&!(k=y[z],E=G[k[0]],D=k[1],y[z+1]&&g<=(E*D[D.length-1]+G[y[z+1][0]])/2);z++);E===G.year&&g<5*E&&(D=[1,2,5]);g=K(g/E,D,"year"===k[0]?Math.max(v(g/E),1):1);return{unitRange:E,count:g,unitName:k[0]}};return g}();g=function(){function g(){}g.compose=function(g){g.keepProps.push("dateTime");g.prototype.getTimeTicks=function(){return this.chart.time.getTimeTicks.apply(this.chart.time,arguments)};H(g,"init",function(g){"datetime"!==g.userOptions.type?this.dateTime=void 0:
+this.dateTime||(this.dateTime=new N(this))})};g.AdditionsClass=N;return g}();g.compose(k);return g});P(A,"parts/LogarithmicAxis.js",[A["parts/Axis.js"],A["parts/Utilities.js"]],function(k,g){var H=g.addEvent,v=g.getMagnitude,K=g.normalizeTickInterval,G=g.pick,N=function(){function g(g){this.axis=g}g.prototype.getLogTickPositions=function(g,k,J,E){var y=this.axis,z=y.len,t=y.options,q=[];E||(this.minorAutoInterval=void 0);if(.5<=g)g=Math.round(g),q=y.getLinearTickPositions(g,k,J);else if(.08<=g){t=
+Math.floor(k);var r,h;for(z=.3<g?[1,2,4]:.15<g?[1,2,4,6,8]:[1,2,3,4,5,6,7,8,9];t<J+1&&!h;t++){var f=z.length;for(r=0;r<f&&!h;r++){var a=this.log2lin(this.lin2log(t)*z[r]);a>k&&(!E||l<=J)&&"undefined"!==typeof l&&q.push(l);l>J&&(h=!0);var l=a}}}else k=this.lin2log(k),J=this.lin2log(J),g=E?y.getMinorTickInterval():t.tickInterval,g=G("auto"===g?null:g,this.minorAutoInterval,t.tickPixelInterval/(E?5:1)*(J-k)/((E?z/y.tickPositions.length:z)||1)),g=K(g,void 0,v(g)),q=y.getLinearTickPositions(g,k,J).map(this.log2lin),
+E||(this.minorAutoInterval=g/5);E||(y.tickInterval=g);return q};g.prototype.lin2log=function(g){return Math.pow(10,g)};g.prototype.log2lin=function(g){return Math.log(g)/Math.LN10};return g}();g=function(){function g(){}g.compose=function(g){g.keepProps.push("logarithmic");var k=g.prototype,y=N.prototype;k.log2lin=y.log2lin;k.lin2log=y.lin2log;H(g,"init",function(g){var k=this.logarithmic;"logarithmic"!==g.userOptions.type?this.logarithmic=void 0:(k||(k=this.logarithmic=new N(this)),this.log2lin!==
+k.log2lin&&(k.log2lin=this.log2lin.bind(this)),this.lin2log!==k.lin2log&&(k.lin2log=this.lin2log.bind(this)))});H(g,"afterInit",function(){var g=this.logarithmic;g&&(this.lin2val=function(k){return g.lin2log(k)},this.val2lin=function(k){return g.log2lin(k)})})};return g}();g.compose(k);return g});P(A,"parts/PlotLineOrBand.js",[A["parts/Globals.js"],A["parts/Axis.js"],A["parts/Utilities.js"]],function(k,g,H){var v=H.arrayMax,K=H.arrayMin,G=H.defined,N=H.destroyObjectProperties,M=H.erase,y=H.extend,
+I=H.merge,J=H.objectEach,E=H.pick,D=function(){function g(t,q){this.axis=t;q&&(this.options=q,this.id=q.id)}g.prototype.render=function(){k.fireEvent(this,"render");var t=this,q=t.axis,r=q.horiz,h=q.logarithmic,f=t.options,a=f.label,l=t.label,e=f.to,c=f.from,m=f.value,u=G(c)&&G(e),L=G(m),F=t.svgElem,w=!F,p=[],C=f.color,O=E(f.zIndex,0),B=f.events;p={"class":"highcharts-plot-"+(u?"band ":"line ")+(f.className||"")};var d={},b=q.chart.renderer,n=u?"bands":"lines";h&&(c=h.log2lin(c),e=h.log2lin(e),m=
+h.log2lin(m));q.chart.styledMode||(L?(p.stroke=C||"#999999",p["stroke-width"]=E(f.width,1),f.dashStyle&&(p.dashstyle=f.dashStyle)):u&&(p.fill=C||"#e6ebf5",f.borderWidth&&(p.stroke=f.borderColor,p["stroke-width"]=f.borderWidth)));d.zIndex=O;n+="-"+O;(h=q.plotLinesAndBandsGroups[n])||(q.plotLinesAndBandsGroups[n]=h=b.g("plot-"+n).attr(d).add());w&&(t.svgElem=F=b.path().attr(p).add(h));if(L)p=q.getPlotLinePath({value:m,lineWidth:F.strokeWidth(),acrossPanes:f.acrossPanes});else if(u)p=q.getPlotBandPath(c,
+e,f);else return;(w||!F.d)&&p&&p.length?(F.attr({d:p}),B&&J(B,function(b,d){F.on(d,function(b){B[d].apply(t,[b])})})):F&&(p?(F.show(!0),F.animate({d:p})):F.d&&(F.hide(),l&&(t.label=l=l.destroy())));a&&(G(a.text)||G(a.formatter))&&p&&p.length&&0<q.width&&0<q.height&&!p.isFlat?(a=I({align:r&&u&&"center",x:r?!u&&4:10,verticalAlign:!r&&u&&"middle",y:r?u?16:10:u?6:-4,rotation:r&&!u&&90},a),this.renderLabel(a,p,u,O)):l&&l.hide();return t};g.prototype.renderLabel=function(t,q,r,h){var f=this.label,a=this.axis.chart.renderer;
+f||(f={align:t.textAlign||t.align,rotation:t.rotation,"class":"highcharts-plot-"+(r?"band":"line")+"-label "+(t.className||"")},f.zIndex=h,h=this.getLabelText(t),this.label=f=a.text(h,0,0,t.useHTML).attr(f).add(),this.axis.chart.styledMode||f.css(t.style));a=q.xBounds||[q[0][1],q[1][1],r?q[2][1]:q[0][1]];q=q.yBounds||[q[0][2],q[1][2],r?q[2][2]:q[0][2]];r=K(a);h=K(q);f.align(t,!1,{x:r,y:h,width:v(a)-r,height:v(q)-h});f.show(!0)};g.prototype.getLabelText=function(t){return G(t.formatter)?t.formatter.call(this):
+t.text};g.prototype.destroy=function(){M(this.axis.plotLinesAndBands,this);delete this.axis;N(this)};return g}();y(g.prototype,{getPlotBandPath:function(g,t){var q=this.getPlotLinePath({value:t,force:!0,acrossPanes:this.options.acrossPanes}),r=this.getPlotLinePath({value:g,force:!0,acrossPanes:this.options.acrossPanes}),h=[],f=this.horiz,a=1;g=g<this.min&&t<this.min||g>this.max&&t>this.max;if(r&&q){if(g){var l=r.toString()===q.toString();a=0}for(g=0;g<r.length;g+=2){t=r[g];var e=r[g+1],c=q[g],m=q[g+
+1];"M"!==t[0]&&"L"!==t[0]||"M"!==e[0]&&"L"!==e[0]||"M"!==c[0]&&"L"!==c[0]||"M"!==m[0]&&"L"!==m[0]||(f&&c[1]===t[1]?(c[1]+=a,m[1]+=a):f||c[2]!==t[2]||(c[2]+=a,m[2]+=a),h.push(["M",t[1],t[2]],["L",e[1],e[2]],["L",m[1],m[2]],["L",c[1],c[2]],["Z"]));h.isFlat=l}}return h},addPlotBand:function(g){return this.addPlotBandOrLine(g,"plotBands")},addPlotLine:function(g){return this.addPlotBandOrLine(g,"plotLines")},addPlotBandOrLine:function(g,t){var q=(new D(this,g)).render(),r=this.userOptions;if(q){if(t){var h=
+r[t]||[];h.push(g);r[t]=h}this.plotLinesAndBands.push(q)}return q},removePlotBandOrLine:function(g){for(var t=this.plotLinesAndBands,q=this.options,r=this.userOptions,h=t.length;h--;)t[h].id===g&&t[h].destroy();[q.plotLines||[],r.plotLines||[],q.plotBands||[],r.plotBands||[]].forEach(function(f){for(h=f.length;h--;)(f[h]||{}).id===g&&M(f,f[h])})},removePlotBand:function(g){this.removePlotBandOrLine(g)},removePlotLine:function(g){this.removePlotBandOrLine(g)}});k.PlotLineOrBand=D;return k.PlotLineOrBand});
+P(A,"parts/Tooltip.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.clamp,v=g.css,K=g.defined,G=g.discardElement,N=g.extend,M=g.fireEvent,y=g.format,I=g.isNumber,J=g.isString,E=g.merge,D=g.pick,z=g.splat,t=g.syncTimeout,q=g.timeUnits;"";var r=k.doc,h=function(){function f(a,f){this.crosshairs=[];this.distance=0;this.isHidden=!0;this.isSticky=!1;this.now={};this.options={};this.outside=!1;this.chart=a;this.init(a,f)}f.prototype.applyFilter=function(){var a=this.chart;a.renderer.definition({tagName:"filter",
+id:"drop-shadow-"+a.index,opacity:.5,children:[{tagName:"feGaussianBlur","in":"SourceAlpha",stdDeviation:1},{tagName:"feOffset",dx:1,dy:1},{tagName:"feComponentTransfer",children:[{tagName:"feFuncA",type:"linear",slope:.3}]},{tagName:"feMerge",children:[{tagName:"feMergeNode"},{tagName:"feMergeNode","in":"SourceGraphic"}]}]});a.renderer.definition({tagName:"style",textContent:".highcharts-tooltip-"+a.index+"{filter:url(#drop-shadow-"+a.index+")}"})};f.prototype.bodyFormatter=function(a){return a.map(function(a){var e=
+a.series.tooltipOptions;return(e[(a.point.formatPrefix||"point")+"Formatter"]||a.point.tooltipFormatter).call(a.point,e[(a.point.formatPrefix||"point")+"Format"]||"")})};f.prototype.cleanSplit=function(a){this.chart.series.forEach(function(f){var e=f&&f.tt;e&&(!e.isActive||a?f.tt=e.destroy():e.isActive=!1)})};f.prototype.defaultFormatter=function(a){var f=this.points||z(this);var e=[a.tooltipFooterHeaderFormatter(f[0])];e=e.concat(a.bodyFormatter(f));e.push(a.tooltipFooterHeaderFormatter(f[0],!0));
+return e};f.prototype.destroy=function(){this.label&&(this.label=this.label.destroy());this.split&&this.tt&&(this.cleanSplit(this.chart,!0),this.tt=this.tt.destroy());this.renderer&&(this.renderer=this.renderer.destroy(),G(this.container));g.clearTimeout(this.hideTimer);g.clearTimeout(this.tooltipTimeout)};f.prototype.getAnchor=function(a,f){var e=this.chart,c=e.pointer,m=e.inverted,u=e.plotTop,h=e.plotLeft,l=0,w=0,p,C;a=z(a);this.followPointer&&f?("undefined"===typeof f.chartX&&(f=c.normalize(f)),
+a=[f.chartX-h,f.chartY-u]):a[0].tooltipPos?a=a[0].tooltipPos:(a.forEach(function(a){p=a.series.yAxis;C=a.series.xAxis;l+=a.plotX+(!m&&C?C.left-h:0);w+=(a.plotLow?(a.plotLow+a.plotHigh)/2:a.plotY)+(!m&&p?p.top-u:0)}),l/=a.length,w/=a.length,a=[m?e.plotWidth-w:l,this.shared&&!m&&1<a.length&&f?f.chartY-u:m?e.plotHeight-l:w]);return a.map(Math.round)};f.prototype.getDateFormat=function(a,f,e,c){var m=this.chart.time,u=m.dateFormat("%m-%d %H:%M:%S.%L",f),h={millisecond:15,second:12,minute:9,hour:6,day:3},
+l="millisecond";for(w in q){if(a===q.week&&+m.dateFormat("%w",f)===e&&"00:00:00.000"===u.substr(6)){var w="week";break}if(q[w]>a){w=l;break}if(h[w]&&u.substr(h[w])!=="01-01 00:00:00.000".substr(h[w]))break;"week"!==w&&(l=w)}if(w)var p=m.resolveDTLFormat(c[w]).main;return p};f.prototype.getLabel=function(){var a,f,e=this,c=this.chart.renderer,m=this.chart.styledMode,u=this.options,h="tooltip"+(K(u.className)?" "+u.className:""),F=(null===(a=u.style)||void 0===a?void 0:a.pointerEvents)||(!this.followPointer&&
+u.stickOnContact?"auto":"none"),w;a=function(){e.inContact=!0};var p=function(){var a=e.chart.hoverSeries;e.inContact=!1;if(a&&a.onMouseOut)a.onMouseOut()};if(!this.label){this.outside&&(this.container=w=k.doc.createElement("div"),w.className="highcharts-tooltip-container",v(w,{position:"absolute",top:"1px",pointerEvents:F,zIndex:3}),k.doc.body.appendChild(w),this.renderer=c=new k.Renderer(w,0,0,null===(f=this.chart.options.chart)||void 0===f?void 0:f.style,void 0,void 0,c.styledMode));this.split?
+this.label=c.g(h):(this.label=c.label("",0,0,u.shape||"callout",null,null,u.useHTML,null,h).attr({padding:u.padding,r:u.borderRadius}),m||this.label.attr({fill:u.backgroundColor,"stroke-width":u.borderWidth}).css(u.style).css({pointerEvents:F}).shadow(u.shadow));m&&(this.applyFilter(),this.label.addClass("highcharts-tooltip-"+this.chart.index));if(e.outside&&!e.split){var C={x:this.label.xSetter,y:this.label.ySetter};this.label.xSetter=function(a,c){C[c].call(this.label,e.distance);w.style.left=a+
+"px"};this.label.ySetter=function(a,c){C[c].call(this.label,e.distance);w.style.top=a+"px"}}this.label.on("mouseenter",a).on("mouseleave",p).attr({zIndex:8}).add()}return this.label};f.prototype.getPosition=function(a,f,e){var c=this.chart,m=this.distance,u={},h=c.inverted&&e.h||0,l,w=this.outside,p=w?r.documentElement.clientWidth-2*m:c.chartWidth,C=w?Math.max(r.body.scrollHeight,r.documentElement.scrollHeight,r.body.offsetHeight,r.documentElement.offsetHeight,r.documentElement.clientHeight):c.chartHeight,
+t=c.pointer.getChartPosition(),B=c.containerScaling,d=function(b){return B?b*B.scaleX:b},b=function(b){return B?b*B.scaleY:b},n=function(n){var u="x"===n;return[n,u?p:C,u?a:f].concat(w?[u?d(a):b(f),u?t.left-m+d(e.plotX+c.plotLeft):t.top-m+b(e.plotY+c.plotTop),0,u?p:C]:[u?a:f,u?e.plotX+c.plotLeft:e.plotY+c.plotTop,u?c.plotLeft:c.plotTop,u?c.plotLeft+c.plotWidth:c.plotTop+c.plotHeight])},x=n("y"),q=n("x"),g=!this.followPointer&&D(e.ttBelow,!c.inverted===!!e.negative),z=function(a,c,e,f,n,p,w){var x=
+"y"===a?b(m):d(m),l=(e-f)/2,C=f<n-m,F=n+m+f<c,B=n-x-e+l;n=n+x-l;if(g&&F)u[a]=n;else if(!g&&C)u[a]=B;else if(C)u[a]=Math.min(w-f,0>B-h?B:B-h);else if(F)u[a]=Math.max(p,n+h+e>c?n:n+h);else return!1},k=function(b,d,a,c,e){var f;e<m||e>d-m?f=!1:u[b]=e<a/2?1:e>d-c/2?d-c-2:e-a/2;return f},y=function(b){var d=x;x=q;q=d;l=b},E=function(){!1!==z.apply(0,x)?!1!==k.apply(0,q)||l||(y(!0),E()):l?u.x=u.y=0:(y(!0),E())};(c.inverted||1<this.len)&&y();E();return u};f.prototype.getXDateFormat=function(a,f,e){f=f.dateTimeLabelFormats;
+var c=e&&e.closestPointRange;return(c?this.getDateFormat(c,a.x,e.options.startOfWeek,f):f.day)||f.year};f.prototype.hide=function(a){var f=this;g.clearTimeout(this.hideTimer);a=D(a,this.options.hideDelay,500);this.isHidden||(this.hideTimer=t(function(){f.getLabel().fadeOut(a?void 0:a);f.isHidden=!0},a))};f.prototype.init=function(a,f){this.chart=a;this.options=f;this.crosshairs=[];this.now={x:0,y:0};this.isHidden=!0;this.split=f.split&&!a.inverted&&!a.polar;this.shared=f.shared||this.split;this.outside=
+D(f.outside,!(!a.scrollablePixelsX&&!a.scrollablePixelsY))};f.prototype.isStickyOnContact=function(){return!(this.followPointer||!this.options.stickOnContact||!this.inContact)};f.prototype.move=function(a,f,e,c){var m=this,u=m.now,h=!1!==m.options.animation&&!m.isHidden&&(1<Math.abs(a-u.x)||1<Math.abs(f-u.y)),l=m.followPointer||1<m.len;N(u,{x:h?(2*u.x+a)/3:a,y:h?(u.y+f)/2:f,anchorX:l?void 0:h?(2*u.anchorX+e)/3:e,anchorY:l?void 0:h?(u.anchorY+c)/2:c});m.getLabel().attr(u);m.drawTracker();h&&(g.clearTimeout(this.tooltipTimeout),
+this.tooltipTimeout=setTimeout(function(){m&&m.move(a,f,e,c)},32))};f.prototype.refresh=function(a,f){var e=this.chart,c=this.options,m=a,u={},h=[],l=c.formatter||this.defaultFormatter;u=this.shared;var w=e.styledMode;if(c.enabled){g.clearTimeout(this.hideTimer);this.followPointer=z(m)[0].series.tooltipOptions.followPointer;var p=this.getAnchor(m,f);f=p[0];var C=p[1];!u||m.series&&m.series.noSharedTooltip?u=m.getLabelConfig():(e.pointer.applyInactiveState(m),m.forEach(function(a){a.setState("hover");
+h.push(a.getLabelConfig())}),u={x:m[0].category,y:m[0].y},u.points=h,m=m[0]);this.len=h.length;e=l.call(u,this);l=m.series;this.distance=D(l.tooltipOptions.distance,16);!1===e?this.hide():(this.split?this.renderSplit(e,z(a)):(a=this.getLabel(),c.style.width&&!w||a.css({width:this.chart.spacingBox.width+"px"}),a.attr({text:e&&e.join?e.join(""):e}),a.removeClass(/highcharts-color-[\d]+/g).addClass("highcharts-color-"+D(m.colorIndex,l.colorIndex)),w||a.attr({stroke:c.borderColor||m.color||l.color||"#666666"}),
+this.updatePosition({plotX:f,plotY:C,negative:m.negative,ttBelow:m.ttBelow,h:p[2]||0})),this.isHidden&&this.label&&this.label.attr({opacity:1}).show(),this.isHidden=!1);M(this,"refresh")}};f.prototype.renderSplit=function(a,f){function e(b,d,a,c,e){void 0===e&&(e=!0);a?(d=y?0:I,b=H(b-c/2,g.left,g.right-c)):(d-=E,b=e?b-c-x:b+x,b=H(b,e?b:g.left,g.right));return{x:b,y:d}}var c=this,m=c.chart,u=c.chart,h=u.plotHeight,l=u.plotLeft,w=u.plotTop,p=u.pointer,C=u.renderer,r=u.scrollablePixelsY,B=void 0===r?
+0:r;r=u.scrollingContainer;r=void 0===r?{scrollLeft:0,scrollTop:0}:r;var d=r.scrollLeft,b=r.scrollTop,n=u.styledMode,x=c.distance,q=c.options,t=c.options.positioner,g={left:d,right:d+u.chartWidth,top:b,bottom:b+u.chartHeight},z=c.getLabel(),y=!(!m.xAxis[0]||!m.xAxis[0].opposite),E=w+b,v=0,I=h-B;J(a)&&(a=[!1,a]);a=a.slice(0,f.length+1).reduce(function(d,a,m){if(!1!==a&&""!==a){m=f[m-1]||{isHeader:!0,plotX:f[0].plotX,plotY:h,series:{}};var u=m.isHeader,p=u?c:m.series,F=p.tt,r=m.isHeader;var L=m.series;
+var O="highcharts-color-"+D(m.colorIndex,L.colorIndex,"none");F||(F={padding:q.padding,r:q.borderRadius},n||(F.fill=q.backgroundColor,F["stroke-width"]=q.borderWidth),F=C.label("",0,0,q[r?"headerShape":"shape"]||"callout",void 0,void 0,q.useHTML).addClass((r?"highcharts-tooltip-header ":"")+"highcharts-tooltip-box "+O).attr(F).add(z));F.isActive=!0;F.attr({text:a});n||F.css(q.style).shadow(q.shadow).attr({stroke:q.borderColor||m.color||L.color||"#333333"});a=p.tt=F;r=a.getBBox();p=r.width+a.strokeWidth();
+u&&(v=r.height,I+=v,y&&(E-=v));L=m.plotX;L=void 0===L?0:L;O=m.plotY;O=void 0===O?0:O;var k=m.series;if(m.isHeader){L=l+L;var Q=w+h/2}else F=k.xAxis,k=k.yAxis,L=F.pos+H(L,-x,F.len+x),k.pos+O>=b+w&&k.pos+O<=b+w+h-B&&(Q=k.pos+O);L=H(L,g.left-x,g.right+x);"number"===typeof Q?(r=r.height+1,O=t?t.call(c,p,r,m):e(L,Q,u,p),d.push({align:t?0:void 0,anchorX:L,anchorY:Q,boxWidth:p,point:m,rank:D(O.rank,u?1:0),size:r,target:O.y,tt:a,x:O.x})):a.isActive=!1}return d},[]);!t&&a.some(function(b){return b.x<g.left})&&
+(a=a.map(function(b){var d=e(b.anchorX,b.anchorY,b.point.isHeader,b.boxWidth,!1);return N(b,{target:d.y,x:d.x})}));c.cleanSplit();k.distribute(a,I);a.forEach(function(b){var d=b.pos;b.tt.attr({visibility:"undefined"===typeof d?"hidden":"inherit",x:b.x,y:d+E,anchorX:b.anchorX,anchorY:b.anchorY})});a=c.container;m=c.renderer;c.outside&&a&&m&&(u=z.getBBox(),m.setSize(u.width+u.x,u.height+u.y,!1),p=p.getChartPosition(),a.style.left=p.left+"px",a.style.top=p.top+"px")};f.prototype.drawTracker=function(){if(this.followPointer||
+!this.options.stickOnContact)this.tracker&&this.tracker.destroy();else{var a=this.chart,f=this.label,e=a.hoverPoint;if(f&&e){var c={x:0,y:0,width:0,height:0};e=this.getAnchor(e);var m=f.getBBox();e[0]+=a.plotLeft-f.translateX;e[1]+=a.plotTop-f.translateY;c.x=Math.min(0,e[0]);c.y=Math.min(0,e[1]);c.width=0>e[0]?Math.max(Math.abs(e[0]),m.width-e[0]):Math.max(Math.abs(e[0]),m.width);c.height=0>e[1]?Math.max(Math.abs(e[1]),m.height-Math.abs(e[1])):Math.max(Math.abs(e[1]),m.height);this.tracker?this.tracker.attr(c):
+(this.tracker=f.renderer.rect(c).addClass("highcharts-tracker").add(f),a.styledMode||this.tracker.attr({fill:"rgba(0,0,0,0)"}))}}};f.prototype.styledModeFormat=function(a){return a.replace('style="font-size: 10px"','class="highcharts-header"').replace(/style="color:{(point|series)\.color}"/g,'class="highcharts-color-{$1.colorIndex}"')};f.prototype.tooltipFooterHeaderFormatter=function(a,f){var e=f?"footer":"header",c=a.series,m=c.tooltipOptions,u=m.xDateFormat,h=c.xAxis,l=h&&"datetime"===h.options.type&&
+I(a.key),w=m[e+"Format"];f={isFooter:f,labelConfig:a};M(this,"headerFormatter",f,function(e){l&&!u&&(u=this.getXDateFormat(a,m,h));l&&u&&(a.point&&a.point.tooltipDateKeys||["key"]).forEach(function(a){w=w.replace("{point."+a+"}","{point."+a+":"+u+"}")});c.chart.styledMode&&(w=this.styledModeFormat(w));e.text=y(w,{point:a,series:c},this.chart)});return f.text};f.prototype.update=function(a){this.destroy();E(!0,this.chart.options.tooltip.userOptions,a);this.init(this.chart,E(!0,this.options,a))};f.prototype.updatePosition=
+function(a){var f=this.chart,e=f.pointer,c=this.getLabel(),m=a.plotX+f.plotLeft,u=a.plotY+f.plotTop;e=e.getChartPosition();a=(this.options.positioner||this.getPosition).call(this,c.width,c.height,a);if(this.outside){var h=(this.options.borderWidth||0)+2*this.distance;this.renderer.setSize(c.width+h,c.height+h,!1);if(f=f.containerScaling)v(this.container,{transform:"scale("+f.scaleX+", "+f.scaleY+")"}),m*=f.scaleX,u*=f.scaleY;m+=e.left-a.x;u+=e.top-a.y}this.move(Math.round(a.x),Math.round(a.y||0),
+m,u)};return f}();k.Tooltip=h;return k.Tooltip});P(A,"parts/Pointer.js",[A["parts/Globals.js"],A["parts/Utilities.js"],A["parts/Tooltip.js"],A["parts/Color.js"]],function(k,g,H,v){var K=g.addEvent,G=g.attr,N=g.css,M=g.defined,y=g.extend,I=g.find,J=g.fireEvent,E=g.isNumber,D=g.isObject,z=g.objectEach,t=g.offset,q=g.pick,r=g.splat,h=v.parse,f=k.charts,a=k.noop;g=function(){function l(a,c){this.lastValidTouch={};this.pinchDown=[];this.runChartClick=!1;this.chart=a;this.hasDragged=!1;this.options=c;this.unbindContainerMouseLeave=
+function(){};this.init(a,c)}l.prototype.applyInactiveState=function(a){var c=[],e;(a||[]).forEach(function(a){e=a.series;c.push(e);e.linkedParent&&c.push(e.linkedParent);e.linkedSeries&&(c=c.concat(e.linkedSeries));e.navigatorSeries&&c.push(e.navigatorSeries)});this.chart.series.forEach(function(a){-1===c.indexOf(a)?a.setState("inactive",!0):a.options.inactiveOtherPoints&&a.setAllPointsToState("inactive")})};l.prototype.destroy=function(){var a=this;"undefined"!==typeof a.unDocMouseMove&&a.unDocMouseMove();
+this.unbindContainerMouseLeave();k.chartCount||(k.unbindDocumentMouseUp&&(k.unbindDocumentMouseUp=k.unbindDocumentMouseUp()),k.unbindDocumentTouchEnd&&(k.unbindDocumentTouchEnd=k.unbindDocumentTouchEnd()));clearInterval(a.tooltipTimeout);z(a,function(c,e){a[e]=null})};l.prototype.drag=function(a){var c=this.chart,e=c.options.chart,f=a.chartX,l=a.chartY,F=this.zoomHor,w=this.zoomVert,p=c.plotLeft,C=c.plotTop,r=c.plotWidth,B=c.plotHeight,d=this.selectionMarker,b=this.mouseDownX||0,n=this.mouseDownY||
+0,x=D(e.panning)?e.panning&&e.panning.enabled:e.panning,q=e.panKey&&a[e.panKey+"Key"];if(!d||!d.touch)if(f<p?f=p:f>p+r&&(f=p+r),l<C?l=C:l>C+B&&(l=C+B),this.hasDragged=Math.sqrt(Math.pow(b-f,2)+Math.pow(n-l,2)),10<this.hasDragged){var t=c.isInsidePlot(b-p,n-C);c.hasCartesianSeries&&(this.zoomX||this.zoomY)&&t&&!q&&!d&&(this.selectionMarker=d=c.renderer.rect(p,C,F?1:r,w?1:B,0).attr({"class":"highcharts-selection-marker",zIndex:7}).add(),c.styledMode||d.attr({fill:e.selectionMarkerFill||h("#335cad").setOpacity(.25).get()}));
+d&&F&&(f-=b,d.attr({width:Math.abs(f),x:(0<f?0:f)+b}));d&&w&&(f=l-n,d.attr({height:Math.abs(f),y:(0<f?0:f)+n}));t&&!d&&x&&c.pan(a,e.panning)}};l.prototype.dragStart=function(a){var c=this.chart;c.mouseIsDown=a.type;c.cancelClick=!1;c.mouseDownX=this.mouseDownX=a.chartX;c.mouseDownY=this.mouseDownY=a.chartY};l.prototype.drop=function(a){var c=this,e=this.chart,f=this.hasPinched;if(this.selectionMarker){var h={originalEvent:a,xAxis:[],yAxis:[]},l=this.selectionMarker,w=l.attr?l.attr("x"):l.x,p=l.attr?
+l.attr("y"):l.y,C=l.attr?l.attr("width"):l.width,r=l.attr?l.attr("height"):l.height,B;if(this.hasDragged||f)e.axes.forEach(function(d){if(d.zoomEnabled&&M(d.min)&&(f||c[{xAxis:"zoomX",yAxis:"zoomY"}[d.coll]])){var b=d.horiz,e="touchend"===a.type?d.minPixelPadding:0,m=d.toValue((b?w:p)+e);b=d.toValue((b?w+C:p+r)-e);h[d.coll].push({axis:d,min:Math.min(m,b),max:Math.max(m,b)});B=!0}}),B&&J(e,"selection",h,function(d){e.zoom(y(d,f?{animation:!1}:null))});E(e.index)&&(this.selectionMarker=this.selectionMarker.destroy());
+f&&this.scaleGroups()}e&&E(e.index)&&(N(e.container,{cursor:e._cursor}),e.cancelClick=10<this.hasDragged,e.mouseIsDown=this.hasDragged=this.hasPinched=!1,this.pinchDown=[])};l.prototype.findNearestKDPoint=function(a,c,f){var e=this.chart,m=e.hoverPoint;e=e.tooltip;if(m&&e&&e.isStickyOnContact())return m;var h;a.forEach(function(a){var e=!(a.noSharedTooltip&&c)&&0>a.options.findNearestPointBy.indexOf("y");a=a.searchPoint(f,e);if((e=D(a,!0))&&!(e=!D(h,!0))){e=h.distX-a.distX;var m=h.dist-a.dist,u=(a.series.group&&
+a.series.group.zIndex)-(h.series.group&&h.series.group.zIndex);e=0<(0!==e&&c?e:0!==m?m:0!==u?u:h.series.index>a.series.index?-1:1)}e&&(h=a)});return h};l.prototype.getChartCoordinatesFromPoint=function(a,c){var e=a.series,f=e.xAxis;e=e.yAxis;var h=q(a.clientX,a.plotX),l=a.shapeArgs;if(f&&e)return c?{chartX:f.len+f.pos-h,chartY:e.len+e.pos-a.plotY}:{chartX:h+f.pos,chartY:a.plotY+e.pos};if(l&&l.x&&l.y)return{chartX:l.x,chartY:l.y}};l.prototype.getChartPosition=function(){return this.chartPosition||
+(this.chartPosition=t(this.chart.container))};l.prototype.getCoordinates=function(a){var c={xAxis:[],yAxis:[]};this.chart.axes.forEach(function(e){c[e.isXAxis?"xAxis":"yAxis"].push({axis:e,value:e.toValue(a[e.horiz?"chartX":"chartY"])})});return c};l.prototype.getHoverData=function(a,c,f,h,l,F){var e,m=[];h=!(!h||!a);var u=c&&!c.stickyTracking,r={chartX:F?F.chartX:void 0,chartY:F?F.chartY:void 0,shared:l};J(this,"beforeGetHoverData",r);u=u?[c]:f.filter(function(a){return r.filter?r.filter(a):a.visible&&
+!(!l&&a.directTouch)&&q(a.options.enableMouseTracking,!0)&&a.stickyTracking});c=(e=h||!F?a:this.findNearestKDPoint(u,l,F))&&e.series;e&&(l&&!c.noSharedTooltip?(u=f.filter(function(a){return r.filter?r.filter(a):a.visible&&!(!l&&a.directTouch)&&q(a.options.enableMouseTracking,!0)&&!a.noSharedTooltip}),u.forEach(function(a){var d=I(a.points,function(b){return b.x===e.x&&!b.isNull});D(d)&&(a.chart.isBoosting&&(d=a.getPoint(d)),m.push(d))})):m.push(e));r={hoverPoint:e};J(this,"afterGetHoverData",r);return{hoverPoint:r.hoverPoint,
+hoverSeries:c,hoverPoints:m}};l.prototype.getPointFromEvent=function(a){a=a.target;for(var c;a&&!c;)c=a.point,a=a.parentNode;return c};l.prototype.onTrackerMouseOut=function(a){a=a.relatedTarget||a.toElement;var c=this.chart.hoverSeries;this.isDirectTouch=!1;if(!(!c||!a||c.stickyTracking||this.inClass(a,"highcharts-tooltip")||this.inClass(a,"highcharts-series-"+c.index)&&this.inClass(a,"highcharts-tracker")))c.onMouseOut()};l.prototype.inClass=function(a,c){for(var e;a;){if(e=G(a,"class")){if(-1!==
+e.indexOf(c))return!0;if(-1!==e.indexOf("highcharts-container"))return!1}a=a.parentNode}};l.prototype.init=function(a,c){this.options=c;this.chart=a;this.runChartClick=c.chart.events&&!!c.chart.events.click;this.pinchDown=[];this.lastValidTouch={};H&&(a.tooltip=new H(a,c.tooltip),this.followTouchMove=q(c.tooltip.followTouchMove,!0));this.setDOMEvents()};l.prototype.normalize=function(a,c){var e=a.touches,f=e?e.length?e.item(0):e.changedTouches[0]:a;c||(c=this.getChartPosition());e=f.pageX-c.left;
+c=f.pageY-c.top;if(f=this.chart.containerScaling)e/=f.scaleX,c/=f.scaleY;return y(a,{chartX:Math.round(e),chartY:Math.round(c)})};l.prototype.onContainerClick=function(a){var c=this.chart,e=c.hoverPoint;a=this.normalize(a);var f=c.plotLeft,h=c.plotTop;c.cancelClick||(e&&this.inClass(a.target,"highcharts-tracker")?(J(e.series,"click",y(a,{point:e})),c.hoverPoint&&e.firePointEvent("click",a)):(y(a,this.getCoordinates(a)),c.isInsidePlot(a.chartX-f,a.chartY-h)&&J(c,"click",a)))};l.prototype.onContainerMouseDown=
+function(a){a=this.normalize(a);if(k.isFirefox&&0!==a.button)this.onContainerMouseMove(a);if("undefined"===typeof a.button||1===((a.buttons||a.button)&1))this.zoomOption(a),this.dragStart(a)};l.prototype.onContainerMouseLeave=function(a){var c=f[q(k.hoverChartIndex,-1)],e=this.chart.tooltip;a=this.normalize(a);c&&(a.relatedTarget||a.toElement)&&(c.pointer.reset(),c.pointer.chartPosition=void 0);e&&!e.isHidden&&this.reset()};l.prototype.onContainerMouseMove=function(a){var c=this.chart;a=this.normalize(a);
+this.setHoverChartIndex();a.preventDefault||(a.returnValue=!1);"mousedown"===c.mouseIsDown&&this.drag(a);c.openMenu||!this.inClass(a.target,"highcharts-tracker")&&!c.isInsidePlot(a.chartX-c.plotLeft,a.chartY-c.plotTop)||this.runPointActions(a)};l.prototype.onDocumentTouchEnd=function(a){f[k.hoverChartIndex]&&f[k.hoverChartIndex].pointer.drop(a)};l.prototype.onContainerTouchMove=function(a){this.touch(a)};l.prototype.onContainerTouchStart=function(a){this.zoomOption(a);this.touch(a,!0)};l.prototype.onDocumentMouseMove=
+function(a){var c=this.chart,e=this.chartPosition;a=this.normalize(a,e);var f=c.tooltip;!e||f&&f.isStickyOnContact()||c.isInsidePlot(a.chartX-c.plotLeft,a.chartY-c.plotTop)||this.inClass(a.target,"highcharts-tracker")||this.reset()};l.prototype.onDocumentMouseUp=function(a){var c=f[q(k.hoverChartIndex,-1)];c&&c.pointer.drop(a)};l.prototype.pinch=function(e){var c=this,f=c.chart,h=c.pinchDown,l=e.touches||[],F=l.length,w=c.lastValidTouch,p=c.hasZoom,C=c.selectionMarker,r={},B=1===F&&(c.inClass(e.target,
+"highcharts-tracker")&&f.runTrackerClick||c.runChartClick),d={};1<F&&(c.initiated=!0);p&&c.initiated&&!B&&e.preventDefault();[].map.call(l,function(b){return c.normalize(b)});"touchstart"===e.type?([].forEach.call(l,function(b,d){h[d]={chartX:b.chartX,chartY:b.chartY}}),w.x=[h[0].chartX,h[1]&&h[1].chartX],w.y=[h[0].chartY,h[1]&&h[1].chartY],f.axes.forEach(function(b){if(b.zoomEnabled){var d=f.bounds[b.horiz?"h":"v"],a=b.minPixelPadding,c=b.toPixels(Math.min(q(b.options.min,b.dataMin),b.dataMin)),
+e=b.toPixels(Math.max(q(b.options.max,b.dataMax),b.dataMax)),h=Math.max(c,e);d.min=Math.min(b.pos,Math.min(c,e)-a);d.max=Math.max(b.pos+b.len,h+a)}}),c.res=!0):c.followTouchMove&&1===F?this.runPointActions(c.normalize(e)):h.length&&(C||(c.selectionMarker=C=y({destroy:a,touch:!0},f.plotBox)),c.pinchTranslate(h,l,r,C,d,w),c.hasPinched=p,c.scaleGroups(r,d),c.res&&(c.res=!1,this.reset(!1,0)))};l.prototype.pinchTranslate=function(a,c,f,h,l,F){this.zoomHor&&this.pinchTranslateDirection(!0,a,c,f,h,l,F);
+this.zoomVert&&this.pinchTranslateDirection(!1,a,c,f,h,l,F)};l.prototype.pinchTranslateDirection=function(a,c,f,h,l,F,w,p){var e=this.chart,m=a?"x":"y",u=a?"X":"Y",d="chart"+u,b=a?"width":"height",n=e["plot"+(a?"Left":"Top")],x,r,q=p||1,t=e.inverted,g=e.bounds[a?"h":"v"],L=1===c.length,k=c[0][d],z=f[0][d],y=!L&&c[1][d],D=!L&&f[1][d];f=function(){"number"===typeof D&&20<Math.abs(k-y)&&(q=p||Math.abs(z-D)/Math.abs(k-y));r=(n-z)/q+k;x=e["plot"+(a?"Width":"Height")]/q};f();c=r;if(c<g.min){c=g.min;var E=
+!0}else c+x>g.max&&(c=g.max-x,E=!0);E?(z-=.8*(z-w[m][0]),"number"===typeof D&&(D-=.8*(D-w[m][1])),f()):w[m]=[z,D];t||(F[m]=r-n,F[b]=x);F=t?1/q:q;l[b]=x;l[m]=c;h[t?a?"scaleY":"scaleX":"scale"+u]=q;h["translate"+u]=F*n+(z-F*k)};l.prototype.reset=function(a,c){var e=this.chart,f=e.hoverSeries,h=e.hoverPoint,l=e.hoverPoints,w=e.tooltip,p=w&&w.shared?l:h;a&&p&&r(p).forEach(function(c){c.series.isCartesian&&"undefined"===typeof c.plotX&&(a=!1)});if(a)w&&p&&r(p).length&&(w.refresh(p),w.shared&&l?l.forEach(function(a){a.setState(a.state,
+!0);a.series.isCartesian&&(a.series.xAxis.crosshair&&a.series.xAxis.drawCrosshair(null,a),a.series.yAxis.crosshair&&a.series.yAxis.drawCrosshair(null,a))}):h&&(h.setState(h.state,!0),e.axes.forEach(function(a){a.crosshair&&h.series[a.coll]===a&&a.drawCrosshair(null,h)})));else{if(h)h.onMouseOut();l&&l.forEach(function(a){a.setState()});if(f)f.onMouseOut();w&&w.hide(c);this.unDocMouseMove&&(this.unDocMouseMove=this.unDocMouseMove());e.axes.forEach(function(a){a.hideCrosshair()});this.hoverX=e.hoverPoints=
+e.hoverPoint=null}};l.prototype.runPointActions=function(a,c){var e=this.chart,h=e.tooltip&&e.tooltip.options.enabled?e.tooltip:void 0,l=h?h.shared:!1,F=c||e.hoverPoint,w=F&&F.series||e.hoverSeries;w=this.getHoverData(F,w,e.series,(!a||"touchmove"!==a.type)&&(!!c||w&&w.directTouch&&this.isDirectTouch),l,a);F=w.hoverPoint;var p=w.hoverPoints;c=(w=w.hoverSeries)&&w.tooltipOptions.followPointer;l=l&&w&&!w.noSharedTooltip;if(F&&(F!==e.hoverPoint||h&&h.isHidden)){(e.hoverPoints||[]).forEach(function(a){-1===
+p.indexOf(a)&&a.setState()});if(e.hoverSeries!==w)w.onMouseOver();this.applyInactiveState(p);(p||[]).forEach(function(a){a.setState("hover")});e.hoverPoint&&e.hoverPoint.firePointEvent("mouseOut");if(!F.series)return;F.firePointEvent("mouseOver");e.hoverPoints=p;e.hoverPoint=F;h&&h.refresh(l?p:F,a)}else c&&h&&!h.isHidden&&(F=h.getAnchor([{}],a),h.updatePosition({plotX:F[0],plotY:F[1]}));this.unDocMouseMove||(this.unDocMouseMove=K(e.container.ownerDocument,"mousemove",function(a){var c=f[k.hoverChartIndex];
+if(c)c.pointer.onDocumentMouseMove(a)}));e.axes.forEach(function(c){var f=q((c.crosshair||{}).snap,!0),h;f&&((h=e.hoverPoint)&&h.series[c.coll]===c||(h=I(p,function(d){return d.series[c.coll]===c})));h||!f?c.drawCrosshair(a,h):c.hideCrosshair()})};l.prototype.scaleGroups=function(a,c){var e=this.chart,f;e.series.forEach(function(h){f=a||h.getPlotBox();h.xAxis&&h.xAxis.zoomEnabled&&h.group&&(h.group.attr(f),h.markerGroup&&(h.markerGroup.attr(f),h.markerGroup.clip(c?e.clipRect:null)),h.dataLabelsGroup&&
+h.dataLabelsGroup.attr(f))});e.clipRect.attr(c||e.clipBox)};l.prototype.setDOMEvents=function(){var a=this.chart.container,c=a.ownerDocument;a.onmousedown=this.onContainerMouseDown.bind(this);a.onmousemove=this.onContainerMouseMove.bind(this);a.onclick=this.onContainerClick.bind(this);this.unbindContainerMouseLeave=K(a,"mouseleave",this.onContainerMouseLeave.bind(this));k.unbindDocumentMouseUp||(k.unbindDocumentMouseUp=K(c,"mouseup",this.onDocumentMouseUp.bind(this)));k.hasTouch&&(K(a,"touchstart",
+this.onContainerTouchStart.bind(this)),K(a,"touchmove",this.onContainerTouchMove.bind(this)),k.unbindDocumentTouchEnd||(k.unbindDocumentTouchEnd=K(c,"touchend",this.onDocumentTouchEnd.bind(this))))};l.prototype.setHoverChartIndex=function(){var a=this.chart,c=k.charts[q(k.hoverChartIndex,-1)];if(c&&c!==a)c.pointer.onContainerMouseLeave({relatedTarget:!0});c&&c.mouseIsDown||(k.hoverChartIndex=a.index)};l.prototype.touch=function(a,c){var e=this.chart,f;this.setHoverChartIndex();if(1===a.touches.length)if(a=
+this.normalize(a),(f=e.isInsidePlot(a.chartX-e.plotLeft,a.chartY-e.plotTop))&&!e.openMenu){c&&this.runPointActions(a);if("touchmove"===a.type){c=this.pinchDown;var h=c[0]?4<=Math.sqrt(Math.pow(c[0].chartX-a.chartX,2)+Math.pow(c[0].chartY-a.chartY,2)):!1}q(h,!0)&&this.pinch(a)}else c&&this.reset();else 2===a.touches.length&&this.pinch(a)};l.prototype.zoomOption=function(a){var c=this.chart,f=c.options.chart,e=f.zoomType||"";c=c.inverted;/touch/.test(a.type)&&(e=q(f.pinchType,e));this.zoomX=a=/x/.test(e);
+this.zoomY=e=/y/.test(e);this.zoomHor=a&&!c||e&&c;this.zoomVert=e&&!c||a&&c;this.hasZoom=a||e};return l}();k.Pointer=g;return k.Pointer});P(A,"parts/MSPointer.js",[A["parts/Globals.js"],A["parts/Pointer.js"],A["parts/Utilities.js"]],function(k,g,H){function v(){var q=[];q.item=function(r){return this[r]};y(z,function(r){q.push({pageX:r.pageX,pageY:r.pageY,target:r.target})});return q}function K(q,r,h,f){"touch"!==q.pointerType&&q.pointerType!==q.MSPOINTER_TYPE_TOUCH||!J[k.hoverChartIndex]||(f(q),
+f=J[k.hoverChartIndex].pointer,f[r]({type:h,target:q.currentTarget,preventDefault:D,touches:v()}))}var G=this&&this.__extends||function(){var q=function(r,h){q=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(f,a){f.__proto__=a}||function(f,a){for(var h in a)a.hasOwnProperty(h)&&(f[h]=a[h])};return q(r,h)};return function(r,h){function f(){this.constructor=r}q(r,h);r.prototype=null===h?Object.create(h):(f.prototype=h.prototype,new f)}}(),N=H.addEvent,M=H.css,y=H.objectEach,I=H.removeEvent,
+J=k.charts,E=k.doc,D=k.noop,z={},t=!!k.win.PointerEvent;return function(q){function r(){return null!==q&&q.apply(this,arguments)||this}G(r,q);r.prototype.batchMSEvents=function(h){h(this.chart.container,t?"pointerdown":"MSPointerDown",this.onContainerPointerDown);h(this.chart.container,t?"pointermove":"MSPointerMove",this.onContainerPointerMove);h(E,t?"pointerup":"MSPointerUp",this.onDocumentPointerUp)};r.prototype.destroy=function(){this.batchMSEvents(I);q.prototype.destroy.call(this)};r.prototype.init=
+function(h,f){q.prototype.init.call(this,h,f);this.hasZoom&&M(h.container,{"-ms-touch-action":"none","touch-action":"none"})};r.prototype.onContainerPointerDown=function(h){K(h,"onContainerTouchStart","touchstart",function(f){z[f.pointerId]={pageX:f.pageX,pageY:f.pageY,target:f.currentTarget}})};r.prototype.onContainerPointerMove=function(h){K(h,"onContainerTouchMove","touchmove",function(f){z[f.pointerId]={pageX:f.pageX,pageY:f.pageY};z[f.pointerId].target||(z[f.pointerId].target=f.currentTarget)})};
+r.prototype.onDocumentPointerUp=function(h){K(h,"onDocumentTouchEnd","touchend",function(f){delete z[f.pointerId]})};r.prototype.setDOMEvents=function(){q.prototype.setDOMEvents.call(this);(this.hasZoom||this.followTouchMove)&&this.batchMSEvents(N)};return r}(g)});P(A,"parts/Legend.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.addEvent,v=g.animObject,K=g.css,G=g.defined,N=g.discardElement,M=g.find,y=g.fireEvent,I=g.format,J=g.isNumber,E=g.merge,D=g.pick,z=g.relativeLength,
+t=g.setAnimation,q=g.stableSort,r=g.syncTimeout;g=g.wrap;var h=k.isFirefox,f=k.marginNames,a=k.win,l=function(){function a(a,f){this.allItems=[];this.contentGroup=this.box=void 0;this.display=!1;this.group=void 0;this.offsetWidth=this.maxLegendWidth=this.maxItemWidth=this.legendWidth=this.legendHeight=this.lastLineHeight=this.lastItemY=this.itemY=this.itemX=this.itemMarginTop=this.itemMarginBottom=this.itemHeight=this.initialItemY=0;this.options={};this.padding=0;this.pages=[];this.proximate=!1;this.scrollGroup=
+void 0;this.widthOption=this.totalItemWidth=this.titleHeight=this.symbolWidth=this.symbolHeight=0;this.chart=a;this.init(a,f)}a.prototype.init=function(a,f){this.chart=a;this.setOptions(f);f.enabled&&(this.render(),H(this.chart,"endResize",function(){this.legend.positionCheckboxes()}),this.proximate?this.unchartrender=H(this.chart,"render",function(){this.legend.proximatePositions();this.legend.positionItems()}):this.unchartrender&&this.unchartrender())};a.prototype.setOptions=function(a){var c=D(a.padding,
+8);this.options=a;this.chart.styledMode||(this.itemStyle=a.itemStyle,this.itemHiddenStyle=E(this.itemStyle,a.itemHiddenStyle));this.itemMarginTop=a.itemMarginTop||0;this.itemMarginBottom=a.itemMarginBottom||0;this.padding=c;this.initialItemY=c-5;this.symbolWidth=D(a.symbolWidth,16);this.pages=[];this.proximate="proximate"===a.layout&&!this.chart.inverted;this.baseline=void 0};a.prototype.update=function(a,f){var c=this.chart;this.setOptions(E(!0,this.options,a));this.destroy();c.isDirtyLegend=c.isDirtyBox=
+!0;D(f,!0)&&c.redraw();y(this,"afterUpdate")};a.prototype.colorizeItem=function(a,f){a.legendGroup[f?"removeClass":"addClass"]("highcharts-legend-item-hidden");if(!this.chart.styledMode){var c=this.options,e=a.legendItem,h=a.legendLine,m=a.legendSymbol,p=this.itemHiddenStyle.color;c=f?c.itemStyle.color:p;var l=f?a.color||p:p,r=a.options&&a.options.marker,q={fill:l};e&&e.css({fill:c,color:c});h&&h.attr({stroke:l});m&&(r&&m.isMarker&&(q=a.pointAttribs(),f||(q.stroke=q.fill=p)),m.attr(q))}y(this,"afterColorizeItem",
+{item:a,visible:f})};a.prototype.positionItems=function(){this.allItems.forEach(this.positionItem,this);this.chart.isResizing||this.positionCheckboxes()};a.prototype.positionItem=function(a){var c=this.options,f=c.symbolPadding;c=!c.rtl;var e=a._legendItemPos,h=e[0];e=e[1];var w=a.checkbox;if((a=a.legendGroup)&&a.element)a[G(a.translateY)?"animate":"attr"]({translateX:c?h:this.legendWidth-h-2*f-4,translateY:e});w&&(w.x=h,w.y=e)};a.prototype.destroyItem=function(a){var c=a.checkbox;["legendItem","legendLine",
+"legendSymbol","legendGroup"].forEach(function(c){a[c]&&(a[c]=a[c].destroy())});c&&N(a.checkbox)};a.prototype.destroy=function(){function a(a){this[a]&&(this[a]=this[a].destroy())}this.getAllItems().forEach(function(c){["legendItem","legendGroup"].forEach(a,c)});"clipRect up down pager nav box title group".split(" ").forEach(a,this);this.display=null};a.prototype.positionCheckboxes=function(){var a=this.group&&this.group.alignAttr,f=this.clipHeight||this.legendHeight,e=this.titleHeight;if(a){var h=
+a.translateY;this.allItems.forEach(function(c){var m=c.checkbox;if(m){var p=h+e+m.y+(this.scrollOffset||0)+3;K(m,{left:a.translateX+c.checkboxOffset+m.x-20+"px",top:p+"px",display:this.proximate||p>h-6&&p<h+f-6?"":"none"})}},this)}};a.prototype.renderTitle=function(){var a=this.options,f=this.padding,e=a.title,h=0;e.text&&(this.title||(this.title=this.chart.renderer.label(e.text,f-3,f-4,null,null,null,a.useHTML,null,"legend-title").attr({zIndex:1}),this.chart.styledMode||this.title.css(e.style),this.title.add(this.group)),
+e.width||this.title.css({width:this.maxLegendWidth+"px"}),a=this.title.getBBox(),h=a.height,this.offsetWidth=a.width,this.contentGroup.attr({translateY:h}));this.titleHeight=h};a.prototype.setText=function(a){var c=this.options;a.legendItem.attr({text:c.labelFormat?I(c.labelFormat,a,this.chart):c.labelFormatter.call(a)})};a.prototype.renderItem=function(a){var c=this.chart,f=c.renderer,e=this.options,h=this.symbolWidth,w=e.symbolPadding,p=this.itemStyle,l=this.itemHiddenStyle,r="horizontal"===e.layout?
+D(e.itemDistance,20):0,q=!e.rtl,d=a.legendItem,b=!a.series,n=!b&&a.series.drawLegendSymbol?a.series:a,x=n.options;x=this.createCheckboxForItem&&x&&x.showCheckbox;r=h+w+r+(x?20:0);var t=e.useHTML,g=a.options.className;d||(a.legendGroup=f.g("legend-item").addClass("highcharts-"+n.type+"-series highcharts-color-"+a.colorIndex+(g?" "+g:"")+(b?" highcharts-series-"+a.index:"")).attr({zIndex:1}).add(this.scrollGroup),a.legendItem=d=f.text("",q?h+w:-w,this.baseline||0,t),c.styledMode||d.css(E(a.visible?
+p:l)),d.attr({align:q?"left":"right",zIndex:2}).add(a.legendGroup),this.baseline||(this.fontMetrics=f.fontMetrics(c.styledMode?12:p.fontSize,d),this.baseline=this.fontMetrics.f+3+this.itemMarginTop,d.attr("y",this.baseline)),this.symbolHeight=e.symbolHeight||this.fontMetrics.f,n.drawLegendSymbol(this,a),this.setItemEvents&&this.setItemEvents(a,d,t));x&&!a.checkbox&&this.createCheckboxForItem&&this.createCheckboxForItem(a);this.colorizeItem(a,a.visible);!c.styledMode&&p.width||d.css({width:(e.itemWidth||
+this.widthOption||c.spacingBox.width)-r+"px"});this.setText(a);c=d.getBBox();a.itemWidth=a.checkboxOffset=e.itemWidth||a.legendItemWidth||c.width+r;this.maxItemWidth=Math.max(this.maxItemWidth,a.itemWidth);this.totalItemWidth+=a.itemWidth;this.itemHeight=a.itemHeight=Math.round(a.legendItemHeight||c.height||this.symbolHeight)};a.prototype.layoutItem=function(a){var c=this.options,f=this.padding,e="horizontal"===c.layout,h=a.itemHeight,w=this.itemMarginBottom,p=this.itemMarginTop,l=e?D(c.itemDistance,
+20):0,r=this.maxLegendWidth;c=c.alignColumns&&this.totalItemWidth>r?this.maxItemWidth:a.itemWidth;e&&this.itemX-f+c>r&&(this.itemX=f,this.lastLineHeight&&(this.itemY+=p+this.lastLineHeight+w),this.lastLineHeight=0);this.lastItemY=p+this.itemY+w;this.lastLineHeight=Math.max(h,this.lastLineHeight);a._legendItemPos=[this.itemX,this.itemY];e?this.itemX+=c:(this.itemY+=p+h+w,this.lastLineHeight=h);this.offsetWidth=this.widthOption||Math.max((e?this.itemX-f-(a.checkbox?0:l):c)+f,this.offsetWidth)};a.prototype.getAllItems=
+function(){var a=[];this.chart.series.forEach(function(c){var f=c&&c.options;c&&D(f.showInLegend,G(f.linkedTo)?!1:void 0,!0)&&(a=a.concat(c.legendItems||("point"===f.legendType?c.data:c)))});y(this,"afterGetAllItems",{allItems:a});return a};a.prototype.getAlignment=function(){var a=this.options;return this.proximate?a.align.charAt(0)+"tv":a.floating?"":a.align.charAt(0)+a.verticalAlign.charAt(0)+a.layout.charAt(0)};a.prototype.adjustMargins=function(a,e){var c=this.chart,h=this.options,m=this.getAlignment();
+m&&[/(lth|ct|rth)/,/(rtv|rm|rbv)/,/(rbh|cb|lbh)/,/(lbv|lm|ltv)/].forEach(function(u,p){u.test(m)&&!G(a[p])&&(c[f[p]]=Math.max(c[f[p]],c.legend[(p+1)%2?"legendHeight":"legendWidth"]+[1,-1,-1,1][p]*h[p%2?"x":"y"]+D(h.margin,12)+e[p]+(c.titleOffset[p]||0)))})};a.prototype.proximatePositions=function(){var a=this.chart,f=[],e="left"===this.options.align;this.allItems.forEach(function(c){var h=e;if(c.yAxis&&c.points){c.xAxis.options.reversed&&(h=!h);var m=M(h?c.points:c.points.slice(0).reverse(),function(a){return J(a.plotY)});
+h=this.itemMarginTop+c.legendItem.getBBox().height+this.itemMarginBottom;var p=c.yAxis.top-a.plotTop;c.visible?(m=m?m.plotY:c.yAxis.height,m+=p-.3*h):m=p+c.yAxis.height;f.push({target:m,size:h,item:c})}},this);k.distribute(f,a.plotHeight);f.forEach(function(c){c.item._legendItemPos[1]=a.plotTop-a.spacing[0]+c.pos})};a.prototype.render=function(){var a=this.chart,f=a.renderer,e=this.group,h=this.box,l=this.options,w=this.padding;this.itemX=w;this.itemY=this.initialItemY;this.lastItemY=this.offsetWidth=
+0;this.widthOption=z(l.width,a.spacingBox.width-w);var p=a.spacingBox.width-2*w-l.x;-1<["rm","lm"].indexOf(this.getAlignment().substring(0,2))&&(p/=2);this.maxLegendWidth=this.widthOption||p;e||(this.group=e=f.g("legend").attr({zIndex:7}).add(),this.contentGroup=f.g().attr({zIndex:1}).add(e),this.scrollGroup=f.g().add(this.contentGroup));this.renderTitle();var C=this.getAllItems();q(C,function(a,d){return(a.options&&a.options.legendIndex||0)-(d.options&&d.options.legendIndex||0)});l.reversed&&C.reverse();
+this.allItems=C;this.display=p=!!C.length;this.itemHeight=this.totalItemWidth=this.maxItemWidth=this.lastLineHeight=0;C.forEach(this.renderItem,this);C.forEach(this.layoutItem,this);C=(this.widthOption||this.offsetWidth)+w;var r=this.lastItemY+this.lastLineHeight+this.titleHeight;r=this.handleOverflow(r);r+=w;h||(this.box=h=f.rect().addClass("highcharts-legend-box").attr({r:l.borderRadius}).add(e),h.isNew=!0);a.styledMode||h.attr({stroke:l.borderColor,"stroke-width":l.borderWidth||0,fill:l.backgroundColor||
+"none"}).shadow(l.shadow);0<C&&0<r&&(h[h.isNew?"attr":"animate"](h.crisp.call({},{x:0,y:0,width:C,height:r},h.strokeWidth())),h.isNew=!1);h[p?"show":"hide"]();a.styledMode&&"none"===e.getStyle("display")&&(C=r=0);this.legendWidth=C;this.legendHeight=r;p&&this.align();this.proximate||this.positionItems();y(this,"afterRender")};a.prototype.align=function(a){void 0===a&&(a=this.chart.spacingBox);var c=this.chart,f=this.options,e=a.y;/(lth|ct|rth)/.test(this.getAlignment())&&0<c.titleOffset[0]?e+=c.titleOffset[0]:
+/(lbh|cb|rbh)/.test(this.getAlignment())&&0<c.titleOffset[2]&&(e-=c.titleOffset[2]);e!==a.y&&(a=E(a,{y:e}));this.group.align(E(f,{width:this.legendWidth,height:this.legendHeight,verticalAlign:this.proximate?"top":f.verticalAlign}),!0,a)};a.prototype.handleOverflow=function(a){var c=this,f=this.chart,e=f.renderer,h=this.options,l=h.y,p=this.padding;l=f.spacingBox.height+("top"===h.verticalAlign?-l:l)-p;var C=h.maxHeight,r,q=this.clipRect,d=h.navigation,b=D(d.animation,!0),n=d.arrowSize||12,x=this.nav,
+t=this.pages,g,k=this.allItems,z=function(b){"number"===typeof b?q.attr({height:b}):q&&(c.clipRect=q.destroy(),c.contentGroup.clip());c.contentGroup.div&&(c.contentGroup.div.style.clip=b?"rect("+p+"px,9999px,"+(p+b)+"px,0)":"auto")},y=function(b){c[b]=e.circle(0,0,1.3*n).translate(n/2,n/2).add(x);f.styledMode||c[b].attr("fill","rgba(0,0,0,0.0001)");return c[b]};"horizontal"!==h.layout||"middle"===h.verticalAlign||h.floating||(l/=2);C&&(l=Math.min(l,C));t.length=0;a>l&&!1!==d.enabled?(this.clipHeight=
+r=Math.max(l-20-this.titleHeight-p,0),this.currentPage=D(this.currentPage,1),this.fullHeight=a,k.forEach(function(b,a){var d=b._legendItemPos[1],c=Math.round(b.legendItem.getBBox().height),f=t.length;if(!f||d-t[f-1]>r&&(g||d)!==t[f-1])t.push(g||d),f++;b.pageIx=f-1;g&&(k[a-1].pageIx=f-1);a===k.length-1&&d+c-t[f-1]>r&&d!==g&&(t.push(d),b.pageIx=f);d!==g&&(g=d)}),q||(q=c.clipRect=e.clipRect(0,p,9999,0),c.contentGroup.clip(q)),z(r),x||(this.nav=x=e.g().attr({zIndex:1}).add(this.group),this.up=e.symbol("triangle",
+0,0,n,n).add(x),y("upTracker").on("click",function(){c.scroll(-1,b)}),this.pager=e.text("",15,10).addClass("highcharts-legend-navigation"),f.styledMode||this.pager.css(d.style),this.pager.add(x),this.down=e.symbol("triangle-down",0,0,n,n).add(x),y("downTracker").on("click",function(){c.scroll(1,b)})),c.scroll(0),a=l):x&&(z(),this.nav=x.destroy(),this.scrollGroup.attr({translateY:1}),this.clipHeight=0);return a};a.prototype.scroll=function(a,f){var c=this,e=this.chart,h=this.pages,m=h.length,p=this.currentPage+
+a;a=this.clipHeight;var l=this.options.navigation,q=this.pager,g=this.padding;p>m&&(p=m);0<p&&("undefined"!==typeof f&&t(f,e),this.nav.attr({translateX:g,translateY:a+this.padding+7+this.titleHeight,visibility:"visible"}),[this.up,this.upTracker].forEach(function(a){a.attr({"class":1===p?"highcharts-legend-nav-inactive":"highcharts-legend-nav-active"})}),q.attr({text:p+"/"+m}),[this.down,this.downTracker].forEach(function(a){a.attr({x:18+this.pager.getBBox().width,"class":p===m?"highcharts-legend-nav-inactive":
+"highcharts-legend-nav-active"})},this),e.styledMode||(this.up.attr({fill:1===p?l.inactiveColor:l.activeColor}),this.upTracker.css({cursor:1===p?"default":"pointer"}),this.down.attr({fill:p===m?l.inactiveColor:l.activeColor}),this.downTracker.css({cursor:p===m?"default":"pointer"})),this.scrollOffset=-h[p-1]+this.initialItemY,this.scrollGroup.animate({translateY:this.scrollOffset}),this.currentPage=p,this.positionCheckboxes(),f=v(D(f,e.renderer.globalAnimation,!0)),r(function(){y(c,"afterScroll",
+{currentPage:p})},f.duration||0))};return a}();(/Trident\/7\.0/.test(a.navigator&&a.navigator.userAgent)||h)&&g(l.prototype,"positionItem",function(a,c){var f=this,e=function(){c._legendItemPos&&a.call(f,c)};e();f.bubbleLegend||setTimeout(e)});k.Legend=l;return k.Legend});P(A,"parts/Chart.js",[A["parts/Globals.js"],A["parts/Legend.js"],A["parts/MSPointer.js"],A["parts/Pointer.js"],A["parts/Time.js"],A["parts/Utilities.js"]],function(k,g,H,v,K,G){var N=G.addEvent,M=G.animate,y=G.animObject,I=G.attr,
+J=G.createElement,E=G.css,D=G.defined,z=G.discardElement,t=G.erase,q=G.error,r=G.extend,h=G.find,f=G.fireEvent,a=G.getStyle,l=G.isArray,e=G.isFunction,c=G.isNumber,m=G.isObject,u=G.isString,L=G.merge,F=G.numberFormat,w=G.objectEach,p=G.pick,C=G.pInt,O=G.relativeLength,B=G.removeEvent,d=G.setAnimation,b=G.splat,n=G.syncTimeout,x=G.uniqueKey,Q=k.doc,R=k.Axis,X=k.defaultOptions,U=k.charts,V=k.marginNames,W=k.seriesTypes,A=k.win,Y=k.Chart=function(){this.getArgs.apply(this,arguments)};k.chart=function(b,
+a,d){return new Y(b,a,d)};r(Y.prototype,{callbacks:[],getArgs:function(){var b=[].slice.call(arguments);if(u(b[0])||b[0].nodeName)this.renderTo=b.shift();this.init(b[0],b[1])},init:function(b,a){var d,c=b.series,n=b.plotOptions||{};f(this,"init",{args:arguments},function(){b.series=null;d=L(X,b);var h=d.chart||{};w(d.plotOptions,function(b,a){m(b)&&(b.tooltip=n[a]&&L(n[a].tooltip)||void 0)});d.tooltip.userOptions=b.chart&&b.chart.forExport&&b.tooltip.userOptions||b.tooltip;d.series=b.series=c;this.userOptions=
+b;var p=h.events;this.margin=[];this.spacing=[];this.bounds={h:{},v:{}};this.labelCollectors=[];this.callback=a;this.isResizing=0;this.options=d;this.axes=[];this.series=[];this.time=b.time&&Object.keys(b.time).length?new K(b.time):k.time;this.numberFormatter=h.numberFormatter||F;this.styledMode=h.styledMode;this.hasCartesianSeries=h.showAxes;var l=this;l.index=U.length;U.push(l);k.chartCount++;p&&w(p,function(b,a){e(b)&&N(l,a,b)});l.xAxis=[];l.yAxis=[];l.pointCount=l.colorCounter=l.symbolCounter=
+0;f(l,"afterInit");l.firstRender()})},initSeries:function(b){var a=this.options.chart;a=b.type||a.type||a.defaultSeriesType;var d=W[a];d||q(17,!0,this,{missingModuleFor:a});a=new d;a.init(this,b);return a},setSeriesData:function(){this.getSeriesOrderByLinks().forEach(function(b){b.points||b.data||!b.enabledDataSorting||b.setData(b.options.data,!1)})},getSeriesOrderByLinks:function(){return this.series.concat().sort(function(b,a){return b.linkedSeries.length||a.linkedSeries.length?a.linkedSeries.length-
+b.linkedSeries.length:0})},orderSeries:function(b){var a=this.series;for(b=b||0;b<a.length;b++)a[b]&&(a[b].index=b,a[b].name=a[b].getName())},isInsidePlot:function(b,a,d){var c=d?a:b;b=d?b:a;c={x:c,y:b,isInsidePlot:0<=c&&c<=this.plotWidth&&0<=b&&b<=this.plotHeight};f(this,"afterIsInsidePlot",c);return c.isInsidePlot},redraw:function(b){f(this,"beforeRedraw");var a=this.axes,c=this.series,e=this.pointer,n=this.legend,h=this.userOptions.legend,p=this.isDirtyLegend,l=this.hasCartesianSeries,m=this.isDirtyBox,
+x=this.renderer,u=x.isHidden(),w=[];this.setResponsive&&this.setResponsive(!1);d(this.hasRendered?b:!1,this);u&&this.temporaryDisplay();this.layOutTitles();for(b=c.length;b--;){var C=c[b];if(C.options.stacking){var F=!0;if(C.isDirty){var q=!0;break}}}if(q)for(b=c.length;b--;)C=c[b],C.options.stacking&&(C.isDirty=!0);c.forEach(function(b){b.isDirty&&("point"===b.options.legendType?(b.updateTotals&&b.updateTotals(),p=!0):h&&(h.labelFormatter||h.labelFormat)&&(p=!0));b.isDirtyData&&f(b,"updatedData")});
+p&&n&&n.options.enabled&&(n.render(),this.isDirtyLegend=!1);F&&this.getStacks();l&&a.forEach(function(b){b.updateNames();b.setScale()});this.getMargins();l&&(a.forEach(function(b){b.isDirty&&(m=!0)}),a.forEach(function(b){var a=b.min+","+b.max;b.extKey!==a&&(b.extKey=a,w.push(function(){f(b,"afterSetExtremes",r(b.eventArgs,b.getExtremes()));delete b.eventArgs}));(m||F)&&b.redraw()}));m&&this.drawChartBox();f(this,"predraw");c.forEach(function(b){(m||b.isDirty)&&b.visible&&b.redraw();b.isDirtyData=
+!1});e&&e.reset(!0);x.draw();f(this,"redraw");f(this,"render");u&&this.temporaryDisplay(!0);w.forEach(function(b){b.call()})},get:function(b){function a(a){return a.id===b||a.options&&a.options.id===b}var d=this.series,c;var f=h(this.axes,a)||h(this.series,a);for(c=0;!f&&c<d.length;c++)f=h(d[c].points||[],a);return f},getAxes:function(){var a=this,d=this.options,c=d.xAxis=b(d.xAxis||{});d=d.yAxis=b(d.yAxis||{});f(this,"getAxes");c.forEach(function(b,a){b.index=a;b.isX=!0});d.forEach(function(b,a){b.index=
+a});c.concat(d).forEach(function(b){new R(a,b)});f(this,"afterGetAxes")},getSelectedPoints:function(){var b=[];this.series.forEach(function(a){b=b.concat(a.getPointsCollection().filter(function(b){return p(b.selectedStaging,b.selected)}))});return b},getSelectedSeries:function(){return this.series.filter(function(b){return b.selected})},setTitle:function(b,a,d){this.applyDescription("title",b);this.applyDescription("subtitle",a);this.applyDescription("caption",void 0);this.layOutTitles(d)},applyDescription:function(b,
+a){var d=this,c="title"===b?{color:"#333333",fontSize:this.options.isStock?"16px":"18px"}:{color:"#666666"};c=this.options[b]=L(!this.styledMode&&{style:c},this.options[b],a);var f=this[b];f&&a&&(this[b]=f=f.destroy());c&&!f&&(f=this.renderer.text(c.text,0,0,c.useHTML).attr({align:c.align,"class":"highcharts-"+b,zIndex:c.zIndex||4}).add(),f.update=function(a){d[{title:"setTitle",subtitle:"setSubtitle",caption:"setCaption"}[b]](a)},this.styledMode||f.css(c.style),this[b]=f)},layOutTitles:function(b){var a=
+[0,0,0],d=this.renderer,c=this.spacingBox;["title","subtitle","caption"].forEach(function(b){var f=this[b],e=this.options[b],n=e.verticalAlign||"top";b="title"===b?-3:"top"===n?a[0]+2:0;if(f){if(!this.styledMode)var h=e.style.fontSize;h=d.fontMetrics(h,f).b;f.css({width:(e.width||c.width+(e.widthAdjust||0))+"px"});var p=Math.round(f.getBBox(e.useHTML).height);f.align(r({y:"bottom"===n?h:b+h,height:p},e),!1,"spacingBox");e.floating||("top"===n?a[0]=Math.ceil(a[0]+p):"bottom"===n&&(a[2]=Math.ceil(a[2]+
+p)))}},this);a[0]&&"top"===(this.options.title.verticalAlign||"top")&&(a[0]+=this.options.title.margin);a[2]&&"bottom"===this.options.caption.verticalAlign&&(a[2]+=this.options.caption.margin);var e=!this.titleOffset||this.titleOffset.join(",")!==a.join(",");this.titleOffset=a;f(this,"afterLayOutTitles");!this.isDirtyBox&&e&&(this.isDirtyBox=this.isDirtyLegend=e,this.hasRendered&&p(b,!0)&&this.isDirtyBox&&this.redraw())},getChartSize:function(){var b=this.options.chart,d=b.width;b=b.height;var c=
+this.renderTo;D(d)||(this.containerWidth=a(c,"width"));D(b)||(this.containerHeight=a(c,"height"));this.chartWidth=Math.max(0,d||this.containerWidth||600);this.chartHeight=Math.max(0,O(b,this.chartWidth)||(1<this.containerHeight?this.containerHeight:400))},temporaryDisplay:function(b){var d=this.renderTo;if(b)for(;d&&d.style;)d.hcOrigStyle&&(E(d,d.hcOrigStyle),delete d.hcOrigStyle),d.hcOrigDetached&&(Q.body.removeChild(d),d.hcOrigDetached=!1),d=d.parentNode;else for(;d&&d.style;){Q.body.contains(d)||
+d.parentNode||(d.hcOrigDetached=!0,Q.body.appendChild(d));if("none"===a(d,"display",!1)||d.hcOricDetached)d.hcOrigStyle={display:d.style.display,height:d.style.height,overflow:d.style.overflow},b={display:"block",overflow:"hidden"},d!==this.renderTo&&(b.height=0),E(d,b),d.offsetWidth||d.style.setProperty("display","block","important");d=d.parentNode;if(d===Q.body)break}},setClassName:function(b){this.container.className="highcharts-container "+(b||"")},getContainer:function(){var b=this.options,a=
+b.chart;var e=this.renderTo;var n=x(),h,p;e||(this.renderTo=e=a.renderTo);u(e)&&(this.renderTo=e=Q.getElementById(e));e||q(13,!0,this);var m=C(I(e,"data-highcharts-chart"));c(m)&&U[m]&&U[m].hasRendered&&U[m].destroy();I(e,"data-highcharts-chart",this.index);e.innerHTML="";a.skipClone||e.offsetWidth||this.temporaryDisplay();this.getChartSize();m=this.chartWidth;var l=this.chartHeight;E(e,{overflow:"hidden"});this.styledMode||(h=r({position:"relative",overflow:"hidden",width:m+"px",height:l+"px",textAlign:"left",
+lineHeight:"normal",zIndex:0,"-webkit-tap-highlight-color":"rgba(0,0,0,0)"},a.style));this.container=e=J("div",{id:n},h,e);this._cursor=e.style.cursor;this.renderer=new (k[a.renderer]||k.Renderer)(e,m,l,null,a.forExport,b.exporting&&b.exporting.allowHTML,this.styledMode);d(void 0,this);this.setClassName(a.className);if(this.styledMode)for(p in b.defs)this.renderer.definition(b.defs[p]);else this.renderer.setStyle(a.style);this.renderer.chartIndex=this.index;f(this,"afterGetContainer")},getMargins:function(b){var a=
+this.spacing,d=this.margin,c=this.titleOffset;this.resetMargins();c[0]&&!D(d[0])&&(this.plotTop=Math.max(this.plotTop,c[0]+a[0]));c[2]&&!D(d[2])&&(this.marginBottom=Math.max(this.marginBottom,c[2]+a[2]));this.legend&&this.legend.display&&this.legend.adjustMargins(d,a);f(this,"getMargins");b||this.getAxisMargins()},getAxisMargins:function(){var b=this,a=b.axisOffset=[0,0,0,0],d=b.colorAxis,c=b.margin,f=function(b){b.forEach(function(b){b.visible&&b.getOffset()})};b.hasCartesianSeries?f(b.axes):d&&
+d.length&&f(d);V.forEach(function(d,f){D(c[f])||(b[d]+=a[f])});b.setChartSize()},reflow:function(b){var d=this,c=d.options.chart,f=d.renderTo,e=D(c.width)&&D(c.height),h=c.width||a(f,"width");c=c.height||a(f,"height");f=b?b.target:A;if(!e&&!d.isPrinting&&h&&c&&(f===A||f===Q)){if(h!==d.containerWidth||c!==d.containerHeight)G.clearTimeout(d.reflowTimeout),d.reflowTimeout=n(function(){d.container&&d.setSize(void 0,void 0,!1)},b?100:0);d.containerWidth=h;d.containerHeight=c}},setReflow:function(b){var a=
+this;!1===b||this.unbindReflow?!1===b&&this.unbindReflow&&(this.unbindReflow=this.unbindReflow()):(this.unbindReflow=N(A,"resize",function(b){a.options&&a.reflow(b)}),N(this,"destroy",this.unbindReflow))},setSize:function(b,a,c){var e=this,h=e.renderer;e.isResizing+=1;d(c,e);c=h.globalAnimation;e.oldChartHeight=e.chartHeight;e.oldChartWidth=e.chartWidth;"undefined"!==typeof b&&(e.options.chart.width=b);"undefined"!==typeof a&&(e.options.chart.height=a);e.getChartSize();e.styledMode||(c?M:E)(e.container,
+{width:e.chartWidth+"px",height:e.chartHeight+"px"},c);e.setChartSize(!0);h.setSize(e.chartWidth,e.chartHeight,c);e.axes.forEach(function(b){b.isDirty=!0;b.setScale()});e.isDirtyLegend=!0;e.isDirtyBox=!0;e.layOutTitles();e.getMargins();e.redraw(c);e.oldChartHeight=null;f(e,"resize");n(function(){e&&f(e,"endResize",null,function(){--e.isResizing})},y(c).duration||0)},setChartSize:function(b){var a=this.inverted,d=this.renderer,c=this.chartWidth,e=this.chartHeight,n=this.options.chart,h=this.spacing,
+p=this.clipOffset,m,l,x,u;this.plotLeft=m=Math.round(this.plotLeft);this.plotTop=l=Math.round(this.plotTop);this.plotWidth=x=Math.max(0,Math.round(c-m-this.marginRight));this.plotHeight=u=Math.max(0,Math.round(e-l-this.marginBottom));this.plotSizeX=a?u:x;this.plotSizeY=a?x:u;this.plotBorderWidth=n.plotBorderWidth||0;this.spacingBox=d.spacingBox={x:h[3],y:h[0],width:c-h[3]-h[1],height:e-h[0]-h[2]};this.plotBox=d.plotBox={x:m,y:l,width:x,height:u};c=2*Math.floor(this.plotBorderWidth/2);a=Math.ceil(Math.max(c,
+p[3])/2);d=Math.ceil(Math.max(c,p[0])/2);this.clipBox={x:a,y:d,width:Math.floor(this.plotSizeX-Math.max(c,p[1])/2-a),height:Math.max(0,Math.floor(this.plotSizeY-Math.max(c,p[2])/2-d))};b||this.axes.forEach(function(b){b.setAxisSize();b.setAxisTranslation()});f(this,"afterSetChartSize",{skipAxes:b})},resetMargins:function(){f(this,"resetMargins");var b=this,a=b.options.chart;["margin","spacing"].forEach(function(d){var c=a[d],e=m(c)?c:[c,c,c,c];["Top","Right","Bottom","Left"].forEach(function(c,f){b[d][f]=
+p(a[d+c],e[f])})});V.forEach(function(a,d){b[a]=p(b.margin[d],b.spacing[d])});b.axisOffset=[0,0,0,0];b.clipOffset=[0,0,0,0]},drawChartBox:function(){var b=this.options.chart,a=this.renderer,d=this.chartWidth,c=this.chartHeight,e=this.chartBackground,h=this.plotBackground,n=this.plotBorder,p=this.styledMode,m=this.plotBGImage,l=b.backgroundColor,x=b.plotBackgroundColor,u=b.plotBackgroundImage,w,C=this.plotLeft,r=this.plotTop,F=this.plotWidth,q=this.plotHeight,t=this.plotBox,g=this.clipRect,B=this.clipBox,
+O="animate";e||(this.chartBackground=e=a.rect().addClass("highcharts-background").add(),O="attr");if(p)var k=w=e.strokeWidth();else{k=b.borderWidth||0;w=k+(b.shadow?8:0);l={fill:l||"none"};if(k||e["stroke-width"])l.stroke=b.borderColor,l["stroke-width"]=k;e.attr(l).shadow(b.shadow)}e[O]({x:w/2,y:w/2,width:d-w-k%2,height:c-w-k%2,r:b.borderRadius});O="animate";h||(O="attr",this.plotBackground=h=a.rect().addClass("highcharts-plot-background").add());h[O](t);p||(h.attr({fill:x||"none"}).shadow(b.plotShadow),
+u&&(m?(u!==m.attr("href")&&m.attr("href",u),m.animate(t)):this.plotBGImage=a.image(u,C,r,F,q).add()));g?g.animate({width:B.width,height:B.height}):this.clipRect=a.clipRect(B);O="animate";n||(O="attr",this.plotBorder=n=a.rect().addClass("highcharts-plot-border").attr({zIndex:1}).add());p||n.attr({stroke:b.plotBorderColor,"stroke-width":b.plotBorderWidth||0,fill:"none"});n[O](n.crisp({x:C,y:r,width:F,height:q},-n.strokeWidth()));this.isDirtyBox=!1;f(this,"afterDrawChartBox")},propFromSeries:function(){var b=
+this,a=b.options.chart,d,c=b.options.series,e,f;["inverted","angular","polar"].forEach(function(h){d=W[a.type||a.defaultSeriesType];f=a[h]||d&&d.prototype[h];for(e=c&&c.length;!f&&e--;)(d=W[c[e].type])&&d.prototype[h]&&(f=!0);b[h]=f})},linkSeries:function(){var b=this,a=b.series;a.forEach(function(b){b.linkedSeries.length=0});a.forEach(function(a){var d=a.options.linkedTo;u(d)&&(d=":previous"===d?b.series[a.index-1]:b.get(d))&&d.linkedParent!==a&&(d.linkedSeries.push(a),a.linkedParent=d,d.enabledDataSorting&&
+a.setDataSortingOptions(),a.visible=p(a.options.visible,d.options.visible,a.visible))});f(this,"afterLinkSeries")},renderSeries:function(){this.series.forEach(function(b){b.translate();b.render()})},renderLabels:function(){var b=this,a=b.options.labels;a.items&&a.items.forEach(function(d){var c=r(a.style,d.style),e=C(c.left)+b.plotLeft,f=C(c.top)+b.plotTop+12;delete c.left;delete c.top;b.renderer.text(d.html,e,f).attr({zIndex:2}).css(c).add()})},render:function(){var b=this.axes,a=this.colorAxis,
+d=this.renderer,c=this.options,e=0,f=function(b){b.forEach(function(b){b.visible&&b.render()})};this.setTitle();this.legend=new g(this,c.legend);this.getStacks&&this.getStacks();this.getMargins(!0);this.setChartSize();c=this.plotWidth;b.some(function(b){if(b.horiz&&b.visible&&b.options.labels.enabled&&b.series.length)return e=21,!0});var h=this.plotHeight=Math.max(this.plotHeight-e,0);b.forEach(function(b){b.setScale()});this.getAxisMargins();var n=1.1<c/this.plotWidth;var p=1.05<h/this.plotHeight;
+if(n||p)b.forEach(function(b){(b.horiz&&n||!b.horiz&&p)&&b.setTickInterval(!0)}),this.getMargins();this.drawChartBox();this.hasCartesianSeries?f(b):a&&a.length&&f(a);this.seriesGroup||(this.seriesGroup=d.g("series-group").attr({zIndex:3}).add());this.renderSeries();this.renderLabels();this.addCredits();this.setResponsive&&this.setResponsive();this.updateContainerScaling();this.hasRendered=!0},addCredits:function(b){var a=this;b=L(!0,this.options.credits,b);b.enabled&&!this.credits&&(this.credits=
+this.renderer.text(b.text+(this.mapCredits||""),0,0).addClass("highcharts-credits").on("click",function(){b.href&&(A.location.href=b.href)}).attr({align:b.position.align,zIndex:8}),a.styledMode||this.credits.css(b.style),this.credits.add().align(b.position),this.credits.update=function(b){a.credits=a.credits.destroy();a.addCredits(b)})},updateContainerScaling:function(){var b=this.container;if(b.offsetWidth&&b.offsetHeight&&b.getBoundingClientRect){var a=b.getBoundingClientRect(),d=a.width/b.offsetWidth;
+b=a.height/b.offsetHeight;1!==d||1!==b?this.containerScaling={scaleX:d,scaleY:b}:delete this.containerScaling}},destroy:function(){var b=this,a=b.axes,d=b.series,c=b.container,e,h=c&&c.parentNode;f(b,"destroy");b.renderer.forExport?t(U,b):U[b.index]=void 0;k.chartCount--;b.renderTo.removeAttribute("data-highcharts-chart");B(b);for(e=a.length;e--;)a[e]=a[e].destroy();this.scroller&&this.scroller.destroy&&this.scroller.destroy();for(e=d.length;e--;)d[e]=d[e].destroy();"title subtitle chartBackground plotBackground plotBGImage plotBorder seriesGroup clipRect credits pointer rangeSelector legend resetZoomButton tooltip renderer".split(" ").forEach(function(a){var d=
+b[a];d&&d.destroy&&(b[a]=d.destroy())});c&&(c.innerHTML="",B(c),h&&z(c));w(b,function(a,d){delete b[d]})},firstRender:function(){var b=this,a=b.options;if(!b.isReadyToRender||b.isReadyToRender()){b.getContainer();b.resetMargins();b.setChartSize();b.propFromSeries();b.getAxes();(l(a.series)?a.series:[]).forEach(function(a){b.initSeries(a)});b.linkSeries();b.setSeriesData();f(b,"beforeRender");v&&(b.pointer=k.hasTouch||!A.PointerEvent&&!A.MSPointerEvent?new v(b,a):new H(b,a));b.render();if(!b.renderer.imgCount&&
+!b.hasLoaded)b.onload();b.temporaryDisplay(!0)}},onload:function(){this.callbacks.concat([this.callback]).forEach(function(b){b&&"undefined"!==typeof this.index&&b.apply(this,[this])},this);f(this,"load");f(this,"render");D(this.index)&&this.setReflow(this.options.chart.reflow);this.hasLoaded=!0}})});P(A,"parts/ScrollablePlotArea.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.addEvent,v=g.createElement,K=g.pick,G=g.stop;g=k.Chart;"";H(g,"afterSetChartSize",function(g){var v=
+this.options.chart.scrollablePlotArea,y=v&&v.minWidth;v=v&&v.minHeight;if(!this.renderer.forExport){if(y){if(this.scrollablePixelsX=y=Math.max(0,y-this.chartWidth)){this.plotWidth+=y;this.inverted?(this.clipBox.height+=y,this.plotBox.height+=y):(this.clipBox.width+=y,this.plotBox.width+=y);var I={1:{name:"right",value:y}}}}else v&&(this.scrollablePixelsY=y=Math.max(0,v-this.chartHeight))&&(this.plotHeight+=y,this.inverted?(this.clipBox.width+=y,this.plotBox.width+=y):(this.clipBox.height+=y,this.plotBox.height+=
+y),I={2:{name:"bottom",value:y}});I&&!g.skipAxes&&this.axes.forEach(function(g){I[g.side]?g.getPlotLinePath=function(){var y=I[g.side].name,D=this[y];this[y]=D-I[g.side].value;var z=k.Axis.prototype.getPlotLinePath.apply(this,arguments);this[y]=D;return z}:(g.setAxisSize(),g.setAxisTranslation())})}});H(g,"render",function(){this.scrollablePixelsX||this.scrollablePixelsY?(this.setUpScrolling&&this.setUpScrolling(),this.applyFixed()):this.fixedDiv&&this.applyFixed()});g.prototype.setUpScrolling=function(){var g=
+this,k={WebkitOverflowScrolling:"touch",overflowX:"hidden",overflowY:"hidden"};this.scrollablePixelsX&&(k.overflowX="auto");this.scrollablePixelsY&&(k.overflowY="auto");this.scrollingContainer=v("div",{className:"highcharts-scrolling"},k,this.renderTo);H(this.scrollingContainer,"scroll",function(){g.pointer&&delete g.pointer.chartPosition});this.innerContainer=v("div",{className:"highcharts-inner-container"},null,this.scrollingContainer);this.innerContainer.appendChild(this.container);this.setUpScrolling=
+null};g.prototype.moveFixedElements=function(){var g=this.container,k=this.fixedRenderer,y=".highcharts-contextbutton .highcharts-credits .highcharts-legend .highcharts-legend-checkbox .highcharts-navigator-series .highcharts-navigator-xaxis .highcharts-navigator-yaxis .highcharts-navigator .highcharts-reset-zoom .highcharts-scrollbar .highcharts-subtitle .highcharts-title".split(" "),v;this.scrollablePixelsX&&!this.inverted?v=".highcharts-yaxis":this.scrollablePixelsX&&this.inverted?v=".highcharts-xaxis":
+this.scrollablePixelsY&&!this.inverted?v=".highcharts-xaxis":this.scrollablePixelsY&&this.inverted&&(v=".highcharts-yaxis");y.push(v,v+"-labels");y.forEach(function(y){[].forEach.call(g.querySelectorAll(y),function(g){(g.namespaceURI===k.SVG_NS?k.box:k.box.parentNode).appendChild(g);g.style.pointerEvents="auto"})})};g.prototype.applyFixed=function(){var g,M,y=!this.fixedDiv,I=this.options.chart.scrollablePlotArea;y?(this.fixedDiv=v("div",{className:"highcharts-fixed"},{position:"absolute",overflow:"hidden",
+pointerEvents:"none",zIndex:2},null,!0),this.renderTo.insertBefore(this.fixedDiv,this.renderTo.firstChild),this.renderTo.style.overflow="visible",this.fixedRenderer=M=new k.Renderer(this.fixedDiv,this.chartWidth,this.chartHeight,null===(g=this.options.chart)||void 0===g?void 0:g.style),this.scrollableMask=M.path().attr({fill:this.options.chart.backgroundColor||"#fff","fill-opacity":K(I.opacity,.85),zIndex:-1}).addClass("highcharts-scrollable-mask").add(),this.moveFixedElements(),H(this,"afterShowResetZoom",
+this.moveFixedElements),H(this,"afterLayOutTitles",this.moveFixedElements)):this.fixedRenderer.setSize(this.chartWidth,this.chartHeight);g=this.chartWidth+(this.scrollablePixelsX||0);M=this.chartHeight+(this.scrollablePixelsY||0);G(this.container);this.container.style.width=g+"px";this.container.style.height=M+"px";this.renderer.boxWrapper.attr({width:g,height:M,viewBox:[0,0,g,M].join(" ")});this.chartBackground.attr({width:g,height:M});this.scrollingContainer.style.height=this.chartHeight+"px";y&&
+(I.scrollPositionX&&(this.scrollingContainer.scrollLeft=this.scrollablePixelsX*I.scrollPositionX),I.scrollPositionY&&(this.scrollingContainer.scrollTop=this.scrollablePixelsY*I.scrollPositionY));M=this.axisOffset;y=this.plotTop-M[0]-1;I=this.plotLeft-M[3]-1;g=this.plotTop+this.plotHeight+M[2]+1;M=this.plotLeft+this.plotWidth+M[1]+1;var J=this.plotLeft+this.plotWidth-(this.scrollablePixelsX||0),E=this.plotTop+this.plotHeight-(this.scrollablePixelsY||0);y=this.scrollablePixelsX?[["M",0,y],["L",this.plotLeft-
+1,y],["L",this.plotLeft-1,g],["L",0,g],["Z"],["M",J,y],["L",this.chartWidth,y],["L",this.chartWidth,g],["L",J,g],["Z"]]:this.scrollablePixelsY?[["M",I,0],["L",I,this.plotTop-1],["L",M,this.plotTop-1],["L",M,0],["Z"],["M",I,E],["L",I,this.chartHeight],["L",M,this.chartHeight],["L",M,E],["Z"]]:[["M",0,0]];"adjustHeight"!==this.redrawTrigger&&this.scrollableMask.attr({d:y})}});P(A,"parts/StackingAxis.js",[A["parts/Utilities.js"]],function(k){var g=k.addEvent,H=k.destroyObjectProperties,v=k.fireEvent,
+K=k.objectEach,G=k.pick,N=function(){function g(g){this.oldStacks={};this.stacks={};this.stacksTouched=0;this.axis=g}g.prototype.buildStacks=function(){var g=this.axis,k=g.series,J=G(g.options.reversedStacks,!0),E=k.length,D;if(!g.isXAxis){this.usePercentage=!1;for(D=E;D--;){var z=k[J?D:E-D-1];z.setStackedPoints()}for(D=0;D<E;D++)k[D].modifyStacks();v(g,"afterBuildStacks")}};g.prototype.cleanStacks=function(){if(!this.axis.isXAxis){if(this.oldStacks)var g=this.stacks=this.oldStacks;K(g,function(g){K(g,
+function(g){g.cumulative=g.total})})}};g.prototype.resetStacks=function(){var g=this,k=g.stacks;g.axis.isXAxis||K(k,function(k){K(k,function(y,D){y.touched<g.stacksTouched?(y.destroy(),delete k[D]):(y.total=null,y.cumulative=null)})})};g.prototype.renderStackTotals=function(){var g=this.axis.chart,k=g.renderer,v=this.stacks,E=this.stackTotalGroup=this.stackTotalGroup||k.g("stack-labels").attr({visibility:"visible",zIndex:6}).add();E.translate(g.plotLeft,g.plotTop);K(v,function(g){K(g,function(g){g.render(E)})})};
+return g}();return function(){function k(){}k.compose=function(y){g(y,"init",k.onInit);g(y,"destroy",k.onDestroy)};k.onDestroy=function(){var g=this.stacking;if(g){var k=g.stacks;K(k,function(g,y){H(g);k[y]=null});g&&g.stackTotalGroup&&g.stackTotalGroup.destroy()}};k.onInit=function(){this.stacking||(this.stacking=new N(this))};return k}()});P(A,"mixins/legend-symbol.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.merge,v=g.pick;k.LegendSymbolMixin={drawRectangle:function(g,
+k){var G=g.symbolHeight,M=g.options.squareSymbol;k.legendSymbol=this.chart.renderer.rect(M?(g.symbolWidth-G)/2:0,g.baseline-G+1,M?G:g.symbolWidth,G,v(g.options.symbolRadius,G/2)).addClass("highcharts-point").attr({zIndex:3}).add(k.legendGroup)},drawLineMarker:function(g){var k=this.options,N=k.marker,M=g.symbolWidth,y=g.symbolHeight,I=y/2,J=this.chart.renderer,E=this.legendGroup;g=g.baseline-Math.round(.3*g.fontMetrics.b);var D={};this.chart.styledMode||(D={"stroke-width":k.lineWidth||0},k.dashStyle&&
+(D.dashstyle=k.dashStyle));this.legendLine=J.path(["M",0,g,"L",M,g]).addClass("highcharts-graph").attr(D).add(E);N&&!1!==N.enabled&&M&&(k=Math.min(v(N.radius,I),I),0===this.symbol.indexOf("url")&&(N=H(N,{width:y,height:y}),k=0),this.legendSymbol=N=J.symbol(this.symbol,M/2-k,g-k,2*k,2*k,N).addClass("highcharts-point").add(E),N.isMarker=!0)}};return k.LegendSymbolMixin});P(A,"parts/Point.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){"";var H=g.animObject,v=g.defined,K=g.erase,G=
+g.extend,N=g.fireEvent,M=g.format,y=g.getNestedProperty,I=g.isArray,J=g.isNumber,E=g.isObject,D=g.syncTimeout,z=g.pick,t=g.removeEvent,q=g.uniqueKey;g=function(){function g(){this.colorIndex=this.category=void 0;this.formatPrefix="point";this.id=void 0;this.isNull=!1;this.percentage=this.options=this.name=void 0;this.selected=!1;this.total=this.series=void 0;this.visible=!0;this.x=void 0}g.prototype.animateBeforeDestroy=function(){var h=this,f={x:h.startXPos,opacity:0},a,l=h.getGraphicalProps();l.singular.forEach(function(e){a=
+"dataLabel"===e;h[e]=h[e].animate(a?{x:h[e].startXPos,y:h[e].startYPos,opacity:0}:f)});l.plural.forEach(function(a){h[a].forEach(function(a){a.element&&a.animate(G({x:h.startXPos},a.startYPos?{x:a.startXPos,y:a.startYPos}:{}))})})};g.prototype.applyOptions=function(h,f){var a=this.series,l=a.options.pointValKey||a.pointValKey;h=g.prototype.optionsToObject.call(this,h);G(this,h);this.options=this.options?G(this.options,h):h;h.group&&delete this.group;h.dataLabels&&delete this.dataLabels;l&&(this.y=
+g.prototype.getNestedProperty.call(this,l));this.formatPrefix=(this.isNull=z(this.isValid&&!this.isValid(),null===this.x||!J(this.y)))?"null":"point";this.selected&&(this.state="select");"name"in this&&"undefined"===typeof f&&a.xAxis&&a.xAxis.hasNames&&(this.x=a.xAxis.nameToX(this));"undefined"===typeof this.x&&a&&(this.x="undefined"===typeof f?a.autoIncrement(this):f);return this};g.prototype.destroy=function(){function h(){if(f.graphic||f.dataLabel||f.dataLabels)t(f),f.destroyElements();for(m in f)f[m]=
+null}var f=this,a=f.series,l=a.chart;a=a.options.dataSorting;var e=l.hoverPoints,c=H(f.series.chart.renderer.globalAnimation),m;f.legendItem&&l.legend.destroyItem(f);e&&(f.setState(),K(e,f),e.length||(l.hoverPoints=null));if(f===l.hoverPoint)f.onMouseOut();a&&a.enabled?(this.animateBeforeDestroy(),D(h,c.duration)):h();l.pointCount--};g.prototype.destroyElements=function(h){var f=this;h=f.getGraphicalProps(h);h.singular.forEach(function(a){f[a]=f[a].destroy()});h.plural.forEach(function(a){f[a].forEach(function(a){a.element&&
+a.destroy()});delete f[a]})};g.prototype.firePointEvent=function(h,f,a){var l=this,e=this.series.options;(e.point.events[h]||l.options&&l.options.events&&l.options.events[h])&&l.importEvents();"click"===h&&e.allowPointSelect&&(a=function(a){l.select&&l.select(null,a.ctrlKey||a.metaKey||a.shiftKey)});N(l,h,f,a)};g.prototype.getClassName=function(){return"highcharts-point"+(this.selected?" highcharts-point-select":"")+(this.negative?" highcharts-negative":"")+(this.isNull?" highcharts-null-point":"")+
+("undefined"!==typeof this.colorIndex?" highcharts-color-"+this.colorIndex:"")+(this.options.className?" "+this.options.className:"")+(this.zone&&this.zone.className?" "+this.zone.className.replace("highcharts-negative",""):"")};g.prototype.getGraphicalProps=function(h){var f=this,a=[],l,e={singular:[],plural:[]};h=h||{graphic:1,dataLabel:1};h.graphic&&a.push("graphic","shadowGroup");h.dataLabel&&a.push("dataLabel","dataLabelUpper","connector");for(l=a.length;l--;){var c=a[l];f[c]&&e.singular.push(c)}["dataLabel",
+"connector"].forEach(function(a){var c=a+"s";h[a]&&f[c]&&e.plural.push(c)});return e};g.prototype.getLabelConfig=function(){return{x:this.category,y:this.y,color:this.color,colorIndex:this.colorIndex,key:this.name||this.category,series:this.series,point:this,percentage:this.percentage,total:this.total||this.stackTotal}};g.prototype.getNestedProperty=function(h){if(h)return 0===h.indexOf("custom.")?y(h,this.options):this[h]};g.prototype.getZone=function(){var h=this.series,f=h.zones;h=h.zoneAxis||
+"y";var a=0,l;for(l=f[a];this[h]>=l.value;)l=f[++a];this.nonZonedColor||(this.nonZonedColor=this.color);this.color=l&&l.color&&!this.options.color?l.color:this.nonZonedColor;return l};g.prototype.hasNewShapeType=function(){return(this.graphic&&(this.graphic.symbolName||this.graphic.element.nodeName))!==this.shapeType};g.prototype.init=function(h,f,a){this.series=h;this.applyOptions(f,a);this.id=v(this.id)?this.id:q();this.resolveColor();h.chart.pointCount++;N(this,"afterInit");return this};g.prototype.optionsToObject=
+function(h){var f={},a=this.series,l=a.options.keys,e=l||a.pointArrayMap||["y"],c=e.length,m=0,u=0;if(J(h)||null===h)f[e[0]]=h;else if(I(h))for(!l&&h.length>c&&(a=typeof h[0],"string"===a?f.name=h[0]:"number"===a&&(f.x=h[0]),m++);u<c;)l&&"undefined"===typeof h[m]||(0<e[u].indexOf(".")?g.prototype.setNestedProperty(f,h[m],e[u]):f[e[u]]=h[m]),m++,u++;else"object"===typeof h&&(f=h,h.dataLabels&&(a._hasPointLabels=!0),h.marker&&(a._hasPointMarkers=!0));return f};g.prototype.resolveColor=function(){var h=
+this.series;var f=h.chart.options.chart.colorCount;var a=h.chart.styledMode;delete this.nonZonedColor;a||this.options.color||(this.color=h.color);h.options.colorByPoint?(a||(f=h.options.colors||h.chart.options.colors,this.color=this.color||f[h.colorCounter],f=f.length),a=h.colorCounter,h.colorCounter++,h.colorCounter===f&&(h.colorCounter=0)):a=h.colorIndex;this.colorIndex=z(this.colorIndex,a)};g.prototype.setNestedProperty=function(h,f,a){a.split(".").reduce(function(a,e,c,h){a[e]=h.length-1===c?
+f:E(a[e],!0)?a[e]:{};return a[e]},h);return h};g.prototype.tooltipFormatter=function(h){var f=this.series,a=f.tooltipOptions,l=z(a.valueDecimals,""),e=a.valuePrefix||"",c=a.valueSuffix||"";f.chart.styledMode&&(h=f.chart.tooltip.styledModeFormat(h));(f.pointArrayMap||["y"]).forEach(function(a){a="{point."+a;if(e||c)h=h.replace(RegExp(a+"}","g"),e+a+"}"+c);h=h.replace(RegExp(a+"}","g"),a+":,."+l+"f}")});return M(h,{point:this,series:this.series},f.chart)};return g}();k.Point=g;return k.Point});P(A,
+"parts/Series.js",[A["mixins/legend-symbol.js"],A["parts/Globals.js"],A["parts/Point.js"],A["parts/Utilities.js"]],function(k,g,H,v){"";var K=v.addEvent,G=v.animObject,N=v.arrayMax,M=v.arrayMin,y=v.clamp,I=v.correctFloat,J=v.defined,E=v.erase,D=v.error,z=v.extend,t=v.find,q=v.fireEvent,r=v.getNestedProperty,h=v.isArray,f=v.isFunction,a=v.isNumber,l=v.isString,e=v.merge,c=v.objectEach,m=v.pick,u=v.removeEvent,L=v.seriesType,F=v.splat,w=v.syncTimeout,p=g.defaultOptions,C=g.defaultPlotOptions,O=g.seriesTypes,
+B=g.SVGElement,d=g.win;g.Series=L("line",null,{lineWidth:2,allowPointSelect:!1,crisp:!0,showCheckbox:!1,animation:{duration:1E3},events:{},marker:{enabledThreshold:2,lineColor:"#ffffff",lineWidth:0,radius:4,states:{normal:{animation:!0},hover:{animation:{duration:50},enabled:!0,radiusPlus:2,lineWidthPlus:1},select:{fillColor:"#cccccc",lineColor:"#000000",lineWidth:2}}},point:{events:{}},dataLabels:{align:"center",formatter:function(){var b=this.series.chart.numberFormatter;return"number"!==typeof this.y?
+"":b(this.y,-1)},padding:5,style:{fontSize:"11px",fontWeight:"bold",color:"contrast",textOutline:"1px contrast"},verticalAlign:"bottom",x:0,y:0},cropThreshold:300,opacity:1,pointRange:0,softThreshold:!0,states:{normal:{animation:!0},hover:{animation:{duration:50},lineWidthPlus:1,marker:{},halo:{size:10,opacity:.25}},select:{animation:{duration:0}},inactive:{animation:{duration:50},opacity:.2}},stickyTracking:!0,turboThreshold:1E3,findNearestPointBy:"x"},{axisTypes:["xAxis","yAxis"],coll:"series",
+colorCounter:0,cropShoulder:1,directTouch:!1,eventsToUnbind:[],isCartesian:!0,parallelArrays:["x","y"],pointClass:H,requireSorting:!0,sorted:!0,init:function(b,a){q(this,"init",{options:a});var d=this,e=b.series,h;this.eventOptions=this.eventOptions||{};d.chart=b;d.options=a=d.setOptions(a);d.linkedSeries=[];d.bindAxes();z(d,{name:a.name,state:"",visible:!1!==a.visible,selected:!0===a.selected});var n=a.events;c(n,function(b,a){f(b)&&d.eventOptions[a]!==b&&(f(d.eventOptions[a])&&u(d,a,d.eventOptions[a]),
+d.eventOptions[a]=b,K(d,a,b))});if(n&&n.click||a.point&&a.point.events&&a.point.events.click||a.allowPointSelect)b.runTrackerClick=!0;d.getColor();d.getSymbol();d.parallelArrays.forEach(function(b){d[b+"Data"]||(d[b+"Data"]=[])});d.isCartesian&&(b.hasCartesianSeries=!0);e.length&&(h=e[e.length-1]);d._i=m(h&&h._i,-1)+1;b.orderSeries(this.insert(e));a.dataSorting&&a.dataSorting.enabled?d.setDataSortingOptions():d.points||d.data||d.setData(a.data,!1);q(this,"afterInit")},is:function(b){return O[b]&&
+this instanceof O[b]},insert:function(b){var d=this.options.index,c;if(a(d)){for(c=b.length;c--;)if(d>=m(b[c].options.index,b[c]._i)){b.splice(c+1,0,this);break}-1===c&&b.unshift(this);c+=1}else b.push(this);return m(c,b.length-1)},bindAxes:function(){var b=this,a=b.options,d=b.chart,c;q(this,"bindAxes",null,function(){(b.axisTypes||[]).forEach(function(e){d[e].forEach(function(d){c=d.options;if(a[e]===c.index||"undefined"!==typeof a[e]&&a[e]===c.id||"undefined"===typeof a[e]&&0===c.index)b.insert(d.series),
+b[e]=d,d.isDirty=!0});b[e]||b.optionalAxis===e||D(18,!0,d)})});q(this,"afterBindAxes")},updateParallelArrays:function(b,d){var c=b.series,e=arguments,f=a(d)?function(a){var e="y"===a&&c.toYData?c.toYData(b):b[a];c[a+"Data"][d]=e}:function(b){Array.prototype[d].apply(c[b+"Data"],Array.prototype.slice.call(e,2))};c.parallelArrays.forEach(f)},hasData:function(){return this.visible&&"undefined"!==typeof this.dataMax&&"undefined"!==typeof this.dataMin||this.visible&&this.yData&&0<this.yData.length},autoIncrement:function(){var b=
+this.options,a=this.xIncrement,d,c=b.pointIntervalUnit,e=this.chart.time;a=m(a,b.pointStart,0);this.pointInterval=d=m(this.pointInterval,b.pointInterval,1);c&&(b=new e.Date(a),"day"===c?e.set("Date",b,e.get("Date",b)+d):"month"===c?e.set("Month",b,e.get("Month",b)+d):"year"===c&&e.set("FullYear",b,e.get("FullYear",b)+d),d=b.getTime()-a);this.xIncrement=a+d;return a},setDataSortingOptions:function(){var b=this.options;z(this,{requireSorting:!1,sorted:!1,enabledDataSorting:!0,allowDG:!1});J(b.pointRange)||
+(b.pointRange=1)},setOptions:function(b){var a=this.chart,d=a.options,c=d.plotOptions,f=a.userOptions||{};b=e(b);a=a.styledMode;var h={plotOptions:c,userOptions:b};q(this,"setOptions",h);var l=h.plotOptions[this.type],u=f.plotOptions||{};this.userOptions=h.userOptions;f=e(l,c.series,f.plotOptions&&f.plotOptions[this.type],b);this.tooltipOptions=e(p.tooltip,p.plotOptions.series&&p.plotOptions.series.tooltip,p.plotOptions[this.type].tooltip,d.tooltip.userOptions,c.series&&c.series.tooltip,c[this.type].tooltip,
+b.tooltip);this.stickyTracking=m(b.stickyTracking,u[this.type]&&u[this.type].stickyTracking,u.series&&u.series.stickyTracking,this.tooltipOptions.shared&&!this.noSharedTooltip?!0:f.stickyTracking);null===l.marker&&delete f.marker;this.zoneAxis=f.zoneAxis;d=this.zones=(f.zones||[]).slice();!f.negativeColor&&!f.negativeFillColor||f.zones||(c={value:f[this.zoneAxis+"Threshold"]||f.threshold||0,className:"highcharts-negative"},a||(c.color=f.negativeColor,c.fillColor=f.negativeFillColor),d.push(c));d.length&&
+J(d[d.length-1].value)&&d.push(a?{}:{color:this.color,fillColor:this.fillColor});q(this,"afterSetOptions",{options:f});return f},getName:function(){return m(this.options.name,"Series "+(this.index+1))},getCyclic:function(b,a,d){var c=this.chart,e=this.userOptions,f=b+"Index",h=b+"Counter",n=d?d.length:m(c.options.chart[b+"Count"],c[b+"Count"]);if(!a){var p=m(e[f],e["_"+f]);J(p)||(c.series.length||(c[h]=0),e["_"+f]=p=c[h]%n,c[h]+=1);d&&(a=d[p])}"undefined"!==typeof p&&(this[f]=p);this[b]=a},getColor:function(){this.chart.styledMode?
+this.getCyclic("color"):this.options.colorByPoint?this.options.color=null:this.getCyclic("color",this.options.color||C[this.type].color,this.chart.options.colors)},getPointsCollection:function(){return(this.hasGroupedData?this.points:this.data)||[]},getSymbol:function(){this.getCyclic("symbol",this.options.marker.symbol,this.chart.options.symbols)},findPointIndex:function(b,d){var c=b.id,e=b.x,f=this.points,h,n=this.options.dataSorting;if(c)var p=this.chart.get(c);else if(this.linkedParent||this.enabledDataSorting){var l=
+n&&n.matchByName?"name":"index";p=t(f,function(a){return!a.touched&&a[l]===b[l]});if(!p)return}if(p){var m=p&&p.index;"undefined"!==typeof m&&(h=!0)}"undefined"===typeof m&&a(e)&&(m=this.xData.indexOf(e,d));-1!==m&&"undefined"!==typeof m&&this.cropped&&(m=m>=this.cropStart?m-this.cropStart:m);!h&&f[m]&&f[m].touched&&(m=void 0);return m},drawLegendSymbol:k.drawLineMarker,updateData:function(b,d){var c=this.options,e=c.dataSorting,f=this.points,h=[],n,p,m,l=this.requireSorting,u=b.length===f.length,
+w=!0;this.xIncrement=null;b.forEach(function(b,d){var p=J(b)&&this.pointClass.prototype.optionsToObject.call({series:this},b)||{};var w=p.x;if(p.id||a(w)){if(w=this.findPointIndex(p,m),-1===w||"undefined"===typeof w?h.push(b):f[w]&&b!==c.data[w]?(f[w].update(b,!1,null,!1),f[w].touched=!0,l&&(m=w+1)):f[w]&&(f[w].touched=!0),!u||d!==w||e&&e.enabled||this.hasDerivedData)n=!0}else h.push(b)},this);if(n)for(b=f.length;b--;)(p=f[b])&&!p.touched&&p.remove&&p.remove(!1,d);else!u||e&&e.enabled?w=!1:(b.forEach(function(b,
+a){f[a].update&&b!==f[a].y&&f[a].update(b,!1,null,!1)}),h.length=0);f.forEach(function(b){b&&(b.touched=!1)});if(!w)return!1;h.forEach(function(b){this.addPoint(b,!1,null,null,!1)},this);null===this.xIncrement&&this.xData&&this.xData.length&&(this.xIncrement=N(this.xData),this.autoIncrement());return!0},setData:function(b,d,c,e){var f=this,n=f.points,p=n&&n.length||0,u,w=f.options,x=f.chart,C=w.dataSorting,g=null,r=f.xAxis;g=w.turboThreshold;var F=this.xData,q=this.yData,t=(u=f.pointArrayMap)&&u.length,
+B=w.keys,k=0,O=1,z;b=b||[];u=b.length;d=m(d,!0);C&&C.enabled&&(b=this.sortData(b));!1!==e&&u&&p&&!f.cropped&&!f.hasGroupedData&&f.visible&&!f.isSeriesBoosting&&(z=this.updateData(b,c));if(!z){f.xIncrement=null;f.colorCounter=0;this.parallelArrays.forEach(function(b){f[b+"Data"].length=0});if(g&&u>g)if(g=f.getFirstValidPoint(b),a(g))for(c=0;c<u;c++)F[c]=this.autoIncrement(),q[c]=b[c];else if(h(g))if(t)for(c=0;c<u;c++)e=b[c],F[c]=e[0],q[c]=e.slice(1,t+1);else for(B&&(k=B.indexOf("x"),O=B.indexOf("y"),
+k=0<=k?k:0,O=0<=O?O:1),c=0;c<u;c++)e=b[c],F[c]=e[k],q[c]=e[O];else D(12,!1,x);else for(c=0;c<u;c++)"undefined"!==typeof b[c]&&(e={series:f},f.pointClass.prototype.applyOptions.apply(e,[b[c]]),f.updateParallelArrays(e,c));q&&l(q[0])&&D(14,!0,x);f.data=[];f.options.data=f.userOptions.data=b;for(c=p;c--;)n[c]&&n[c].destroy&&n[c].destroy();r&&(r.minRange=r.userMinRange);f.isDirty=x.isDirtyBox=!0;f.isDirtyData=!!n;c=!1}"point"===w.legendType&&(this.processData(),this.generatePoints());d&&x.redraw(c)},
+sortData:function(b){var a=this,d=a.options.dataSorting.sortKey||"y",c=function(b,a){return J(a)&&b.pointClass.prototype.optionsToObject.call({series:b},a)||{}};b.forEach(function(d,e){b[e]=c(a,d);b[e].index=e},this);b.concat().sort(function(b,a){b=r(d,b);a=r(d,a);return a<b?-1:a>b?1:0}).forEach(function(b,a){b.x=a},this);a.linkedSeries&&a.linkedSeries.forEach(function(a){var d=a.options,e=d.data;d.dataSorting&&d.dataSorting.enabled||!e||(e.forEach(function(d,f){e[f]=c(a,d);b[f]&&(e[f].x=b[f].x,e[f].index=
+f)}),a.setData(e,!1))});return b},getProcessedData:function(b){var a=this.xData,d=this.yData,c=a.length;var e=0;var f=this.xAxis,h=this.options;var p=h.cropThreshold;var m=b||this.getExtremesFromAll||h.getExtremesFromAll,l=this.isCartesian;b=f&&f.val2lin;h=!(!f||!f.logarithmic);var u=this.requireSorting;if(f){f=f.getExtremes();var w=f.min;var C=f.max}if(l&&this.sorted&&!m&&(!p||c>p||this.forceCrop))if(a[c-1]<w||a[0]>C)a=[],d=[];else if(this.yData&&(a[0]<w||a[c-1]>C)){e=this.cropData(this.xData,this.yData,
+w,C);a=e.xData;d=e.yData;e=e.start;var g=!0}for(p=a.length||1;--p;)if(c=h?b(a[p])-b(a[p-1]):a[p]-a[p-1],0<c&&("undefined"===typeof r||c<r))var r=c;else 0>c&&u&&(D(15,!1,this.chart),u=!1);return{xData:a,yData:d,cropped:g,cropStart:e,closestPointRange:r}},processData:function(b){var a=this.xAxis;if(this.isCartesian&&!this.isDirty&&!a.isDirty&&!this.yAxis.isDirty&&!b)return!1;b=this.getProcessedData();this.cropped=b.cropped;this.cropStart=b.cropStart;this.processedXData=b.xData;this.processedYData=b.yData;
+this.closestPointRange=this.basePointRange=b.closestPointRange},cropData:function(b,a,d,c,e){var f=b.length,h=0,n=f,p;e=m(e,this.cropShoulder);for(p=0;p<f;p++)if(b[p]>=d){h=Math.max(0,p-e);break}for(d=p;d<f;d++)if(b[d]>c){n=d+e;break}return{xData:b.slice(h,n),yData:a.slice(h,n),start:h,end:n}},generatePoints:function(){var b=this.options,a=b.data,d=this.data,c,e=this.processedXData,f=this.processedYData,h=this.pointClass,p=e.length,m=this.cropStart||0,l=this.hasGroupedData;b=b.keys;var u=[],w;d||
+l||(d=[],d.length=a.length,d=this.data=d);b&&l&&(this.options.keys=!1);for(w=0;w<p;w++){var C=m+w;if(l){var g=(new h).init(this,[e[w]].concat(F(f[w])));g.dataGroup=this.groupMap[w];g.dataGroup.options&&(g.options=g.dataGroup.options,z(g,g.dataGroup.options),delete g.dataLabels)}else(g=d[C])||"undefined"===typeof a[C]||(d[C]=g=(new h).init(this,a[C],e[w]));g&&(g.index=C,u[w]=g)}this.options.keys=b;if(d&&(p!==(c=d.length)||l))for(w=0;w<c;w++)w!==m||l||(w+=p),d[w]&&(d[w].destroyElements(),d[w].plotX=
+void 0);this.data=d;this.points=u;q(this,"afterGeneratePoints")},getXExtremes:function(b){return{min:M(b),max:N(b)}},getExtremes:function(b,d){var c=this.xAxis,e=this.yAxis,f=this.processedXData||this.xData,n=[],p=0,m=0;var l=0;var u=this.requireSorting?this.cropShoulder:0,w=e?e.positiveValuesOnly:!1,C;b=b||this.stackedYData||this.processedYData||[];e=b.length;c&&(l=c.getExtremes(),m=l.min,l=l.max);for(C=0;C<e;C++){var g=f[C];var r=b[C];var F=(a(r)||h(r))&&(r.length||0<r||!w);g=d||this.getExtremesFromAll||
+this.options.getExtremesFromAll||this.cropped||!c||(f[C+u]||g)>=m&&(f[C-u]||g)<=l;if(F&&g)if(F=r.length)for(;F--;)a(r[F])&&(n[p++]=r[F]);else n[p++]=r}b={dataMin:M(n),dataMax:N(n)};q(this,"afterGetExtremes",{dataExtremes:b});return b},applyExtremes:function(){var b=this.getExtremes();this.dataMin=b.dataMin;this.dataMax=b.dataMax;return b},getFirstValidPoint:function(b){for(var a=null,d=b.length,c=0;null===a&&c<d;)a=b[c],c++;return a},translate:function(){this.processedXData||this.processData();this.generatePoints();
+var b=this.options,d=b.stacking,c=this.xAxis,e=c.categories,f=this.enabledDataSorting,p=this.yAxis,l=this.points,u=l.length,w=!!this.modifyValue,C,g=this.pointPlacementToXValue(),r=!!g,F=b.threshold,t=b.startFromThreshold?F:0,B,k=this.zoneAxis||"y",O=Number.MAX_VALUE;for(C=0;C<u;C++){var z=l[C],L=z.x,D=z.y,v=z.low,E=d&&p.stacking&&p.stacking.stacks[(this.negStacks&&D<(t?0:F)?"-":"")+this.stackKey];p.positiveValuesOnly&&null!==D&&0>=D&&(z.isNull=!0);z.plotX=B=I(y(c.translate(L,0,0,0,1,g,"flags"===
+this.type),-1E5,1E5));if(d&&this.visible&&E&&E[L]){var G=this.getStackIndicator(G,L,this.index);if(!z.isNull){var M=E[L];var H=M.points[G.key]}}h(H)&&(v=H[0],D=H[1],v===t&&G.key===E[L].base&&(v=m(a(F)&&F,p.min)),p.positiveValuesOnly&&0>=v&&(v=null),z.total=z.stackTotal=M.total,z.percentage=M.total&&z.y/M.total*100,z.stackY=D,this.irregularWidths||M.setOffset(this.pointXOffset||0,this.barW||0));z.yBottom=J(v)?y(p.translate(v,0,1,0,1),-1E5,1E5):null;w&&(D=this.modifyValue(D,z));z.plotY="number"===typeof D&&
+Infinity!==D?y(p.translate(D,0,1,0,1),-1E5,1E5):void 0;z.isInside=this.isPointInside(z);z.clientX=r?I(c.translate(L,0,0,0,1,g)):B;z.negative=z[k]<(b[k+"Threshold"]||F||0);z.category=e&&"undefined"!==typeof e[z.x]?e[z.x]:z.x;if(!z.isNull&&!1!==z.visible){"undefined"!==typeof N&&(O=Math.min(O,Math.abs(B-N)));var N=B}z.zone=this.zones.length&&z.getZone();!z.graphic&&this.group&&f&&(z.isNew=!0)}this.closestPointRangePx=O;q(this,"afterTranslate")},getValidPoints:function(b,a,d){var c=this.chart;return(b||
+this.points||[]).filter(function(b){return a&&!c.isInsidePlot(b.plotX,b.plotY,c.inverted)?!1:!1!==b.visible&&(d||!b.isNull)})},getClipBox:function(b,a){var d=this.options,c=this.chart,e=c.inverted,f=this.xAxis,h=f&&this.yAxis;b&&!1===d.clip&&h?b=e?{y:-c.chartWidth+h.len+h.pos,height:c.chartWidth,width:c.chartHeight,x:-c.chartHeight+f.len+f.pos}:{y:-h.pos,height:c.chartHeight,width:c.chartWidth,x:-f.pos}:(b=this.clipBox||c.clipBox,a&&(b.width=c.plotSizeX,b.x=0));return a?{width:b.width,x:b.x}:b},setClip:function(b){var a=
+this.chart,d=this.options,c=a.renderer,e=a.inverted,f=this.clipBox,h=this.getClipBox(b),p=this.sharedClipKey||["_sharedClip",b&&b.duration,b&&b.easing,h.height,d.xAxis,d.yAxis].join(),m=a[p],l=a[p+"m"];b&&(h.width=0,e&&(h.x=a.plotHeight+(!1!==d.clip?0:a.plotTop)));m?a.hasLoaded||m.attr(h):(b&&(a[p+"m"]=l=c.clipRect(e?a.plotSizeX+99:-99,e?-a.plotLeft:-a.plotTop,99,e?a.chartWidth:a.chartHeight)),a[p]=m=c.clipRect(h),m.count={length:0});b&&!m.count[this.index]&&(m.count[this.index]=!0,m.count.length+=
+1);if(!1!==d.clip||b)this.group.clip(b||f?m:a.clipRect),this.markerGroup.clip(l),this.sharedClipKey=p;b||(m.count[this.index]&&(delete m.count[this.index],--m.count.length),0===m.count.length&&p&&a[p]&&(f||(a[p]=a[p].destroy()),a[p+"m"]&&(a[p+"m"]=a[p+"m"].destroy())))},animate:function(b){var a=this.chart,d=G(this.options.animation);if(!a.hasRendered)if(b)this.setClip(d);else{var c=this.sharedClipKey;b=a[c];var e=this.getClipBox(d,!0);b&&b.animate(e,d);a[c+"m"]&&a[c+"m"].animate({width:e.width+99,
+x:e.x-(a.inverted?0:99)},d)}},afterAnimate:function(){this.setClip();q(this,"afterAnimate");this.finishedAnimating=!0},drawPoints:function(){var b=this.points,a=this.chart,d,c,e=this.options.marker,f=this[this.specialGroup]||this.markerGroup,h=this.xAxis,p=m(e.enabled,!h||h.isRadial?!0:null,this.closestPointRangePx>=e.enabledThreshold*e.radius);if(!1!==e.enabled||this._hasPointMarkers)for(d=0;d<b.length;d++){var l=b[d];var u=(c=l.graphic)?"animate":"attr";var w=l.marker||{};var C=!!l.marker;if((p&&
+"undefined"===typeof w.enabled||w.enabled)&&!l.isNull&&!1!==l.visible){var g=m(w.symbol,this.symbol);var r=this.markerAttribs(l,l.selected&&"select");this.enabledDataSorting&&(l.startXPos=h.reversed?-r.width:h.width);var F=!1!==l.isInside;c?c[F?"show":"hide"](F).animate(r):F&&(0<r.width||l.hasImage)&&(l.graphic=c=a.renderer.symbol(g,r.x,r.y,r.width,r.height,C?w:e).add(f),this.enabledDataSorting&&a.hasRendered&&(c.attr({x:l.startXPos}),u="animate"));c&&"animate"===u&&c[F?"show":"hide"](F).animate(r);
+if(c&&!a.styledMode)c[u](this.pointAttribs(l,l.selected&&"select"));c&&c.addClass(l.getClassName(),!0)}else c&&(l.graphic=c.destroy())}},markerAttribs:function(b,a){var d=this.options,c=d.marker,e=b.marker||{},f=e.symbol||c.symbol,h=m(e.radius,c.radius);a&&(c=c.states[a],a=e.states&&e.states[a],h=m(a&&a.radius,c&&c.radius,h+(c&&c.radiusPlus||0)));b.hasImage=f&&0===f.indexOf("url");b.hasImage&&(h=0);b={x:d.crisp?Math.floor(b.plotX)-h:b.plotX-h,y:b.plotY-h};h&&(b.width=b.height=2*h);return b},pointAttribs:function(b,
+a){var d=this.options.marker,c=b&&b.options,e=c&&c.marker||{},f=this.color,h=c&&c.color,p=b&&b.color;c=m(e.lineWidth,d.lineWidth);var n=b&&b.zone&&b.zone.color;b=1;f=h||n||p||f;h=e.fillColor||d.fillColor||f;f=e.lineColor||d.lineColor||f;a=a||"normal";d=d.states[a];a=e.states&&e.states[a]||{};c=m(a.lineWidth,d.lineWidth,c+m(a.lineWidthPlus,d.lineWidthPlus,0));h=a.fillColor||d.fillColor||h;f=a.lineColor||d.lineColor||f;b=m(a.opacity,d.opacity,b);return{stroke:f,"stroke-width":c,fill:h,opacity:b}},destroy:function(b){var a=
+this,e=a.chart,f=/AppleWebKit\/533/.test(d.navigator.userAgent),h,p,l=a.data||[],m,u;q(a,"destroy");this.removeEvents(b);(a.axisTypes||[]).forEach(function(b){(u=a[b])&&u.series&&(E(u.series,a),u.isDirty=u.forceRedraw=!0)});a.legendItem&&a.chart.legend.destroyItem(a);for(p=l.length;p--;)(m=l[p])&&m.destroy&&m.destroy();a.points=null;v.clearTimeout(a.animationTimeout);c(a,function(b,a){b instanceof B&&!b.survive&&(h=f&&"group"===a?"hide":"destroy",b[h]())});e.hoverSeries===a&&(e.hoverSeries=null);
+E(e.series,a);e.orderSeries();c(a,function(d,c){b&&"hcEvents"===c||delete a[c]})},getGraphPath:function(b,a,d){var c=this,e=c.options,f=e.step,h,p=[],n=[],l;b=b||c.points;(h=b.reversed)&&b.reverse();(f={right:1,center:2}[f]||f&&3)&&h&&(f=4-f);b=this.getValidPoints(b,!1,!(e.connectNulls&&!a&&!d));b.forEach(function(h,m){var u=h.plotX,w=h.plotY,C=b[m-1];(h.leftCliff||C&&C.rightCliff)&&!d&&(l=!0);h.isNull&&!J(a)&&0<m?l=!e.connectNulls:h.isNull&&!a?l=!0:(0===m||l?m=[["M",h.plotX,h.plotY]]:c.getPointSpline?
+m=[c.getPointSpline(b,h,m)]:f?(m=1===f?[["L",C.plotX,w]]:2===f?[["L",(C.plotX+u)/2,C.plotY],["L",(C.plotX+u)/2,w]]:[["L",u,C.plotY]],m.push(["L",u,w])):m=[["L",u,w]],n.push(h.x),f&&(n.push(h.x),2===f&&n.push(h.x)),p.push.apply(p,m),l=!1)});p.xMap=n;return c.graphPath=p},drawGraph:function(){var b=this,a=this.options,d=(this.gappedPath||this.getGraphPath).call(this),c=this.chart.styledMode,e=[["graph","highcharts-graph"]];c||e[0].push(a.lineColor||this.color||"#cccccc",a.dashStyle);e=b.getZonesGraphs(e);
+e.forEach(function(e,f){var h=e[0],p=b[h],n=p?"animate":"attr";p?(p.endX=b.preventGraphAnimation?null:d.xMap,p.animate({d:d})):d.length&&(b[h]=p=b.chart.renderer.path(d).addClass(e[1]).attr({zIndex:1}).add(b.group));p&&!c&&(h={stroke:e[2],"stroke-width":a.lineWidth,fill:b.fillGraph&&b.color||"none"},e[3]?h.dashstyle=e[3]:"square"!==a.linecap&&(h["stroke-linecap"]=h["stroke-linejoin"]="round"),p[n](h).shadow(2>f&&a.shadow));p&&(p.startX=d.xMap,p.isArea=d.isArea)})},getZonesGraphs:function(b){this.zones.forEach(function(a,
+d){d=["zone-graph-"+d,"highcharts-graph highcharts-zone-graph-"+d+" "+(a.className||"")];this.chart.styledMode||d.push(a.color||this.color,a.dashStyle||this.options.dashStyle);b.push(d)},this);return b},applyZones:function(){var b=this,a=this.chart,d=a.renderer,c=this.zones,e,f,h=this.clips||[],p,l=this.graph,u=this.area,w=Math.max(a.chartWidth,a.chartHeight),C=this[(this.zoneAxis||"y")+"Axis"],g=a.inverted,r,F,q,t=!1,B,k;if(c.length&&(l||u)&&C&&"undefined"!==typeof C.min){var z=C.reversed;var O=
+C.horiz;l&&!this.showLine&&l.hide();u&&u.hide();var L=C.getExtremes();c.forEach(function(c,n){e=z?O?a.plotWidth:0:O?0:C.toPixels(L.min)||0;e=y(m(f,e),0,w);f=y(Math.round(C.toPixels(m(c.value,L.max),!0)||0),0,w);t&&(e=f=C.toPixels(L.max));r=Math.abs(e-f);F=Math.min(e,f);q=Math.max(e,f);C.isXAxis?(p={x:g?q:F,y:0,width:r,height:w},O||(p.x=a.plotHeight-p.x)):(p={x:0,y:g?q:F,width:w,height:r},O&&(p.y=a.plotWidth-p.y));g&&d.isVML&&(p=C.isXAxis?{x:0,y:z?F:q,height:p.width,width:a.chartWidth}:{x:p.y-a.plotLeft-
+a.spacingBox.x,y:0,width:p.height,height:a.chartHeight});h[n]?h[n].animate(p):h[n]=d.clipRect(p);B=b["zone-area-"+n];k=b["zone-graph-"+n];l&&k&&k.clip(h[n]);u&&B&&B.clip(h[n]);t=c.value>L.max;b.resetZones&&0===f&&(f=void 0)});this.clips=h}else b.visible&&(l&&l.show(!0),u&&u.show(!0))},invertGroups:function(b){function a(){["group","markerGroup"].forEach(function(a){d[a]&&(c.renderer.isVML&&d[a].attr({width:d.yAxis.len,height:d.xAxis.len}),d[a].width=d.yAxis.len,d[a].height=d.xAxis.len,d[a].invert(d.isRadialSeries?
+!1:b))})}var d=this,c=d.chart;d.xAxis&&(d.eventsToUnbind.push(K(c,"resize",a)),a(),d.invertGroups=a)},plotGroup:function(b,a,d,c,e){var f=this[b],h=!f;h&&(this[b]=f=this.chart.renderer.g().attr({zIndex:c||.1}).add(e));f.addClass("highcharts-"+a+" highcharts-series-"+this.index+" highcharts-"+this.type+"-series "+(J(this.colorIndex)?"highcharts-color-"+this.colorIndex+" ":"")+(this.options.className||"")+(f.hasClass("highcharts-tracker")?" highcharts-tracker":""),!0);f.attr({visibility:d})[h?"attr":
+"animate"](this.getPlotBox());return f},getPlotBox:function(){var b=this.chart,a=this.xAxis,d=this.yAxis;b.inverted&&(a=d,d=this.xAxis);return{translateX:a?a.left:b.plotLeft,translateY:d?d.top:b.plotTop,scaleX:1,scaleY:1}},removeEvents:function(b){b?this.eventsToUnbind.length&&(this.eventsToUnbind.forEach(function(b){b()}),this.eventsToUnbind.length=0):u(this)},render:function(){var b=this,a=b.chart,d=b.options,c=!b.finishedAnimating&&a.renderer.isSVG&&G(d.animation).duration,e=b.visible?"inherit":
+"hidden",f=d.zIndex,h=b.hasRendered,p=a.seriesGroup,l=a.inverted;q(this,"render");var m=b.plotGroup("group","series",e,f,p);b.markerGroup=b.plotGroup("markerGroup","markers",e,f,p);c&&b.animate&&b.animate(!0);m.inverted=b.isCartesian||b.invertable?l:!1;b.drawGraph&&(b.drawGraph(),b.applyZones());b.visible&&b.drawPoints();b.drawDataLabels&&b.drawDataLabels();b.redrawPoints&&b.redrawPoints();b.drawTracker&&!1!==b.options.enableMouseTracking&&b.drawTracker();b.invertGroups(l);!1===d.clip||b.sharedClipKey||
+h||m.clip(a.clipRect);c&&b.animate&&b.animate();h||(b.animationTimeout=w(function(){b.afterAnimate()},c||0));b.isDirty=!1;b.hasRendered=!0;q(b,"afterRender")},redraw:function(){var b=this.chart,a=this.isDirty||this.isDirtyData,d=this.group,c=this.xAxis,e=this.yAxis;d&&(b.inverted&&d.attr({width:b.plotWidth,height:b.plotHeight}),d.animate({translateX:m(c&&c.left,b.plotLeft),translateY:m(e&&e.top,b.plotTop)}));this.translate();this.render();a&&delete this.kdTree},kdAxisArray:["clientX","plotY"],searchPoint:function(b,
+a){var d=this.xAxis,c=this.yAxis,e=this.chart.inverted;return this.searchKDTree({clientX:e?d.len-b.chartY+d.pos:b.chartX-d.pos,plotY:e?c.len-b.chartX+c.pos:b.chartY-c.pos},a,b)},buildKDTree:function(b){function a(b,c,e){var f;if(f=b&&b.length){var h=d.kdAxisArray[c%e];b.sort(function(b,a){return b[h]-a[h]});f=Math.floor(f/2);return{point:b[f],left:a(b.slice(0,f),c+1,e),right:a(b.slice(f+1),c+1,e)}}}this.buildingKdTree=!0;var d=this,c=-1<d.options.findNearestPointBy.indexOf("y")?2:1;delete d.kdTree;
+w(function(){d.kdTree=a(d.getValidPoints(null,!d.directTouch),c,c);d.buildingKdTree=!1},d.options.kdNow||b&&"touchstart"===b.type?0:1)},searchKDTree:function(b,a,d){function c(b,a,d,n){var l=a.point,m=e.kdAxisArray[d%n],u=l;var w=J(b[f])&&J(l[f])?Math.pow(b[f]-l[f],2):null;var C=J(b[h])&&J(l[h])?Math.pow(b[h]-l[h],2):null;C=(w||0)+(C||0);l.dist=J(C)?Math.sqrt(C):Number.MAX_VALUE;l.distX=J(w)?Math.sqrt(w):Number.MAX_VALUE;m=b[m]-l[m];C=0>m?"left":"right";w=0>m?"right":"left";a[C]&&(C=c(b,a[C],d+1,
+n),u=C[p]<u[p]?C:l);a[w]&&Math.sqrt(m*m)<u[p]&&(b=c(b,a[w],d+1,n),u=b[p]<u[p]?b:u);return u}var e=this,f=this.kdAxisArray[0],h=this.kdAxisArray[1],p=a?"distX":"dist";a=-1<e.options.findNearestPointBy.indexOf("y")?2:1;this.kdTree||this.buildingKdTree||this.buildKDTree(d);if(this.kdTree)return c(b,this.kdTree,a,a)},pointPlacementToXValue:function(){var b=this.options,d=b.pointRange,c=this.xAxis;b=b.pointPlacement;"between"===b&&(b=c.reversed?-.5:.5);return a(b)?b*m(d,c.pointRange):0},isPointInside:function(b){return"undefined"!==
+typeof b.plotY&&"undefined"!==typeof b.plotX&&0<=b.plotY&&b.plotY<=this.yAxis.len&&0<=b.plotX&&b.plotX<=this.xAxis.len}});""});P(A,"parts/Stacking.js",[A["parts/Axis.js"],A["parts/Globals.js"],A["parts/StackingAxis.js"],A["parts/Utilities.js"]],function(k,g,H,v){var K=v.correctFloat,G=v.defined,N=v.destroyObjectProperties,M=v.format,y=v.pick;"";v=g.Chart;var I=g.Series,J=function(){function g(g,k,t,q,r){var h=g.chart.inverted;this.axis=g;this.isNegative=t;this.options=k=k||{};this.x=q;this.total=
+null;this.points={};this.stack=r;this.rightCliff=this.leftCliff=0;this.alignOptions={align:k.align||(h?t?"left":"right":"center"),verticalAlign:k.verticalAlign||(h?"middle":t?"bottom":"top"),y:k.y,x:k.x};this.textAlign=k.textAlign||(h?t?"right":"left":"center")}g.prototype.destroy=function(){N(this,this.axis)};g.prototype.render=function(g){var k=this.axis.chart,t=this.options,q=t.format;q=q?M(q,this,k):t.formatter.call(this);this.label?this.label.attr({text:q,visibility:"hidden"}):(this.label=k.renderer.label(q,
+null,null,t.shape,null,null,t.useHTML,!1,"stack-labels"),q={r:t.borderRadius||0,text:q,rotation:t.rotation,padding:y(t.padding,5),visibility:"hidden"},k.styledMode||(q.fill=t.backgroundColor,q.stroke=t.borderColor,q["stroke-width"]=t.borderWidth,this.label.css(t.style)),this.label.attr(q),this.label.added||this.label.add(g));this.label.labelrank=k.plotHeight};g.prototype.setOffset=function(g,k,t,q,r){var h=this.axis,f=h.chart;q=h.translate(h.stacking.usePercentage?100:q?q:this.total,0,0,0,1);t=h.translate(t?
+t:0);t=G(q)&&Math.abs(q-t);g=y(r,f.xAxis[0].translate(this.x))+g;h=G(q)&&this.getStackBox(f,this,g,q,k,t,h);k=this.label;t=this.isNegative;g="justify"===y(this.options.overflow,"justify");var a=this.textAlign;k&&h&&(r=k.getBBox(),q=k.padding,a="left"===a?f.inverted?-q:q:"right"===a?r.width:f.inverted&&"center"===a?r.width/2:f.inverted?t?r.width+q:-q:r.width/2,t=f.inverted?r.height/2:t?-q:r.height,this.alignOptions.x=y(this.options.x,0),this.alignOptions.y=y(this.options.y,0),h.x-=a,h.y-=t,k.align(this.alignOptions,
+null,h),f.isInsidePlot(k.alignAttr.x+a-this.alignOptions.x,k.alignAttr.y+t-this.alignOptions.y)?k.show():(k.alignAttr.y=-9999,g=!1),g&&I.prototype.justifyDataLabel.call(this.axis,k,this.alignOptions,k.alignAttr,r,h),k.attr({x:k.alignAttr.x,y:k.alignAttr.y}),y(!g&&this.options.crop,!0)&&((f=f.isInsidePlot(k.x-q+k.width,k.y)&&f.isInsidePlot(k.x+q,k.y))||k.hide()))};g.prototype.getStackBox=function(g,k,t,q,r,h,f){var a=k.axis.reversed,l=g.inverted,e=f.height+f.pos-(l?g.plotLeft:g.plotTop);k=k.isNegative&&
+!a||!k.isNegative&&a;return{x:l?k?q-f.right:q-h+f.pos-g.plotLeft:t+g.xAxis[0].transB-g.plotLeft,y:l?f.height-t-r:k?e-q-h:e-q,width:l?h:r,height:l?r:h}};return g}();v.prototype.getStacks=function(){var g=this,k=g.inverted;g.yAxis.forEach(function(g){g.stacking&&g.stacking.stacks&&g.hasVisibleSeries&&(g.stacking.oldStacks=g.stacking.stacks)});g.series.forEach(function(z){var t=z.xAxis&&z.xAxis.options||{};!z.options.stacking||!0!==z.visible&&!1!==g.options.chart.ignoreHiddenSeries||(z.stackKey=[z.type,
+y(z.options.stack,""),k?t.top:t.left,k?t.height:t.width].join())})};H.compose(k);I.prototype.setStackedPoints=function(){if(this.options.stacking&&(!0===this.visible||!1===this.chart.options.chart.ignoreHiddenSeries)){var g=this.processedXData,k=this.processedYData,z=[],t=k.length,q=this.options,r=q.threshold,h=y(q.startFromThreshold&&r,0),f=q.stack;q=q.stacking;var a=this.stackKey,l="-"+a,e=this.negStacks,c=this.yAxis,m=c.stacking.stacks,u=c.stacking.oldStacks,L,F;c.stacking.stacksTouched+=1;for(F=
+0;F<t;F++){var w=g[F];var p=k[F];var C=this.getStackIndicator(C,w,this.index);var O=C.key;var B=(L=e&&p<(h?0:r))?l:a;m[B]||(m[B]={});m[B][w]||(u[B]&&u[B][w]?(m[B][w]=u[B][w],m[B][w].total=null):m[B][w]=new J(c,c.options.stackLabels,L,w,f));B=m[B][w];null!==p?(B.points[O]=B.points[this.index]=[y(B.cumulative,h)],G(B.cumulative)||(B.base=O),B.touched=c.stacking.stacksTouched,0<C.index&&!1===this.singleStacks&&(B.points[O][0]=B.points[this.index+","+w+",0"][0])):B.points[O]=B.points[this.index]=null;
+"percent"===q?(L=L?a:l,e&&m[L]&&m[L][w]?(L=m[L][w],B.total=L.total=Math.max(L.total,B.total)+Math.abs(p)||0):B.total=K(B.total+(Math.abs(p)||0))):B.total=K(B.total+(p||0));B.cumulative=y(B.cumulative,h)+(p||0);null!==p&&(B.points[O].push(B.cumulative),z[F]=B.cumulative)}"percent"===q&&(c.stacking.usePercentage=!0);this.stackedYData=z;c.stacking.oldStacks={}}};I.prototype.modifyStacks=function(){var g=this,k=g.stackKey,z=g.yAxis.stacking.stacks,t=g.processedXData,q,r=g.options.stacking;g[r+"Stacker"]&&
+[k,"-"+k].forEach(function(h){for(var f=t.length,a,l;f--;)if(a=t[f],q=g.getStackIndicator(q,a,g.index,h),l=(a=z[h]&&z[h][a])&&a.points[q.key])g[r+"Stacker"](l,a,f)})};I.prototype.percentStacker=function(g,k,z){k=k.total?100/k.total:0;g[0]=K(g[0]*k);g[1]=K(g[1]*k);this.stackedYData[z]=g[1]};I.prototype.getStackIndicator=function(g,k,z,t){!G(g)||g.x!==k||t&&g.key!==t?g={x:k,index:0,key:t}:g.index++;g.key=[z,k,g.index].join();return g};g.StackItem=J;return g.StackItem});P(A,"parts/Dynamics.js",[A["parts/Globals.js"],
+A["parts/Point.js"],A["parts/Time.js"],A["parts/Utilities.js"]],function(k,g,H,v){var K=v.addEvent,G=v.animate,N=v.createElement,M=v.css,y=v.defined,I=v.erase,J=v.error,E=v.extend,D=v.fireEvent,z=v.isArray,t=v.isNumber,q=v.isObject,r=v.isString,h=v.merge,f=v.objectEach,a=v.pick,l=v.relativeLength,e=v.setAnimation,c=v.splat,m=k.Axis;v=k.Chart;var u=k.Series,L=k.seriesTypes;k.cleanRecursively=function(a,c){var e={};f(a,function(f,h){if(q(a[h],!0)&&!a.nodeType&&c[h])f=k.cleanRecursively(a[h],c[h]),Object.keys(f).length&&
+(e[h]=f);else if(q(a[h])||a[h]!==c[h])e[h]=a[h]});return e};E(v.prototype,{addSeries:function(c,e,f){var h,p=this;c&&(e=a(e,!0),D(p,"addSeries",{options:c},function(){h=p.initSeries(c);p.isDirtyLegend=!0;p.linkSeries();h.enabledDataSorting&&h.setData(c.data,!1);D(p,"afterAddSeries",{series:h});e&&p.redraw(f)}));return h},addAxis:function(a,c,e,f){return this.createAxis(c?"xAxis":"yAxis",{axis:a,redraw:e,animation:f})},addColorAxis:function(a,c,e){return this.createAxis("colorAxis",{axis:a,redraw:c,
+animation:e})},createAxis:function(e,f){var p=this.options,l="colorAxis"===e,u=f.redraw,w=f.animation;f=h(f.axis,{index:this[e].length,isX:"xAxis"===e});var d=l?new k.ColorAxis(this,f):new m(this,f);p[e]=c(p[e]||{});p[e].push(f);l&&(this.isDirtyLegend=!0,this.axes.forEach(function(b){b.series=[]}),this.series.forEach(function(b){b.bindAxes();b.isDirtyData=!0}));a(u,!0)&&this.redraw(w);return d},showLoading:function(c){var e=this,f=e.options,h=e.loadingDiv,l=f.loading,m=function(){h&&M(h,{left:e.plotLeft+
+"px",top:e.plotTop+"px",width:e.plotWidth+"px",height:e.plotHeight+"px"})};h||(e.loadingDiv=h=N("div",{className:"highcharts-loading highcharts-loading-hidden"},null,e.container),e.loadingSpan=N("span",{className:"highcharts-loading-inner"},null,h),K(e,"redraw",m));h.className="highcharts-loading";e.loadingSpan.innerHTML=a(c,f.lang.loading,"");e.styledMode||(M(h,E(l.style,{zIndex:10})),M(e.loadingSpan,l.labelStyle),e.loadingShown||(M(h,{opacity:0,display:""}),G(h,{opacity:l.style.opacity||.5},{duration:l.showDuration||
+0})));e.loadingShown=!0;m()},hideLoading:function(){var a=this.options,c=this.loadingDiv;c&&(c.className="highcharts-loading highcharts-loading-hidden",this.styledMode||G(c,{opacity:0},{duration:a.loading.hideDuration||100,complete:function(){M(c,{display:"none"})}}));this.loadingShown=!1},propsRequireDirtyBox:"backgroundColor borderColor borderWidth borderRadius plotBackgroundColor plotBackgroundImage plotBorderColor plotBorderWidth plotShadow shadow".split(" "),propsRequireReflow:"margin marginTop marginRight marginBottom marginLeft spacing spacingTop spacingRight spacingBottom spacingLeft".split(" "),
+propsRequireUpdateSeries:"chart.inverted chart.polar chart.ignoreHiddenSeries chart.type colors plotOptions time tooltip".split(" "),collectionsWithUpdate:["xAxis","yAxis","zAxis","series"],update:function(e,m,p,u){var w=this,g={credits:"addCredits",title:"setTitle",subtitle:"setSubtitle",caption:"setCaption"},d,b,n,C=e.isResponsiveOptions,q=[];D(w,"update",{options:e});C||w.setResponsive(!1,!0);e=k.cleanRecursively(e,w.options);h(!0,w.userOptions,e);if(d=e.chart){h(!0,w.options.chart,d);"className"in
+d&&w.setClassName(d.className);"reflow"in d&&w.setReflow(d.reflow);if("inverted"in d||"polar"in d||"type"in d){w.propFromSeries();var F=!0}"alignTicks"in d&&(F=!0);f(d,function(a,d){-1!==w.propsRequireUpdateSeries.indexOf("chart."+d)&&(b=!0);-1!==w.propsRequireDirtyBox.indexOf(d)&&(w.isDirtyBox=!0);C||-1===w.propsRequireReflow.indexOf(d)||(n=!0)});!w.styledMode&&"style"in d&&w.renderer.setStyle(d.style)}!w.styledMode&&e.colors&&(this.options.colors=e.colors);e.plotOptions&&h(!0,this.options.plotOptions,
+e.plotOptions);e.time&&this.time===k.time&&(this.time=new H(e.time));f(e,function(a,d){if(w[d]&&"function"===typeof w[d].update)w[d].update(a,!1);else if("function"===typeof w[g[d]])w[g[d]](a);"chart"!==d&&-1!==w.propsRequireUpdateSeries.indexOf(d)&&(b=!0)});this.collectionsWithUpdate.forEach(function(b){if(e[b]){if("series"===b){var d=[];w[b].forEach(function(b,c){b.options.isInternal||d.push(a(b.options.index,c))})}c(e[b]).forEach(function(a,c){(c=y(a.id)&&w.get(a.id)||w[b][d?d[c]:c])&&c.coll===
+b&&(c.update(a,!1),p&&(c.touched=!0));!c&&p&&w.collectionsWithInit[b]&&(w.collectionsWithInit[b][0].apply(w,[a].concat(w.collectionsWithInit[b][1]||[]).concat([!1])).touched=!0)});p&&w[b].forEach(function(b){b.touched||b.options.isInternal?delete b.touched:q.push(b)})}});q.forEach(function(b){b.remove&&b.remove(!1)});F&&w.axes.forEach(function(b){b.update({},!1)});b&&w.getSeriesOrderByLinks().forEach(function(b){b.chart&&b.update({},!1)},this);e.loading&&h(!0,w.options.loading,e.loading);F=d&&d.width;
+d=d&&d.height;r(d)&&(d=l(d,F||w.chartWidth));n||t(F)&&F!==w.chartWidth||t(d)&&d!==w.chartHeight?w.setSize(F,d,u):a(m,!0)&&w.redraw(u);D(w,"afterUpdate",{options:e,redraw:m,animation:u})},setSubtitle:function(a,c){this.applyDescription("subtitle",a);this.layOutTitles(c)},setCaption:function(a,c){this.applyDescription("caption",a);this.layOutTitles(c)}});v.prototype.collectionsWithInit={xAxis:[v.prototype.addAxis,[!0]],yAxis:[v.prototype.addAxis,[!1]],series:[v.prototype.addSeries]};E(g.prototype,{update:function(c,
+e,f,h){function p(){l.applyOptions(c);var h=b&&l.hasDummyGraphic;h=null===l.y?!h:h;b&&h&&(l.graphic=b.destroy(),delete l.hasDummyGraphic);q(c,!0)&&(b&&b.element&&c&&c.marker&&"undefined"!==typeof c.marker.symbol&&(l.graphic=b.destroy()),c&&c.dataLabels&&l.dataLabel&&(l.dataLabel=l.dataLabel.destroy()),l.connector&&(l.connector=l.connector.destroy()));n=l.index;d.updateParallelArrays(l,n);u.data[n]=q(u.data[n],!0)||q(c,!0)?l.options:a(c,u.data[n]);d.isDirty=d.isDirtyData=!0;!d.fixedBox&&d.hasCartesianSeries&&
+(m.isDirtyBox=!0);"point"===u.legendType&&(m.isDirtyLegend=!0);e&&m.redraw(f)}var l=this,d=l.series,b=l.graphic,n,m=d.chart,u=d.options;e=a(e,!0);!1===h?p():l.firePointEvent("update",{options:c},p)},remove:function(a,c){this.series.removePoint(this.series.data.indexOf(this),a,c)}});E(u.prototype,{addPoint:function(c,e,f,h,l){var p=this.options,d=this.data,b=this.chart,n=this.xAxis;n=n&&n.hasNames&&n.names;var m=p.data,u=this.xData,w;e=a(e,!0);var g={series:this};this.pointClass.prototype.applyOptions.apply(g,
+[c]);var C=g.x;var r=u.length;if(this.requireSorting&&C<u[r-1])for(w=!0;r&&u[r-1]>C;)r--;this.updateParallelArrays(g,"splice",r,0,0);this.updateParallelArrays(g,r);n&&g.name&&(n[C]=g.name);m.splice(r,0,c);w&&(this.data.splice(r,0,null),this.processData());"point"===p.legendType&&this.generatePoints();f&&(d[0]&&d[0].remove?d[0].remove(!1):(d.shift(),this.updateParallelArrays(g,"shift"),m.shift()));!1!==l&&D(this,"addPoint",{point:g});this.isDirtyData=this.isDirty=!0;e&&b.redraw(h)},removePoint:function(c,
+f,h){var p=this,l=p.data,m=l[c],d=p.points,b=p.chart,n=function(){d&&d.length===l.length&&d.splice(c,1);l.splice(c,1);p.options.data.splice(c,1);p.updateParallelArrays(m||{series:p},"splice",c,1);m&&m.destroy();p.isDirty=!0;p.isDirtyData=!0;f&&b.redraw()};e(h,b);f=a(f,!0);m?m.firePointEvent("remove",null,n):n()},remove:function(c,e,f,h){function p(){l.destroy(h);l.remove=null;d.isDirtyLegend=d.isDirtyBox=!0;d.linkSeries();a(c,!0)&&d.redraw(e)}var l=this,d=l.chart;!1!==f?D(l,"remove",null,p):p()},
+update:function(c,e){c=k.cleanRecursively(c,this.userOptions);D(this,"update",{options:c});var f=this,l=f.chart,m=f.userOptions,u=f.initialType||f.type,d=c.type||m.type||l.options.chart.type,b=!(this.hasDerivedData||c.dataGrouping||d&&d!==this.type||"undefined"!==typeof c.pointStart||c.pointInterval||c.pointIntervalUnit||c.keys),n=L[u].prototype,w,g=["group","markerGroup","dataLabelsGroup","transformGroup"],r=["eventOptions","navigatorSeries","baseSeries"],q=f.finishedAnimating&&{animation:!1},t=
+{};b&&(r.push("data","isDirtyData","points","processedXData","processedYData","xIncrement","_hasPointMarkers","_hasPointLabels","mapMap","mapData","minY","maxY","minX","maxX"),!1!==c.visible&&r.push("area","graph"),f.parallelArrays.forEach(function(b){r.push(b+"Data")}),c.data&&(c.dataSorting&&E(f.options.dataSorting,c.dataSorting),this.setData(c.data,!1)));c=h(m,q,{index:"undefined"===typeof m.index?f.index:m.index,pointStart:a(m.pointStart,f.xData[0])},!b&&{data:f.options.data},c);b&&c.data&&(c.data=
+f.options.data);r=g.concat(r);r.forEach(function(b){r[b]=f[b];delete f[b]});f.remove(!1,null,!1,!0);for(w in n)f[w]=void 0;L[d||u]?E(f,L[d||u].prototype):J(17,!0,l,{missingModuleFor:d||u});r.forEach(function(b){f[b]=r[b]});f.init(l,c);if(b&&this.points){var F=f.options;!1===F.visible?(t.graphic=1,t.dataLabel=1):f._hasPointLabels||(d=F.marker,n=F.dataLabels,d&&(!1===d.enabled||"symbol"in d)&&(t.graphic=1),n&&!1===n.enabled&&(t.dataLabel=1));this.points.forEach(function(b){b&&b.series&&(b.resolveColor(),
+Object.keys(t).length&&b.destroyElements(t),!1===F.showInLegend&&b.legendItem&&l.legend.destroyItem(b))},this)}c.zIndex!==m.zIndex&&g.forEach(function(b){f[b]&&f[b].attr({zIndex:c.zIndex})});f.initialType=u;l.linkSeries();D(this,"afterUpdate");a(e,!0)&&l.redraw(b?void 0:!1)},setName:function(a){this.name=this.options.name=this.userOptions.name=a;this.chart.isDirtyLegend=!0}});E(m.prototype,{update:function(c,e){var p=this.chart,l=c&&c.events||{};c=h(this.userOptions,c);p.options[this.coll].indexOf&&
+(p.options[this.coll][p.options[this.coll].indexOf(this.userOptions)]=c);f(p.options[this.coll].events,function(a,c){"undefined"===typeof l[c]&&(l[c]=void 0)});this.destroy(!0);this.init(p,E(c,{events:l}));p.isDirtyBox=!0;a(e,!0)&&p.redraw()},remove:function(c){for(var e=this.chart,f=this.coll,h=this.series,l=h.length;l--;)h[l]&&h[l].remove(!1);I(e.axes,this);I(e[f],this);z(e.options[f])?e.options[f].splice(this.options.index,1):delete e.options[f];e[f].forEach(function(a,d){a.options.index=a.userOptions.index=
+d});this.destroy();e.isDirtyBox=!0;a(c,!0)&&e.redraw()},setTitle:function(a,c){this.update({title:a},c)},setCategories:function(a,c){this.update({categories:a},c)}})});P(A,"parts/AreaSeries.js",[A["parts/Globals.js"],A["parts/Color.js"],A["mixins/legend-symbol.js"],A["parts/Utilities.js"]],function(k,g,H,v){var K=g.parse,G=v.objectEach,N=v.pick;g=v.seriesType;var M=k.Series;g("area","line",{softThreshold:!1,threshold:0},{singleStacks:!1,getStackPoints:function(g){var k=[],y=[],v=this.xAxis,D=this.yAxis,
+z=D.stacking.stacks[this.stackKey],t={},q=this.index,r=D.series,h=r.length,f=N(D.options.reversedStacks,!0)?1:-1,a;g=g||this.points;if(this.options.stacking){for(a=0;a<g.length;a++)g[a].leftNull=g[a].rightNull=void 0,t[g[a].x]=g[a];G(z,function(a,c){null!==a.total&&y.push(c)});y.sort(function(a,c){return a-c});var l=r.map(function(a){return a.visible});y.forEach(function(e,c){var m=0,u,g;if(t[e]&&!t[e].isNull)k.push(t[e]),[-1,1].forEach(function(m){var w=1===m?"rightNull":"leftNull",p=0,C=z[y[c+m]];
+if(C)for(a=q;0<=a&&a<h;)u=C.points[a],u||(a===q?t[e][w]=!0:l[a]&&(g=z[e].points[a])&&(p-=g[1]-g[0])),a+=f;t[e][1===m?"rightCliff":"leftCliff"]=p});else{for(a=q;0<=a&&a<h;){if(u=z[e].points[a]){m=u[1];break}a+=f}m=D.translate(m,0,1,0,1);k.push({isNull:!0,plotX:v.translate(e,0,0,0,1),x:e,plotY:m,yBottom:m})}})}return k},getGraphPath:function(g){var k=M.prototype.getGraphPath,y=this.options,v=y.stacking,D=this.yAxis,z,t=[],q=[],r=this.index,h=D.stacking.stacks[this.stackKey],f=y.threshold,a=Math.round(D.getThreshold(y.threshold));
+y=N(y.connectNulls,"percent"===v);var l=function(e,l,m){var u=g[e];e=v&&h[u.x].points[r];var p=u[m+"Null"]||0;m=u[m+"Cliff"]||0;u=!0;if(m||p){var C=(p?e[0]:e[1])+m;var k=e[0]+m;u=!!p}else!v&&g[l]&&g[l].isNull&&(C=k=f);"undefined"!==typeof C&&(q.push({plotX:c,plotY:null===C?a:D.getThreshold(C),isNull:u,isCliff:!0}),t.push({plotX:c,plotY:null===k?a:D.getThreshold(k),doCurve:!1}))};g=g||this.points;v&&(g=this.getStackPoints(g));for(z=0;z<g.length;z++){v||(g[z].leftCliff=g[z].rightCliff=g[z].leftNull=
+g[z].rightNull=void 0);var e=g[z].isNull;var c=N(g[z].rectPlotX,g[z].plotX);var m=N(g[z].yBottom,a);if(!e||y)y||l(z,z-1,"left"),e&&!v&&y||(q.push(g[z]),t.push({x:z,plotX:c,plotY:m})),y||l(z,z+1,"right")}z=k.call(this,q,!0,!0);t.reversed=!0;e=k.call(this,t,!0,!0);(m=e[0])&&"M"===m[0]&&(e[0]=["L",m[1],m[2]]);e=z.concat(e);k=k.call(this,q,!1,y);e.xMap=z.xMap;this.areaPath=e;return k},drawGraph:function(){this.areaPath=[];M.prototype.drawGraph.apply(this);var g=this,k=this.areaPath,v=this.options,E=[["area",
+"highcharts-area",this.color,v.fillColor]];this.zones.forEach(function(k,z){E.push(["zone-area-"+z,"highcharts-area highcharts-zone-area-"+z+" "+k.className,k.color||g.color,k.fillColor||v.fillColor])});E.forEach(function(y){var z=y[0],t=g[z],q=t?"animate":"attr",r={};t?(t.endX=g.preventGraphAnimation?null:k.xMap,t.animate({d:k})):(r.zIndex=0,t=g[z]=g.chart.renderer.path(k).addClass(y[1]).add(g.group),t.isArea=!0);g.chart.styledMode||(r.fill=N(y[3],K(y[2]).setOpacity(N(v.fillOpacity,.75)).get()));
+t[q](r);t.startX=k.xMap;t.shiftUnit=v.step?2:1})},drawLegendSymbol:H.drawRectangle});""});P(A,"parts/SplineSeries.js",[A["parts/Utilities.js"]],function(k){var g=k.pick;k=k.seriesType;k("spline","line",{},{getPointSpline:function(k,v,K){var G=v.plotX||0,N=v.plotY||0,M=k[K-1];K=k[K+1];if(M&&!M.isNull&&!1!==M.doCurve&&!v.isCliff&&K&&!K.isNull&&!1!==K.doCurve&&!v.isCliff){k=M.plotY||0;var y=K.plotX||0;K=K.plotY||0;var I=0;var J=(1.5*G+(M.plotX||0))/2.5;var E=(1.5*N+k)/2.5;y=(1.5*G+y)/2.5;var D=(1.5*
+N+K)/2.5;y!==J&&(I=(D-E)*(y-G)/(y-J)+N-D);E+=I;D+=I;E>k&&E>N?(E=Math.max(k,N),D=2*N-E):E<k&&E<N&&(E=Math.min(k,N),D=2*N-E);D>K&&D>N?(D=Math.max(K,N),E=2*N-D):D<K&&D<N&&(D=Math.min(K,N),E=2*N-D);v.rightContX=y;v.rightContY=D}v=["C",g(M.rightContX,M.plotX,0),g(M.rightContY,M.plotY,0),g(J,G,0),g(E,N,0),G,N];M.rightContX=M.rightContY=void 0;return v}});""});P(A,"parts/AreaSplineSeries.js",[A["parts/Globals.js"],A["mixins/legend-symbol.js"],A["parts/Utilities.js"]],function(k,g,H){H=H.seriesType;var v=
+k.seriesTypes.area.prototype;H("areaspline","spline",k.defaultPlotOptions.area,{getStackPoints:v.getStackPoints,getGraphPath:v.getGraphPath,drawGraph:v.drawGraph,drawLegendSymbol:g.drawRectangle});""});P(A,"parts/ColumnSeries.js",[A["parts/Globals.js"],A["parts/Color.js"],A["mixins/legend-symbol.js"],A["parts/Utilities.js"]],function(k,g,H,v){"";var K=g.parse,G=v.animObject,N=v.clamp,M=v.defined,y=v.extend,I=v.isNumber,J=v.merge,E=v.pick;g=v.seriesType;var D=k.Series;g("column","line",{borderRadius:0,
+groupPadding:.2,marker:null,pointPadding:.1,minPointLength:0,cropThreshold:50,pointRange:null,states:{hover:{halo:!1,brightness:.1},select:{color:"#cccccc",borderColor:"#000000"}},dataLabels:{align:null,verticalAlign:null,y:null},softThreshold:!1,startFromThreshold:!0,stickyTracking:!1,tooltip:{distance:6},threshold:0,borderColor:"#ffffff"},{cropShoulder:0,directTouch:!0,trackerGroups:["group","dataLabelsGroup"],negStacks:!0,init:function(){D.prototype.init.apply(this,arguments);var g=this,k=g.chart;
+k.hasRendered&&k.series.forEach(function(k){k.type===g.type&&(k.isDirty=!0)})},getColumnMetrics:function(){var g=this,k=g.options,q=g.xAxis,r=g.yAxis,h=q.options.reversedStacks;h=q.reversed&&!h||!q.reversed&&h;var f,a={},l=0;!1===k.grouping?l=1:g.chart.series.forEach(function(c){var e=c.yAxis,h=c.options;if(c.type===g.type&&(c.visible||!g.chart.options.chart.ignoreHiddenSeries)&&r.len===e.len&&r.pos===e.pos){if(h.stacking){f=c.stackKey;"undefined"===typeof a[f]&&(a[f]=l++);var m=a[f]}else!1!==h.grouping&&
+(m=l++);c.columnIndex=m}});var e=Math.min(Math.abs(q.transA)*(q.ordinal&&q.ordinal.slope||k.pointRange||q.closestPointRange||q.tickInterval||1),q.len),c=e*k.groupPadding,m=(e-2*c)/(l||1);k=Math.min(k.maxPointWidth||q.len,E(k.pointWidth,m*(1-2*k.pointPadding)));g.columnMetrics={width:k,offset:(m-k)/2+(c+((g.columnIndex||0)+(h?1:0))*m-e/2)*(h?-1:1)};return g.columnMetrics},crispCol:function(g,k,q,r){var h=this.chart,f=this.borderWidth,a=-(f%2?.5:0);f=f%2?.5:1;h.inverted&&h.renderer.isVML&&(f+=1);this.options.crisp&&
+(q=Math.round(g+q)+a,g=Math.round(g)+a,q-=g);r=Math.round(k+r)+f;a=.5>=Math.abs(k)&&.5<r;k=Math.round(k)+f;r-=k;a&&r&&(--k,r+=1);return{x:g,y:k,width:q,height:r}},translate:function(){var g=this,k=g.chart,q=g.options,r=g.dense=2>g.closestPointRange*g.xAxis.transA;r=g.borderWidth=E(q.borderWidth,r?0:1);var h=g.xAxis,f=g.yAxis,a=q.threshold,l=g.translatedThreshold=f.getThreshold(a),e=E(q.minPointLength,5),c=g.getColumnMetrics(),m=c.width,u=g.barW=Math.max(m,1+2*r),L=g.pointXOffset=c.offset,F=g.dataMin,
+w=g.dataMax;k.inverted&&(l-=.5);q.pointPadding&&(u=Math.ceil(u));D.prototype.translate.apply(g);g.points.forEach(function(c){var p=E(c.yBottom,l),r=999+Math.abs(p),q=m,d=c.plotX;r=N(c.plotY,-r,f.len+r);var b=c.plotX+L,n=u,x=Math.min(r,p),t=Math.max(r,p)-x;if(e&&Math.abs(t)<e){t=e;var z=!f.reversed&&!c.negative||f.reversed&&c.negative;I(a)&&I(w)&&c.y===a&&w<=a&&(f.min||0)<a&&F!==w&&(z=!z);x=Math.abs(x-l)>e?p-e:l-(z?e:0)}M(c.options.pointWidth)&&(q=n=Math.ceil(c.options.pointWidth),b-=Math.round((q-
+m)/2));c.barX=b;c.pointWidth=q;c.tooltipPos=k.inverted?[f.len+f.pos-k.plotLeft-r,h.len+h.pos-k.plotTop-(d||0)-L-n/2,t]:[b+n/2,r+f.pos-k.plotTop,t];c.shapeType=g.pointClass.prototype.shapeType||"rect";c.shapeArgs=g.crispCol.apply(g,c.isNull?[b,l,n,0]:[b,x,n,t])})},getSymbol:k.noop,drawLegendSymbol:H.drawRectangle,drawGraph:function(){this.group[this.dense?"addClass":"removeClass"]("highcharts-dense-data")},pointAttribs:function(g,k){var q=this.options,r=this.pointAttrToOptions||{};var h=r.stroke||
+"borderColor";var f=r["stroke-width"]||"borderWidth",a=g&&g.color||this.color,l=g&&g[h]||q[h]||this.color||a,e=g&&g[f]||q[f]||this[f]||0;r=g&&g.options.dashStyle||q.dashStyle;var c=E(g&&g.opacity,q.opacity,1);if(g&&this.zones.length){var m=g.getZone();a=g.options.color||m&&(m.color||g.nonZonedColor)||this.color;m&&(l=m.borderColor||l,r=m.dashStyle||r,e=m.borderWidth||e)}k&&g&&(g=J(q.states[k],g.options.states&&g.options.states[k]||{}),k=g.brightness,a=g.color||"undefined"!==typeof k&&K(a).brighten(g.brightness).get()||
+a,l=g[h]||l,e=g[f]||e,r=g.dashStyle||r,c=E(g.opacity,c));h={fill:a,stroke:l,"stroke-width":e,opacity:c};r&&(h.dashstyle=r);return h},drawPoints:function(){var g=this,k=this.chart,q=g.options,r=k.renderer,h=q.animationLimit||250,f;g.points.forEach(function(a){var l=a.graphic,e=!!l,c=l&&k.pointCount<h?"animate":"attr";if(I(a.plotY)&&null!==a.y){f=a.shapeArgs;l&&a.hasNewShapeType()&&(l=l.destroy());g.enabledDataSorting&&(a.startXPos=g.xAxis.reversed?-(f?f.width:0):g.xAxis.width);l||(a.graphic=l=r[a.shapeType](f).add(a.group||
+g.group))&&g.enabledDataSorting&&k.hasRendered&&k.pointCount<h&&(l.attr({x:a.startXPos}),e=!0,c="animate");if(l&&e)l[c](J(f));if(q.borderRadius)l[c]({r:q.borderRadius});k.styledMode||l[c](g.pointAttribs(a,a.selected&&"select")).shadow(!1!==a.allowShadow&&q.shadow,null,q.stacking&&!q.borderRadius);l.addClass(a.getClassName(),!0)}else l&&(a.graphic=l.destroy())})},animate:function(g){var k=this,q=this.yAxis,r=k.options,h=this.chart.inverted,f={},a=h?"translateX":"translateY";if(g)f.scaleY=.001,g=N(q.toPixels(r.threshold),
+q.pos,q.pos+q.len),h?f.translateX=g-q.len:f.translateY=g,k.clipBox&&k.setClip(),k.group.attr(f);else{var l=k.group.attr(a);k.group.animate({scaleY:1},y(G(k.options.animation),{step:function(e,c){k.group&&(f[a]=l+c.pos*(q.pos-l),k.group.attr(f))}}))}},remove:function(){var g=this,k=g.chart;k.hasRendered&&k.series.forEach(function(k){k.type===g.type&&(k.isDirty=!0)});D.prototype.remove.apply(g,arguments)}});""});P(A,"parts/BarSeries.js",[A["parts/Utilities.js"]],function(k){k=k.seriesType;k("bar","column",
+null,{inverted:!0});""});P(A,"parts/ScatterSeries.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.addEvent;g=g.seriesType;var v=k.Series;g("scatter","line",{lineWidth:0,findNearestPointBy:"xy",jitter:{x:0,y:0},marker:{enabled:!0},tooltip:{headerFormat:'<span style="color:{point.color}">\u25cf</span> <span style="font-size: 10px"> {series.name}</span><br/>',pointFormat:"x: <b>{point.x}</b><br/>y: <b>{point.y}</b><br/>"}},{sorted:!1,requireSorting:!1,noSharedTooltip:!0,trackerGroups:["group",
+"markerGroup","dataLabelsGroup"],takeOrdinalPosition:!1,drawGraph:function(){this.options.lineWidth&&v.prototype.drawGraph.call(this)},applyJitter:function(){var g=this,k=this.options.jitter,v=this.points.length;k&&this.points.forEach(function(G,y){["x","y"].forEach(function(I,J){var E="plot"+I.toUpperCase();if(k[I]&&!G.isNull){var D=g[I+"Axis"];var z=k[I]*D.transA;if(D&&!D.isLog){var t=Math.max(0,G[E]-z);D=Math.min(D.len,G[E]+z);J=1E4*Math.sin(y+J*v);G[E]=t+(D-t)*(J-Math.floor(J));"x"===I&&(G.clientX=
+G.plotX)}}})})}});H(v,"afterTranslate",function(){this.applyJitter&&this.applyJitter()});""});P(A,"mixins/centered-series.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.isNumber,v=g.pick,K=g.relativeLength,G=k.deg2rad;k.CenteredSeriesMixin={getCenter:function(){var g=this.options,k=this.chart,y=2*(g.slicedOffset||0),G=k.plotWidth-2*y,J=k.plotHeight-2*y,E=g.center,D=Math.min(G,J),z=g.size,t=g.innerSize||0;"string"===typeof z&&(z=parseFloat(z));"string"===typeof t&&(t=parseFloat(t));
+g=[v(E[0],"50%"),v(E[1],"50%"),v(z&&0>z?void 0:g.size,"100%"),v(t&&0>t?void 0:g.innerSize||0,"0%")];k.angular&&(g[3]=0);for(E=0;4>E;++E)z=g[E],k=2>E||2===E&&/%$/.test(z),g[E]=K(z,[G,J,D,g[2]][E])+(k?y:0);g[3]>g[2]&&(g[3]=g[2]);return g},getStartAndEndRadians:function(g,k){g=H(g)?g:0;k=H(k)&&k>g&&360>k-g?k:g+360;return{start:G*(g+-90),end:G*(k+-90)}}}});P(A,"parts/PieSeries.js",[A["parts/Globals.js"],A["mixins/legend-symbol.js"],A["parts/Point.js"],A["parts/Utilities.js"]],function(k,g,H,v){var K=
+v.addEvent,G=v.clamp,A=v.defined,M=v.fireEvent,y=v.isNumber,I=v.merge,J=v.pick,E=v.relativeLength,D=v.seriesType,z=v.setAnimation;v=k.CenteredSeriesMixin;var t=v.getStartAndEndRadians,q=k.noop,r=k.Series;D("pie","line",{center:[null,null],clip:!1,colorByPoint:!0,dataLabels:{allowOverlap:!0,connectorPadding:5,connectorShape:"fixedOffset",crookDistance:"70%",distance:30,enabled:!0,formatter:function(){return this.point.isNull?void 0:this.point.name},softConnector:!0,x:0},fillColor:void 0,ignoreHiddenPoint:!0,
+inactiveOtherPoints:!0,legendType:"point",marker:null,size:null,showInLegend:!1,slicedOffset:10,stickyTracking:!1,tooltip:{followPointer:!0},borderColor:"#ffffff",borderWidth:1,lineWidth:void 0,states:{hover:{brightness:.1}}},{isCartesian:!1,requireSorting:!1,directTouch:!0,noSharedTooltip:!0,trackerGroups:["group","dataLabelsGroup"],axisTypes:[],pointAttribs:k.seriesTypes.column.prototype.pointAttribs,animate:function(h){var f=this,a=f.points,l=f.startAngleRad;h||a.forEach(function(a){var c=a.graphic,
+e=a.shapeArgs;c&&e&&(c.attr({r:J(a.startR,f.center&&f.center[3]/2),start:l,end:l}),c.animate({r:e.r,start:e.start,end:e.end},f.options.animation))})},hasData:function(){return!!this.processedXData.length},updateTotals:function(){var h,f=0,a=this.points,l=a.length,e=this.options.ignoreHiddenPoint;for(h=0;h<l;h++){var c=a[h];f+=e&&!c.visible?0:c.isNull?0:c.y}this.total=f;for(h=0;h<l;h++)c=a[h],c.percentage=0<f&&(c.visible||!e)?c.y/f*100:0,c.total=f},generatePoints:function(){r.prototype.generatePoints.call(this);
+this.updateTotals()},getX:function(h,f,a){var l=this.center,e=this.radii?this.radii[a.index]:l[2]/2;h=Math.asin(G((h-l[1])/(e+a.labelDistance),-1,1));return l[0]+(f?-1:1)*Math.cos(h)*(e+a.labelDistance)+(0<a.labelDistance?(f?-1:1)*this.options.dataLabels.padding:0)},translate:function(h){this.generatePoints();var f=0,a=this.options,l=a.slicedOffset,e=l+(a.borderWidth||0),c=t(a.startAngle,a.endAngle),g=this.startAngleRad=c.start;c=(this.endAngleRad=c.end)-g;var u=this.points,k=a.dataLabels.distance;
+a=a.ignoreHiddenPoint;var r,w=u.length;h||(this.center=h=this.getCenter());for(r=0;r<w;r++){var p=u[r];var C=g+f*c;if(!a||p.visible)f+=p.percentage/100;var q=g+f*c;p.shapeType="arc";p.shapeArgs={x:h[0],y:h[1],r:h[2]/2,innerR:h[3]/2,start:Math.round(1E3*C)/1E3,end:Math.round(1E3*q)/1E3};p.labelDistance=J(p.options.dataLabels&&p.options.dataLabels.distance,k);p.labelDistance=E(p.labelDistance,p.shapeArgs.r);this.maxLabelDistance=Math.max(this.maxLabelDistance||0,p.labelDistance);q=(q+C)/2;q>1.5*Math.PI?
+q-=2*Math.PI:q<-Math.PI/2&&(q+=2*Math.PI);p.slicedTranslation={translateX:Math.round(Math.cos(q)*l),translateY:Math.round(Math.sin(q)*l)};var B=Math.cos(q)*h[2]/2;var d=Math.sin(q)*h[2]/2;p.tooltipPos=[h[0]+.7*B,h[1]+.7*d];p.half=q<-Math.PI/2||q>Math.PI/2?1:0;p.angle=q;C=Math.min(e,p.labelDistance/5);p.labelPosition={natural:{x:h[0]+B+Math.cos(q)*p.labelDistance,y:h[1]+d+Math.sin(q)*p.labelDistance},"final":{},alignment:0>p.labelDistance?"center":p.half?"right":"left",connectorPosition:{breakAt:{x:h[0]+
+B+Math.cos(q)*C,y:h[1]+d+Math.sin(q)*C},touchingSliceAt:{x:h[0]+B,y:h[1]+d}}}}M(this,"afterTranslate")},drawEmpty:function(){var h=this.options;if(0===this.total){var f=this.center[0];var a=this.center[1];this.graph||(this.graph=this.chart.renderer.circle(f,a,0).addClass("highcharts-graph").add(this.group));this.graph.animate({"stroke-width":h.borderWidth,cx:f,cy:a,r:this.center[2]/2,fill:h.fillColor||"none",stroke:h.color||"#cccccc"},this.options.animation)}else this.graph&&(this.graph=this.graph.destroy())},
+redrawPoints:function(){var h=this,f=h.chart,a=f.renderer,l,e,c,g,u=h.options.shadow;this.drawEmpty();!u||h.shadowGroup||f.styledMode||(h.shadowGroup=a.g("shadow").attr({zIndex:-1}).add(h.group));h.points.forEach(function(m){var k={};e=m.graphic;if(!m.isNull&&e){g=m.shapeArgs;l=m.getTranslate();if(!f.styledMode){var w=m.shadowGroup;u&&!w&&(w=m.shadowGroup=a.g("shadow").add(h.shadowGroup));w&&w.attr(l);c=h.pointAttribs(m,m.selected&&"select")}m.delayedRendering?(e.setRadialReference(h.center).attr(g).attr(l),
+f.styledMode||e.attr(c).attr({"stroke-linejoin":"round"}).shadow(u,w),m.delayedRendering=!1):(e.setRadialReference(h.center),f.styledMode||I(!0,k,c),I(!0,k,g,l),e.animate(k));e.attr({visibility:m.visible?"inherit":"hidden"});e.addClass(m.getClassName())}else e&&(m.graphic=e.destroy())})},drawPoints:function(){var h=this.chart.renderer;this.points.forEach(function(f){f.graphic&&f.hasNewShapeType()&&(f.graphic=f.graphic.destroy());f.graphic||(f.graphic=h[f.shapeType](f.shapeArgs).add(f.series.group),
+f.delayedRendering=!0)})},searchPoint:q,sortByAngle:function(h,f){h.sort(function(a,h){return"undefined"!==typeof a.angle&&(h.angle-a.angle)*f})},drawLegendSymbol:g.drawRectangle,getCenter:v.getCenter,getSymbol:q,drawGraph:null},{init:function(){H.prototype.init.apply(this,arguments);var h=this;h.name=J(h.name,"Slice");var f=function(a){h.slice("select"===a.type)};K(h,"select",f);K(h,"unselect",f);return h},isValid:function(){return y(this.y)&&0<=this.y},setVisible:function(h,f){var a=this,l=a.series,
+e=l.chart,c=l.options.ignoreHiddenPoint;f=J(f,c);h!==a.visible&&(a.visible=a.options.visible=h="undefined"===typeof h?!a.visible:h,l.options.data[l.data.indexOf(a)]=a.options,["graphic","dataLabel","connector","shadowGroup"].forEach(function(c){if(a[c])a[c][h?"show":"hide"](!0)}),a.legendItem&&e.legend.colorizeItem(a,h),h||"hover"!==a.state||a.setState(""),c&&(l.isDirty=!0),f&&e.redraw())},slice:function(h,f,a){var l=this.series;z(a,l.chart);J(f,!0);this.sliced=this.options.sliced=A(h)?h:!this.sliced;
+l.options.data[l.data.indexOf(this)]=this.options;this.graphic&&this.graphic.animate(this.getTranslate());this.shadowGroup&&this.shadowGroup.animate(this.getTranslate())},getTranslate:function(){return this.sliced?this.slicedTranslation:{translateX:0,translateY:0}},haloPath:function(h){var f=this.shapeArgs;return this.sliced||!this.visible?[]:this.series.chart.renderer.symbols.arc(f.x,f.y,f.r+h,f.r+h,{innerR:f.r-1,start:f.start,end:f.end})},connectorShapes:{fixedOffset:function(h,f,a){var l=f.breakAt;
+f=f.touchingSliceAt;return[["M",h.x,h.y],a.softConnector?["C",h.x+("left"===h.alignment?-5:5),h.y,2*l.x-f.x,2*l.y-f.y,l.x,l.y]:["L",l.x,l.y],["L",f.x,f.y]]},straight:function(h,f){f=f.touchingSliceAt;return[["M",h.x,h.y],["L",f.x,f.y]]},crookedLine:function(h,f,a){f=f.touchingSliceAt;var l=this.series,e=l.center[0],c=l.chart.plotWidth,g=l.chart.plotLeft;l=h.alignment;var u=this.shapeArgs.r;a=E(a.crookDistance,1);c="left"===l?e+u+(c+g-e-u)*(1-a):g+(e-u)*a;a=["L",c,h.y];e=!0;if("left"===l?c>h.x||c<
+f.x:c<h.x||c>f.x)e=!1;h=[["M",h.x,h.y]];e&&h.push(a);h.push(["L",f.x,f.y]);return h}},getConnectorPath:function(){var h=this.labelPosition,f=this.series.options.dataLabels,a=f.connectorShape,l=this.connectorShapes;l[a]&&(a=l[a]);return a.call(this,{x:h.final.x,y:h.final.y,alignment:h.alignment},h.connectorPosition,f)}});""});P(A,"parts/DataLabels.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.animObject,v=g.arrayMax,A=g.clamp,G=g.defined,N=g.extend,M=g.fireEvent,y=g.format,
+I=g.isArray,J=g.merge,E=g.objectEach,D=g.pick,z=g.relativeLength,t=g.splat,q=g.stableSort;g=k.noop;var r=k.Series,h=k.seriesTypes;k.distribute=function(f,a,h){function e(a,c){return a.target-c.target}var c,l=!0,g=f,r=[];var t=0;var w=g.reducedLen||a;for(c=f.length;c--;)t+=f[c].size;if(t>w){q(f,function(a,c){return(c.rank||0)-(a.rank||0)});for(t=c=0;t<=w;)t+=f[c].size,c++;r=f.splice(c-1,f.length)}q(f,e);for(f=f.map(function(a){return{size:a.size,targets:[a.target],align:D(a.align,.5)}});l;){for(c=
+f.length;c--;)l=f[c],t=(Math.min.apply(0,l.targets)+Math.max.apply(0,l.targets))/2,l.pos=A(t-l.size*l.align,0,a-l.size);c=f.length;for(l=!1;c--;)0<c&&f[c-1].pos+f[c-1].size>f[c].pos&&(f[c-1].size+=f[c].size,f[c-1].targets=f[c-1].targets.concat(f[c].targets),f[c-1].align=.5,f[c-1].pos+f[c-1].size>a&&(f[c-1].pos=a-f[c-1].size),f.splice(c,1),l=!0)}g.push.apply(g,r);c=0;f.some(function(e){var f=0;if(e.targets.some(function(){g[c].pos=e.pos+f;if("undefined"!==typeof h&&Math.abs(g[c].pos-g[c].target)>h)return g.slice(0,
+c+1).forEach(function(a){delete a.pos}),g.reducedLen=(g.reducedLen||a)-.1*a,g.reducedLen>.1*a&&k.distribute(g,a,h),!0;f+=g[c].size;c++}))return!0});q(g,e)};r.prototype.drawDataLabels=function(){function f(a,b){var d=b.filter;return d?(b=d.operator,a=a[d.property],d=d.value,">"===b&&a>d||"<"===b&&a<d||">="===b&&a>=d||"<="===b&&a<=d||"=="===b&&a==d||"==="===b&&a===d?!0:!1):!0}function a(a,b){var d=[],c;if(I(a)&&!I(b))d=a.map(function(a){return J(a,b)});else if(I(b)&&!I(a))d=b.map(function(b){return J(a,
+b)});else if(I(a)||I(b))for(c=Math.max(a.length,b.length);c--;)d[c]=J(a[c],b[c]);else d=J(a,b);return d}var h=this,e=h.chart,c=h.options,g=c.dataLabels,u=h.points,k,r=h.hasRendered||0,w=H(c.animation).duration,p=Math.min(w,200),C=!e.renderer.forExport&&D(g.defer,0<p),q=e.renderer;g=a(a(e.options.plotOptions&&e.options.plotOptions.series&&e.options.plotOptions.series.dataLabels,e.options.plotOptions&&e.options.plotOptions[h.type]&&e.options.plotOptions[h.type].dataLabels),g);M(this,"drawDataLabels");
+if(I(g)||g.enabled||h._hasPointLabels){var B=h.plotGroup("dataLabelsGroup","data-labels",C&&!r?"hidden":"inherit",g.zIndex||6);C&&(B.attr({opacity:+r}),r||setTimeout(function(){var a=h.dataLabelsGroup;a&&(h.visible&&B.show(!0),a[c.animation?"animate":"attr"]({opacity:1},{duration:p}))},w-p));u.forEach(function(d){k=t(a(g,d.dlOptions||d.options&&d.options.dataLabels));k.forEach(function(b,a){var p=b.enabled&&(!d.isNull||d.dataLabelOnNull)&&f(d,b),g=d.dataLabels?d.dataLabels[a]:d.dataLabel,l=d.connectors?
+d.connectors[a]:d.connector,m=D(b.distance,d.labelDistance),n=!g;if(p){var u=d.getLabelConfig();var w=D(b[d.formatPrefix+"Format"],b.format);u=G(w)?y(w,u,e):(b[d.formatPrefix+"Formatter"]||b.formatter).call(u,b);w=b.style;var k=b.rotation;e.styledMode||(w.color=D(b.color,w.color,h.color,"#000000"),"contrast"===w.color?(d.contrastColor=q.getContrast(d.color||h.color),w.color=!G(m)&&b.inside||0>m||c.stacking?d.contrastColor:"#000000"):delete d.contrastColor,c.cursor&&(w.cursor=c.cursor));var r={r:b.borderRadius||
+0,rotation:k,padding:b.padding,zIndex:1};e.styledMode||(r.fill=b.backgroundColor,r.stroke=b.borderColor,r["stroke-width"]=b.borderWidth);E(r,function(b,a){"undefined"===typeof b&&delete r[a]})}!g||p&&G(u)?p&&G(u)&&(g?r.text=u:(d.dataLabels=d.dataLabels||[],g=d.dataLabels[a]=k?q.text(u,0,-9999,b.useHTML).addClass("highcharts-data-label"):q.label(u,0,-9999,b.shape,null,null,b.useHTML,null,"data-label"),a||(d.dataLabel=g),g.addClass(" highcharts-data-label-color-"+d.colorIndex+" "+(b.className||"")+
+(b.useHTML?" highcharts-tracker":""))),g.options=b,g.attr(r),e.styledMode||g.css(w).shadow(b.shadow),g.added||g.add(B),b.textPath&&!b.useHTML&&(g.setTextPath(d.getDataLabelPath&&d.getDataLabelPath(g)||d.graphic,b.textPath),d.dataLabelPath&&!b.textPath.enabled&&(d.dataLabelPath=d.dataLabelPath.destroy())),h.alignDataLabel(d,g,b,null,n)):(d.dataLabel=d.dataLabel&&d.dataLabel.destroy(),d.dataLabels&&(1===d.dataLabels.length?delete d.dataLabels:delete d.dataLabels[a]),a||delete d.dataLabel,l&&(d.connector=
+d.connector.destroy(),d.connectors&&(1===d.connectors.length?delete d.connectors:delete d.connectors[a])))})})}M(this,"afterDrawDataLabels")};r.prototype.alignDataLabel=function(f,a,h,e,c){var g=this,l=this.chart,k=this.isCartesian&&l.inverted,r=this.enabledDataSorting,w=D(f.dlBox&&f.dlBox.centerX,f.plotX,-9999),p=D(f.plotY,-9999),C=a.getBBox(),q=h.rotation,t=h.align,d=l.isInsidePlot(w,Math.round(p),k),b="justify"===D(h.overflow,r?"none":"justify"),n=this.visible&&!1!==f.visible&&(f.series.forceDL||
+r&&!b||d||h.inside&&e&&l.isInsidePlot(w,k?e.x+1:e.y+e.height-1,k));var x=function(e){r&&g.xAxis&&!b&&g.setDataLabelStartPos(f,a,c,d,e)};if(n){var v=l.renderer.fontMetrics(l.styledMode?void 0:h.style.fontSize,a).b;e=N({x:k?this.yAxis.len-p:w,y:Math.round(k?this.xAxis.len-w:p),width:0,height:0},e);N(h,{width:C.width,height:C.height});q?(b=!1,w=l.renderer.rotCorr(v,q),w={x:e.x+h.x+e.width/2+w.x,y:e.y+h.y+{top:0,middle:.5,bottom:1}[h.verticalAlign]*e.height},x(w),a[c?"attr":"animate"](w).attr({align:t}),
+x=(q+720)%360,x=180<x&&360>x,"left"===t?w.y-=x?C.height:0:"center"===t?(w.x-=C.width/2,w.y-=C.height/2):"right"===t&&(w.x-=C.width,w.y-=x?0:C.height),a.placed=!0,a.alignAttr=w):(x(e),a.align(h,null,e),w=a.alignAttr);b&&0<=e.height?this.justifyDataLabel(a,h,w,C,e,c):D(h.crop,!0)&&(n=l.isInsidePlot(w.x,w.y)&&l.isInsidePlot(w.x+C.width,w.y+C.height));if(h.shape&&!q)a[c?"attr":"animate"]({anchorX:k?l.plotWidth-f.plotY:f.plotX,anchorY:k?l.plotHeight-f.plotX:f.plotY})}c&&r&&(a.placed=!1);n||r&&!b||(a.hide(!0),
+a.placed=!1)};r.prototype.setDataLabelStartPos=function(f,a,h,e,c){var g=this.chart,l=g.inverted,k=this.xAxis,r=k.reversed,w=l?a.height/2:a.width/2;f=(f=f.pointWidth)?f/2:0;k=l?c.x:r?-w-f:k.width-w+f;c=l?r?this.yAxis.height-w+f:-w-f:c.y;a.startXPos=k;a.startYPos=c;e?"hidden"===a.visibility&&(a.show(),a.attr({opacity:0}).animate({opacity:1})):a.attr({opacity:1}).animate({opacity:0},void 0,a.hide);g.hasRendered&&(h&&a.attr({x:a.startXPos,y:a.startYPos}),a.placed=!0)};r.prototype.justifyDataLabel=function(f,
+a,h,e,c,g){var l=this.chart,m=a.align,k=a.verticalAlign,w=f.box?0:f.padding||0;var p=h.x+w;if(0>p){"right"===m?(a.align="left",a.inside=!0):a.x=-p;var r=!0}p=h.x+e.width-w;p>l.plotWidth&&("left"===m?(a.align="right",a.inside=!0):a.x=l.plotWidth-p,r=!0);p=h.y+w;0>p&&("bottom"===k?(a.verticalAlign="top",a.inside=!0):a.y=-p,r=!0);p=h.y+e.height-w;p>l.plotHeight&&("top"===k?(a.verticalAlign="bottom",a.inside=!0):a.y=l.plotHeight-p,r=!0);r&&(f.placed=!g,f.align(a,null,c));return r};h.pie&&(h.pie.prototype.dataLabelPositioners=
+{radialDistributionY:function(f){return f.top+f.distributeBox.pos},radialDistributionX:function(f,a,h,e){return f.getX(h<a.top+2||h>a.bottom-2?e:h,a.half,a)},justify:function(f,a,h){return h[0]+(f.half?-1:1)*(a+f.labelDistance)},alignToPlotEdges:function(f,a,h,e){f=f.getBBox().width;return a?f+e:h-f-e},alignToConnectors:function(f,a,h,e){var c=0,g;f.forEach(function(a){g=a.dataLabel.getBBox().width;g>c&&(c=g)});return a?c+e:h-c-e}},h.pie.prototype.drawDataLabels=function(){var f=this,a=f.data,h,e=
+f.chart,c=f.options.dataLabels||{},g=c.connectorPadding,u,q=e.plotWidth,t=e.plotHeight,w=e.plotLeft,p=Math.round(e.chartWidth/3),C,y=f.center,B=y[2]/2,d=y[1],b,n,x,z,E=[[],[]],I,H,A,M,K=[0,0,0,0],N=f.dataLabelPositioners,P;f.visible&&(c.enabled||f._hasPointLabels)&&(a.forEach(function(b){b.dataLabel&&b.visible&&b.dataLabel.shortened&&(b.dataLabel.attr({width:"auto"}).css({width:"auto",textOverflow:"clip"}),b.dataLabel.shortened=!1)}),r.prototype.drawDataLabels.apply(f),a.forEach(function(b){b.dataLabel&&
+(b.visible?(E[b.half].push(b),b.dataLabel._pos=null,!G(c.style.width)&&!G(b.options.dataLabels&&b.options.dataLabels.style&&b.options.dataLabels.style.width)&&b.dataLabel.getBBox().width>p&&(b.dataLabel.css({width:Math.round(.7*p)+"px"}),b.dataLabel.shortened=!0)):(b.dataLabel=b.dataLabel.destroy(),b.dataLabels&&1===b.dataLabels.length&&delete b.dataLabels))}),E.forEach(function(a,p){var l=a.length,m=[],u;if(l){f.sortByAngle(a,p-.5);if(0<f.maxLabelDistance){var r=Math.max(0,d-B-f.maxLabelDistance);
+var C=Math.min(d+B+f.maxLabelDistance,e.plotHeight);a.forEach(function(b){0<b.labelDistance&&b.dataLabel&&(b.top=Math.max(0,d-B-b.labelDistance),b.bottom=Math.min(d+B+b.labelDistance,e.plotHeight),u=b.dataLabel.getBBox().height||21,b.distributeBox={target:b.labelPosition.natural.y-b.top+u/2,size:u,rank:b.y},m.push(b.distributeBox))});r=C+u-r;k.distribute(m,r,r/5)}for(M=0;M<l;M++){h=a[M];x=h.labelPosition;b=h.dataLabel;A=!1===h.visible?"hidden":"inherit";H=r=x.natural.y;m&&G(h.distributeBox)&&("undefined"===
+typeof h.distributeBox.pos?A="hidden":(z=h.distributeBox.size,H=N.radialDistributionY(h)));delete h.positionIndex;if(c.justify)I=N.justify(h,B,y);else switch(c.alignTo){case "connectors":I=N.alignToConnectors(a,p,q,w);break;case "plotEdges":I=N.alignToPlotEdges(b,p,q,w);break;default:I=N.radialDistributionX(f,h,H,r)}b._attr={visibility:A,align:x.alignment};P=h.options.dataLabels||{};b._pos={x:I+D(P.x,c.x)+({left:g,right:-g}[x.alignment]||0),y:H+D(P.y,c.y)-10};x.final.x=I;x.final.y=H;D(c.crop,!0)&&
+(n=b.getBBox().width,r=null,I-n<g&&1===p?(r=Math.round(n-I+g),K[3]=Math.max(r,K[3])):I+n>q-g&&0===p&&(r=Math.round(I+n-q+g),K[1]=Math.max(r,K[1])),0>H-z/2?K[0]=Math.max(Math.round(-H+z/2),K[0]):H+z/2>t&&(K[2]=Math.max(Math.round(H+z/2-t),K[2])),b.sideOverflow=r)}}}),0===v(K)||this.verifyDataLabelOverflow(K))&&(this.placeDataLabels(),this.points.forEach(function(a){P=J(c,a.options.dataLabels);if(u=D(P.connectorWidth,1)){var d;C=a.connector;if((b=a.dataLabel)&&b._pos&&a.visible&&0<a.labelDistance){A=
+b._attr.visibility;if(d=!C)a.connector=C=e.renderer.path().addClass("highcharts-data-label-connector  highcharts-color-"+a.colorIndex+(a.className?" "+a.className:"")).add(f.dataLabelsGroup),e.styledMode||C.attr({"stroke-width":u,stroke:P.connectorColor||a.color||"#666666"});C[d?"attr":"animate"]({d:a.getConnectorPath()});C.attr("visibility",A)}else C&&(a.connector=C.destroy())}}))},h.pie.prototype.placeDataLabels=function(){this.points.forEach(function(f){var a=f.dataLabel,h;a&&f.visible&&((h=a._pos)?
+(a.sideOverflow&&(a._attr.width=Math.max(a.getBBox().width-a.sideOverflow,0),a.css({width:a._attr.width+"px",textOverflow:(this.options.dataLabels.style||{}).textOverflow||"ellipsis"}),a.shortened=!0),a.attr(a._attr),a[a.moved?"animate":"attr"](h),a.moved=!0):a&&a.attr({y:-9999}));delete f.distributeBox},this)},h.pie.prototype.alignDataLabel=g,h.pie.prototype.verifyDataLabelOverflow=function(f){var a=this.center,h=this.options,e=h.center,c=h.minSize||80,g=null!==h.size;if(!g){if(null!==e[0])var u=
+Math.max(a[2]-Math.max(f[1],f[3]),c);else u=Math.max(a[2]-f[1]-f[3],c),a[0]+=(f[3]-f[1])/2;null!==e[1]?u=A(u,c,a[2]-Math.max(f[0],f[2])):(u=A(u,c,a[2]-f[0]-f[2]),a[1]+=(f[0]-f[2])/2);u<a[2]?(a[2]=u,a[3]=Math.min(z(h.innerSize||0,u),u),this.translate(a),this.drawDataLabels&&this.drawDataLabels()):g=!0}return g});h.column&&(h.column.prototype.alignDataLabel=function(f,a,h,e,c){var g=this.chart.inverted,l=f.series,k=f.dlBox||f.shapeArgs,q=D(f.below,f.plotY>D(this.translatedThreshold,l.yAxis.len)),w=
+D(h.inside,!!this.options.stacking);k&&(e=J(k),0>e.y&&(e.height+=e.y,e.y=0),k=e.y+e.height-l.yAxis.len,0<k&&k<e.height&&(e.height-=k),g&&(e={x:l.yAxis.len-e.y-e.height,y:l.xAxis.len-e.x-e.width,width:e.height,height:e.width}),w||(g?(e.x+=q?0:e.width,e.width=0):(e.y+=q?e.height:0,e.height=0)));h.align=D(h.align,!g||w?"center":q?"right":"left");h.verticalAlign=D(h.verticalAlign,g||w?"middle":q?"top":"bottom");r.prototype.alignDataLabel.call(this,f,a,h,e,c);h.inside&&f.contrastColor&&a.css({color:f.contrastColor})})});
+P(A,"modules/overlapping-datalabels.src.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var H=g.addEvent,v=g.fireEvent,A=g.isArray,G=g.objectEach,N=g.pick;k=k.Chart;H(k,"render",function(){var g=[];(this.labelCollectors||[]).forEach(function(k){g=g.concat(k())});(this.yAxis||[]).forEach(function(k){k.stacking&&k.options.stackLabels&&!k.options.stackLabels.allowOverlap&&G(k.stacking.stacks,function(k){G(k,function(k){g.push(k.label)})})});(this.series||[]).forEach(function(k){var v=
+k.options.dataLabels;k.visible&&(!1!==v.enabled||k._hasPointLabels)&&(k.nodes||k.points).forEach(function(k){k.visible&&(A(k.dataLabels)?k.dataLabels:k.dataLabel?[k.dataLabel]:[]).forEach(function(v){var y=v.options;v.labelrank=N(y.labelrank,k.labelrank,k.shapeArgs&&k.shapeArgs.height);y.allowOverlap||g.push(v)})})});this.hideOverlappingLabels(g)});k.prototype.hideOverlappingLabels=function(g){var k=this,G=g.length,J=k.renderer,E,D,z,t=!1;var q=function(f){var a,h=f.box?0:f.padding||0,e=a=0,c;if(f&&
+(!f.alignAttr||f.placed)){var g=f.alignAttr||{x:f.attr("x"),y:f.attr("y")};var u=f.parentGroup;f.width||(a=f.getBBox(),f.width=a.width,f.height=a.height,a=J.fontMetrics(null,f.element).h);var k=f.width-2*h;(c={left:"0",center:"0.5",right:"1"}[f.alignValue])?e=+c*k:Math.round(f.x)!==f.translateX&&(e=f.x-f.translateX);return{x:g.x+(u.translateX||0)+h-e,y:g.y+(u.translateY||0)+h-a,width:f.width-2*h,height:f.height-2*h}}};for(D=0;D<G;D++)if(E=g[D])E.oldOpacity=E.opacity,E.newOpacity=1,E.absoluteBox=q(E);
+g.sort(function(f,a){return(a.labelrank||0)-(f.labelrank||0)});for(D=0;D<G;D++){var r=(q=g[D])&&q.absoluteBox;for(E=D+1;E<G;++E){var h=(z=g[E])&&z.absoluteBox;!r||!h||q===z||0===q.newOpacity||0===z.newOpacity||h.x>r.x+r.width||h.x+h.width<r.x||h.y>r.y+r.height||h.y+h.height<r.y||((q.labelrank<z.labelrank?q:z).newOpacity=0)}}g.forEach(function(f){if(f){var a=f.newOpacity;f.oldOpacity!==a&&(f.alignAttr&&f.placed?(f[a?"removeClass":"addClass"]("highcharts-data-label-hidden"),t=!0,f.alignAttr.opacity=
+a,f[f.isOld?"animate":"attr"](f.alignAttr,null,function(){k.styledMode||f.css({pointerEvents:a?"auto":"none"});f.visibility=a?"inherit":"hidden";f.placed=!!a}),v(k,"afterHideOverlappingLabel")):f.attr({opacity:a}));f.isOld=!0}});t&&v(k,"afterHideAllOverlappingLabels")}});P(A,"parts/Interaction.js",[A["parts/Globals.js"],A["parts/Legend.js"],A["parts/Point.js"],A["parts/Utilities.js"]],function(k,g,H,v){var A=v.addEvent,G=v.createElement,N=v.css,M=v.defined,y=v.extend,I=v.fireEvent,J=v.isArray,E=v.isFunction,
+D=v.isNumber,z=v.isObject,t=v.merge,q=v.objectEach,r=v.pick;v=k.Chart;var h=k.defaultOptions,f=k.defaultPlotOptions,a=k.hasTouch,l=k.Series,e=k.seriesTypes,c=k.svg;var m=k.TrackerMixin={drawTrackerPoint:function(){var c=this,e=c.chart,f=e.pointer,h=function(a){var c=f.getPointFromEvent(a);"undefined"!==typeof c&&(f.isDirectTouch=!0,c.onMouseOver(a))},g;c.points.forEach(function(a){g=J(a.dataLabels)?a.dataLabels:a.dataLabel?[a.dataLabel]:[];a.graphic&&(a.graphic.element.point=a);g.forEach(function(c){c.div?
+c.div.point=a:c.element.point=a})});c._hasTracking||(c.trackerGroups.forEach(function(g){if(c[g]){c[g].addClass("highcharts-tracker").on("mouseover",h).on("mouseout",function(a){f.onTrackerMouseOut(a)});if(a)c[g].on("touchstart",h);!e.styledMode&&c.options.cursor&&c[g].css(N).css({cursor:c.options.cursor})}}),c._hasTracking=!0);I(this,"afterDrawTracker")},drawTrackerGraph:function(){var e=this,f=e.options,h=f.trackByArea,g=[].concat(h?e.areaPath:e.graphPath),p=e.chart,l=p.pointer,m=p.renderer,k=p.options.tooltip.snap,
+d=e.tracker,b=function(b){if(p.hoverSeries!==e)e.onMouseOver()},n="rgba(192,192,192,"+(c?.0001:.002)+")";d?d.attr({d:g}):e.graph&&(e.tracker=m.path(g).attr({visibility:e.visible?"visible":"hidden",zIndex:2}).addClass(h?"highcharts-tracker-area":"highcharts-tracker-line").add(e.group),p.styledMode||e.tracker.attr({"stroke-linecap":"round","stroke-linejoin":"round",stroke:n,fill:h?n:"none","stroke-width":e.graph.strokeWidth()+(h?0:2*k)}),[e.tracker,e.markerGroup].forEach(function(d){d.addClass("highcharts-tracker").on("mouseover",
+b).on("mouseout",function(b){l.onTrackerMouseOut(b)});f.cursor&&!p.styledMode&&d.css({cursor:f.cursor});if(a)d.on("touchstart",b)}));I(this,"afterDrawTracker")}};e.column&&(e.column.prototype.drawTracker=m.drawTrackerPoint);e.pie&&(e.pie.prototype.drawTracker=m.drawTrackerPoint);e.scatter&&(e.scatter.prototype.drawTracker=m.drawTrackerPoint);y(g.prototype,{setItemEvents:function(a,c,e){var f=this,h=f.chart.renderer.boxWrapper,g=a instanceof H,l="highcharts-legend-"+(g?"point":"series")+"-active",
+m=f.chart.styledMode;(e?[c,a.legendSymbol]:[a.legendGroup]).forEach(function(d){if(d)d.on("mouseover",function(){a.visible&&f.allItems.forEach(function(b){a!==b&&b.setState("inactive",!g)});a.setState("hover");a.visible&&h.addClass(l);m||c.css(f.options.itemHoverStyle)}).on("mouseout",function(){f.chart.styledMode||c.css(t(a.visible?f.itemStyle:f.itemHiddenStyle));f.allItems.forEach(function(b){a!==b&&b.setState("",!g)});h.removeClass(l);a.setState()}).on("click",function(b){var d=function(){a.setVisible&&
+a.setVisible();f.allItems.forEach(function(b){a!==b&&b.setState(a.visible?"inactive":"",!g)})};h.removeClass(l);b={browserEvent:b};a.firePointEvent?a.firePointEvent("legendItemClick",b,d):I(a,"legendItemClick",b,d)})})},createCheckboxForItem:function(a){a.checkbox=G("input",{type:"checkbox",className:"highcharts-legend-checkbox",checked:a.selected,defaultChecked:a.selected},this.options.itemCheckboxStyle,this.chart.container);A(a.checkbox,"click",function(c){I(a.series||a,"checkboxClick",{checked:c.target.checked,
+item:a},function(){a.select()})})}});y(v.prototype,{showResetZoom:function(){function a(){c.zoomOut()}var c=this,e=h.lang,f=c.options.chart.resetZoomButton,g=f.theme,l=g.states,m="chart"===f.relativeTo||"spaceBox"===f.relativeTo?null:"plotBox";I(this,"beforeShowResetZoom",null,function(){c.resetZoomButton=c.renderer.button(e.resetZoom,null,null,a,g,l&&l.hover).attr({align:f.position.align,title:e.resetZoomTitle}).addClass("highcharts-reset-zoom").add().align(f.position,!1,m)});I(this,"afterShowResetZoom")},
+zoomOut:function(){I(this,"selection",{resetSelection:!0},this.zoom)},zoom:function(a){var c=this,e,f=c.pointer,h=!1,g=c.inverted?f.mouseDownX:f.mouseDownY;!a||a.resetSelection?(c.axes.forEach(function(a){e=a.zoom()}),f.initiated=!1):a.xAxis.concat(a.yAxis).forEach(function(a){var d=a.axis,b=c.inverted?d.left:d.top,p=c.inverted?b+d.width:b+d.height,l=d.isXAxis,m=!1;if(!l&&g>=b&&g<=p||l||!M(g))m=!0;f[l?"zoomX":"zoomY"]&&m&&(e=d.zoom(a.min,a.max),d.displayBtn&&(h=!0))});var l=c.resetZoomButton;h&&!l?
+c.showResetZoom():!h&&z(l)&&(c.resetZoomButton=l.destroy());e&&c.redraw(r(c.options.chart.animation,a&&a.animation,100>c.pointCount))},pan:function(a,c){var e=this,f=e.hoverPoints,h=e.options.chart,g=e.options.mapNavigation&&e.options.mapNavigation.enabled,l;c="object"===typeof c?c:{enabled:c,type:"x"};h&&h.panning&&(h.panning=c);var m=c.type;I(this,"pan",{originalEvent:a},function(){f&&f.forEach(function(b){b.setState()});var d=[1];"xy"===m?d=[1,0]:"y"===m&&(d=[0]);d.forEach(function(b){var d=e[b?
+"xAxis":"yAxis"][0],c=d.options,f=d.horiz,h=a[f?"chartX":"chartY"];f=f?"mouseDownX":"mouseDownY";var p=e[f],u=(d.pointRange||0)/2,w=d.reversed&&!e.inverted||!d.reversed&&e.inverted?-1:1,r=d.getExtremes(),C=d.toValue(p-h,!0)+u*w;w=d.toValue(p+d.len-h,!0)-u*w;var q=w<C;p=q?w:C;C=q?C:w;var t=d.hasVerticalPanning(),B=d.panningState;d.series.forEach(function(a){if(t&&!b&&(!B||B.isDirty)){var d=a.getProcessedData(!0);a=a.getExtremes(d.yData,!0);B||(B={startMin:Number.MAX_VALUE,startMax:-Number.MAX_VALUE});
+D(a.dataMin)&&D(a.dataMax)&&(B.startMin=Math.min(a.dataMin,B.startMin),B.startMax=Math.max(a.dataMax,B.startMax))}});w=Math.min(k.pick(null===B||void 0===B?void 0:B.startMin,r.dataMin),u?r.min:d.toValue(d.toPixels(r.min)-d.minPixelPadding));u=Math.max(k.pick(null===B||void 0===B?void 0:B.startMax,r.dataMax),u?r.max:d.toValue(d.toPixels(r.max)+d.minPixelPadding));d.panningState=B;if(!c.ordinal){c=w-p;0<c&&(C+=c,p=w);c=C-u;0<c&&(C=u,p-=c);if(d.series.length&&p!==r.min&&C!==r.max&&b||B&&p>=w&&C<=u)d.setExtremes(p,
+C,!1,!1,{trigger:"pan"}),e.resetZoomButton||g||!m.match("y")||(e.showResetZoom(),d.displayBtn=!1),l=!0;e[f]=h}});l&&e.redraw(!1);N(e.container,{cursor:"move"})})}});y(H.prototype,{select:function(a,c){var e=this,f=e.series,h=f.chart;this.selectedStaging=a=r(a,!e.selected);e.firePointEvent(a?"select":"unselect",{accumulate:c},function(){e.selected=e.options.selected=a;f.options.data[f.data.indexOf(e)]=e.options;e.setState(a&&"select");c||h.getSelectedPoints().forEach(function(a){var c=a.series;a.selected&&
+a!==e&&(a.selected=a.options.selected=!1,c.options.data[c.data.indexOf(a)]=a.options,a.setState(h.hoverPoints&&c.options.inactiveOtherPoints?"inactive":""),a.firePointEvent("unselect"))})});delete this.selectedStaging},onMouseOver:function(a){var c=this.series.chart,e=c.pointer;a=a?e.normalize(a):e.getChartCoordinatesFromPoint(this,c.inverted);e.runPointActions(a,this)},onMouseOut:function(){var a=this.series.chart;this.firePointEvent("mouseOut");this.series.options.inactiveOtherPoints||(a.hoverPoints||
+[]).forEach(function(a){a.setState()});a.hoverPoints=a.hoverPoint=null},importEvents:function(){if(!this.hasImportedEvents){var a=this,c=t(a.series.options.point,a.options).events;a.events=c;q(c,function(c,e){E(c)&&A(a,e,c)});this.hasImportedEvents=!0}},setState:function(a,c){var e=this.series,h=this.state,g=e.options.states[a||"normal"]||{},l=f[e.type].marker&&e.options.marker,m=l&&!1===l.enabled,k=l&&l.states&&l.states[a||"normal"]||{},d=!1===k.enabled,b=e.stateMarkerGraphic,n=this.marker||{},u=
+e.chart,q=e.halo,t,v=l&&e.markerAttribs;a=a||"";if(!(a===this.state&&!c||this.selected&&"select"!==a||!1===g.enabled||a&&(d||m&&!1===k.enabled)||a&&n.states&&n.states[a]&&!1===n.states[a].enabled)){this.state=a;v&&(t=e.markerAttribs(this,a));if(this.graphic){h&&this.graphic.removeClass("highcharts-point-"+h);a&&this.graphic.addClass("highcharts-point-"+a);if(!u.styledMode){var z=e.pointAttribs(this,a);var D=r(u.options.chart.animation,g.animation);e.options.inactiveOtherPoints&&z.opacity&&((this.dataLabels||
+[]).forEach(function(a){a&&a.animate({opacity:z.opacity},D)}),this.connector&&this.connector.animate({opacity:z.opacity},D));this.graphic.animate(z,D)}t&&this.graphic.animate(t,r(u.options.chart.animation,k.animation,l.animation));b&&b.hide()}else{if(a&&k){h=n.symbol||e.symbol;b&&b.currentSymbol!==h&&(b=b.destroy());if(t)if(b)b[c?"animate":"attr"]({x:t.x,y:t.y});else h&&(e.stateMarkerGraphic=b=u.renderer.symbol(h,t.x,t.y,t.width,t.height).add(e.markerGroup),b.currentSymbol=h);!u.styledMode&&b&&b.attr(e.pointAttribs(this,
+a))}b&&(b[a&&this.isInside?"show":"hide"](),b.element.point=this)}a=g.halo;g=(b=this.graphic||b)&&b.visibility||"inherit";a&&a.size&&b&&"hidden"!==g&&!this.isCluster?(q||(e.halo=q=u.renderer.path().add(b.parentGroup)),q.show()[c?"animate":"attr"]({d:this.haloPath(a.size)}),q.attr({"class":"highcharts-halo highcharts-color-"+r(this.colorIndex,e.colorIndex)+(this.className?" "+this.className:""),visibility:g,zIndex:-1}),q.point=this,u.styledMode||q.attr(y({fill:this.color||e.color,"fill-opacity":a.opacity},
+a.attributes))):q&&q.point&&q.point.haloPath&&q.animate({d:q.point.haloPath(0)},null,q.hide);I(this,"afterSetState")}},haloPath:function(a){return this.series.chart.renderer.symbols.circle(Math.floor(this.plotX)-a,this.plotY-a,2*a,2*a)}});y(l.prototype,{onMouseOver:function(){var a=this.chart,c=a.hoverSeries;a.pointer.setHoverChartIndex();if(c&&c!==this)c.onMouseOut();this.options.events.mouseOver&&I(this,"mouseOver");this.setState("hover");a.hoverSeries=this},onMouseOut:function(){var a=this.options,
+c=this.chart,e=c.tooltip,f=c.hoverPoint;c.hoverSeries=null;if(f)f.onMouseOut();this&&a.events.mouseOut&&I(this,"mouseOut");!e||this.stickyTracking||e.shared&&!this.noSharedTooltip||e.hide();c.series.forEach(function(a){a.setState("",!0)})},setState:function(a,c){var e=this,f=e.options,h=e.graph,g=f.inactiveOtherPoints,l=f.states,m=f.lineWidth,d=f.opacity,b=r(l[a||"normal"]&&l[a||"normal"].animation,e.chart.options.chart.animation);f=0;a=a||"";if(e.state!==a&&([e.group,e.markerGroup,e.dataLabelsGroup].forEach(function(b){b&&
+(e.state&&b.removeClass("highcharts-series-"+e.state),a&&b.addClass("highcharts-series-"+a))}),e.state=a,!e.chart.styledMode)){if(l[a]&&!1===l[a].enabled)return;a&&(m=l[a].lineWidth||m+(l[a].lineWidthPlus||0),d=r(l[a].opacity,d));if(h&&!h.dashstyle)for(l={"stroke-width":m},h.animate(l,b);e["zone-graph-"+f];)e["zone-graph-"+f].attr(l),f+=1;g||[e.group,e.markerGroup,e.dataLabelsGroup,e.labelBySeries].forEach(function(a){a&&a.animate({opacity:d},b)})}c&&g&&e.points&&e.setAllPointsToState(a)},setAllPointsToState:function(a){this.points.forEach(function(c){c.setState&&
+c.setState(a)})},setVisible:function(a,c){var e=this,f=e.chart,h=e.legendItem,g=f.options.chart.ignoreHiddenSeries,l=e.visible;var m=(e.visible=a=e.options.visible=e.userOptions.visible="undefined"===typeof a?!l:a)?"show":"hide";["group","dataLabelsGroup","markerGroup","tracker","tt"].forEach(function(a){if(e[a])e[a][m]()});if(f.hoverSeries===e||(f.hoverPoint&&f.hoverPoint.series)===e)e.onMouseOut();h&&f.legend.colorizeItem(e,a);e.isDirty=!0;e.options.stacking&&f.series.forEach(function(a){a.options.stacking&&
+a.visible&&(a.isDirty=!0)});e.linkedSeries.forEach(function(d){d.setVisible(a,!1)});g&&(f.isDirtyBox=!0);I(e,m);!1!==c&&f.redraw()},show:function(){this.setVisible(!0)},hide:function(){this.setVisible(!1)},select:function(a){this.selected=a=this.options.selected="undefined"===typeof a?!this.selected:a;this.checkbox&&(this.checkbox.checked=a);I(this,a?"select":"unselect")},drawTracker:m.drawTrackerGraph})});P(A,"parts/Responsive.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var A=
+g.find,v=g.isArray,K=g.isObject,G=g.merge,N=g.objectEach,M=g.pick,y=g.splat,I=g.uniqueKey;k=k.Chart;k.prototype.setResponsive=function(g,k){var v=this.options.responsive,z=[],t=this.currentResponsive;!k&&v&&v.rules&&v.rules.forEach(function(g){"undefined"===typeof g._id&&(g._id=I());this.matchResponsiveRule(g,z)},this);k=G.apply(0,z.map(function(g){return A(v.rules,function(k){return k._id===g}).chartOptions}));k.isResponsiveOptions=!0;z=z.toString()||void 0;z!==(t&&t.ruleIds)&&(t&&this.update(t.undoOptions,
+g,!0),z?(t=this.currentOptions(k),t.isResponsiveOptions=!0,this.currentResponsive={ruleIds:z,mergedOptions:k,undoOptions:t},this.update(k,g,!0)):this.currentResponsive=void 0)};k.prototype.matchResponsiveRule=function(g,k){var v=g.condition;(v.callback||function(){return this.chartWidth<=M(v.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=M(v.maxHeight,Number.MAX_VALUE)&&this.chartWidth>=M(v.minWidth,0)&&this.chartHeight>=M(v.minHeight,0)}).call(this)&&k.push(g._id)};k.prototype.currentOptions=function(g){function k(g,
+q,r,h){var f;N(g,function(a,g){if(!h&&-1<D.collectionsWithUpdate.indexOf(g))for(a=y(a),r[g]=[],f=0;f<a.length;f++)q[g][f]&&(r[g][f]={},k(a[f],q[g][f],r[g][f],h+1));else K(a)?(r[g]=v(a)?[]:{},k(a,q[g]||{},r[g],h+1)):r[g]="undefined"===typeof q[g]?null:q[g]})}var D=this,z={};k(g,this.options,z,0);return z}});P(A,"masters/highcharts.src.js",[A["parts/Globals.js"]],function(k){return k});P(A,"parts/NavigatorAxis.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var A=k.isTouchDevice,v=
+g.addEvent,K=g.correctFloat,G=g.defined,N=g.isNumber,M=g.pick,y=function(){function g(g){this.axis=g}g.prototype.destroy=function(){this.axis=void 0};g.prototype.toFixedRange=function(g,k,v,z){var t=this.axis,q=t.chart;q=q&&q.fixedRange;var r=(t.pointRange||0)/2;g=M(v,t.translate(g,!0,!t.horiz));k=M(z,t.translate(k,!0,!t.horiz));t=q&&(k-g)/q;G(v)||(g=K(g+r));G(z)||(k=K(k-r));.7<t&&1.3>t&&(z?g=k-q:k=g+q);N(g)&&N(k)||(g=k=void 0);return{min:g,max:k}};return g}();return function(){function g(){}g.compose=
+function(g){g.keepProps.push("navigatorAxis");v(g,"init",function(){this.navigatorAxis||(this.navigatorAxis=new y(this))});v(g,"zoom",function(g){var k=this.chart.options,v=k.navigator,t=this.navigatorAxis,q=k.chart.pinchType,r=k.rangeSelector;k=k.chart.zoomType;this.isXAxis&&(v&&v.enabled||r&&r.enabled)&&("y"===k?g.zoomed=!1:(!A&&"xy"===k||A&&"xy"===q)&&this.options.range&&(v=t.previousZoom,G(g.newMin)?t.previousZoom=[this.min,this.max]:v&&(g.newMin=v[0],g.newMax=v[1],t.previousZoom=void 0)));"undefined"!==
+typeof g.zoomed&&g.preventDefault()})};g.AdditionsClass=y;return g}()});P(A,"parts/ScrollbarAxis.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var A=g.addEvent,v=g.defined,K=g.pick;return function(){function g(){}g.compose=function(g,G){A(g,"afterInit",function(){var g=this;g.options&&g.options.scrollbar&&g.options.scrollbar.enabled&&(g.options.scrollbar.vertical=!g.horiz,g.options.startOnTick=g.options.endOnTick=!1,g.scrollbar=new G(g.chart.renderer,g.options.scrollbar,g.chart),
+A(g.scrollbar,"changed",function(y){var G=K(g.options&&g.options.min,g.min),E=K(g.options&&g.options.max,g.max),D=v(g.dataMin)?Math.min(G,g.min,g.dataMin):G,z=(v(g.dataMax)?Math.max(E,g.max,g.dataMax):E)-D;v(G)&&v(E)&&(g.horiz&&!g.reversed||!g.horiz&&g.reversed?(G=D+z*this.to,D+=z*this.from):(G=D+z*(1-this.from),D+=z*(1-this.to)),K(this.options.liveRedraw,k.svg&&!k.isTouchDevice&&!this.chart.isBoosting)||"mouseup"===y.DOMType||!v(y.DOMType)?g.setExtremes(D,G,!0,"mousemove"!==y.DOMType,y):this.setRange(this.from,
+this.to))}))});A(g,"afterRender",function(){var g=Math.min(K(this.options.min,this.min),this.min,K(this.dataMin,this.min)),k=Math.max(K(this.options.max,this.max),this.max,K(this.dataMax,this.max)),G=this.scrollbar,E=this.axisTitleMargin+(this.titleOffset||0),D=this.chart.scrollbarsOffsets,z=this.options.margin||0;G&&(this.horiz?(this.opposite||(D[1]+=E),G.position(this.left,this.top+this.height+2+D[1]-(this.opposite?z:0),this.width,this.height),this.opposite||(D[1]+=z),E=1):(this.opposite&&(D[0]+=
+E),G.position(this.left+this.width+2+D[0]-(this.opposite?0:z),this.top,this.width,this.height),this.opposite&&(D[0]+=z),E=0),D[E]+=G.size+G.options.margin,isNaN(g)||isNaN(k)||!v(this.min)||!v(this.max)||this.min===this.max?G.setRange(0,1):(D=(this.min-g)/(k-g),g=(this.max-g)/(k-g),this.horiz&&!this.reversed||!this.horiz&&this.reversed?G.setRange(D,g):G.setRange(1-g,1-D)))});A(g,"afterGetOffset",function(){var g=this.horiz?2:1,k=this.scrollbar;k&&(this.chart.scrollbarsOffsets=[0,0],this.chart.axisOffset[g]+=
+k.size+k.options.margin)})};return g}()});P(A,"parts/Scrollbar.js",[A["parts/Axis.js"],A["parts/Globals.js"],A["parts/ScrollbarAxis.js"],A["parts/Utilities.js"]],function(k,g,A,v){var H=v.addEvent,G=v.correctFloat,N=v.defined,M=v.destroyObjectProperties,y=v.fireEvent,I=v.merge,J=v.pick,E=v.removeEvent;v=g.defaultOptions;var D=g.hasTouch,z=g.isTouchDevice,t=g.swapXY=function(g,h){h&&g.forEach(function(f){for(var a=f.length,h,e=0;e<a;e+=2)h=f[e+1],"number"===typeof h&&(f[e+1]=f[e+2],f[e+2]=h)});return g},
+q=function(){function g(h,f,a){this._events=[];this.from=this.chartY=this.chartX=0;this.scrollbar=this.group=void 0;this.scrollbarButtons=[];this.scrollbarGroup=void 0;this.scrollbarLeft=0;this.scrollbarRifles=void 0;this.scrollbarStrokeWidth=1;this.to=this.size=this.scrollbarTop=0;this.track=void 0;this.trackBorderWidth=1;this.userOptions={};this.y=this.x=0;this.chart=a;this.options=f;this.renderer=a.renderer;this.init(h,f,a)}g.prototype.addEvents=function(){var h=this.options.inverted?[1,0]:[0,
+1],f=this.scrollbarButtons,a=this.scrollbarGroup.element,g=this.track.element,e=this.mouseDownHandler.bind(this),c=this.mouseMoveHandler.bind(this),m=this.mouseUpHandler.bind(this);h=[[f[h[0]].element,"click",this.buttonToMinClick.bind(this)],[f[h[1]].element,"click",this.buttonToMaxClick.bind(this)],[g,"click",this.trackClick.bind(this)],[a,"mousedown",e],[a.ownerDocument,"mousemove",c],[a.ownerDocument,"mouseup",m]];D&&h.push([a,"touchstart",e],[a.ownerDocument,"touchmove",c],[a.ownerDocument,"touchend",
+m]);h.forEach(function(a){H.apply(null,a)});this._events=h};g.prototype.buttonToMaxClick=function(h){var f=(this.to-this.from)*J(this.options.step,.2);this.updatePosition(this.from+f,this.to+f);y(this,"changed",{from:this.from,to:this.to,trigger:"scrollbar",DOMEvent:h})};g.prototype.buttonToMinClick=function(h){var f=G(this.to-this.from)*J(this.options.step,.2);this.updatePosition(G(this.from-f),G(this.to-f));y(this,"changed",{from:this.from,to:this.to,trigger:"scrollbar",DOMEvent:h})};g.prototype.cursorToScrollbarPosition=
+function(h){var f=this.options;f=f.minWidth>this.calculatedWidth?f.minWidth:0;return{chartX:(h.chartX-this.x-this.xOffset)/(this.barWidth-f),chartY:(h.chartY-this.y-this.yOffset)/(this.barWidth-f)}};g.prototype.destroy=function(){var h=this.chart.scroller;this.removeEvents();["track","scrollbarRifles","scrollbar","scrollbarGroup","group"].forEach(function(f){this[f]&&this[f].destroy&&(this[f]=this[f].destroy())},this);h&&this===h.scrollbar&&(h.scrollbar=null,M(h.scrollbarButtons))};g.prototype.drawScrollbarButton=
+function(h){var f=this.renderer,a=this.scrollbarButtons,g=this.options,e=this.size;var c=f.g().add(this.group);a.push(c);c=f.rect().addClass("highcharts-scrollbar-button").add(c);this.chart.styledMode||c.attr({stroke:g.buttonBorderColor,"stroke-width":g.buttonBorderWidth,fill:g.buttonBackgroundColor});c.attr(c.crisp({x:-.5,y:-.5,width:e+1,height:e+1,r:g.buttonBorderRadius},c.strokeWidth()));c=f.path(t([["M",e/2+(h?-1:1),e/2-3],["L",e/2+(h?-1:1),e/2+3],["L",e/2+(h?2:-2),e/2]],g.vertical)).addClass("highcharts-scrollbar-arrow").add(a[h]);
+this.chart.styledMode||c.attr({fill:g.buttonArrowColor})};g.prototype.init=function(h,f,a){this.scrollbarButtons=[];this.renderer=h;this.userOptions=f;this.options=I(g.defaultOptions,f);this.chart=a;this.size=J(this.options.size,this.options.height);f.enabled&&(this.render(),this.addEvents())};g.prototype.mouseDownHandler=function(h){h=this.chart.pointer.normalize(h);h=this.cursorToScrollbarPosition(h);this.chartX=h.chartX;this.chartY=h.chartY;this.initPositions=[this.from,this.to];this.grabbedCenter=
+!0};g.prototype.mouseMoveHandler=function(h){var f=this.chart.pointer.normalize(h),a=this.options.vertical?"chartY":"chartX",g=this.initPositions||[];!this.grabbedCenter||h.touches&&0===h.touches[0][a]||(f=this.cursorToScrollbarPosition(f)[a],a=this[a],a=f-a,this.hasDragged=!0,this.updatePosition(g[0]+a,g[1]+a),this.hasDragged&&y(this,"changed",{from:this.from,to:this.to,trigger:"scrollbar",DOMType:h.type,DOMEvent:h}))};g.prototype.mouseUpHandler=function(h){this.hasDragged&&y(this,"changed",{from:this.from,
+to:this.to,trigger:"scrollbar",DOMType:h.type,DOMEvent:h});this.grabbedCenter=this.hasDragged=this.chartX=this.chartY=null};g.prototype.position=function(h,f,a,g){var e=this.options.vertical,c=0,l=this.rendered?"animate":"attr";this.x=h;this.y=f+this.trackBorderWidth;this.width=a;this.xOffset=this.height=g;this.yOffset=c;e?(this.width=this.yOffset=a=c=this.size,this.xOffset=f=0,this.barWidth=g-2*a,this.x=h+=this.options.margin):(this.height=this.xOffset=g=f=this.size,this.barWidth=a-2*g,this.y+=this.options.margin);
+this.group[l]({translateX:h,translateY:this.y});this.track[l]({width:a,height:g});this.scrollbarButtons[1][l]({translateX:e?0:a-f,translateY:e?g-c:0})};g.prototype.removeEvents=function(){this._events.forEach(function(h){E.apply(null,h)});this._events.length=0};g.prototype.render=function(){var h=this.renderer,f=this.options,a=this.size,g=this.chart.styledMode,e;this.group=e=h.g("scrollbar").attr({zIndex:f.zIndex,translateY:-99999}).add();this.track=h.rect().addClass("highcharts-scrollbar-track").attr({x:0,
+r:f.trackBorderRadius||0,height:a,width:a}).add(e);g||this.track.attr({fill:f.trackBackgroundColor,stroke:f.trackBorderColor,"stroke-width":f.trackBorderWidth});this.trackBorderWidth=this.track.strokeWidth();this.track.attr({y:-this.trackBorderWidth%2/2});this.scrollbarGroup=h.g().add(e);this.scrollbar=h.rect().addClass("highcharts-scrollbar-thumb").attr({height:a,width:a,r:f.barBorderRadius||0}).add(this.scrollbarGroup);this.scrollbarRifles=h.path(t([["M",-3,a/4],["L",-3,2*a/3],["M",0,a/4],["L",
+0,2*a/3],["M",3,a/4],["L",3,2*a/3]],f.vertical)).addClass("highcharts-scrollbar-rifles").add(this.scrollbarGroup);g||(this.scrollbar.attr({fill:f.barBackgroundColor,stroke:f.barBorderColor,"stroke-width":f.barBorderWidth}),this.scrollbarRifles.attr({stroke:f.rifleColor,"stroke-width":1}));this.scrollbarStrokeWidth=this.scrollbar.strokeWidth();this.scrollbarGroup.translate(-this.scrollbarStrokeWidth%2/2,-this.scrollbarStrokeWidth%2/2);this.drawScrollbarButton(0);this.drawScrollbarButton(1)};g.prototype.setRange=
+function(h,f){var a=this.options,g=a.vertical,e=a.minWidth,c=this.barWidth,m,k=!this.rendered||this.hasDragged||this.chart.navigator&&this.chart.navigator.hasDragged?"attr":"animate";if(N(c)){h=Math.max(h,0);var r=Math.ceil(c*h);this.calculatedWidth=m=G(c*Math.min(f,1)-r);m<e&&(r=(c-e+m)*h,m=e);e=Math.floor(r+this.xOffset+this.yOffset);c=m/2-.5;this.from=h;this.to=f;g?(this.scrollbarGroup[k]({translateY:e}),this.scrollbar[k]({height:m}),this.scrollbarRifles[k]({translateY:c}),this.scrollbarTop=e,
+this.scrollbarLeft=0):(this.scrollbarGroup[k]({translateX:e}),this.scrollbar[k]({width:m}),this.scrollbarRifles[k]({translateX:c}),this.scrollbarLeft=e,this.scrollbarTop=0);12>=m?this.scrollbarRifles.hide():this.scrollbarRifles.show(!0);!1===a.showFull&&(0>=h&&1<=f?this.group.hide():this.group.show());this.rendered=!0}};g.prototype.trackClick=function(h){var f=this.chart.pointer.normalize(h),a=this.to-this.from,g=this.y+this.scrollbarTop,e=this.x+this.scrollbarLeft;this.options.vertical&&f.chartY>
+g||!this.options.vertical&&f.chartX>e?this.updatePosition(this.from+a,this.to+a):this.updatePosition(this.from-a,this.to-a);y(this,"changed",{from:this.from,to:this.to,trigger:"scrollbar",DOMEvent:h})};g.prototype.update=function(h){this.destroy();this.init(this.chart.renderer,I(!0,this.options,h),this.chart)};g.prototype.updatePosition=function(h,f){1<f&&(h=G(1-G(f-h)),f=1);0>h&&(f=G(f-h),h=0);this.from=h;this.to=f};g.defaultOptions={height:z?20:14,barBorderRadius:0,buttonBorderRadius:0,liveRedraw:void 0,
+margin:10,minWidth:6,step:.2,zIndex:3,barBackgroundColor:"#cccccc",barBorderWidth:1,barBorderColor:"#cccccc",buttonArrowColor:"#333333",buttonBackgroundColor:"#e6e6e6",buttonBorderColor:"#cccccc",buttonBorderWidth:1,rifleColor:"#333333",trackBackgroundColor:"#f2f2f2",trackBorderColor:"#f2f2f2",trackBorderWidth:1};return g}();g.Scrollbar||(v.scrollbar=I(!0,q.defaultOptions,v.scrollbar),g.Scrollbar=q,A.compose(k,q));return g.Scrollbar});P(A,"parts/Navigator.js",[A["parts/Axis.js"],A["parts/Color.js"],
+A["parts/Globals.js"],A["parts/NavigatorAxis.js"],A["parts/Scrollbar.js"],A["parts/Utilities.js"]],function(k,g,A,v,K,G){g=g.parse;var H=G.addEvent,M=G.clamp,y=G.correctFloat,I=G.defined,J=G.destroyObjectProperties,E=G.erase,D=G.extend,z=G.find,t=G.isArray,q=G.isNumber,r=G.merge,h=G.pick,f=G.removeEvent,a=G.splat;G=A.Chart;var l=A.defaultOptions,e=A.hasTouch,c=A.isTouchDevice,m=A.Series,u=function(a){for(var c=[],e=1;e<arguments.length;e++)c[e-1]=arguments[e];c=[].filter.call(c,q);if(c.length)return Math[a].apply(0,
+c)};var L="undefined"===typeof A.seriesTypes.areaspline?"line":"areaspline";D(l,{navigator:{height:40,margin:25,maskInside:!0,handles:{width:7,height:15,symbols:["navigator-handle","navigator-handle"],enabled:!0,lineWidth:1,backgroundColor:"#f2f2f2",borderColor:"#999999"},maskFill:g("#6685c2").setOpacity(.3).get(),outlineColor:"#cccccc",outlineWidth:1,series:{type:L,fillOpacity:.05,lineWidth:1,compare:null,dataGrouping:{approximation:"average",enabled:!0,groupPixelWidth:2,smoothed:!0,units:[["millisecond",
+[1,2,5,10,20,25,50,100,200,500]],["second",[1,2,5,10,15,30]],["minute",[1,2,5,10,15,30]],["hour",[1,2,3,4,6,8,12]],["day",[1,2,3,4]],["week",[1,2,3]],["month",[1,3,6]],["year",null]]},dataLabels:{enabled:!1,zIndex:2},id:"highcharts-navigator-series",className:"highcharts-navigator-series",lineColor:null,marker:{enabled:!1},threshold:null},xAxis:{overscroll:0,className:"highcharts-navigator-xaxis",tickLength:0,lineWidth:0,gridLineColor:"#e6e6e6",gridLineWidth:1,tickPixelInterval:200,labels:{align:"left",
+style:{color:"#999999"},x:3,y:-4},crosshair:!1},yAxis:{className:"highcharts-navigator-yaxis",gridLineWidth:0,startOnTick:!1,endOnTick:!1,minPadding:.1,maxPadding:.1,labels:{enabled:!1},crosshair:!1,title:{text:null},tickLength:0,tickWidth:0}}});A.Renderer.prototype.symbols["navigator-handle"]=function(a,c,e,f,h){a=h.width/2;c=Math.round(a/3)+.5;h=h.height||0;return[["M",-a-1,.5],["L",a,.5],["L",a,h+.5],["L",-a-1,h+.5],["L",-a-1,.5],["M",-c,4],["L",-c,h-3],["M",c-1,4],["L",c-1,h-3]]};var F=function(){function g(a){this.zoomedMin=
+this.zoomedMax=this.yAxis=this.xAxis=this.top=this.size=this.shades=this.rendered=this.range=this.outlineHeight=this.outline=this.opposite=this.navigatorSize=this.navigatorSeries=this.navigatorOptions=this.navigatorGroup=this.navigatorEnabled=this.left=this.height=this.handles=this.chart=this.baseSeries=void 0;this.init(a)}g.prototype.drawHandle=function(a,c,e,f){var d=this.navigatorOptions.handles.height;this.handles[c][f](e?{translateX:Math.round(this.left+this.height/2),translateY:Math.round(this.top+
+parseInt(a,10)+.5-d)}:{translateX:Math.round(this.left+parseInt(a,10)),translateY:Math.round(this.top+this.height/2-d/2-1)})};g.prototype.drawOutline=function(a,c,e,f){var d=this.navigatorOptions.maskInside,b=this.outline.strokeWidth(),h=b/2,g=b%2/2;b=this.outlineHeight;var p=this.scrollbarHeight||0,l=this.size,m=this.left-p,k=this.top;e?(m-=h,e=k+c+g,c=k+a+g,g=[["M",m+b,k-p-g],["L",m+b,e],["L",m,e],["L",m,c],["L",m+b,c],["L",m+b,k+l+p]],d&&g.push(["M",m+b,e-h],["L",m+b,c+h])):(a+=m+p-g,c+=m+p-g,
+k+=h,g=[["M",m,k],["L",a,k],["L",a,k+b],["L",c,k+b],["L",c,k],["L",m+l+2*p,k]],d&&g.push(["M",a-h,k],["L",c+h,k]));this.outline[f]({d:g})};g.prototype.drawMasks=function(a,c,e,f){var d=this.left,b=this.top,h=this.height;if(e){var g=[d,d,d];var p=[b,b+a,b+c];var m=[h,h,h];var l=[a,c-a,this.size-c]}else g=[d,d+a,d+c],p=[b,b,b],m=[a,c-a,this.size-c],l=[h,h,h];this.shades.forEach(function(a,b){a[f]({x:g[b],y:p[b],width:m[b],height:l[b]})})};g.prototype.renderElements=function(){var a=this,c=a.navigatorOptions,
+e=c.maskInside,f=a.chart,d=f.renderer,b,h={cursor:f.inverted?"ns-resize":"ew-resize"};a.navigatorGroup=b=d.g("navigator").attr({zIndex:8,visibility:"hidden"}).add();[!e,e,!e].forEach(function(e,g){a.shades[g]=d.rect().addClass("highcharts-navigator-mask"+(1===g?"-inside":"-outside")).add(b);f.styledMode||a.shades[g].attr({fill:e?c.maskFill:"rgba(0,0,0,0)"}).css(1===g&&h)});a.outline=d.path().addClass("highcharts-navigator-outline").add(b);f.styledMode||a.outline.attr({"stroke-width":c.outlineWidth,
+stroke:c.outlineColor});c.handles.enabled&&[0,1].forEach(function(e){c.handles.inverted=f.inverted;a.handles[e]=d.symbol(c.handles.symbols[e],-c.handles.width/2-1,0,c.handles.width,c.handles.height,c.handles);a.handles[e].attr({zIndex:7-e}).addClass("highcharts-navigator-handle highcharts-navigator-handle-"+["left","right"][e]).add(b);if(!f.styledMode){var g=c.handles;a.handles[e].attr({fill:g.backgroundColor,stroke:g.borderColor,"stroke-width":g.lineWidth}).css(h)}})};g.prototype.update=function(a){(this.series||
+[]).forEach(function(a){a.baseSeries&&delete a.baseSeries.navigatorSeries});this.destroy();r(!0,this.chart.options.navigator,this.options,a);this.init(this.chart)};g.prototype.render=function(a,c,e,f){var d=this.chart,b=this.scrollbarHeight,g,p=this.xAxis,m=p.pointRange||0;var l=p.navigatorAxis.fake?d.xAxis[0]:p;var k=this.navigatorEnabled,r,w=this.rendered;var u=d.inverted;var C=d.xAxis[0].minRange,t=d.xAxis[0].options.maxRange;if(!this.hasDragged||I(e)){a=y(a-m/2);c=y(c+m/2);if(!q(a)||!q(c))if(w)e=
+0,f=h(p.width,l.width);else return;this.left=h(p.left,d.plotLeft+b+(u?d.plotWidth:0));this.size=r=g=h(p.len,(u?d.plotHeight:d.plotWidth)-2*b);d=u?b:g+2*b;e=h(e,p.toPixels(a,!0));f=h(f,p.toPixels(c,!0));q(e)&&Infinity!==Math.abs(e)||(e=0,f=d);a=p.toValue(e,!0);c=p.toValue(f,!0);var B=Math.abs(y(c-a));B<C?this.grabbedLeft?e=p.toPixels(c-C-m,!0):this.grabbedRight&&(f=p.toPixels(a+C+m,!0)):I(t)&&y(B-m)>t&&(this.grabbedLeft?e=p.toPixels(c-t-m,!0):this.grabbedRight&&(f=p.toPixels(a+t+m,!0)));this.zoomedMax=
+M(Math.max(e,f),0,r);this.zoomedMin=M(this.fixedWidth?this.zoomedMax-this.fixedWidth:Math.min(e,f),0,r);this.range=this.zoomedMax-this.zoomedMin;r=Math.round(this.zoomedMax);e=Math.round(this.zoomedMin);k&&(this.navigatorGroup.attr({visibility:"visible"}),w=w&&!this.hasDragged?"animate":"attr",this.drawMasks(e,r,u,w),this.drawOutline(e,r,u,w),this.navigatorOptions.handles.enabled&&(this.drawHandle(e,0,u,w),this.drawHandle(r,1,u,w)));this.scrollbar&&(u?(u=this.top-b,l=this.left-b+(k||!l.opposite?0:
+(l.titleOffset||0)+l.axisTitleMargin),b=g+2*b):(u=this.top+(k?this.height:-b),l=this.left-b),this.scrollbar.position(l,u,d,b),this.scrollbar.setRange(this.zoomedMin/(g||1),this.zoomedMax/(g||1)));this.rendered=!0}};g.prototype.addMouseEvents=function(){var a=this,c=a.chart,f=c.container,h=[],d,b;a.mouseMoveHandler=d=function(b){a.onMouseMove(b)};a.mouseUpHandler=b=function(b){a.onMouseUp(b)};h=a.getPartsEvents("mousedown");h.push(H(c.renderTo,"mousemove",d),H(f.ownerDocument,"mouseup",b));e&&(h.push(H(c.renderTo,
+"touchmove",d),H(f.ownerDocument,"touchend",b)),h.concat(a.getPartsEvents("touchstart")));a.eventsToUnbind=h;a.series&&a.series[0]&&h.push(H(a.series[0].xAxis,"foundExtremes",function(){c.navigator.modifyNavigatorAxisExtremes()}))};g.prototype.getPartsEvents=function(a){var c=this,e=[];["shades","handles"].forEach(function(f){c[f].forEach(function(d,b){e.push(H(d.element,a,function(a){c[f+"Mousedown"](a,b)}))})});return e};g.prototype.shadesMousedown=function(a,c){a=this.chart.pointer.normalize(a);
+var e=this.chart,f=this.xAxis,d=this.zoomedMin,b=this.left,h=this.size,g=this.range,m=a.chartX;e.inverted&&(m=a.chartY,b=this.top);if(1===c)this.grabbedCenter=m,this.fixedWidth=g,this.dragOffset=m-d;else{a=m-b-g/2;if(0===c)a=Math.max(0,a);else if(2===c&&a+g>=h)if(a=h-g,this.reversedExtremes){a-=g;var p=this.getUnionExtremes().dataMin}else var l=this.getUnionExtremes().dataMax;a!==d&&(this.fixedWidth=g,c=f.navigatorAxis.toFixedRange(a,a+g,p,l),I(c.min)&&e.xAxis[0].setExtremes(Math.min(c.min,c.max),
+Math.max(c.min,c.max),!0,null,{trigger:"navigator"}))}};g.prototype.handlesMousedown=function(a,c){this.chart.pointer.normalize(a);a=this.chart;var e=a.xAxis[0],f=this.reversedExtremes;0===c?(this.grabbedLeft=!0,this.otherHandlePos=this.zoomedMax,this.fixedExtreme=f?e.min:e.max):(this.grabbedRight=!0,this.otherHandlePos=this.zoomedMin,this.fixedExtreme=f?e.max:e.min);a.fixedRange=null};g.prototype.onMouseMove=function(a){var e=this,f=e.chart,g=e.left,d=e.navigatorSize,b=e.range,m=e.dragOffset,l=f.inverted;
+a.touches&&0===a.touches[0].pageX||(a=f.pointer.normalize(a),f=a.chartX,l&&(g=e.top,f=a.chartY),e.grabbedLeft?(e.hasDragged=!0,e.render(0,0,f-g,e.otherHandlePos)):e.grabbedRight?(e.hasDragged=!0,e.render(0,0,e.otherHandlePos,f-g)):e.grabbedCenter&&(e.hasDragged=!0,f<m?f=m:f>d+m-b&&(f=d+m-b),e.render(0,0,f-m,f-m+b)),e.hasDragged&&e.scrollbar&&h(e.scrollbar.options.liveRedraw,A.svg&&!c&&!this.chart.isBoosting)&&(a.DOMType=a.type,setTimeout(function(){e.onMouseUp(a)},0)))};g.prototype.onMouseUp=function(a){var c=
+this.chart,e=this.xAxis,f=this.scrollbar,d=a.DOMEvent||a,b=c.inverted,h=this.rendered&&!this.hasDragged?"animate":"attr",g=Math.round(this.zoomedMax),m=Math.round(this.zoomedMin);if(this.hasDragged&&(!f||!f.hasDragged)||"scrollbar"===a.trigger){f=this.getUnionExtremes();if(this.zoomedMin===this.otherHandlePos)var l=this.fixedExtreme;else if(this.zoomedMax===this.otherHandlePos)var p=this.fixedExtreme;this.zoomedMax===this.size&&(p=this.reversedExtremes?f.dataMin:f.dataMax);0===this.zoomedMin&&(l=
+this.reversedExtremes?f.dataMax:f.dataMin);e=e.navigatorAxis.toFixedRange(this.zoomedMin,this.zoomedMax,l,p);I(e.min)&&c.xAxis[0].setExtremes(Math.min(e.min,e.max),Math.max(e.min,e.max),!0,this.hasDragged?!1:null,{trigger:"navigator",triggerOp:"navigator-drag",DOMEvent:d})}"mousemove"!==a.DOMType&&"touchmove"!==a.DOMType&&(this.grabbedLeft=this.grabbedRight=this.grabbedCenter=this.fixedWidth=this.fixedExtreme=this.otherHandlePos=this.hasDragged=this.dragOffset=null);this.navigatorEnabled&&(this.shades&&
+this.drawMasks(m,g,b,h),this.outline&&this.drawOutline(m,g,b,h),this.navigatorOptions.handles.enabled&&Object.keys(this.handles).length===this.handles.length&&(this.drawHandle(m,0,b,h),this.drawHandle(g,1,b,h)))};g.prototype.removeEvents=function(){this.eventsToUnbind&&(this.eventsToUnbind.forEach(function(a){a()}),this.eventsToUnbind=void 0);this.removeBaseSeriesEvents()};g.prototype.removeBaseSeriesEvents=function(){var a=this.baseSeries||[];this.navigatorEnabled&&a[0]&&(!1!==this.navigatorOptions.adaptToUpdatedData&&
+a.forEach(function(a){f(a,"updatedData",this.updatedDataHandler)},this),a[0].xAxis&&f(a[0].xAxis,"foundExtremes",this.modifyBaseAxisExtremes))};g.prototype.init=function(a){var c=a.options,e=c.navigator,f=e.enabled,d=c.scrollbar,b=d.enabled;c=f?e.height:0;var g=b?d.height:0;this.handles=[];this.shades=[];this.chart=a;this.setBaseSeries();this.height=c;this.scrollbarHeight=g;this.scrollbarEnabled=b;this.navigatorEnabled=f;this.navigatorOptions=e;this.scrollbarOptions=d;this.outlineHeight=c+g;this.opposite=
+h(e.opposite,!(f||!a.inverted));var m=this;f=m.baseSeries;d=a.xAxis.length;b=a.yAxis.length;var l=f&&f[0]&&f[0].xAxis||a.xAxis[0]||{options:{}};a.isDirtyBox=!0;m.navigatorEnabled?(m.xAxis=new k(a,r({breaks:l.options.breaks,ordinal:l.options.ordinal},e.xAxis,{id:"navigator-x-axis",yAxis:"navigator-y-axis",isX:!0,type:"datetime",index:d,isInternal:!0,offset:0,keepOrdinalPadding:!0,startOnTick:!1,endOnTick:!1,minPadding:0,maxPadding:0,zoomEnabled:!1},a.inverted?{offsets:[g,0,-g,0],width:c}:{offsets:[0,
+-g,0,g],height:c})),m.yAxis=new k(a,r(e.yAxis,{id:"navigator-y-axis",alignTicks:!1,offset:0,index:b,isInternal:!0,zoomEnabled:!1},a.inverted?{width:c}:{height:c})),f||e.series.data?m.updateNavigatorSeries(!1):0===a.series.length&&(m.unbindRedraw=H(a,"beforeRedraw",function(){0<a.series.length&&!m.series&&(m.setBaseSeries(),m.unbindRedraw())})),m.reversedExtremes=a.inverted&&!m.xAxis.reversed||!a.inverted&&m.xAxis.reversed,m.renderElements(),m.addMouseEvents()):(m.xAxis={chart:a,navigatorAxis:{fake:!0},
+translate:function(b,d){var c=a.xAxis[0],e=c.getExtremes(),f=c.len-2*g,h=u("min",c.options.min,e.dataMin);c=u("max",c.options.max,e.dataMax)-h;return d?b*c/f+h:f*(b-h)/c},toPixels:function(a){return this.translate(a)},toValue:function(a){return this.translate(a,!0)}},m.xAxis.navigatorAxis.axis=m.xAxis,m.xAxis.navigatorAxis.toFixedRange=v.AdditionsClass.prototype.toFixedRange.bind(m.xAxis.navigatorAxis));a.options.scrollbar.enabled&&(a.scrollbar=m.scrollbar=new K(a.renderer,r(a.options.scrollbar,{margin:m.navigatorEnabled?
+0:10,vertical:a.inverted}),a),H(m.scrollbar,"changed",function(b){var d=m.size,c=d*this.to;d*=this.from;m.hasDragged=m.scrollbar.hasDragged;m.render(0,0,d,c);(a.options.scrollbar.liveRedraw||"mousemove"!==b.DOMType&&"touchmove"!==b.DOMType)&&setTimeout(function(){m.onMouseUp(b)})}));m.addBaseSeriesEvents();m.addChartEvents()};g.prototype.getUnionExtremes=function(a){var c=this.chart.xAxis[0],e=this.xAxis,f=e.options,d=c.options,b;a&&null===c.dataMin||(b={dataMin:h(f&&f.min,u("min",d.min,c.dataMin,
+e.dataMin,e.min)),dataMax:h(f&&f.max,u("max",d.max,c.dataMax,e.dataMax,e.max))});return b};g.prototype.setBaseSeries=function(a,c){var e=this.chart,f=this.baseSeries=[];a=a||e.options&&e.options.navigator.baseSeries||(e.series.length?z(e.series,function(a){return!a.options.isInternal}).index:0);(e.series||[]).forEach(function(d,b){d.options.isInternal||!d.options.showInNavigator&&(b!==a&&d.options.id!==a||!1===d.options.showInNavigator)||f.push(d)});this.xAxis&&!this.xAxis.navigatorAxis.fake&&this.updateNavigatorSeries(!0,
+c)};g.prototype.updateNavigatorSeries=function(c,e){var g=this,m=g.chart,d=g.baseSeries,b,p,k=g.navigatorOptions.series,u,w={enableMouseTracking:!1,index:null,linkedTo:null,group:"nav",padXAxis:!1,xAxis:"navigator-x-axis",yAxis:"navigator-y-axis",showInLegend:!1,stacking:void 0,isInternal:!0,states:{inactive:{opacity:1}}},q=g.series=(g.series||[]).filter(function(a){var b=a.baseSeries;return 0>d.indexOf(b)?(b&&(f(b,"updatedData",g.updatedDataHandler),delete b.navigatorSeries),a.chart&&a.destroy(),
+!1):!0});d&&d.length&&d.forEach(function(a){var c=a.navigatorSeries,f=D({color:a.color,visible:a.visible},t(k)?l.navigator.series:k);c&&!1===g.navigatorOptions.adaptToUpdatedData||(w.name="Navigator "+d.length,b=a.options||{},u=b.navigatorOptions||{},p=r(b,w,f,u),p.pointRange=h(f.pointRange,u.pointRange,l.plotOptions[p.type||"line"].pointRange),f=u.data||f.data,g.hasNavigatorData=g.hasNavigatorData||!!f,p.data=f||b.data&&b.data.slice(0),c&&c.options?c.update(p,e):(a.navigatorSeries=m.initSeries(p),
+a.navigatorSeries.baseSeries=a,q.push(a.navigatorSeries)))});if(k.data&&(!d||!d.length)||t(k))g.hasNavigatorData=!1,k=a(k),k.forEach(function(a,b){w.name="Navigator "+(q.length+1);p=r(l.navigator.series,{color:m.series[b]&&!m.series[b].options.isInternal&&m.series[b].color||m.options.colors[b]||m.options.colors[0]},w,a);p.data=a.data;p.data&&(g.hasNavigatorData=!0,q.push(m.initSeries(p)))});c&&this.addBaseSeriesEvents()};g.prototype.addBaseSeriesEvents=function(){var a=this,c=a.baseSeries||[];c[0]&&
+c[0].xAxis&&H(c[0].xAxis,"foundExtremes",this.modifyBaseAxisExtremes);c.forEach(function(c){H(c,"show",function(){this.navigatorSeries&&this.navigatorSeries.setVisible(!0,!1)});H(c,"hide",function(){this.navigatorSeries&&this.navigatorSeries.setVisible(!1,!1)});!1!==this.navigatorOptions.adaptToUpdatedData&&c.xAxis&&H(c,"updatedData",this.updatedDataHandler);H(c,"remove",function(){this.navigatorSeries&&(E(a.series,this.navigatorSeries),I(this.navigatorSeries.options)&&this.navigatorSeries.remove(!1),
+delete this.navigatorSeries)})},this)};g.prototype.getBaseSeriesMin=function(a){return this.baseSeries.reduce(function(a,c){return Math.min(a,c.xData?c.xData[0]:a)},a)};g.prototype.modifyNavigatorAxisExtremes=function(){var a=this.xAxis,c;"undefined"!==typeof a.getExtremes&&(!(c=this.getUnionExtremes(!0))||c.dataMin===a.min&&c.dataMax===a.max||(a.min=c.dataMin,a.max=c.dataMax))};g.prototype.modifyBaseAxisExtremes=function(){var a=this.chart.navigator,c=this.getExtremes(),e=c.dataMin,f=c.dataMax;c=
+c.max-c.min;var d=a.stickToMin,b=a.stickToMax,g=h(this.options.overscroll,0),m=a.series&&a.series[0],l=!!this.setExtremes;if(!this.eventArgs||"rangeSelectorButton"!==this.eventArgs.trigger){if(d){var k=e;var u=k+c}b&&(u=f+g,d||(k=Math.max(e,u-c,a.getBaseSeriesMin(m&&m.xData?m.xData[0]:-Number.MAX_VALUE))));l&&(d||b)&&q(k)&&(this.min=this.userMin=k,this.max=this.userMax=u)}a.stickToMin=a.stickToMax=null};g.prototype.updatedDataHandler=function(){var a=this.chart.navigator,c=this.navigatorSeries,e=
+a.getBaseSeriesMin(this.xData[0]);a.stickToMax=a.reversedExtremes?0===Math.round(a.zoomedMin):Math.round(a.zoomedMax)>=Math.round(a.size);a.stickToMin=q(this.xAxis.min)&&this.xAxis.min<=e&&(!this.chart.fixedRange||!a.stickToMax);c&&!a.hasNavigatorData&&(c.options.pointStart=this.xData[0],c.setData(this.options.data,!1,null,!1))};g.prototype.addChartEvents=function(){this.eventsToUnbind||(this.eventsToUnbind=[]);this.eventsToUnbind.push(H(this.chart,"redraw",function(){var a=this.navigator,c=a&&(a.baseSeries&&
+a.baseSeries[0]&&a.baseSeries[0].xAxis||this.xAxis[0]);c&&a.render(c.min,c.max)}),H(this.chart,"getMargins",function(){var a=this.navigator,c=a.opposite?"plotTop":"marginBottom";this.inverted&&(c=a.opposite?"marginRight":"plotLeft");this[c]=(this[c]||0)+(a.navigatorEnabled||!this.inverted?a.outlineHeight:0)+a.navigatorOptions.margin}))};g.prototype.destroy=function(){this.removeEvents();this.xAxis&&(E(this.chart.xAxis,this.xAxis),E(this.chart.axes,this.xAxis));this.yAxis&&(E(this.chart.yAxis,this.yAxis),
+E(this.chart.axes,this.yAxis));(this.series||[]).forEach(function(a){a.destroy&&a.destroy()});"series xAxis yAxis shades outline scrollbarTrack scrollbarRifles scrollbarGroup scrollbar navigatorGroup rendered".split(" ").forEach(function(a){this[a]&&this[a].destroy&&this[a].destroy();this[a]=null},this);[this.handles].forEach(function(a){J(a)},this)};return g}();A.Navigator||(A.Navigator=F,v.compose(k),H(G,"beforeShowResetZoom",function(){var a=this.options,e=a.navigator,f=a.rangeSelector;if((e&&
+e.enabled||f&&f.enabled)&&(!c&&"x"===a.chart.zoomType||c&&"x"===a.chart.pinchType))return!1}),H(G,"beforeRender",function(){var a=this.options;if(a.navigator.enabled||a.scrollbar.enabled)this.scroller=this.navigator=new F(this)}),H(G,"afterSetChartSize",function(){var a=this.legend,c=this.navigator;if(c){var e=a&&a.options;var f=c.xAxis;var g=c.yAxis;var d=c.scrollbarHeight;this.inverted?(c.left=c.opposite?this.chartWidth-d-c.height:this.spacing[3]+d,c.top=this.plotTop+d):(c.left=this.plotLeft+d,
+c.top=c.navigatorOptions.top||this.chartHeight-c.height-d-this.spacing[2]-(this.rangeSelector&&this.extraBottomMargin?this.rangeSelector.getHeight():0)-(e&&"bottom"===e.verticalAlign&&e.enabled&&!e.floating?a.legendHeight+h(e.margin,10):0)-(this.titleOffset?this.titleOffset[2]:0));f&&g&&(this.inverted?f.options.left=g.options.left=c.left:f.options.top=g.options.top=c.top,f.setAxisSize(),g.setAxisSize())}}),H(G,"update",function(a){var c=a.options.navigator||{},e=a.options.scrollbar||{};this.navigator||
+this.scroller||!c.enabled&&!e.enabled||(r(!0,this.options.navigator,c),r(!0,this.options.scrollbar,e),delete a.options.navigator,delete a.options.scrollbar)}),H(G,"afterUpdate",function(a){this.navigator||this.scroller||!this.options.navigator.enabled&&!this.options.scrollbar.enabled||(this.scroller=this.navigator=new F(this),h(a.redraw,!0)&&this.redraw(a.animation))}),H(G,"afterAddSeries",function(){this.navigator&&this.navigator.setBaseSeries(null,!1)}),H(m,"afterUpdate",function(){this.chart.navigator&&
+!this.options.isInternal&&this.chart.navigator.setBaseSeries(null,!1)}),G.prototype.callbacks.push(function(a){var c=a.navigator;c&&a.xAxis[0]&&(a=a.xAxis[0].getExtremes(),c.render(a.min,a.max))}));A.Navigator=F;return A.Navigator});P(A,"parts/OrdinalAxis.js",[A["parts/Axis.js"],A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g,A){var v=A.addEvent,H=A.css,G=A.defined,N=A.pick,M=A.timeUnits;A=g.Chart;var y=g.Series,I=function(){function k(g){this.index={};this.axis=g}k.prototype.getExtendedPositions=
+function(){var k=this,v=k.axis,t=v.constructor.prototype,q=v.chart,r=v.series[0].currentDataGrouping,h=k.index,f=r?r.count+r.unitName:"raw",a=v.options.overscroll,l=v.getExtremes(),e;h||(h=k.index={});if(!h[f]){var c={series:[],chart:q,getExtremes:function(){return{min:l.dataMin,max:l.dataMax+a}},options:{ordinal:!0},ordinal:{},ordinal2lin:t.ordinal2lin,val2lin:t.val2lin};c.ordinal.axis=c;v.series.forEach(function(a){e={xAxis:c,xData:a.xData.slice(),chart:q,destroyGroupedData:g.noop,getProcessedData:g.Series.prototype.getProcessedData};
+e.xData=e.xData.concat(k.getOverscrollPositions());e.options={dataGrouping:r?{enabled:!0,forced:!0,approximation:"open",units:[[r.unitName,[r.count]]]}:{enabled:!1}};a.processData.apply(e);c.series.push(e)});v.beforeSetTickPositions.apply(c);h[f]=c.ordinal.positions}return h[f]};k.prototype.getGroupIntervalFactor=function(g,k,t){t=t.processedXData;var q=t.length,r=[];var h=this.groupIntervalFactor;if(!h){for(h=0;h<q-1;h++)r[h]=t[h+1]-t[h];r.sort(function(f,a){return f-a});r=r[Math.floor(q/2)];g=Math.max(g,
+t[0]);k=Math.min(k,t[q-1]);this.groupIntervalFactor=h=q*r/(k-g)}return h};k.prototype.getOverscrollPositions=function(){var g=this.axis,k=g.options.overscroll,t=this.overscrollPointsRange,q=[],r=g.dataMax;if(G(t))for(q.push(r);r<=g.dataMax+k;)r+=t,q.push(r);return q};k.prototype.postProcessTickInterval=function(g){var k=this.axis,t=this.slope;return t?k.options.breaks?k.closestPointRange||g:g/(t/k.closestPointRange):g};return k}(),J=function(){function g(){}g.compose=function(g,k,t){g.keepProps.push("ordinal");
+var q=g.prototype;q.beforeSetTickPositions=function(){var g=this.ordinal,h=[],f,a=!1,l=this.getExtremes(),e=l.min,c=l.max,m,k=this.isXAxis&&!!this.options.breaks;l=this.options.ordinal;var q=Number.MAX_VALUE,t=this.chart.options.chart.ignoreHiddenSeries,w;if(l||k){this.series.forEach(function(a,c){f=[];if(!(t&&!1===a.visible||!1===a.takeOrdinalPosition&&!k)&&(h=h.concat(a.processedXData),p=h.length,h.sort(function(a,b){return a-b}),q=Math.min(q,N(a.closestPointRange,q)),p)){for(c=0;c<p-1;)h[c]!==
+h[c+1]&&f.push(h[c+1]),c++;f[0]!==h[0]&&f.unshift(h[0]);h=f}a.isSeriesBoosting&&(w=!0)});w&&(h.length=0);var p=h.length;if(2<p){var C=h[1]-h[0];for(m=p-1;m--&&!a;)h[m+1]-h[m]!==C&&(a=!0);!this.options.keepOrdinalPadding&&(h[0]-e>C||c-h[h.length-1]>C)&&(a=!0)}else this.options.overscroll&&(2===p?q=h[1]-h[0]:1===p?(q=this.options.overscroll,h=[h[0],h[0]+q]):q=g.overscrollPointsRange);a?(this.options.overscroll&&(g.overscrollPointsRange=q,h=h.concat(g.getOverscrollPositions())),g.positions=h,C=this.ordinal2lin(Math.max(e,
+h[0]),!0),m=Math.max(this.ordinal2lin(Math.min(c,h[h.length-1]),!0),1),g.slope=c=(c-e)/(m-C),g.offset=e-C*c):(g.overscrollPointsRange=N(this.closestPointRange,g.overscrollPointsRange),g.positions=this.ordinal.slope=g.offset=void 0)}this.isOrdinal=l&&a;g.groupIntervalFactor=null};g.prototype.getTimeTicks=function(g,h,f,a,l,e,c){void 0===l&&(l=[]);void 0===e&&(e=0);var m=0,k,r,q={},w=[],p=-Number.MAX_VALUE,t=this.options.tickPixelInterval,v=this.chart.time,B=[];if(!this.options.ordinal&&!this.options.breaks||
+!l||3>l.length||"undefined"===typeof h)return v.getTimeTicks.apply(v,arguments);var d=l.length;for(k=0;k<d;k++){var b=k&&l[k-1]>f;l[k]<h&&(m=k);if(k===d-1||l[k+1]-l[k]>5*e||b){if(l[k]>p){for(r=v.getTimeTicks(g,l[m],l[k],a);r.length&&r[0]<=p;)r.shift();r.length&&(p=r[r.length-1]);B.push(w.length);w=w.concat(r)}m=k+1}if(b)break}r=r.info;if(c&&r.unitRange<=M.hour){k=w.length-1;for(m=1;m<k;m++)if(v.dateFormat("%d",w[m])!==v.dateFormat("%d",w[m-1])){q[w[m]]="day";var n=!0}n&&(q[w[0]]="day");r.higherRanks=
+q}r.segmentStarts=B;w.info=r;if(c&&G(t)){m=B=w.length;n=[];var x;for(v=[];m--;)k=this.translate(w[m]),x&&(v[m]=x-k),n[m]=x=k;v.sort();v=v[Math.floor(v.length/2)];v<.6*t&&(v=null);m=w[B-1]>f?B-1:B;for(x=void 0;m--;)k=n[m],B=Math.abs(x-k),x&&B<.8*t&&(null===v||B<.8*v)?(q[w[m]]&&!q[w[m+1]]?(B=m+1,x=k):B=m,w.splice(B,1)):x=k}return w};q.lin2val=function(g,h){var f=this.ordinal,a=f.positions;if(a){var l=f.slope,e=f.offset;f=a.length-1;if(h)if(0>g)g=a[0];else if(g>f)g=a[f];else{f=Math.floor(g);var c=g-
+f}else for(;f--;)if(h=l*f+e,g>=h){l=l*(f+1)+e;c=(g-h)/(l-h);break}return"undefined"!==typeof c&&"undefined"!==typeof a[f]?a[f]+(c?c*(a[f+1]-a[f]):0):g}return g};q.val2lin=function(g,h){var f=this.ordinal,a=f.positions;if(a){var l=a.length,e;for(e=l;e--;)if(a[e]===g){var c=e;break}for(e=l-1;e--;)if(g>a[e]||0===e){g=(g-a[e])/(a[e+1]-a[e]);c=e+g;break}h=h?c:f.slope*(c||0)+f.offset}else h=g;return h};q.ordinal2lin=q.val2lin;v(g,"afterInit",function(){this.ordinal||(this.ordinal=new I(this))});v(g,"foundExtremes",
+function(){this.isXAxis&&G(this.options.overscroll)&&this.max===this.dataMax&&(!this.chart.mouseIsDown||this.isInternal)&&(!this.eventArgs||this.eventArgs&&"navigator"!==this.eventArgs.trigger)&&(this.max+=this.options.overscroll,!this.isInternal&&G(this.userMin)&&(this.min+=this.options.overscroll))});v(g,"afterSetScale",function(){this.horiz&&!this.isDirty&&(this.isDirty=this.isOrdinal&&this.chart.navigator&&!this.chart.navigator.adaptToUpdatedData)});v(k,"pan",function(g){var h=this.xAxis[0],f=
+h.options.overscroll,a=g.originalEvent.chartX,l=this.options.chart&&this.options.chart.panning,e=!1;if(l&&"y"!==l.type&&h.options.ordinal&&h.series.length){var c=this.mouseDownX,m=h.getExtremes(),k=m.dataMax,r=m.min,q=m.max,w=this.hoverPoints,p=h.closestPointRange||h.ordinal&&h.ordinal.overscrollPointsRange;c=(c-a)/(h.translationSlope*(h.ordinal.slope||p));var t={ordinal:{positions:h.ordinal.getExtendedPositions()}};p=h.lin2val;var v=h.val2lin;if(!t.ordinal.positions)e=!0;else if(1<Math.abs(c)){w&&
+w.forEach(function(a){a.setState()});if(0>c){w=t;var B=h.ordinal.positions?h:t}else w=h.ordinal.positions?h:t,B=t;t=B.ordinal.positions;k>t[t.length-1]&&t.push(k);this.fixedRange=q-r;c=h.navigatorAxis.toFixedRange(null,null,p.apply(w,[v.apply(w,[r,!0])+c,!0]),p.apply(B,[v.apply(B,[q,!0])+c,!0]));c.min>=Math.min(m.dataMin,r)&&c.max<=Math.max(k,q)+f&&h.setExtremes(c.min,c.max,!0,!1,{trigger:"pan"});this.mouseDownX=a;H(this.container,{cursor:"move"})}}else e=!0;e||l&&/y/.test(l.type)?f&&(h.max=h.dataMax+
+f):g.preventDefault()});v(t,"updatedData",function(){var g=this.xAxis;g&&g.options.ordinal&&delete g.ordinal.index})};return g}();J.compose(k,A,y);return J});P(A,"modules/broken-axis.src.js",[A["parts/Axis.js"],A["parts/Globals.js"],A["parts/Utilities.js"],A["parts/Stacking.js"]],function(k,g,A,v){var H=A.addEvent,G=A.find,N=A.fireEvent,M=A.isArray,y=A.isNumber,I=A.pick,J=g.Series,E=function(){function g(g){this.hasBreaks=!1;this.axis=g}g.isInBreak=function(g,k){var q=g.repeat||Infinity,r=g.from,
+h=g.to-g.from;k=k>=r?(k-r)%q:q-(r-k)%q;return g.inclusive?k<=h:k<h&&0!==k};g.lin2Val=function(k){var t=this.brokenAxis;t=t&&t.breakArray;if(!t)return k;var q;for(q=0;q<t.length;q++){var r=t[q];if(r.from>=k)break;else r.to<k?k+=r.len:g.isInBreak(r,k)&&(k+=r.len)}return k};g.val2Lin=function(k){var t=this.brokenAxis;t=t&&t.breakArray;if(!t)return k;var q=k,r;for(r=0;r<t.length;r++){var h=t[r];if(h.to<=k)q-=h.len;else if(h.from>=k)break;else if(g.isInBreak(h,k)){q-=k-h.from;break}}return q};g.prototype.findBreakAt=
+function(g,k){return G(k,function(k){return k.from<g&&g<k.to})};g.prototype.isInAnyBreak=function(k,t){var q=this.axis,r=q.options.breaks,h=r&&r.length,f;if(h){for(;h--;)if(g.isInBreak(r[h],k)){var a=!0;f||(f=I(r[h].showPoints,!q.isXAxis))}var l=a&&t?a&&!f:a}return l};g.prototype.setBreaks=function(v,t){var q=this,r=q.axis,h=M(v)&&!!v.length;r.isDirty=q.hasBreaks!==h;q.hasBreaks=h;r.options.breaks=r.userOptions.breaks=v;r.forceRedraw=!0;r.series.forEach(function(f){f.isDirty=!0});h||r.val2lin!==g.val2Lin||
+(delete r.val2lin,delete r.lin2val);h&&(r.userOptions.ordinal=!1,r.lin2val=g.lin2Val,r.val2lin=g.val2Lin,r.setExtremes=function(f,a,h,e,c){if(q.hasBreaks){for(var g,l=this.options.breaks;g=q.findBreakAt(f,l);)f=g.to;for(;g=q.findBreakAt(a,l);)a=g.from;a<f&&(a=f)}k.prototype.setExtremes.call(this,f,a,h,e,c)},r.setAxisTranslation=function(f){k.prototype.setAxisTranslation.call(this,f);q.unitLength=null;if(q.hasBreaks){f=r.options.breaks||[];var a=[],h=[],e=0,c,m=r.userMin||r.min,u=r.userMax||r.max,
+t=I(r.pointRangePadding,0),v;f.forEach(function(a){c=a.repeat||Infinity;g.isInBreak(a,m)&&(m+=a.to%c-m%c);g.isInBreak(a,u)&&(u-=u%c-a.from%c)});f.forEach(function(e){p=e.from;for(c=e.repeat||Infinity;p-c>m;)p-=c;for(;p<m;)p+=c;for(v=p;v<u;v+=c)a.push({value:v,move:"in"}),a.push({value:v+(e.to-e.from),move:"out",size:e.breakSize})});a.sort(function(a,c){return a.value===c.value?("in"===a.move?0:1)-("in"===c.move?0:1):a.value-c.value});var w=0;var p=m;a.forEach(function(a){w+="in"===a.move?1:-1;1===
+w&&"in"===a.move&&(p=a.value);0===w&&(h.push({from:p,to:a.value,len:a.value-p-(a.size||0)}),e+=a.value-p-(a.size||0))});r.breakArray=q.breakArray=h;q.unitLength=u-m-e+t;N(r,"afterBreaks");r.staticScale?r.transA=r.staticScale:q.unitLength&&(r.transA*=(u-r.min+t)/q.unitLength);t&&(r.minPixelPadding=r.transA*r.minPointOffset);r.min=m;r.max=u}});I(t,!0)&&r.chart.redraw()};return g}();g=function(){function g(){}g.compose=function(g,k){g.keepProps.push("brokenAxis");var q=J.prototype;q.drawBreaks=function(g,
+h){var f=this,a=f.points,k,e,c,m;if(g&&g.brokenAxis&&g.brokenAxis.hasBreaks){var u=g.brokenAxis;h.forEach(function(h){k=u&&u.breakArray||[];e=g.isXAxis?g.min:I(f.options.threshold,g.min);a.forEach(function(a){m=I(a["stack"+h.toUpperCase()],a[h]);k.forEach(function(f){if(y(e)&&y(m)){c=!1;if(e<f.from&&m>f.to||e>f.from&&m<f.from)c="pointBreak";else if(e<f.from&&m>f.from&&m<f.to||e>f.from&&m>f.to&&m<f.from)c="pointInBreak";c&&N(g,c,{point:a,brk:f})}})})})}};q.gappedPath=function(){var g=this.currentDataGrouping,
+h=g&&g.gapSize;g=this.options.gapSize;var f=this.points.slice(),a=f.length-1,k=this.yAxis,e;if(g&&0<a)for("value"!==this.options.gapUnit&&(g*=this.basePointRange),h&&h>g&&h>=this.basePointRange&&(g=h),e=void 0;a--;)e&&!1!==e.visible||(e=f[a+1]),h=f[a],!1!==e.visible&&!1!==h.visible&&(e.x-h.x>g&&(e=(h.x+e.x)/2,f.splice(a+1,0,{isNull:!0,x:e}),k.stacking&&this.options.stacking&&(e=k.stacking.stacks[this.stackKey][e]=new v(k,k.options.stackLabels,!1,e,this.stack),e.total=0)),e=h);return this.getGraphPath(f)};
+H(g,"init",function(){this.brokenAxis||(this.brokenAxis=new E(this))});H(g,"afterInit",function(){"undefined"!==typeof this.brokenAxis&&this.brokenAxis.setBreaks(this.options.breaks,!1)});H(g,"afterSetTickPositions",function(){var g=this.brokenAxis;if(g&&g.hasBreaks){var h=this.tickPositions,f=this.tickPositions.info,a=[],k;for(k=0;k<h.length;k++)g.isInAnyBreak(h[k])||a.push(h[k]);this.tickPositions=a;this.tickPositions.info=f}});H(g,"afterSetOptions",function(){this.brokenAxis&&this.brokenAxis.hasBreaks&&
+(this.options.ordinal=!1)});H(k,"afterGeneratePoints",function(){var g=this.options.connectNulls,h=this.points,f=this.xAxis,a=this.yAxis;if(this.isDirty)for(var k=h.length;k--;){var e=h[k],c=!(null===e.y&&!1===g)&&(f&&f.brokenAxis&&f.brokenAxis.isInAnyBreak(e.x,!0)||a&&a.brokenAxis&&a.brokenAxis.isInAnyBreak(e.y,!0));e.visible=c?!1:!1!==e.options.visible}});H(k,"afterRender",function(){this.drawBreaks(this.xAxis,["x"]);this.drawBreaks(this.yAxis,I(this.pointArrayMap,["y"]))})};return g}();g.compose(k,
+J);return g});P(A,"masters/modules/broken-axis.src.js",[],function(){});P(A,"parts/DataGrouping.js",[A["parts/DateTimeAxis.js"],A["parts/Globals.js"],A["parts/Point.js"],A["parts/Tooltip.js"],A["parts/Utilities.js"]],function(k,g,A,v,K){"";var G=K.addEvent,H=K.arrayMax,M=K.arrayMin,y=K.correctFloat,I=K.defined,J=K.error,E=K.extend,D=K.format,z=K.isNumber,t=K.merge,q=K.pick,r=g.Axis,h=g.defaultPlotOptions;K=g.Series;var f=g.approximations={sum:function(a){var c=a.length;if(!c&&a.hasNulls)var e=null;
+else if(c)for(e=0;c--;)e+=a[c];return e},average:function(a){var c=a.length;a=f.sum(a);z(a)&&c&&(a=y(a/c));return a},averages:function(){var a=[];[].forEach.call(arguments,function(c){a.push(f.average(c))});return"undefined"===typeof a[0]?void 0:a},open:function(a){return a.length?a[0]:a.hasNulls?null:void 0},high:function(a){return a.length?H(a):a.hasNulls?null:void 0},low:function(a){return a.length?M(a):a.hasNulls?null:void 0},close:function(a){return a.length?a[a.length-1]:a.hasNulls?null:void 0},
+ohlc:function(a,c,e,g){a=f.open(a);c=f.high(c);e=f.low(e);g=f.close(g);if(z(a)||z(c)||z(e)||z(g))return[a,c,e,g]},range:function(a,c){a=f.low(a);c=f.high(c);if(z(a)||z(c))return[a,c];if(null===a&&null===c)return null}},a=function(a,c,e,g){var h=this,d=h.data,b=h.options&&h.options.data,m=[],k=[],l=[],p=a.length,u=!!c,r=[],q=h.pointArrayMap,w=q&&q.length,v=["x"].concat(q||["y"]),C=0,F=0,y;g="function"===typeof g?g:f[g]?f[g]:f[h.getDGApproximation&&h.getDGApproximation()||"average"];w?q.forEach(function(){r.push([])}):
+r.push([]);var A=w||1;for(y=0;y<=p&&!(a[y]>=e[0]);y++);for(y;y<=p;y++){for(;"undefined"!==typeof e[C+1]&&a[y]>=e[C+1]||y===p;){var D=e[C];h.dataGroupInfo={start:h.cropStart+F,length:r[0].length};var G=g.apply(h,r);h.pointClass&&!I(h.dataGroupInfo.options)&&(h.dataGroupInfo.options=t(h.pointClass.prototype.optionsToObject.call({series:h},h.options.data[h.cropStart+F])),v.forEach(function(a){delete h.dataGroupInfo.options[a]}));"undefined"!==typeof G&&(m.push(D),k.push(G),l.push(h.dataGroupInfo));F=
+y;for(D=0;D<A;D++)r[D].length=0,r[D].hasNulls=!1;C+=1;if(y===p)break}if(y===p)break;if(q)for(D=h.cropStart+y,G=d&&d[D]||h.pointClass.prototype.applyOptions.apply({series:h},[b[D]]),D=0;D<w;D++){var L=G[q[D]];z(L)?r[D].push(L):null===L&&(r[D].hasNulls=!0)}else D=u?c[y]:null,z(D)?r[0].push(D):null===D&&(r[0].hasNulls=!0)}return{groupedXData:m,groupedYData:k,groupMap:l}},l={approximations:f,groupData:a},e=K.prototype,c=e.processData,m=e.generatePoints,u={groupPixelWidth:2,dateTimeLabelFormats:{millisecond:["%A, %b %e, %H:%M:%S.%L",
+"%A, %b %e, %H:%M:%S.%L","-%H:%M:%S.%L"],second:["%A, %b %e, %H:%M:%S","%A, %b %e, %H:%M:%S","-%H:%M:%S"],minute:["%A, %b %e, %H:%M","%A, %b %e, %H:%M","-%H:%M"],hour:["%A, %b %e, %H:%M","%A, %b %e, %H:%M","-%H:%M"],day:["%A, %b %e, %Y","%A, %b %e","-%A, %b %e, %Y"],week:["Week from %A, %b %e, %Y","%A, %b %e","-%A, %b %e, %Y"],month:["%B %Y","%B","-%B %Y"],year:["%Y","%Y","-%Y"]}},L={line:{},spline:{},area:{},areaspline:{},arearange:{},column:{groupPixelWidth:10},columnrange:{groupPixelWidth:10},
+candlestick:{groupPixelWidth:10},ohlc:{groupPixelWidth:5}},F=g.defaultDataGroupingUnits=[["millisecond",[1,2,5,10,20,25,50,100,200,500]],["second",[1,2,5,10,15,30]],["minute",[1,2,5,10,15,30]],["hour",[1,2,3,4,6,8,12]],["day",[1]],["week",[1]],["month",[1,3,6]],["year",null]];e.getDGApproximation=function(){return this.is("arearange")?"range":this.is("ohlc")?"ohlc":this.is("column")?"sum":"average"};e.groupData=a;e.processData=function(){var a=this.chart,f=this.options.dataGrouping,h=!1!==this.allowDG&&
+f&&q(f.enabled,a.options.isStock),g=this.visible||!a.options.chart.ignoreHiddenSeries,m,d=this.currentDataGrouping,b=!1;this.forceCrop=h;this.groupPixelWidth=null;this.hasProcessed=!0;h&&!this.requireSorting&&(this.requireSorting=b=!0);h=!1===c.apply(this,arguments)||!h;b&&(this.requireSorting=!1);if(!h){this.destroyGroupedData();h=f.groupAll?this.xData:this.processedXData;var l=f.groupAll?this.yData:this.processedYData,u=a.plotSizeX;a=this.xAxis;var r=a.options.ordinal,t=this.groupPixelWidth=a.getGroupPixelWidth&&
+a.getGroupPixelWidth();if(t){this.isDirty=m=!0;this.points=null;b=a.getExtremes();var v=b.min;b=b.max;r=r&&a.ordinal&&a.ordinal.getGroupIntervalFactor(v,b,this)||1;t=t*(b-v)/u*r;u=a.getTimeTicks(k.AdditionsClass.prototype.normalizeTimeTickInterval(t,f.units||F),Math.min(v,h[0]),Math.max(b,h[h.length-1]),a.options.startOfWeek,h,this.closestPointRange);l=e.groupData.apply(this,[h,l,u,f.approximation]);h=l.groupedXData;r=l.groupedYData;var y=0;if(f.smoothed&&h.length){var z=h.length-1;for(h[z]=Math.min(h[z],
+b);z--&&0<z;)h[z]+=t/2;h[0]=Math.max(h[0],v)}for(z=1;z<u.length;z++)u.info.segmentStarts&&-1!==u.info.segmentStarts.indexOf(z)||(y=Math.max(u[z]-u[z-1],y));v=u.info;v.gapSize=y;this.closestPointRange=u.info.totalRange;this.groupMap=l.groupMap;if(I(h[0])&&h[0]<a.min&&g){if(!I(a.options.min)&&a.min<=a.dataMin||a.min===a.dataMin)a.min=Math.min(h[0],a.min);a.dataMin=Math.min(h[0],a.dataMin)}f.groupAll&&(f=this.cropData(h,r,a.min,a.max,1),h=f.xData,r=f.yData);this.processedXData=h;this.processedYData=
+r}else this.groupMap=null;this.hasGroupedData=m;this.currentDataGrouping=v;this.preventGraphAnimation=(d&&d.totalRange)!==(v&&v.totalRange)}};e.destroyGroupedData=function(){this.groupedData&&(this.groupedData.forEach(function(a,c){a&&(this.groupedData[c]=a.destroy?a.destroy():null)},this),this.groupedData.length=0)};e.generatePoints=function(){m.apply(this);this.destroyGroupedData();this.groupedData=this.hasGroupedData?this.points:null};G(A,"update",function(){if(this.dataGroup)return J(24,!1,this.series.chart),
+!1});G(v,"headerFormatter",function(a){var c=this.chart,e=c.time,f=a.labelConfig,h=f.series,d=h.tooltipOptions,b=h.options.dataGrouping,g=d.xDateFormat,m=h.xAxis,k=d[(a.isFooter?"footer":"header")+"Format"];if(m&&"datetime"===m.options.type&&b&&z(f.key)){var l=h.currentDataGrouping;b=b.dateTimeLabelFormats||u.dateTimeLabelFormats;if(l)if(d=b[l.unitName],1===l.count)g=d[0];else{g=d[1];var r=d[2]}else!g&&b&&(g=this.getXDateFormat(f,d,m));g=e.dateFormat(g,f.key);r&&(g+=e.dateFormat(r,f.key+l.totalRange-
+1));h.chart.styledMode&&(k=this.styledModeFormat(k));a.text=D(k,{point:E(f.point,{key:g}),series:h},c);a.preventDefault()}});G(K,"destroy",e.destroyGroupedData);G(K,"afterSetOptions",function(a){a=a.options;var c=this.type,e=this.chart.options.plotOptions,f=h[c].dataGrouping,g=this.useCommonDataGrouping&&u;if(L[c]||g)f||(f=t(u,L[c])),a.dataGrouping=t(g,f,e.series&&e.series.dataGrouping,e[c].dataGrouping,this.userOptions.dataGrouping)});G(r,"afterSetScale",function(){this.series.forEach(function(a){a.hasProcessed=
+!1})});r.prototype.getGroupPixelWidth=function(){var a=this.series,c=a.length,e,f=0,h=!1,d;for(e=c;e--;)(d=a[e].options.dataGrouping)&&(f=Math.max(f,q(d.groupPixelWidth,u.groupPixelWidth)));for(e=c;e--;)(d=a[e].options.dataGrouping)&&a[e].hasProcessed&&(c=(a[e].processedXData||a[e].data).length,a[e].groupPixelWidth||c>this.chart.plotSizeX/f||c&&d.forced)&&(h=!0);return h?f:0};r.prototype.setDataGrouping=function(a,c){var e;c=q(c,!0);a||(a={forced:!1,units:null});if(this instanceof r)for(e=this.series.length;e--;)this.series[e].update({dataGrouping:a},
+!1);else this.chart.options.series.forEach(function(c){c.dataGrouping=a},!1);this.ordinal&&(this.ordinal.slope=void 0);c&&this.chart.redraw()};g.dataGrouping=l;"";return l});P(A,"parts/OHLCSeries.js",[A["parts/Globals.js"],A["parts/Point.js"],A["parts/Utilities.js"]],function(k,g,A){A=A.seriesType;var v=k.seriesTypes;A("ohlc","column",{lineWidth:1,tooltip:{pointFormat:'<span style="color:{point.color}">\u25cf</span> <b> {series.name}</b><br/>Open: {point.open}<br/>High: {point.high}<br/>Low: {point.low}<br/>Close: {point.close}<br/>'},
+threshold:null,states:{hover:{lineWidth:3}},stickyTracking:!0},{directTouch:!1,pointArrayMap:["open","high","low","close"],toYData:function(g){return[g.open,g.high,g.low,g.close]},pointValKey:"close",pointAttrToOptions:{stroke:"color","stroke-width":"lineWidth"},init:function(){v.column.prototype.init.apply(this,arguments);this.options.stacking=void 0},pointAttribs:function(g,k){k=v.column.prototype.pointAttribs.call(this,g,k);var A=this.options;delete k.fill;!g.options.color&&A.upColor&&g.open<g.close&&
+(k.stroke=A.upColor);return k},translate:function(){var g=this,k=g.yAxis,A=!!g.modifyValue,H=["plotOpen","plotHigh","plotLow","plotClose","yBottom"];v.column.prototype.translate.apply(g);g.points.forEach(function(v){[v.open,v.high,v.low,v.close,v.low].forEach(function(y,G){null!==y&&(A&&(y=g.modifyValue(y)),v[H[G]]=k.toPixels(y,!0))});v.tooltipPos[1]=v.plotHigh+k.pos-g.chart.plotTop})},drawPoints:function(){var g=this,k=g.chart,v=function(g,k,v){var y=g[0];g=g[1];"number"===typeof y[2]&&(y[2]=Math.max(v+
+k,y[2]));"number"===typeof g[2]&&(g[2]=Math.min(v-k,g[2]))};g.points.forEach(function(A){var y=A.graphic,G=!y;if("undefined"!==typeof A.plotY){y||(A.graphic=y=k.renderer.path().add(g.group));k.styledMode||y.attr(g.pointAttribs(A,A.selected&&"select"));var H=y.strokeWidth();var E=H%2/2;var D=Math.round(A.plotX)-E;var z=Math.round(A.shapeArgs.width/2);var t=[["M",D,Math.round(A.yBottom)],["L",D,Math.round(A.plotHigh)]];if(null!==A.open){var q=Math.round(A.plotOpen)+E;t.push(["M",D,q],["L",D-z,q]);v(t,
+H/2,q)}null!==A.close&&(q=Math.round(A.plotClose)+E,t.push(["M",D,q],["L",D+z,q]),v(t,H/2,q));y[G?"attr":"animate"]({d:t}).addClass(A.getClassName(),!0)}})},animate:null},{getClassName:function(){return g.prototype.getClassName.call(this)+(this.open<this.close?" highcharts-point-up":" highcharts-point-down")}});""});P(A,"parts/CandlestickSeries.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var A=g.merge;g=g.seriesType;var v=k.defaultPlotOptions,K=k.seriesTypes;g("candlestick",
+"ohlc",A(v.column,{states:{hover:{lineWidth:2}},tooltip:v.ohlc.tooltip,threshold:null,lineColor:"#000000",lineWidth:1,upColor:"#ffffff",stickyTracking:!0}),{pointAttribs:function(g,k){var v=K.column.prototype.pointAttribs.call(this,g,k),y=this.options,A=g.open<g.close,G=y.lineColor||this.color;v["stroke-width"]=y.lineWidth;v.fill=g.options.color||(A?y.upColor||this.color:this.color);v.stroke=g.options.lineColor||(A?y.upLineColor||G:G);k&&(g=y.states[k],v.fill=g.color||v.fill,v.stroke=g.lineColor||
+v.stroke,v["stroke-width"]=g.lineWidth||v["stroke-width"]);return v},drawPoints:function(){var g=this,k=g.chart,v=g.yAxis.reversed;g.points.forEach(function(y){var A=y.graphic,G=!A;if("undefined"!==typeof y.plotY){A||(y.graphic=A=k.renderer.path().add(g.group));g.chart.styledMode||A.attr(g.pointAttribs(y,y.selected&&"select")).shadow(g.options.shadow);var E=A.strokeWidth()%2/2;var D=Math.round(y.plotX)-E;var z=y.plotOpen;var t=y.plotClose;var q=Math.min(z,t);z=Math.max(z,t);var r=Math.round(y.shapeArgs.width/
+2);t=v?z!==y.yBottom:Math.round(q)!==Math.round(y.plotHigh);var h=v?Math.round(q)!==Math.round(y.plotHigh):z!==y.yBottom;q=Math.round(q)+E;z=Math.round(z)+E;E=[];E.push(["M",D-r,z],["L",D-r,q],["L",D+r,q],["L",D+r,z],["Z"],["M",D,q],["L",D,t?Math.round(v?y.yBottom:y.plotHigh):q],["M",D,z],["L",D,h?Math.round(v?y.plotHigh:y.yBottom):z]);A[G?"attr":"animate"]({d:E}).addClass(y.getClassName(),!0)}})}});""});P(A,"mixins/on-series.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){var A=
+g.defined,v=g.stableSort,K=k.seriesTypes;return{getPlotBox:function(){return k.Series.prototype.getPlotBox.call(this.options.onSeries&&this.chart.get(this.options.onSeries)||this)},translate:function(){K.column.prototype.translate.apply(this);var g=this,k=g.options,H=g.chart,y=g.points,I=y.length-1,J,E=k.onSeries;E=E&&H.get(E);k=k.onKey||"y";var D=E&&E.options.step,z=E&&E.points,t=z&&z.length,q=H.inverted,r=g.xAxis,h=g.yAxis,f=0,a;if(E&&E.visible&&t){f=(E.pointXOffset||0)+(E.barW||0)/2;H=E.currentDataGrouping;
+var l=z[t-1].x+(H?H.totalRange:0);v(y,function(a,c){return a.x-c.x});for(k="plot"+k[0].toUpperCase()+k.substr(1);t--&&y[I];){var e=z[t];H=y[I];H.y=e.y;if(e.x<=H.x&&"undefined"!==typeof e[k]){if(H.x<=l&&(H.plotY=e[k],e.x<H.x&&!D&&(a=z[t+1])&&"undefined"!==typeof a[k])){var c=(H.x-e.x)/(a.x-e.x);H.plotY+=c*(a[k]-e[k]);H.y+=c*(a.y-e.y)}I--;t++;if(0>I)break}}}y.forEach(function(a,c){a.plotX+=f;if("undefined"===typeof a.plotY||q)0<=a.plotX&&a.plotX<=r.len?q?(a.plotY=r.translate(a.x,0,1,0,1),a.plotX=A(a.y)?
+h.translate(a.y,0,0,0,1):0):a.plotY=(r.opposite?0:g.yAxis.len)+r.offset:a.shapeArgs={};if((J=y[c-1])&&J.plotX===a.plotX){"undefined"===typeof J.stackIndex&&(J.stackIndex=0);var e=J.stackIndex+1}a.stackIndex=e});this.onSeries=E}}});P(A,"parts/FlagsSeries.js",[A["parts/Globals.js"],A["parts/Utilities.js"],A["mixins/on-series.js"]],function(k,g,A){function v(g){q[g+"pin"]=function(h,f,a,k,e){var c=e&&e.anchorX;e=e&&e.anchorY;"circle"===g&&k>a&&(h-=Math.round((k-a)/2),a=k);var m=q[g](h,f,a,k);if(c&&e){var l=
+c;"circle"===g?l=h+a/2:(h=m[0],a=m[1],"M"===h[0]&&"L"===a[0]&&(l=(h[1]+a[1])/2));m.push(["M",l,f>e?f:f+k],["L",c,e]);m=m.concat(q.circle(c-1,e-1,2,2))}return m}}var H=g.addEvent,G=g.defined,N=g.isNumber,M=g.merge,y=g.objectEach,I=g.seriesType,J=g.wrap;g=k.noop;var E=k.Renderer,D=k.Series,z=k.TrackerMixin,t=k.VMLRenderer,q=k.SVGRenderer.prototype.symbols;I("flags","column",{pointRange:0,allowOverlapX:!1,shape:"flag",stackDistance:12,textAlign:"center",tooltip:{pointFormat:"{point.text}<br/>"},threshold:null,
+y:-30,fillColor:"#ffffff",lineWidth:1,states:{hover:{lineColor:"#000000",fillColor:"#ccd6eb"}},style:{fontSize:"11px",fontWeight:"bold"}},{sorted:!1,noSharedTooltip:!0,allowDG:!1,takeOrdinalPosition:!1,trackerGroups:["markerGroup"],forceCrop:!0,init:D.prototype.init,pointAttribs:function(g,h){var f=this.options,a=g&&g.color||this.color,k=f.lineColor,e=g&&g.lineWidth;g=g&&g.fillColor||f.fillColor;h&&(g=f.states[h].fillColor,k=f.states[h].lineColor,e=f.states[h].lineWidth);return{fill:g||a,stroke:k||
+a,"stroke-width":e||f.lineWidth||0}},translate:A.translate,getPlotBox:A.getPlotBox,drawPoints:function(){var g=this.points,h=this.chart,f=h.renderer,a=h.inverted,l=this.options,e=l.y,c,m=this.yAxis,u={},q=[];for(c=g.length;c--;){var t=g[c];var w=(a?t.plotY:t.plotX)>this.xAxis.len;var p=t.plotX;var v=t.stackIndex;var z=t.options.shape||l.shape;var B=t.plotY;"undefined"!==typeof B&&(B=t.plotY+e-("undefined"!==typeof v&&v*l.stackDistance));t.anchorX=v?void 0:t.plotX;var d=v?void 0:t.plotY;var b="flag"!==
+z;v=t.graphic;"undefined"!==typeof B&&0<=p&&!w?(v||(v=t.graphic=f.label("",null,null,z,null,null,l.useHTML),h.styledMode||v.attr(this.pointAttribs(t)).css(M(l.style,t.style)),v.attr({align:b?"center":"left",width:l.width,height:l.height,"text-align":l.textAlign}).addClass("highcharts-point").add(this.markerGroup),t.graphic.div&&(t.graphic.div.point=t),h.styledMode||v.shadow(l.shadow),v.isNew=!0),0<p&&(p-=v.strokeWidth()%2),z={y:B,anchorY:d},l.allowOverlapX&&(z.x=p,z.anchorX=t.anchorX),v.attr({text:t.options.title||
+l.title||"A"})[v.isNew?"attr":"animate"](z),l.allowOverlapX||(u[t.plotX]?u[t.plotX].size=Math.max(u[t.plotX].size,v.width):u[t.plotX]={align:b?.5:0,size:v.width,target:p,anchorX:p}),t.tooltipPos=[p,B+m.pos-h.plotTop]):v&&(t.graphic=v.destroy())}l.allowOverlapX||(y(u,function(a){a.plotX=a.anchorX;q.push(a)}),k.distribute(q,a?m.len:this.xAxis.len,100),g.forEach(function(a){var b=a.graphic&&u[a.plotX];b&&(a.graphic[a.graphic.isNew?"attr":"animate"]({x:b.pos+b.align*b.size,anchorX:a.anchorX}),G(b.pos)?
+a.graphic.isNew=!1:(a.graphic.attr({x:-9999,anchorX:-9999}),a.graphic.isNew=!0))}));l.useHTML&&J(this.markerGroup,"on",function(a){return k.SVGElement.prototype.on.apply(a.apply(this,[].slice.call(arguments,1)),[].slice.call(arguments,1))})},drawTracker:function(){var g=this.points;z.drawTrackerPoint.apply(this);g.forEach(function(h){var f=h.graphic;f&&H(f.element,"mouseover",function(){0<h.stackIndex&&!h.raised&&(h._y=f.y,f.attr({y:h._y-8}),h.raised=!0);g.forEach(function(a){a!==h&&a.raised&&a.graphic&&
+(a.graphic.attr({y:a._y}),a.raised=!1)})})})},animate:function(g){g&&this.setClip()},setClip:function(){D.prototype.setClip.apply(this,arguments);!1!==this.options.clip&&this.sharedClipKey&&this.markerGroup.clip(this.chart[this.sharedClipKey])},buildKDTree:g,invertGroups:g},{isValid:function(){return N(this.y)||"undefined"===typeof this.y}});q.flag=function(g,h,f,a,k){var e=k&&k.anchorX||g;k=k&&k.anchorY||h;var c=q.circle(e-1,k-1,2,2);c.push(["M",e,k],["L",g,h+a],["L",g,h],["L",g+f,h],["L",g+f,h+
+a],["L",g,h+a],["Z"]);return c};v("circle");v("square");E===t&&["circlepin","flag","squarepin"].forEach(function(g){t.prototype.symbols[g]=q[g]});""});P(A,"parts/RangeSelector.js",[A["parts/Globals.js"],A["parts/Utilities.js"]],function(k,g){function A(a){this.init(a)}var v=g.addEvent,K=g.createElement,G=g.css,N=g.defined,M=g.destroyObjectProperties,y=g.discardElement,I=g.extend,J=g.fireEvent,E=g.isNumber,D=g.merge,z=g.objectEach,t=g.pick,q=g.pInt,r=g.splat,h=k.Axis;g=k.Chart;var f=k.defaultOptions;
+I(f,{rangeSelector:{verticalAlign:"top",buttonTheme:{width:28,height:18,padding:2,zIndex:7},floating:!1,x:0,y:0,height:void 0,inputPosition:{align:"right",x:0,y:0},buttonPosition:{align:"left",x:0,y:0},labelStyle:{color:"#666666"}}});f.lang=D(f.lang,{rangeSelectorZoom:"Zoom",rangeSelectorFrom:"From",rangeSelectorTo:"To"});A.prototype={clickButton:function(a,f){var e=this.chart,c=this.buttonOptions[a],g=e.xAxis[0],k=e.scroller&&e.scroller.getUnionExtremes()||g||{},l=k.dataMin,q=k.dataMax,w=g&&Math.round(Math.min(g.max,
+t(q,g.max))),p=c.type;k=c._range;var C,y=c.dataGrouping;if(null!==l&&null!==q){e.fixedRange=k;y&&(this.forcedDataGrouping=!0,h.prototype.setDataGrouping.call(g||{chart:this.chart},y,!1),this.frozenStates=c.preserveDataGrouping);if("month"===p||"year"===p)if(g){p={range:c,max:w,chart:e,dataMin:l,dataMax:q};var B=g.minFromRange.call(p);E(p.newMax)&&(w=p.newMax)}else k=c;else if(k)B=Math.max(w-k,l),w=Math.min(B+k,q);else if("ytd"===p)if(g)"undefined"===typeof q&&(l=Number.MAX_VALUE,q=Number.MIN_VALUE,
+e.series.forEach(function(a){a=a.xData;l=Math.min(a[0],l);q=Math.max(a[a.length-1],q)}),f=!1),w=this.getYTDExtremes(q,l,e.time.useUTC),B=C=w.min,w=w.max;else{this.deferredYTDClick=a;return}else"all"===p&&g&&(B=l,w=q);B+=c._offsetMin;w+=c._offsetMax;this.setSelected(a);if(g)g.setExtremes(B,w,t(f,1),null,{trigger:"rangeSelectorButton",rangeSelectorButton:c});else{var d=r(e.options.xAxis)[0];var b=d.range;d.range=k;var n=d.min;d.min=C;v(e,"load",function(){d.range=b;d.min=n})}}},setSelected:function(a){this.selected=
+this.options.selected=a},defaultButtons:[{type:"month",count:1,text:"1m"},{type:"month",count:3,text:"3m"},{type:"month",count:6,text:"6m"},{type:"ytd",text:"YTD"},{type:"year",count:1,text:"1y"},{type:"all",text:"All"}],init:function(a){var f=this,e=a.options.rangeSelector,c=e.buttons||[].concat(f.defaultButtons),g=e.selected,h=function(){var a=f.minInput,c=f.maxInput;a&&a.blur&&J(a,"blur");c&&c.blur&&J(c,"blur")};f.chart=a;f.options=e;f.buttons=[];f.buttonOptions=c;this.unMouseDown=v(a.container,
+"mousedown",h);this.unResize=v(a,"resize",h);c.forEach(f.computeButtonRange);"undefined"!==typeof g&&c[g]&&this.clickButton(g,!1);v(a,"load",function(){a.xAxis&&a.xAxis[0]&&v(a.xAxis[0],"setExtremes",function(c){this.max-this.min!==a.fixedRange&&"rangeSelectorButton"!==c.trigger&&"updatedData"!==c.trigger&&f.forcedDataGrouping&&!f.frozenStates&&this.setDataGrouping(!1,!1)})})},updateButtonStates:function(){var a=this,f=this.chart,e=f.xAxis[0],c=Math.round(e.max-e.min),g=!e.hasVisibleSeries,h=f.scroller&&
+f.scroller.getUnionExtremes()||e,k=h.dataMin,q=h.dataMax;f=a.getYTDExtremes(q,k,f.time.useUTC);var r=f.min,p=f.max,t=a.selected,v=E(t),B=a.options.allButtonsEnabled,d=a.buttons;a.buttonOptions.forEach(function(b,f){var h=b._range,m=b.type,l=b.count||1,n=d[f],u=0,w=b._offsetMax-b._offsetMin;b=f===t;var C=h>q-k,y=h<e.minRange,z=!1,A=!1;h=h===c;("month"===m||"year"===m)&&c+36E5>=864E5*{month:28,year:365}[m]*l-w&&c-36E5<=864E5*{month:31,year:366}[m]*l+w?h=!0:"ytd"===m?(h=p-r+w===c,z=!b):"all"===m&&(h=
+e.max-e.min>=q-k,A=!b&&v&&h);m=!B&&(C||y||A||g);l=b&&h||h&&!v&&!z||b&&a.frozenStates;m?u=3:l&&(v=!0,u=2);n.state!==u&&(n.setState(u),0===u&&t===f&&a.setSelected(null))})},computeButtonRange:function(a){var f=a.type,e=a.count||1,c={millisecond:1,second:1E3,minute:6E4,hour:36E5,day:864E5,week:6048E5};if(c[f])a._range=c[f]*e;else if("month"===f||"year"===f)a._range=864E5*{month:30,year:365}[f]*e;a._offsetMin=t(a.offsetMin,0);a._offsetMax=t(a.offsetMax,0);a._range+=a._offsetMax-a._offsetMin},setInputValue:function(a,
+f){var e=this.chart.options.rangeSelector,c=this.chart.time,g=this[a+"Input"];N(f)&&(g.previousValue=g.HCTime,g.HCTime=f);g.value=c.dateFormat(e.inputEditDateFormat||"%Y-%m-%d",g.HCTime);this[a+"DateBox"].attr({text:c.dateFormat(e.inputDateFormat||"%b %e, %Y",g.HCTime)})},showInput:function(a){var f=this.inputGroup,e=this[a+"DateBox"];G(this[a+"Input"],{left:f.translateX+e.x+"px",top:f.translateY+"px",width:e.width-2+"px",height:e.height-2+"px",border:"2px solid silver"})},hideInput:function(a){G(this[a+
+"Input"],{border:0,width:"1px",height:"1px"});this.setInputValue(a)},drawInput:function(a){function g(){var a=p.value,d=(r.inputDateParser||Date.parse)(a),b=c.xAxis[0],f=c.scroller&&c.scroller.xAxis?c.scroller.xAxis:b,g=f.dataMin;f=f.dataMax;d!==p.previousValue&&(p.previousValue=d,E(d)||(d=a.split("-"),d=Date.UTC(q(d[0]),q(d[1])-1,q(d[2]))),E(d)&&(c.time.useUTC||(d+=6E4*(new Date).getTimezoneOffset()),w?d>e.maxInput.HCTime?d=void 0:d<g&&(d=g):d<e.minInput.HCTime?d=void 0:d>f&&(d=f),"undefined"!==
+typeof d&&b.setExtremes(w?d:b.min,w?b.max:d,void 0,void 0,{trigger:"rangeSelectorInput"})))}var e=this,c=e.chart,h=c.renderer.style||{},u=c.renderer,r=c.options.rangeSelector,t=e.div,w="min"===a,p,v,y=this.inputGroup;this[a+"Label"]=v=u.label(f.lang[w?"rangeSelectorFrom":"rangeSelectorTo"],this.inputGroup.offset).addClass("highcharts-range-label").attr({padding:2}).add(y);y.offset+=v.width+5;this[a+"DateBox"]=u=u.label("",y.offset).addClass("highcharts-range-input").attr({padding:2,width:r.inputBoxWidth||
+90,height:r.inputBoxHeight||17,"text-align":"center"}).on("click",function(){e.showInput(a);e[a+"Input"].focus()});c.styledMode||u.attr({stroke:r.inputBoxBorderColor||"#cccccc","stroke-width":1});u.add(y);y.offset+=u.width+(w?10:0);this[a+"Input"]=p=K("input",{name:a,className:"highcharts-range-selector",type:"text"},{top:c.plotTop+"px"},t);c.styledMode||(v.css(D(h,r.labelStyle)),u.css(D({color:"#333333"},h,r.inputStyle)),G(p,I({position:"absolute",border:0,width:"1px",height:"1px",padding:0,textAlign:"center",
+fontSize:h.fontSize,fontFamily:h.fontFamily,top:"-9999em"},r.inputStyle)));p.onfocus=function(){e.showInput(a)};p.onblur=function(){p===k.doc.activeElement&&g();e.hideInput(a);p.blur()};p.onchange=g;p.onkeypress=function(a){13===a.keyCode&&g()}},getPosition:function(){var a=this.chart,f=a.options.rangeSelector;a="top"===f.verticalAlign?a.plotTop-a.axisOffset[0]:0;return{buttonTop:a+f.buttonPosition.y,inputTop:a+f.inputPosition.y-10}},getYTDExtremes:function(a,f,e){var c=this.chart.time,g=new c.Date(a),
+h=c.get("FullYear",g);e=e?c.Date.UTC(h,0,1):+new c.Date(h,0,1);f=Math.max(f||0,e);g=g.getTime();return{max:Math.min(a||g,g),min:f}},render:function(a,g){var e=this,c=e.chart,h=c.renderer,k=c.container,l=c.options,q=l.exporting&&!1!==l.exporting.enabled&&l.navigation&&l.navigation.buttonOptions,r=f.lang,p=e.div,v=l.rangeSelector,y=t(l.chart.style&&l.chart.style.zIndex,0)+1;l=v.floating;var B=e.buttons;p=e.inputGroup;var d=v.buttonTheme,b=v.buttonPosition,n=v.inputPosition,x=v.inputEnabled,z=d&&d.states,
+A=c.plotLeft,D=e.buttonGroup,E,G=e.options.verticalAlign,H=c.legend,I=H&&H.options,J=b.y,M=n.y,N=c.hasLoaded,P=N?"animate":"attr",T=0,S=0;if(!1!==v.enabled){e.rendered||(e.group=E=h.g("range-selector-group").attr({zIndex:7}).add(),e.buttonGroup=D=h.g("range-selector-buttons").add(E),e.zoomText=h.text(r.rangeSelectorZoom,0,15).add(D),c.styledMode||(e.zoomText.css(v.labelStyle),d["stroke-width"]=t(d["stroke-width"],0)),e.buttonOptions.forEach(function(a,b){B[b]=h.button(a.text,0,0,function(c){var d=
+a.events&&a.events.click,f;d&&(f=d.call(a,c));!1!==f&&e.clickButton(b);e.isActive=!0},d,z&&z.hover,z&&z.select,z&&z.disabled).attr({"text-align":"center"}).add(D)}),!1!==x&&(e.div=p=K("div",null,{position:"relative",height:0,zIndex:y}),k.parentNode.insertBefore(p,k),e.inputGroup=p=h.g("input-group").add(E),p.offset=0,e.drawInput("min"),e.drawInput("max")));e.zoomText[P]({x:t(A+b.x,A)});var da=t(A+b.x,A)+e.zoomText.getBBox().width+5;e.buttonOptions.forEach(function(a,b){B[b][P]({x:da});da+=B[b].width+
+t(v.buttonSpacing,5)});A=c.plotLeft-c.spacing[3];e.updateButtonStates();q&&this.titleCollision(c)&&"top"===G&&"right"===b.align&&b.y+D.getBBox().height-12<(q.y||0)+q.height&&(T=-40);k=b.x-c.spacing[3];"right"===b.align?k+=T-A:"center"===b.align&&(k-=A/2);D.align({y:b.y,width:D.getBBox().width,align:b.align,x:k},!0,c.spacingBox);e.group.placed=N;e.buttonGroup.placed=N;!1!==x&&(T=q&&this.titleCollision(c)&&"top"===G&&"right"===n.align&&n.y-p.getBBox().height-12<(q.y||0)+q.height+c.spacing[0]?-40:0,
+"left"===n.align?k=A:"right"===n.align&&(k=-Math.max(c.axisOffset[1],-T)),p.align({y:n.y,width:p.getBBox().width,align:n.align,x:n.x+k-2},!0,c.spacingBox),q=p.alignAttr.translateX+p.alignOptions.x-T+p.getBBox().x+2,k=p.alignOptions.width,r=D.alignAttr.translateX+D.getBBox().x,A=D.getBBox().width+20,(n.align===b.align||r+A>q&&q+k>r&&J<M+p.getBBox().height)&&p.attr({translateX:p.alignAttr.translateX+(c.axisOffset[1]>=-T?0:-T),translateY:p.alignAttr.translateY+D.getBBox().height+10}),e.setInputValue("min",
+a),e.setInputValue("max",g),e.inputGroup.placed=N);e.group.align({verticalAlign:G},!0,c.spacingBox);a=e.group.getBBox().height+20;g=e.group.alignAttr.translateY;"bottom"===G&&(H=I&&"bottom"===I.verticalAlign&&I.enabled&&!I.floating?H.legendHeight+t(I.margin,10):0,a=a+H-20,S=g-a-(l?0:v.y)-(c.titleOffset?c.titleOffset[2]:0)-10);if("top"===G)l&&(S=0),c.titleOffset&&c.titleOffset[0]&&(S=c.titleOffset[0]),S+=c.margin[0]-c.spacing[0]||0;else if("middle"===G)if(M===J)S=0>M?g+void 0:g;else if(M||J)S=0>M||
+0>J?S-Math.min(M,J):g-a+NaN;e.group.translate(v.x,v.y+Math.floor(S));!1!==x&&(e.minInput.style.marginTop=e.group.translateY+"px",e.maxInput.style.marginTop=e.group.translateY+"px");e.rendered=!0}},getHeight:function(){var a=this.options,f=this.group,e=a.y,c=a.buttonPosition.y,g=a.inputPosition.y;if(a.height)return a.height;a=f?f.getBBox(!0).height+13+e:0;f=Math.min(g,c);if(0>g&&0>c||0<g&&0<c)a+=Math.abs(f);return a},titleCollision:function(a){return!(a.options.title.text||a.options.subtitle.text)},
+update:function(a){var f=this.chart;D(!0,f.options.rangeSelector,a);this.destroy();this.init(f);f.rangeSelector.render()},destroy:function(){var a=this,f=a.minInput,e=a.maxInput;a.unMouseDown();a.unResize();M(a.buttons);f&&(f.onfocus=f.onblur=f.onchange=null);e&&(e.onfocus=e.onblur=e.onchange=null);z(a,function(c,e){c&&"chart"!==e&&(c.destroy?c.destroy():c.nodeType&&y(this[e]));c!==A.prototype[e]&&(a[e]=null)},this)}};h.prototype.minFromRange=function(){var a=this.range,f=a.type,e=this.max,c=this.chart.time,
+g=function(a,e){var g="year"===f?"FullYear":"Month",h=new c.Date(a),k=c.get(g,h);c.set(g,h,k+e);k===c.get(g,h)&&c.set("Date",h,0);return h.getTime()-a};if(E(a)){var h=e-a;var k=a}else h=e+g(e,-a.count),this.chart&&(this.chart.fixedRange=e-h);var q=t(this.dataMin,Number.MIN_VALUE);E(h)||(h=q);h<=q&&(h=q,"undefined"===typeof k&&(k=g(h,a.count)),this.newMax=Math.min(h+k,this.dataMax));E(e)||(h=void 0);return h};k.RangeSelector||(v(g,"afterGetContainer",function(){this.options.rangeSelector.enabled&&
+(this.rangeSelector=new A(this))}),v(g,"beforeRender",function(){var a=this.axes,f=this.rangeSelector;f&&(E(f.deferredYTDClick)&&(f.clickButton(f.deferredYTDClick),delete f.deferredYTDClick),a.forEach(function(a){a.updateNames();a.setScale()}),this.getAxisMargins(),f.render(),a=f.options.verticalAlign,f.options.floating||("bottom"===a?this.extraBottomMargin=!0:"middle"!==a&&(this.extraTopMargin=!0)))}),v(g,"update",function(a){var f=a.options.rangeSelector;a=this.rangeSelector;var e=this.extraBottomMargin,
+c=this.extraTopMargin;f&&f.enabled&&!N(a)&&(this.options.rangeSelector.enabled=!0,this.rangeSelector=new A(this));this.extraTopMargin=this.extraBottomMargin=!1;a&&(a.render(),f=f&&f.verticalAlign||a.options&&a.options.verticalAlign,a.options.floating||("bottom"===f?this.extraBottomMargin=!0:"middle"!==f&&(this.extraTopMargin=!0)),this.extraBottomMargin!==e||this.extraTopMargin!==c)&&(this.isDirtyBox=!0)}),v(g,"render",function(){var a=this.rangeSelector;a&&!a.options.floating&&(a.render(),a=a.options.verticalAlign,
+"bottom"===a?this.extraBottomMargin=!0:"middle"!==a&&(this.extraTopMargin=!0))}),v(g,"getMargins",function(){var a=this.rangeSelector;a&&(a=a.getHeight(),this.extraTopMargin&&(this.plotTop+=a),this.extraBottomMargin&&(this.marginBottom+=a))}),g.prototype.callbacks.push(function(a){function f(){e=a.xAxis[0].getExtremes();g=a.legend;k=null===c||void 0===c?void 0:c.options.verticalAlign;E(e.min)&&c.render(e.min,e.max);c&&g.display&&"top"===k&&k===g.options.verticalAlign&&(h=D(a.spacingBox),h.y="vertical"===
+g.options.layout?a.plotTop:h.y+c.getHeight(),g.group.placed=!1,g.align(h))}var e,c=a.rangeSelector,g,h,k;if(c){var q=v(a.xAxis[0],"afterSetExtremes",function(a){c.render(a.min,a.max)});var r=v(a,"redraw",f);f()}v(a,"destroy",function(){c&&(r(),q())})}),k.RangeSelector=A)});P(A,"parts/StockChart.js",[A["parts/Axis.js"],A["parts/Globals.js"],A["parts/Point.js"],A["parts/Utilities.js"]],function(k,g,A,v){var H=v.addEvent,G=v.arrayMax,N=v.arrayMin,M=v.clamp,y=v.defined,I=v.extend,J=v.find,E=v.format,
+D=v.isNumber,z=v.isString,t=v.merge,q=v.pick,r=v.splat,h=g.Chart;v=g.Series;var f=g.SVGRenderer,a=v.prototype,l=a.init,e=a.processData,c=A.prototype.tooltipFormatter;g.StockChart=g.stockChart=function(a,c,e){var f=z(a)||a.nodeName,k=arguments[f?1:0],m=k,l=k.series,u=g.getOptions(),v,d=q(k.navigator&&k.navigator.enabled,u.navigator.enabled,!0);k.xAxis=r(k.xAxis||{}).map(function(a,c){return t({minPadding:0,maxPadding:0,overscroll:0,ordinal:!0,title:{text:null},labels:{overflow:"justify"},showLastLabel:!0},
+u.xAxis,u.xAxis&&u.xAxis[c],a,{type:"datetime",categories:null},d?{startOnTick:!1,endOnTick:!1}:null)});k.yAxis=r(k.yAxis||{}).map(function(a,c){v=q(a.opposite,!0);return t({labels:{y:-2},opposite:v,showLastLabel:!(!a.categories&&"category"!==a.type),title:{text:null}},u.yAxis,u.yAxis&&u.yAxis[c],a)});k.series=null;k=t({chart:{panning:{enabled:!0,type:"x"},pinchType:"x"},navigator:{enabled:d},scrollbar:{enabled:q(u.scrollbar.enabled,!0)},rangeSelector:{enabled:q(u.rangeSelector.enabled,!0)},title:{text:null},
+tooltip:{split:q(u.tooltip.split,!0),crosshairs:!0},legend:{enabled:!1}},k,{isStock:!0});k.series=m.series=l;return f?new h(a,k,e):new h(k,c)};H(v,"setOptions",function(a){var c;this.chart.options.isStock&&(this.is("column")||this.is("columnrange")?c={borderWidth:0,shadow:!1}:this.is("scatter")||this.is("sma")||(c={marker:{enabled:!1,radius:2}}),c&&(a.plotOptions[this.type]=t(a.plotOptions[this.type],c)))});H(k,"autoLabelAlign",function(a){var c=this.chart,e=this.options;c=c._labelPanes=c._labelPanes||
+{};var f=this.options.labels;this.chart.options.isStock&&"yAxis"===this.coll&&(e=e.top+","+e.height,!c[e]&&f.enabled&&(15===f.x&&(f.x=0),"undefined"===typeof f.align&&(f.align="right"),c[e]=this,a.align="right",a.preventDefault()))});H(k,"destroy",function(){var a=this.chart,c=this.options&&this.options.top+","+this.options.height;c&&a._labelPanes&&a._labelPanes[c]===this&&delete a._labelPanes[c]});H(k,"getPlotLinePath",function(a){function c(a){var b="xAxis"===a?"yAxis":"xAxis";a=e.options[b];return D(a)?
+[g[b][a]]:z(a)?[g.get(a)]:f.map(function(a){return a[b]})}var e=this,f=this.isLinked&&!this.series?this.linkedParent.series:this.series,g=e.chart,h=g.renderer,k=e.left,m=e.top,l,d,b,n,r=[],t=[],v=a.translatedValue,A=a.value,E=a.force;if(g.options.isStock&&!1!==a.acrossPanes&&"xAxis"===e.coll||"yAxis"===e.coll){a.preventDefault();t=c(e.coll);var G=e.isXAxis?g.yAxis:g.xAxis;G.forEach(function(a){if(y(a.options.id)?-1===a.options.id.indexOf("navigator"):1){var b=a.isXAxis?"yAxis":"xAxis";b=y(a.options[b])?
+g[b][a.options[b]]:g[b][0];e===b&&t.push(a)}});var H=t.length?[]:[e.isXAxis?g.yAxis[0]:g.xAxis[0]];t.forEach(function(a){-1!==H.indexOf(a)||J(H,function(b){return b.pos===a.pos&&b.len===a.len})||H.push(a)});var I=q(v,e.translate(A,null,null,a.old));D(I)&&(e.horiz?H.forEach(function(a){var c;d=a.pos;n=d+a.len;l=b=Math.round(I+e.transB);"pass"!==E&&(l<k||l>k+e.width)&&(E?l=b=M(l,k,k+e.width):c=!0);c||r.push(["M",l,d],["L",b,n])}):H.forEach(function(a){var c;l=a.pos;b=l+a.len;d=n=Math.round(m+e.height-
+I);"pass"!==E&&(d<m||d>m+e.height)&&(E?d=n=M(d,m,m+e.height):c=!0);c||r.push(["M",l,d],["L",b,n])}));a.path=0<r.length?h.crispPolyLine(r,a.lineWidth||1):null}});f.prototype.crispPolyLine=function(a,c){for(var e=0;e<a.length;e+=2){var f=a[e],g=a[e+1];f[1]===g[1]&&(f[1]=g[1]=Math.round(f[1])-c%2/2);f[2]===g[2]&&(f[2]=g[2]=Math.round(f[2])+c%2/2)}return a};H(k,"afterHideCrosshair",function(){this.crossLabel&&(this.crossLabel=this.crossLabel.hide())});H(k,"afterDrawCrosshair",function(a){var c,e;if(y(this.crosshair.label)&&
+this.crosshair.label.enabled&&this.cross){var f=this.chart,g=this.logarithmic,h=this.options.crosshair.label,k=this.horiz,m=this.opposite,l=this.left,d=this.top,b=this.crossLabel,n=h.format,r="",t="inside"===this.options.tickPosition,v=!1!==this.crosshair.snap,z=0,A=a.e||this.cross&&this.cross.e,D=a.point;a=this.min;var G=this.max;g&&(a=g.lin2log(a),G=g.lin2log(G));g=k?"center":m?"right"===this.labelAlign?"right":"left":"left"===this.labelAlign?"left":"center";b||(b=this.crossLabel=f.renderer.label(null,
+null,null,h.shape||"callout").addClass("highcharts-crosshair-label"+(this.series[0]&&" highcharts-color-"+this.series[0].colorIndex)).attr({align:h.align||g,padding:q(h.padding,8),r:q(h.borderRadius,3),zIndex:2}).add(this.labelGroup),f.styledMode||b.attr({fill:h.backgroundColor||this.series[0]&&this.series[0].color||"#666666",stroke:h.borderColor||"","stroke-width":h.borderWidth||0}).css(I({color:"#ffffff",fontWeight:"normal",fontSize:"11px",textAlign:"center"},h.style)));k?(g=v?D.plotX+l:A.chartX,
+d+=m?0:this.height):(g=m?this.width+l:0,d=v?D.plotY+d:A.chartY);n||h.formatter||(this.dateTime&&(r="%b %d, %Y"),n="{value"+(r?":"+r:"")+"}");r=v?D[this.isXAxis?"x":"y"]:this.toValue(k?A.chartX:A.chartY);b.attr({text:n?E(n,{value:r},f):h.formatter.call(this,r),x:g,y:d,visibility:r<a||r>G?"hidden":"visible"});h=b.getBBox();if(k){if(t&&!m||!t&&m)d=b.y-h.height}else d=b.y-h.height/2;k?(c=l-h.x,e=l+this.width-h.x):(c="left"===this.labelAlign?l:0,e="right"===this.labelAlign?l+this.width:f.chartWidth);b.translateX<
+c&&(z=c-b.translateX);b.translateX+h.width>=e&&(z=-(b.translateX+h.width-e));b.attr({x:g+z,y:d,anchorX:k?g:this.opposite?0:f.chartWidth,anchorY:k?this.opposite?f.chartHeight:0:d+h.height/2})}});a.init=function(){l.apply(this,arguments);this.setCompare(this.options.compare)};a.setCompare=function(a){this.modifyValue="value"===a||"percent"===a?function(c,e){var f=this.compareValue;return"undefined"!==typeof c&&"undefined"!==typeof f?(c="value"===a?c-f:c/f*100-(100===this.options.compareBase?0:100),
+e&&(e.change=c),c):0}:null;this.userOptions.compare=a;this.chart.hasRendered&&(this.isDirty=!0)};a.processData=function(a){var c,f=-1,g=!0===this.options.compareStart?0:1;e.apply(this,arguments);if(this.xAxis&&this.processedYData){var h=this.processedXData;var k=this.processedYData;var m=k.length;this.pointArrayMap&&(f=this.pointArrayMap.indexOf(this.options.pointValKey||this.pointValKey||"y"));for(c=0;c<m-g;c++){var l=k[c]&&-1<f?k[c][f]:k[c];if(D(l)&&h[c+g]>=this.xAxis.min&&0!==l){this.compareValue=
+l;break}}}};H(v,"afterGetExtremes",function(a){a=a.dataExtremes;if(this.modifyValue&&a){var c=[this.modifyValue(a.dataMin),this.modifyValue(a.dataMax)];a.dataMin=N(c);a.dataMax=G(c)}});k.prototype.setCompare=function(a,c){this.isXAxis||(this.series.forEach(function(c){c.setCompare(a)}),q(c,!0)&&this.chart.redraw())};A.prototype.tooltipFormatter=function(a){var e=this.series.chart.numberFormatter;a=a.replace("{point.change}",(0<this.change?"+":"")+e(this.change,q(this.series.tooltipOptions.changeDecimals,
+2)));return c.apply(this,[a])};H(v,"render",function(){var a=this.chart;if(!(a.is3d&&a.is3d()||a.polar)&&this.xAxis&&!this.xAxis.isRadial){var c=this.yAxis.len;if(this.xAxis.axisLine){var e=a.plotTop+a.plotHeight-this.yAxis.pos-this.yAxis.len,f=Math.floor(this.xAxis.axisLine.strokeWidth()/2);0<=e&&(c-=Math.max(f-e,0))}!this.clipBox&&this.animate?(this.clipBox=t(a.clipBox),this.clipBox.width=this.xAxis.len,this.clipBox.height=c):a[this.sharedClipKey]&&(a[this.sharedClipKey].animate({width:this.xAxis.len,
+height:c}),a[this.sharedClipKey+"m"]&&a[this.sharedClipKey+"m"].animate({width:this.xAxis.len}))}});H(h,"update",function(a){a=a.options;"scrollbar"in a&&this.navigator&&(t(!0,this.options.scrollbar,a.scrollbar),this.navigator.update({},!1),delete a.scrollbar)})});P(A,"masters/modules/stock.src.js",[],function(){});P(A,"masters/highstock.src.js",[A["masters/highcharts.src.js"]],function(k){k.product="Highstock";return k});A["masters/highstock.src.js"]._modules=A;return A["masters/highstock.src.js"]});
+//# sourceMappingURL=highstock.js.map
+
+},{}],13:[function(require,module,exports){
 var JoleculePanel = function(attachToDiv, chainSelected) {
   this.blankApplet();
   this.attachToDiv = attachToDiv;
@@ -5527,7 +6719,112 @@ JoleculePanel.prototype.blankApplet = function(isOn, message) {
 };
 
 module.exports = JoleculePanel;
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
+var html = require('./menubar.html');
+ 
+var MenuBar = function (root, callbacks) {
+  this.root = root;
+  $(this.root).append(html);
+//  var mainMenu = [{name: 'type': 'Representation'},
+//       {'colour': 'Color'},
+//       ];
+  
+  $('#entropyWeight').val(1);
+  $('#preferredWeight').val(1);
+  $('#distanceWeight').val(1);
+  
+  $('.nav li').hover(
+      function () { //appearing on hover
+        $('ul', this).fadeIn();
+      },
+      function () { //disappearing on hover
+        $('ul', this).fadeOut();
+      }
+    );
+  
+  $('#MenuLines').click(function (e) {
+    callbacks['type']('lines');
+  });
+  $('#MenuCartoon').click(function (e) {
+    callbacks['type']('cartoon');
+  });
+  $('#MenuBallAndStick').click(function (e) {
+    callbacks['type']('ballsAndSticks');
+  });
+  $('#MenuLineTrace').click(function (e) {
+	callbacks['type']('lineTrace');
+  });
+  
+  
+  $('#MenuHomology').click(function (e) {
+    callbacks['colourScheme']('homology');
+  });
+  $('#MenuChains').click(function (e) {
+    callbacks['colourScheme']('chains');
+  });
+  $('#MenuElement').click(function (e) {
+    callbacks['colourScheme']('element');
+  });
+  
+//  $('#MenuLockedView').click(function(e) {
+//	 callbacks['view']('locked');
+//  });
+//  $('#MenuPCAView').click(function(e) {
+//	 callbacks['view']('pca');
+//  });
+//  $('#MenuEntropyView').click(function(e) {
+//	 callbacks['view']('entropy');
+//  });
+//  $('#MenuAutoView').click(function(e) {
+//		 callbacks['view']('auto',{
+//			 entropyWeight: $('#entropyWeight').val(),
+//			 preferredWeight: $('#preferredWeight').val(),
+//			 distanceWeight: $('#distanceWeight').val()
+//			 });
+//  });
+  
+}
+
+
+//MenuBar.prototype.addMenu = function (name) {
+//  this.root.append('<li><a href="#">' + name + '</a></li>');
+//}
+
+module.exports = MenuBar;
+},{"./menubar.html":15}],15:[function(require,module,exports){
+module.exports = '\
+<div class="navigation">\
+	<ul class="nav">\
+		<li><div >Color</div>\
+			<ul>\
+				<li><div id="MenuHomology" >Homology</div></li>\
+        <li><div id="MenuChains" >Chains</div></li>\
+				<li><div id="MenuElement" >By Element</div></li>\
+			</ul></li>\
+		<li><div >Representation</div>\
+			<ul>\
+				<li><div id="MenuCartoon" >Ribbon</div></li>\
+				<li><div id="MenuLines" >Lines</div></li>\
+        		<li><div id="MenuBallAndStick" >Ball And Stick</div></li>\
+        		<li><div id="MenuLineTrace">Lines Trace</div></li>\
+			</ul></li>\
+		<!--\
+		<li><div>View</div>\
+			<ul>\
+				<li><div id="MenuLockedView">Locked</div></li>\
+				<li><div id="MenuPCAView">PCA</div></li>\
+				<li><div id="MenuEntropyView">Entropy</div></li>\
+				<li><div id="MenuAutoView">Auto</div></li>\
+				<li><div id="MenuEntropyWeight">Entropy weight: <input type="text" id="entropyWeight" name="entropyWeight" style="width:20px;"></div></li>\
+				<li><div id="MenuPreferredWeight">Preferred weight: <input type="text" id="preferredWeight" name="preferredWeight" style="width:20px;"></div></li>\
+				<li><div id="MenuDistanceWeight">Distance weight: <input type="text" id="distanceWeight" name="distanceWeight" style="width:20px;"></div></li>\
+			</ul>\
+		</li>\
+		-->\
+	</ul>\
+</div>\
+';
+},{}],16:[function(require,module,exports){
 //var PVSelector = require('./pvSelector');
 var seedrandom = require('seedrandom');
 var menuBar = require('./pv/menuBar');
@@ -6787,112 +8084,7 @@ function createRandomRotations(n) {
 
 module.exports = PV3DPanel;
 
-},{"./pv/menuBar":13,"numeric":140,"seedrandom":160}],13:[function(require,module,exports){
-var html = require('./menubar.html');
- 
-var MenuBar = function (root, callbacks) {
-  this.root = root;
-  $(this.root).append(html);
-//  var mainMenu = [{name: 'type': 'Representation'},
-//       {'colour': 'Color'},
-//       ];
-  
-  $('#entropyWeight').val(1);
-  $('#preferredWeight').val(1);
-  $('#distanceWeight').val(1);
-  
-  $('.nav li').hover(
-      function () { //appearing on hover
-        $('ul', this).fadeIn();
-      },
-      function () { //disappearing on hover
-        $('ul', this).fadeOut();
-      }
-    );
-  
-  $('#MenuLines').click(function (e) {
-    callbacks['type']('lines');
-  });
-  $('#MenuCartoon').click(function (e) {
-    callbacks['type']('cartoon');
-  });
-  $('#MenuBallAndStick').click(function (e) {
-    callbacks['type']('ballsAndSticks');
-  });
-  $('#MenuLineTrace').click(function (e) {
-	callbacks['type']('lineTrace');
-  });
-  
-  
-  $('#MenuHomology').click(function (e) {
-    callbacks['colourScheme']('homology');
-  });
-  $('#MenuChains').click(function (e) {
-    callbacks['colourScheme']('chains');
-  });
-  $('#MenuElement').click(function (e) {
-    callbacks['colourScheme']('element');
-  });
-  
-//  $('#MenuLockedView').click(function(e) {
-//	 callbacks['view']('locked');
-//  });
-//  $('#MenuPCAView').click(function(e) {
-//	 callbacks['view']('pca');
-//  });
-//  $('#MenuEntropyView').click(function(e) {
-//	 callbacks['view']('entropy');
-//  });
-//  $('#MenuAutoView').click(function(e) {
-//		 callbacks['view']('auto',{
-//			 entropyWeight: $('#entropyWeight').val(),
-//			 preferredWeight: $('#preferredWeight').val(),
-//			 distanceWeight: $('#distanceWeight').val()
-//			 });
-//  });
-  
-}
-
-
-//MenuBar.prototype.addMenu = function (name) {
-//  this.root.append('<li><a href="#">' + name + '</a></li>');
-//}
-
-module.exports = MenuBar;
-},{"./menubar.html":14}],14:[function(require,module,exports){
-module.exports = '\
-<div class="navigation">\
-	<ul class="nav">\
-		<li><div >Color</div>\
-			<ul>\
-				<li><div id="MenuHomology" >Homology</div></li>\
-        <li><div id="MenuChains" >Chains</div></li>\
-				<li><div id="MenuElement" >By Element</div></li>\
-			</ul></li>\
-		<li><div >Representation</div>\
-			<ul>\
-				<li><div id="MenuCartoon" >Ribbon</div></li>\
-				<li><div id="MenuLines" >Lines</div></li>\
-        		<li><div id="MenuBallAndStick" >Ball And Stick</div></li>\
-        		<li><div id="MenuLineTrace">Lines Trace</div></li>\
-			</ul></li>\
-		<!--\
-		<li><div>View</div>\
-			<ul>\
-				<li><div id="MenuLockedView">Locked</div></li>\
-				<li><div id="MenuPCAView">PCA</div></li>\
-				<li><div id="MenuEntropyView">Entropy</div></li>\
-				<li><div id="MenuAutoView">Auto</div></li>\
-				<li><div id="MenuEntropyWeight">Entropy weight: <input type="text" id="entropyWeight" name="entropyWeight" style="width:20px;"></div></li>\
-				<li><div id="MenuPreferredWeight">Preferred weight: <input type="text" id="preferredWeight" name="preferredWeight" style="width:20px;"></div></li>\
-				<li><div id="MenuDistanceWeight">Distance weight: <input type="text" id="distanceWeight" name="distanceWeight" style="width:20px;"></div></li>\
-			</ul>\
-		</li>\
-		-->\
-	</ul>\
-</div>\
-';
-},{}],15:[function(require,module,exports){
+},{"./pv/menuBar":14,"numeric":130,"seedrandom":131}],17:[function(require,module,exports){
 var ClusterRenderer = require('./clusterRenderer');
 // Render 2D structures in SVG.
 //
@@ -7130,7 +8322,7 @@ module.exports = ShowMatchingStructures;
 
 // /////// sidebar information panels: moved to textpanels.js //
 
-},{"./clusterRenderer":4}],16:[function(require,module,exports){
+},{"./clusterRenderer":4}],18:[function(require,module,exports){
 var LRU = require("lru-cache");
 
 
@@ -7181,7 +8373,7 @@ TopTen.prototype.getAll = function() {
 
 
 module.exports = TopTen;
-},{"lru-cache":136}],17:[function(require,module,exports){
+},{"lru-cache":126}],19:[function(require,module,exports){
 /** generic functions and stuff to run once document is loaded
  * 
  */
@@ -7210,89 +8402,126 @@ $(function() {
   });
 
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 //
 // Simple cache with automatic removal of oldest values.
 //
 // Authors: Sean O'Donoghue. Kenny Sabir
 //
 // WARNING, this logger is now used by client & server. The client cannot use the logger.
-// var logger = require('./log');
+//var logger = require('./log');
 
-var Cache = function (maximum_cache_size) {
-  var cache = {}
-  var last_access = {}
-  var enabled = true
-  if (typeof maximum_cache_size === 'undefined') { maximum_cache_size = 100 };
 
-  return {
-    write: function (key, value) {
-      if (typeof (Storage) !== "undefined"){
-        console.log("Cache.write save " + key + " to local storage")
-        localStorage.setItem(key, JSON.stringify(value))
-      } else {
-        //				console.log("*** write to cache");
-        if (enabled) {
-          last_access[key] = Date()
-
-          // store in cache
-          cache[key] = value
-
-          // if cache size is too large, remove oldest key
-          var size = Object.keys(cache).length
-          // logger.info('Stored ' + key + ' in cache (size = ' + size + ')');
-          if (size > maximum_cache_size) {
-            var oldest_key = null
-            var oldest_date = null
-            // find and delete oldest key
-            oldest_date = last_access[key]
-            Object.keys(cache).forEach(function (temp_key) {
-              // console.log('checking key = ' + temp_key);
-              if (last_access[temp_key] <= oldest_date) {
-                // console.log('key is older: ' + last_access[temp_key]);
-                oldest_key = temp_key
-                oldest_date = last_access[temp_key]
-              }
-            })
-            // console.log('final oldest key = ' + oldest_key);
-            if (oldest_key !== null) {
-              delete cache[oldest_key]
-              delete last_access[oldest_key]
-            }
-            // logger.info('Deleted ' + oldest_key + ' from cache');
-          }
-        }
-      }
-      return (value)
-    },
-    read: function (key) {
-      if (typeof (Storage) !== "undefined"){
-        if (localStorage.getItem(key) !== null){
-          console.log("Cache.read " + key + " fetched from local storage")
-          return (JSON.parse(localStorage.getItem(key)))
-        } else {
-          console.log("Cache.write error: " + key + " not found in local storage")
-          return (false)
-        }
-      } else if (enabled && key in cache && cache[key]) {
-        // use cached value if available
-        // logger.info('Read ' + key + ' from cache');
-        //				console.log("*** read from cache");
-        return (cache[key])
-      } else {
-        return (false)
-      }
-    },
-    clear: function () {
-      cache = {}
-      last_access = {}
-    }
-  }
+function deleteOldItems(){
+	console.log("####################### " + Object.keys(localStorage).length);
+	console.log(Object.keys(localStorage));
+	// getFeatureKeys();
+	for (let key in localStorage){
+		if (localStorage.hasOwnProperty(key) && key.match(/^FEATURE/i)){
+			localStorage.removeItem(key);
+			console.log("Cache.js removed item " + key + " from local storage");
+		}
+	}
+	// console.log("### end!");
 }
 
-module.exports = Cache
 
-},{}],19:[function(require,module,exports){
+var Cache = function (maximum_cache_size) {
+
+	var cache = {};
+	var last_access = {};
+	var enabled = true;
+	if (typeof maximum_cache_size === 'undefined') {maximum_cache_size = 100};
+
+	return {
+		write: function(key, value) {
+			if(typeof(Storage)!=="undefined"){
+				console.log("Cache.write save "+key+" to local storage");
+				try {
+					localStorage.setItem(key, JSON.stringify(value));
+				  // localStorage.setItem("name", "Hello World!"); //saves to the database, "key", "value"
+				} catch (e) {
+				  // if (e == QUOTA_EXCEEDED_ERR) {
+				    // alert('Quota exceeded!'); //data wasn't successfully saved due to quota exceed so throw an error
+					/* for (var i=0; i<50; i++){
+						if (Object.keys(localStorage).length > 0){
+							localStorage.shift()
+						}
+					}*/
+
+					deleteOldItems();
+				  // }
+
+				//   localStorage.setItem(key, JSON.stringify(value));
+
+
+				}
+
+			} else {
+//				console.log("*** write to cache");
+				if (enabled) {
+
+					last_access[key] = Date();
+
+					// store in cache
+					cache[key] = value;
+
+					// if cache size is too large, remove oldest key
+					var size = Object.keys(cache).length;
+					//logger.info('Stored ' + key + ' in cache (size = ' + size + ')');
+					if (size > maximum_cache_size) {
+						var oldest_key = null;
+						var oldest_date = null;
+						// find and delete oldest key
+						oldest_date = last_access[key];
+						Object.keys(cache).forEach(function (temp_key) {
+							// console.log('checking key = ' + temp_key);
+							if (last_access[temp_key] <= oldest_date) {
+								//console.log('key is older: ' + last_access[temp_key]);
+								oldest_key = temp_key;
+								oldest_date = last_access[temp_key];
+							}
+						});
+						// console.log('final oldest key = ' + oldest_key);
+						if (oldest_key !== null) {
+							delete cache[oldest_key];
+							delete last_access[oldest_key];
+						}
+						//logger.info('Deleted ' + oldest_key + ' from cache');
+					}
+				}
+			}
+			return(value);
+		},
+		read: function(key) {
+			if(typeof(Storage)!=="undefined"){
+				if (localStorage.getItem(key) !== null){
+					console.log("Cache.read "+key+" fetched from local storage");
+					return(JSON.parse(localStorage.getItem(key)));
+				} else {
+					console.log("Cache.write error: "+key+" not found in local storage");
+					return(false);
+				}
+			} else if (enabled && key in cache && cache[key]) {
+				// use cached value if available
+				//logger.info('Read ' + key + ' from cache');
+//				console.log("*** read from cache");
+				return(cache[key]);
+			} else {
+				return(false);
+			}
+		},
+		clear: function() {
+			cache = {};
+			last_access = {};
+
+		}
+	}
+};
+
+module.exports = Cache;
+
+},{}],21:[function(require,module,exports){
 'use strict';
 
 var compileSchema = require('./compile')
@@ -7800,7 +9029,7 @@ function setLogger(self) {
 
 function noop() {}
 
-},{"./cache":20,"./compile":24,"./compile/async":21,"./compile/error_classes":22,"./compile/formats":23,"./compile/resolve":25,"./compile/rules":26,"./compile/schema_obj":27,"./compile/util":29,"./data":30,"./keyword":58,"./refs/data.json":59,"./refs/json-schema-draft-07.json":60,"fast-json-stable-stringify":104}],20:[function(require,module,exports){
+},{"./cache":22,"./compile":26,"./compile/async":23,"./compile/error_classes":24,"./compile/formats":25,"./compile/resolve":27,"./compile/rules":28,"./compile/schema_obj":29,"./compile/util":31,"./data":32,"./keyword":60,"./refs/data.json":61,"./refs/json-schema-draft-07.json":62,"fast-json-stable-stringify":98}],22:[function(require,module,exports){
 'use strict';
 
 
@@ -7828,7 +9057,7 @@ Cache.prototype.clear = function Cache_clear() {
   this._cache = {};
 };
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 var MissingRefError = require('./error_classes').MissingRef;
@@ -7920,7 +9149,7 @@ function compileAsync(schema, meta, callback) {
   }
 }
 
-},{"./error_classes":22}],22:[function(require,module,exports){
+},{"./error_classes":24}],24:[function(require,module,exports){
 'use strict';
 
 var resolve = require('./resolve');
@@ -7956,7 +9185,7 @@ function errorSubclass(Subclass) {
   return Subclass;
 }
 
-},{"./resolve":25}],23:[function(require,module,exports){
+},{"./resolve":27}],25:[function(require,module,exports){
 'use strict';
 
 var util = require('./util');
@@ -8100,7 +9329,7 @@ function regex(str) {
   }
 }
 
-},{"./util":29}],24:[function(require,module,exports){
+},{"./util":31}],26:[function(require,module,exports){
 'use strict';
 
 var resolve = require('./resolve')
@@ -8489,7 +9718,7 @@ function vars(arr, statement) {
   return code;
 }
 
-},{"../dotjs/validate":57,"./error_classes":22,"./resolve":25,"./util":29,"fast-deep-equal":103,"fast-json-stable-stringify":104}],25:[function(require,module,exports){
+},{"../dotjs/validate":59,"./error_classes":24,"./resolve":27,"./util":31,"fast-deep-equal":97,"fast-json-stable-stringify":98}],27:[function(require,module,exports){
 'use strict';
 
 var URI = require('uri-js')
@@ -8761,7 +9990,7 @@ function resolveIds(schema) {
   return localRefs;
 }
 
-},{"./schema_obj":27,"./util":29,"fast-deep-equal":103,"json-schema-traverse":111,"uri-js":178}],26:[function(require,module,exports){
+},{"./schema_obj":29,"./util":31,"fast-deep-equal":97,"json-schema-traverse":101,"uri-js":143}],28:[function(require,module,exports){
 'use strict';
 
 var ruleModules = require('../dotjs')
@@ -8829,7 +10058,7 @@ module.exports = function rules() {
   return RULES;
 };
 
-},{"../dotjs":46,"./util":29}],27:[function(require,module,exports){
+},{"../dotjs":48,"./util":31}],29:[function(require,module,exports){
 'use strict';
 
 var util = require('./util');
@@ -8840,7 +10069,7 @@ function SchemaObject(obj) {
   util.copy(obj, this);
 }
 
-},{"./util":29}],28:[function(require,module,exports){
+},{"./util":31}],30:[function(require,module,exports){
 'use strict';
 
 // https://mathiasbynens.be/notes/javascript-encoding
@@ -8862,7 +10091,7 @@ module.exports = function ucs2length(str) {
   return length;
 };
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 
@@ -9138,7 +10367,7 @@ function unescapeJsonPointer(str) {
   return str.replace(/~1/g, '/').replace(/~0/g, '~');
 }
 
-},{"./ucs2length":28,"fast-deep-equal":103}],30:[function(require,module,exports){
+},{"./ucs2length":30,"fast-deep-equal":97}],32:[function(require,module,exports){
 'use strict';
 
 var KEYWORDS = [
@@ -9189,7 +10418,7 @@ module.exports = function (metaSchema, keywordsJsonPointers) {
   return metaSchema;
 };
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 var metaSchema = require('./refs/json-schema-draft-07.json');
@@ -9228,7 +10457,7 @@ module.exports = {
   }
 };
 
-},{"./refs/json-schema-draft-07.json":60}],32:[function(require,module,exports){
+},{"./refs/json-schema-draft-07.json":62}],34:[function(require,module,exports){
 'use strict';
 module.exports = function generate__limit(it, $keyword, $ruleType) {
   var out = ' ';
@@ -9387,7 +10616,7 @@ module.exports = function generate__limit(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 module.exports = function generate__limitItems(it, $keyword, $ruleType) {
   var out = ' ';
@@ -9466,7 +10695,7 @@ module.exports = function generate__limitItems(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 module.exports = function generate__limitLength(it, $keyword, $ruleType) {
   var out = ' ';
@@ -9550,7 +10779,7 @@ module.exports = function generate__limitLength(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 module.exports = function generate__limitProperties(it, $keyword, $ruleType) {
   var out = ' ';
@@ -9629,7 +10858,7 @@ module.exports = function generate__limitProperties(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict';
 module.exports = function generate_allOf(it, $keyword, $ruleType) {
   var out = ' ';
@@ -9674,7 +10903,7 @@ module.exports = function generate_allOf(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 module.exports = function generate_anyOf(it, $keyword, $ruleType) {
   var out = ' ';
@@ -9750,7 +10979,7 @@ module.exports = function generate_anyOf(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 module.exports = function generate_comment(it, $keyword, $ruleType) {
   var out = ' ';
@@ -9766,7 +10995,7 @@ module.exports = function generate_comment(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 module.exports = function generate_const(it, $keyword, $ruleType) {
   var out = ' ';
@@ -9824,7 +11053,7 @@ module.exports = function generate_const(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 module.exports = function generate_contains(it, $keyword, $ruleType) {
   var out = ' ';
@@ -9908,7 +11137,7 @@ module.exports = function generate_contains(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],41:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict';
 module.exports = function generate_custom(it, $keyword, $ruleType) {
   var out = ' ';
@@ -10138,7 +11367,7 @@ module.exports = function generate_custom(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 'use strict';
 module.exports = function generate_dependencies(it, $keyword, $ruleType) {
   var out = ' ';
@@ -10308,7 +11537,7 @@ module.exports = function generate_dependencies(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 'use strict';
 module.exports = function generate_enum(it, $keyword, $ruleType) {
   var out = ' ';
@@ -10376,7 +11605,7 @@ module.exports = function generate_enum(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict';
 module.exports = function generate_format(it, $keyword, $ruleType) {
   var out = ' ';
@@ -10528,7 +11757,7 @@ module.exports = function generate_format(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 module.exports = function generate_if(it, $keyword, $ruleType) {
   var out = ' ';
@@ -10634,7 +11863,7 @@ module.exports = function generate_if(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 
 //all requires must be explicit because browserify won't work with dynamic requires
@@ -10669,7 +11898,7 @@ module.exports = {
   validate: require('./validate')
 };
 
-},{"./_limit":32,"./_limitItems":33,"./_limitLength":34,"./_limitProperties":35,"./allOf":36,"./anyOf":37,"./comment":38,"./const":39,"./contains":40,"./dependencies":42,"./enum":43,"./format":44,"./if":45,"./items":47,"./multipleOf":48,"./not":49,"./oneOf":50,"./pattern":51,"./properties":52,"./propertyNames":53,"./ref":54,"./required":55,"./uniqueItems":56,"./validate":57}],47:[function(require,module,exports){
+},{"./_limit":34,"./_limitItems":35,"./_limitLength":36,"./_limitProperties":37,"./allOf":38,"./anyOf":39,"./comment":40,"./const":41,"./contains":42,"./dependencies":44,"./enum":45,"./format":46,"./if":47,"./items":49,"./multipleOf":50,"./not":51,"./oneOf":52,"./pattern":53,"./properties":54,"./propertyNames":55,"./ref":56,"./required":57,"./uniqueItems":58,"./validate":59}],49:[function(require,module,exports){
 'use strict';
 module.exports = function generate_items(it, $keyword, $ruleType) {
   var out = ' ';
@@ -10812,7 +12041,7 @@ module.exports = function generate_items(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict';
 module.exports = function generate_multipleOf(it, $keyword, $ruleType) {
   var out = ' ';
@@ -10891,7 +12120,7 @@ module.exports = function generate_multipleOf(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict';
 module.exports = function generate_not(it, $keyword, $ruleType) {
   var out = ' ';
@@ -10977,7 +12206,7 @@ module.exports = function generate_not(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],50:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict';
 module.exports = function generate_oneOf(it, $keyword, $ruleType) {
   var out = ' ';
@@ -11052,7 +12281,7 @@ module.exports = function generate_oneOf(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 module.exports = function generate_pattern(it, $keyword, $ruleType) {
   var out = ' ';
@@ -11129,7 +12358,7 @@ module.exports = function generate_pattern(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 'use strict';
 module.exports = function generate_properties(it, $keyword, $ruleType) {
   var out = ' ';
@@ -11461,7 +12690,7 @@ module.exports = function generate_properties(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 module.exports = function generate_propertyNames(it, $keyword, $ruleType) {
   var out = ' ';
@@ -11545,7 +12774,7 @@ module.exports = function generate_propertyNames(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict';
 module.exports = function generate_ref(it, $keyword, $ruleType) {
   var out = ' ';
@@ -11671,7 +12900,7 @@ module.exports = function generate_ref(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 module.exports = function generate_required(it, $keyword, $ruleType) {
   var out = ' ';
@@ -11943,7 +13172,7 @@ module.exports = function generate_required(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 module.exports = function generate_uniqueItems(it, $keyword, $ruleType) {
   var out = ' ';
@@ -12031,7 +13260,7 @@ module.exports = function generate_uniqueItems(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 module.exports = function generate_validate(it, $keyword, $ruleType) {
   var out = '';
@@ -12527,7 +13756,7 @@ module.exports = function generate_validate(it, $keyword, $ruleType) {
   return out;
 }
 
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 var IDENTIFIER = /^[a-z_$][a-z0-9_$-]*$/i;
@@ -12675,7 +13904,7 @@ function validateKeyword(definition, throwError) {
     return false;
 }
 
-},{"./definition_schema":31,"./dotjs/custom":41}],59:[function(require,module,exports){
+},{"./definition_schema":33,"./dotjs/custom":43}],61:[function(require,module,exports){
 module.exports={
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/data.json#",
@@ -12694,7 +13923,7 @@ module.exports={
     "additionalProperties": false
 }
 
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 module.exports={
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "http://json-schema.org/draft-07/schema#",
@@ -12864,41 +14093,9 @@ module.exports={
     "default": true
 }
 
-},{}],61:[function(require,module,exports){
-(function (process,setImmediate){
-module.exports = function (arr, iterator, callback) {
-  callback = callback || function () {};
-  if (!Array.isArray(arr) || !arr.length) {
-      return callback();
-  }
-  var completed = 0;
-  var iterate = function () {
-    iterator(arr[completed], function (err) {
-      if (err) {
-        callback(err);
-        callback = function () {};
-      }
-      else {
-        ++completed;
-        if (completed >= arr.length) { callback(); }
-        else { nextTick(iterate); }
-      }
-    });
-  };
-  iterate();
-};
-
-function nextTick (cb) {
-  if (typeof setImmediate === 'function') {
-    setImmediate(cb);
-  } else {
-    process.nextTick(cb);
-  }
-}
-}).call(this,require('_process'),require("timers").setImmediate)
-},{"_process":142,"timers":93}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 module.exports = require('./lib/axios');
-},{"./lib/axios":64}],63:[function(require,module,exports){
+},{"./lib/axios":65}],64:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -13080,7 +14277,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"../core/buildFullPath":70,"../core/createError":71,"./../core/settle":75,"./../helpers/buildURL":79,"./../helpers/cookies":81,"./../helpers/isURLSameOrigin":83,"./../helpers/parseHeaders":85,"./../utils":87}],64:[function(require,module,exports){
+},{"../core/buildFullPath":71,"../core/createError":72,"./../core/settle":76,"./../helpers/buildURL":80,"./../helpers/cookies":82,"./../helpers/isURLSameOrigin":84,"./../helpers/parseHeaders":86,"./../utils":88}],65:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -13135,7 +14332,7 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./cancel/Cancel":65,"./cancel/CancelToken":66,"./cancel/isCancel":67,"./core/Axios":68,"./core/mergeConfig":74,"./defaults":77,"./helpers/bind":78,"./helpers/spread":86,"./utils":87}],65:[function(require,module,exports){
+},{"./cancel/Cancel":66,"./cancel/CancelToken":67,"./cancel/isCancel":68,"./core/Axios":69,"./core/mergeConfig":75,"./defaults":78,"./helpers/bind":79,"./helpers/spread":87,"./utils":88}],66:[function(require,module,exports){
 'use strict';
 
 /**
@@ -13156,7 +14353,7 @@ Cancel.prototype.__CANCEL__ = true;
 
 module.exports = Cancel;
 
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 'use strict';
 
 var Cancel = require('./Cancel');
@@ -13215,14 +14412,14 @@ CancelToken.source = function source() {
 
 module.exports = CancelToken;
 
-},{"./Cancel":65}],67:[function(require,module,exports){
+},{"./Cancel":66}],68:[function(require,module,exports){
 'use strict';
 
 module.exports = function isCancel(value) {
   return !!(value && value.__CANCEL__);
 };
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -13318,7 +14515,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"../helpers/buildURL":79,"./../utils":87,"./InterceptorManager":69,"./dispatchRequest":72,"./mergeConfig":74}],69:[function(require,module,exports){
+},{"../helpers/buildURL":80,"./../utils":88,"./InterceptorManager":70,"./dispatchRequest":73,"./mergeConfig":75}],70:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -13372,7 +14569,7 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":87}],70:[function(require,module,exports){
+},{"./../utils":88}],71:[function(require,module,exports){
 'use strict';
 
 var isAbsoluteURL = require('../helpers/isAbsoluteURL');
@@ -13394,7 +14591,7 @@ module.exports = function buildFullPath(baseURL, requestedURL) {
   return requestedURL;
 };
 
-},{"../helpers/combineURLs":80,"../helpers/isAbsoluteURL":82}],71:[function(require,module,exports){
+},{"../helpers/combineURLs":81,"../helpers/isAbsoluteURL":83}],72:[function(require,module,exports){
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -13414,7 +14611,7 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":73}],72:[function(require,module,exports){
+},{"./enhanceError":74}],73:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -13495,7 +14692,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"../cancel/isCancel":67,"../defaults":77,"./../utils":87,"./transformData":76}],73:[function(require,module,exports){
+},{"../cancel/isCancel":68,"../defaults":78,"./../utils":88,"./transformData":77}],74:[function(require,module,exports){
 'use strict';
 
 /**
@@ -13539,7 +14736,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -13614,7 +14811,7 @@ module.exports = function mergeConfig(config1, config2) {
   return config;
 };
 
-},{"../utils":87}],75:[function(require,module,exports){
+},{"../utils":88}],76:[function(require,module,exports){
 'use strict';
 
 var createError = require('./createError');
@@ -13641,7 +14838,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":71}],76:[function(require,module,exports){
+},{"./createError":72}],77:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -13663,7 +14860,7 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":87}],77:[function(require,module,exports){
+},{"./../utils":88}],78:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -13764,7 +14961,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 module.exports = defaults;
 
 }).call(this,require('_process'))
-},{"./adapters/http":63,"./adapters/xhr":63,"./helpers/normalizeHeaderName":84,"./utils":87,"_process":142}],78:[function(require,module,exports){
+},{"./adapters/http":64,"./adapters/xhr":64,"./helpers/normalizeHeaderName":85,"./utils":88,"_process":157}],79:[function(require,module,exports){
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -13777,7 +14974,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -13850,7 +15047,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":87}],80:[function(require,module,exports){
+},{"./../utils":88}],81:[function(require,module,exports){
 'use strict';
 
 /**
@@ -13866,7 +15063,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -13921,7 +15118,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":87}],82:[function(require,module,exports){
+},{"./../utils":88}],83:[function(require,module,exports){
 'use strict';
 
 /**
@@ -13937,7 +15134,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],83:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -14007,7 +15204,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":87}],84:[function(require,module,exports){
+},{"./../utils":88}],85:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -14021,7 +15218,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":87}],85:[function(require,module,exports){
+},{"../utils":88}],86:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -14076,7 +15273,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":87}],86:[function(require,module,exports){
+},{"./../utils":88}],87:[function(require,module,exports){
 'use strict';
 
 /**
@@ -14105,7 +15302,7 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],87:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 'use strict';
 
 var bind = require('./helpers/bind');
@@ -14451,3196 +15648,7 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":78}],88:[function(require,module,exports){
-'use strict'
-
-exports.byteLength = byteLength
-exports.toByteArray = toByteArray
-exports.fromByteArray = fromByteArray
-
-var lookup = []
-var revLookup = []
-var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
-
-var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-for (var i = 0, len = code.length; i < len; ++i) {
-  lookup[i] = code[i]
-  revLookup[code.charCodeAt(i)] = i
-}
-
-// Support decoding URL-safe base64 strings, as Node.js does.
-// See: https://en.wikipedia.org/wiki/Base64#URL_applications
-revLookup['-'.charCodeAt(0)] = 62
-revLookup['_'.charCodeAt(0)] = 63
-
-function getLens (b64) {
-  var len = b64.length
-
-  if (len % 4 > 0) {
-    throw new Error('Invalid string. Length must be a multiple of 4')
-  }
-
-  // Trim off extra bytes after placeholder bytes are found
-  // See: https://github.com/beatgammit/base64-js/issues/42
-  var validLen = b64.indexOf('=')
-  if (validLen === -1) validLen = len
-
-  var placeHoldersLen = validLen === len
-    ? 0
-    : 4 - (validLen % 4)
-
-  return [validLen, placeHoldersLen]
-}
-
-// base64 is 4/3 + up to two characters of the original data
-function byteLength (b64) {
-  var lens = getLens(b64)
-  var validLen = lens[0]
-  var placeHoldersLen = lens[1]
-  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
-}
-
-function _byteLength (b64, validLen, placeHoldersLen) {
-  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
-}
-
-function toByteArray (b64) {
-  var tmp
-  var lens = getLens(b64)
-  var validLen = lens[0]
-  var placeHoldersLen = lens[1]
-
-  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
-
-  var curByte = 0
-
-  // if there are placeholders, only get up to the last complete 4 chars
-  var len = placeHoldersLen > 0
-    ? validLen - 4
-    : validLen
-
-  var i
-  for (i = 0; i < len; i += 4) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 18) |
-      (revLookup[b64.charCodeAt(i + 1)] << 12) |
-      (revLookup[b64.charCodeAt(i + 2)] << 6) |
-      revLookup[b64.charCodeAt(i + 3)]
-    arr[curByte++] = (tmp >> 16) & 0xFF
-    arr[curByte++] = (tmp >> 8) & 0xFF
-    arr[curByte++] = tmp & 0xFF
-  }
-
-  if (placeHoldersLen === 2) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 2) |
-      (revLookup[b64.charCodeAt(i + 1)] >> 4)
-    arr[curByte++] = tmp & 0xFF
-  }
-
-  if (placeHoldersLen === 1) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 10) |
-      (revLookup[b64.charCodeAt(i + 1)] << 4) |
-      (revLookup[b64.charCodeAt(i + 2)] >> 2)
-    arr[curByte++] = (tmp >> 8) & 0xFF
-    arr[curByte++] = tmp & 0xFF
-  }
-
-  return arr
-}
-
-function tripletToBase64 (num) {
-  return lookup[num >> 18 & 0x3F] +
-    lookup[num >> 12 & 0x3F] +
-    lookup[num >> 6 & 0x3F] +
-    lookup[num & 0x3F]
-}
-
-function encodeChunk (uint8, start, end) {
-  var tmp
-  var output = []
-  for (var i = start; i < end; i += 3) {
-    tmp =
-      ((uint8[i] << 16) & 0xFF0000) +
-      ((uint8[i + 1] << 8) & 0xFF00) +
-      (uint8[i + 2] & 0xFF)
-    output.push(tripletToBase64(tmp))
-  }
-  return output.join('')
-}
-
-function fromByteArray (uint8) {
-  var tmp
-  var len = uint8.length
-  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  var parts = []
-  var maxChunkLength = 16383 // must be multiple of 3
-
-  // go through the array every three bytes, we'll deal with trailing stuff later
-  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(
-      uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
-    ))
-  }
-
-  // pad the end with zeros, but make sure to not forget the extra bytes
-  if (extraBytes === 1) {
-    tmp = uint8[len - 1]
-    parts.push(
-      lookup[tmp >> 2] +
-      lookup[(tmp << 4) & 0x3F] +
-      '=='
-    )
-  } else if (extraBytes === 2) {
-    tmp = (uint8[len - 2] << 8) + uint8[len - 1]
-    parts.push(
-      lookup[tmp >> 10] +
-      lookup[(tmp >> 4) & 0x3F] +
-      lookup[(tmp << 2) & 0x3F] +
-      '='
-    )
-  }
-
-  return parts.join('')
-}
-
-},{}],89:[function(require,module,exports){
-
-},{}],90:[function(require,module,exports){
-(function (Buffer){
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-/* eslint-disable no-proto */
-
-'use strict'
-
-var base64 = require('base64-js')
-var ieee754 = require('ieee754')
-
-exports.Buffer = Buffer
-exports.SlowBuffer = SlowBuffer
-exports.INSPECT_MAX_BYTES = 50
-
-var K_MAX_LENGTH = 0x7fffffff
-exports.kMaxLength = K_MAX_LENGTH
-
-/**
- * If `Buffer.TYPED_ARRAY_SUPPORT`:
- *   === true    Use Uint8Array implementation (fastest)
- *   === false   Print warning and recommend using `buffer` v4.x which has an Object
- *               implementation (most compatible, even IE6)
- *
- * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
- * Opera 11.6+, iOS 4.2+.
- *
- * We report that the browser does not support typed arrays if the are not subclassable
- * using __proto__. Firefox 4-29 lacks support for adding new properties to `Uint8Array`
- * (See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438). IE 10 lacks support
- * for __proto__ and has a buggy typed array implementation.
- */
-Buffer.TYPED_ARRAY_SUPPORT = typedArraySupport()
-
-if (!Buffer.TYPED_ARRAY_SUPPORT && typeof console !== 'undefined' &&
-    typeof console.error === 'function') {
-  console.error(
-    'This browser lacks typed array (Uint8Array) support which is required by ' +
-    '`buffer` v5.x. Use `buffer` v4.x if you require old browser support.'
-  )
-}
-
-function typedArraySupport () {
-  // Can typed array instances can be augmented?
-  try {
-    var arr = new Uint8Array(1)
-    arr.__proto__ = { __proto__: Uint8Array.prototype, foo: function () { return 42 } }
-    return arr.foo() === 42
-  } catch (e) {
-    return false
-  }
-}
-
-Object.defineProperty(Buffer.prototype, 'parent', {
-  enumerable: true,
-  get: function () {
-    if (!Buffer.isBuffer(this)) return undefined
-    return this.buffer
-  }
-})
-
-Object.defineProperty(Buffer.prototype, 'offset', {
-  enumerable: true,
-  get: function () {
-    if (!Buffer.isBuffer(this)) return undefined
-    return this.byteOffset
-  }
-})
-
-function createBuffer (length) {
-  if (length > K_MAX_LENGTH) {
-    throw new RangeError('The value "' + length + '" is invalid for option "size"')
-  }
-  // Return an augmented `Uint8Array` instance
-  var buf = new Uint8Array(length)
-  buf.__proto__ = Buffer.prototype
-  return buf
-}
-
-/**
- * The Buffer constructor returns instances of `Uint8Array` that have their
- * prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
- * `Uint8Array`, so the returned instances will have all the node `Buffer` methods
- * and the `Uint8Array` methods. Square bracket notation works as expected -- it
- * returns a single octet.
- *
- * The `Uint8Array` prototype remains unmodified.
- */
-
-function Buffer (arg, encodingOrOffset, length) {
-  // Common case.
-  if (typeof arg === 'number') {
-    if (typeof encodingOrOffset === 'string') {
-      throw new TypeError(
-        'The "string" argument must be of type string. Received type number'
-      )
-    }
-    return allocUnsafe(arg)
-  }
-  return from(arg, encodingOrOffset, length)
-}
-
-// Fix subarray() in ES2016. See: https://github.com/feross/buffer/pull/97
-if (typeof Symbol !== 'undefined' && Symbol.species != null &&
-    Buffer[Symbol.species] === Buffer) {
-  Object.defineProperty(Buffer, Symbol.species, {
-    value: null,
-    configurable: true,
-    enumerable: false,
-    writable: false
-  })
-}
-
-Buffer.poolSize = 8192 // not used by this implementation
-
-function from (value, encodingOrOffset, length) {
-  if (typeof value === 'string') {
-    return fromString(value, encodingOrOffset)
-  }
-
-  if (ArrayBuffer.isView(value)) {
-    return fromArrayLike(value)
-  }
-
-  if (value == null) {
-    throw TypeError(
-      'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
-      'or Array-like Object. Received type ' + (typeof value)
-    )
-  }
-
-  if (isInstance(value, ArrayBuffer) ||
-      (value && isInstance(value.buffer, ArrayBuffer))) {
-    return fromArrayBuffer(value, encodingOrOffset, length)
-  }
-
-  if (typeof value === 'number') {
-    throw new TypeError(
-      'The "value" argument must not be of type number. Received type number'
-    )
-  }
-
-  var valueOf = value.valueOf && value.valueOf()
-  if (valueOf != null && valueOf !== value) {
-    return Buffer.from(valueOf, encodingOrOffset, length)
-  }
-
-  var b = fromObject(value)
-  if (b) return b
-
-  if (typeof Symbol !== 'undefined' && Symbol.toPrimitive != null &&
-      typeof value[Symbol.toPrimitive] === 'function') {
-    return Buffer.from(
-      value[Symbol.toPrimitive]('string'), encodingOrOffset, length
-    )
-  }
-
-  throw new TypeError(
-    'The first argument must be one of type string, Buffer, ArrayBuffer, Array, ' +
-    'or Array-like Object. Received type ' + (typeof value)
-  )
-}
-
-/**
- * Functionally equivalent to Buffer(arg, encoding) but throws a TypeError
- * if value is a number.
- * Buffer.from(str[, encoding])
- * Buffer.from(array)
- * Buffer.from(buffer)
- * Buffer.from(arrayBuffer[, byteOffset[, length]])
- **/
-Buffer.from = function (value, encodingOrOffset, length) {
-  return from(value, encodingOrOffset, length)
-}
-
-// Note: Change prototype *after* Buffer.from is defined to workaround Chrome bug:
-// https://github.com/feross/buffer/pull/148
-Buffer.prototype.__proto__ = Uint8Array.prototype
-Buffer.__proto__ = Uint8Array
-
-function assertSize (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('"size" argument must be of type number')
-  } else if (size < 0) {
-    throw new RangeError('The value "' + size + '" is invalid for option "size"')
-  }
-}
-
-function alloc (size, fill, encoding) {
-  assertSize(size)
-  if (size <= 0) {
-    return createBuffer(size)
-  }
-  if (fill !== undefined) {
-    // Only pay attention to encoding if it's a string. This
-    // prevents accidentally sending in a number that would
-    // be interpretted as a start offset.
-    return typeof encoding === 'string'
-      ? createBuffer(size).fill(fill, encoding)
-      : createBuffer(size).fill(fill)
-  }
-  return createBuffer(size)
-}
-
-/**
- * Creates a new filled Buffer instance.
- * alloc(size[, fill[, encoding]])
- **/
-Buffer.alloc = function (size, fill, encoding) {
-  return alloc(size, fill, encoding)
-}
-
-function allocUnsafe (size) {
-  assertSize(size)
-  return createBuffer(size < 0 ? 0 : checked(size) | 0)
-}
-
-/**
- * Equivalent to Buffer(num), by default creates a non-zero-filled Buffer instance.
- * */
-Buffer.allocUnsafe = function (size) {
-  return allocUnsafe(size)
-}
-/**
- * Equivalent to SlowBuffer(num), by default creates a non-zero-filled Buffer instance.
- */
-Buffer.allocUnsafeSlow = function (size) {
-  return allocUnsafe(size)
-}
-
-function fromString (string, encoding) {
-  if (typeof encoding !== 'string' || encoding === '') {
-    encoding = 'utf8'
-  }
-
-  if (!Buffer.isEncoding(encoding)) {
-    throw new TypeError('Unknown encoding: ' + encoding)
-  }
-
-  var length = byteLength(string, encoding) | 0
-  var buf = createBuffer(length)
-
-  var actual = buf.write(string, encoding)
-
-  if (actual !== length) {
-    // Writing a hex string, for example, that contains invalid characters will
-    // cause everything after the first invalid character to be ignored. (e.g.
-    // 'abxxcd' will be treated as 'ab')
-    buf = buf.slice(0, actual)
-  }
-
-  return buf
-}
-
-function fromArrayLike (array) {
-  var length = array.length < 0 ? 0 : checked(array.length) | 0
-  var buf = createBuffer(length)
-  for (var i = 0; i < length; i += 1) {
-    buf[i] = array[i] & 255
-  }
-  return buf
-}
-
-function fromArrayBuffer (array, byteOffset, length) {
-  if (byteOffset < 0 || array.byteLength < byteOffset) {
-    throw new RangeError('"offset" is outside of buffer bounds')
-  }
-
-  if (array.byteLength < byteOffset + (length || 0)) {
-    throw new RangeError('"length" is outside of buffer bounds')
-  }
-
-  var buf
-  if (byteOffset === undefined && length === undefined) {
-    buf = new Uint8Array(array)
-  } else if (length === undefined) {
-    buf = new Uint8Array(array, byteOffset)
-  } else {
-    buf = new Uint8Array(array, byteOffset, length)
-  }
-
-  // Return an augmented `Uint8Array` instance
-  buf.__proto__ = Buffer.prototype
-  return buf
-}
-
-function fromObject (obj) {
-  if (Buffer.isBuffer(obj)) {
-    var len = checked(obj.length) | 0
-    var buf = createBuffer(len)
-
-    if (buf.length === 0) {
-      return buf
-    }
-
-    obj.copy(buf, 0, 0, len)
-    return buf
-  }
-
-  if (obj.length !== undefined) {
-    if (typeof obj.length !== 'number' || numberIsNaN(obj.length)) {
-      return createBuffer(0)
-    }
-    return fromArrayLike(obj)
-  }
-
-  if (obj.type === 'Buffer' && Array.isArray(obj.data)) {
-    return fromArrayLike(obj.data)
-  }
-}
-
-function checked (length) {
-  // Note: cannot use `length < K_MAX_LENGTH` here because that fails when
-  // length is NaN (which is otherwise coerced to zero.)
-  if (length >= K_MAX_LENGTH) {
-    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
-                         'size: 0x' + K_MAX_LENGTH.toString(16) + ' bytes')
-  }
-  return length | 0
-}
-
-function SlowBuffer (length) {
-  if (+length != length) { // eslint-disable-line eqeqeq
-    length = 0
-  }
-  return Buffer.alloc(+length)
-}
-
-Buffer.isBuffer = function isBuffer (b) {
-  return b != null && b._isBuffer === true &&
-    b !== Buffer.prototype // so Buffer.isBuffer(Buffer.prototype) will be false
-}
-
-Buffer.compare = function compare (a, b) {
-  if (isInstance(a, Uint8Array)) a = Buffer.from(a, a.offset, a.byteLength)
-  if (isInstance(b, Uint8Array)) b = Buffer.from(b, b.offset, b.byteLength)
-  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
-    throw new TypeError(
-      'The "buf1", "buf2" arguments must be one of type Buffer or Uint8Array'
-    )
-  }
-
-  if (a === b) return 0
-
-  var x = a.length
-  var y = b.length
-
-  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
-    if (a[i] !== b[i]) {
-      x = a[i]
-      y = b[i]
-      break
-    }
-  }
-
-  if (x < y) return -1
-  if (y < x) return 1
-  return 0
-}
-
-Buffer.isEncoding = function isEncoding (encoding) {
-  switch (String(encoding).toLowerCase()) {
-    case 'hex':
-    case 'utf8':
-    case 'utf-8':
-    case 'ascii':
-    case 'latin1':
-    case 'binary':
-    case 'base64':
-    case 'ucs2':
-    case 'ucs-2':
-    case 'utf16le':
-    case 'utf-16le':
-      return true
-    default:
-      return false
-  }
-}
-
-Buffer.concat = function concat (list, length) {
-  if (!Array.isArray(list)) {
-    throw new TypeError('"list" argument must be an Array of Buffers')
-  }
-
-  if (list.length === 0) {
-    return Buffer.alloc(0)
-  }
-
-  var i
-  if (length === undefined) {
-    length = 0
-    for (i = 0; i < list.length; ++i) {
-      length += list[i].length
-    }
-  }
-
-  var buffer = Buffer.allocUnsafe(length)
-  var pos = 0
-  for (i = 0; i < list.length; ++i) {
-    var buf = list[i]
-    if (isInstance(buf, Uint8Array)) {
-      buf = Buffer.from(buf)
-    }
-    if (!Buffer.isBuffer(buf)) {
-      throw new TypeError('"list" argument must be an Array of Buffers')
-    }
-    buf.copy(buffer, pos)
-    pos += buf.length
-  }
-  return buffer
-}
-
-function byteLength (string, encoding) {
-  if (Buffer.isBuffer(string)) {
-    return string.length
-  }
-  if (ArrayBuffer.isView(string) || isInstance(string, ArrayBuffer)) {
-    return string.byteLength
-  }
-  if (typeof string !== 'string') {
-    throw new TypeError(
-      'The "string" argument must be one of type string, Buffer, or ArrayBuffer. ' +
-      'Received type ' + typeof string
-    )
-  }
-
-  var len = string.length
-  var mustMatch = (arguments.length > 2 && arguments[2] === true)
-  if (!mustMatch && len === 0) return 0
-
-  // Use a for loop to avoid recursion
-  var loweredCase = false
-  for (;;) {
-    switch (encoding) {
-      case 'ascii':
-      case 'latin1':
-      case 'binary':
-        return len
-      case 'utf8':
-      case 'utf-8':
-        return utf8ToBytes(string).length
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return len * 2
-      case 'hex':
-        return len >>> 1
-      case 'base64':
-        return base64ToBytes(string).length
-      default:
-        if (loweredCase) {
-          return mustMatch ? -1 : utf8ToBytes(string).length // assume utf8
-        }
-        encoding = ('' + encoding).toLowerCase()
-        loweredCase = true
-    }
-  }
-}
-Buffer.byteLength = byteLength
-
-function slowToString (encoding, start, end) {
-  var loweredCase = false
-
-  // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
-  // property of a typed array.
-
-  // This behaves neither like String nor Uint8Array in that we set start/end
-  // to their upper/lower bounds if the value passed is out of range.
-  // undefined is handled specially as per ECMA-262 6th Edition,
-  // Section 13.3.3.7 Runtime Semantics: KeyedBindingInitialization.
-  if (start === undefined || start < 0) {
-    start = 0
-  }
-  // Return early if start > this.length. Done here to prevent potential uint32
-  // coercion fail below.
-  if (start > this.length) {
-    return ''
-  }
-
-  if (end === undefined || end > this.length) {
-    end = this.length
-  }
-
-  if (end <= 0) {
-    return ''
-  }
-
-  // Force coersion to uint32. This will also coerce falsey/NaN values to 0.
-  end >>>= 0
-  start >>>= 0
-
-  if (end <= start) {
-    return ''
-  }
-
-  if (!encoding) encoding = 'utf8'
-
-  while (true) {
-    switch (encoding) {
-      case 'hex':
-        return hexSlice(this, start, end)
-
-      case 'utf8':
-      case 'utf-8':
-        return utf8Slice(this, start, end)
-
-      case 'ascii':
-        return asciiSlice(this, start, end)
-
-      case 'latin1':
-      case 'binary':
-        return latin1Slice(this, start, end)
-
-      case 'base64':
-        return base64Slice(this, start, end)
-
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return utf16leSlice(this, start, end)
-
-      default:
-        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
-        encoding = (encoding + '').toLowerCase()
-        loweredCase = true
-    }
-  }
-}
-
-// This property is used by `Buffer.isBuffer` (and the `is-buffer` npm package)
-// to detect a Buffer instance. It's not possible to use `instanceof Buffer`
-// reliably in a browserify context because there could be multiple different
-// copies of the 'buffer' package in use. This method works even for Buffer
-// instances that were created from another copy of the `buffer` package.
-// See: https://github.com/feross/buffer/issues/154
-Buffer.prototype._isBuffer = true
-
-function swap (b, n, m) {
-  var i = b[n]
-  b[n] = b[m]
-  b[m] = i
-}
-
-Buffer.prototype.swap16 = function swap16 () {
-  var len = this.length
-  if (len % 2 !== 0) {
-    throw new RangeError('Buffer size must be a multiple of 16-bits')
-  }
-  for (var i = 0; i < len; i += 2) {
-    swap(this, i, i + 1)
-  }
-  return this
-}
-
-Buffer.prototype.swap32 = function swap32 () {
-  var len = this.length
-  if (len % 4 !== 0) {
-    throw new RangeError('Buffer size must be a multiple of 32-bits')
-  }
-  for (var i = 0; i < len; i += 4) {
-    swap(this, i, i + 3)
-    swap(this, i + 1, i + 2)
-  }
-  return this
-}
-
-Buffer.prototype.swap64 = function swap64 () {
-  var len = this.length
-  if (len % 8 !== 0) {
-    throw new RangeError('Buffer size must be a multiple of 64-bits')
-  }
-  for (var i = 0; i < len; i += 8) {
-    swap(this, i, i + 7)
-    swap(this, i + 1, i + 6)
-    swap(this, i + 2, i + 5)
-    swap(this, i + 3, i + 4)
-  }
-  return this
-}
-
-Buffer.prototype.toString = function toString () {
-  var length = this.length
-  if (length === 0) return ''
-  if (arguments.length === 0) return utf8Slice(this, 0, length)
-  return slowToString.apply(this, arguments)
-}
-
-Buffer.prototype.toLocaleString = Buffer.prototype.toString
-
-Buffer.prototype.equals = function equals (b) {
-  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
-  if (this === b) return true
-  return Buffer.compare(this, b) === 0
-}
-
-Buffer.prototype.inspect = function inspect () {
-  var str = ''
-  var max = exports.INSPECT_MAX_BYTES
-  str = this.toString('hex', 0, max).replace(/(.{2})/g, '$1 ').trim()
-  if (this.length > max) str += ' ... '
-  return '<Buffer ' + str + '>'
-}
-
-Buffer.prototype.compare = function compare (target, start, end, thisStart, thisEnd) {
-  if (isInstance(target, Uint8Array)) {
-    target = Buffer.from(target, target.offset, target.byteLength)
-  }
-  if (!Buffer.isBuffer(target)) {
-    throw new TypeError(
-      'The "target" argument must be one of type Buffer or Uint8Array. ' +
-      'Received type ' + (typeof target)
-    )
-  }
-
-  if (start === undefined) {
-    start = 0
-  }
-  if (end === undefined) {
-    end = target ? target.length : 0
-  }
-  if (thisStart === undefined) {
-    thisStart = 0
-  }
-  if (thisEnd === undefined) {
-    thisEnd = this.length
-  }
-
-  if (start < 0 || end > target.length || thisStart < 0 || thisEnd > this.length) {
-    throw new RangeError('out of range index')
-  }
-
-  if (thisStart >= thisEnd && start >= end) {
-    return 0
-  }
-  if (thisStart >= thisEnd) {
-    return -1
-  }
-  if (start >= end) {
-    return 1
-  }
-
-  start >>>= 0
-  end >>>= 0
-  thisStart >>>= 0
-  thisEnd >>>= 0
-
-  if (this === target) return 0
-
-  var x = thisEnd - thisStart
-  var y = end - start
-  var len = Math.min(x, y)
-
-  var thisCopy = this.slice(thisStart, thisEnd)
-  var targetCopy = target.slice(start, end)
-
-  for (var i = 0; i < len; ++i) {
-    if (thisCopy[i] !== targetCopy[i]) {
-      x = thisCopy[i]
-      y = targetCopy[i]
-      break
-    }
-  }
-
-  if (x < y) return -1
-  if (y < x) return 1
-  return 0
-}
-
-// Finds either the first index of `val` in `buffer` at offset >= `byteOffset`,
-// OR the last index of `val` in `buffer` at offset <= `byteOffset`.
-//
-// Arguments:
-// - buffer - a Buffer to search
-// - val - a string, Buffer, or number
-// - byteOffset - an index into `buffer`; will be clamped to an int32
-// - encoding - an optional encoding, relevant is val is a string
-// - dir - true for indexOf, false for lastIndexOf
-function bidirectionalIndexOf (buffer, val, byteOffset, encoding, dir) {
-  // Empty buffer means no match
-  if (buffer.length === 0) return -1
-
-  // Normalize byteOffset
-  if (typeof byteOffset === 'string') {
-    encoding = byteOffset
-    byteOffset = 0
-  } else if (byteOffset > 0x7fffffff) {
-    byteOffset = 0x7fffffff
-  } else if (byteOffset < -0x80000000) {
-    byteOffset = -0x80000000
-  }
-  byteOffset = +byteOffset // Coerce to Number.
-  if (numberIsNaN(byteOffset)) {
-    // byteOffset: it it's undefined, null, NaN, "foo", etc, search whole buffer
-    byteOffset = dir ? 0 : (buffer.length - 1)
-  }
-
-  // Normalize byteOffset: negative offsets start from the end of the buffer
-  if (byteOffset < 0) byteOffset = buffer.length + byteOffset
-  if (byteOffset >= buffer.length) {
-    if (dir) return -1
-    else byteOffset = buffer.length - 1
-  } else if (byteOffset < 0) {
-    if (dir) byteOffset = 0
-    else return -1
-  }
-
-  // Normalize val
-  if (typeof val === 'string') {
-    val = Buffer.from(val, encoding)
-  }
-
-  // Finally, search either indexOf (if dir is true) or lastIndexOf
-  if (Buffer.isBuffer(val)) {
-    // Special case: looking for empty string/buffer always fails
-    if (val.length === 0) {
-      return -1
-    }
-    return arrayIndexOf(buffer, val, byteOffset, encoding, dir)
-  } else if (typeof val === 'number') {
-    val = val & 0xFF // Search for a byte value [0-255]
-    if (typeof Uint8Array.prototype.indexOf === 'function') {
-      if (dir) {
-        return Uint8Array.prototype.indexOf.call(buffer, val, byteOffset)
-      } else {
-        return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset)
-      }
-    }
-    return arrayIndexOf(buffer, [ val ], byteOffset, encoding, dir)
-  }
-
-  throw new TypeError('val must be string, number or Buffer')
-}
-
-function arrayIndexOf (arr, val, byteOffset, encoding, dir) {
-  var indexSize = 1
-  var arrLength = arr.length
-  var valLength = val.length
-
-  if (encoding !== undefined) {
-    encoding = String(encoding).toLowerCase()
-    if (encoding === 'ucs2' || encoding === 'ucs-2' ||
-        encoding === 'utf16le' || encoding === 'utf-16le') {
-      if (arr.length < 2 || val.length < 2) {
-        return -1
-      }
-      indexSize = 2
-      arrLength /= 2
-      valLength /= 2
-      byteOffset /= 2
-    }
-  }
-
-  function read (buf, i) {
-    if (indexSize === 1) {
-      return buf[i]
-    } else {
-      return buf.readUInt16BE(i * indexSize)
-    }
-  }
-
-  var i
-  if (dir) {
-    var foundIndex = -1
-    for (i = byteOffset; i < arrLength; i++) {
-      if (read(arr, i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
-        if (foundIndex === -1) foundIndex = i
-        if (i - foundIndex + 1 === valLength) return foundIndex * indexSize
-      } else {
-        if (foundIndex !== -1) i -= i - foundIndex
-        foundIndex = -1
-      }
-    }
-  } else {
-    if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength
-    for (i = byteOffset; i >= 0; i--) {
-      var found = true
-      for (var j = 0; j < valLength; j++) {
-        if (read(arr, i + j) !== read(val, j)) {
-          found = false
-          break
-        }
-      }
-      if (found) return i
-    }
-  }
-
-  return -1
-}
-
-Buffer.prototype.includes = function includes (val, byteOffset, encoding) {
-  return this.indexOf(val, byteOffset, encoding) !== -1
-}
-
-Buffer.prototype.indexOf = function indexOf (val, byteOffset, encoding) {
-  return bidirectionalIndexOf(this, val, byteOffset, encoding, true)
-}
-
-Buffer.prototype.lastIndexOf = function lastIndexOf (val, byteOffset, encoding) {
-  return bidirectionalIndexOf(this, val, byteOffset, encoding, false)
-}
-
-function hexWrite (buf, string, offset, length) {
-  offset = Number(offset) || 0
-  var remaining = buf.length - offset
-  if (!length) {
-    length = remaining
-  } else {
-    length = Number(length)
-    if (length > remaining) {
-      length = remaining
-    }
-  }
-
-  var strLen = string.length
-
-  if (length > strLen / 2) {
-    length = strLen / 2
-  }
-  for (var i = 0; i < length; ++i) {
-    var parsed = parseInt(string.substr(i * 2, 2), 16)
-    if (numberIsNaN(parsed)) return i
-    buf[offset + i] = parsed
-  }
-  return i
-}
-
-function utf8Write (buf, string, offset, length) {
-  return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
-}
-
-function asciiWrite (buf, string, offset, length) {
-  return blitBuffer(asciiToBytes(string), buf, offset, length)
-}
-
-function latin1Write (buf, string, offset, length) {
-  return asciiWrite(buf, string, offset, length)
-}
-
-function base64Write (buf, string, offset, length) {
-  return blitBuffer(base64ToBytes(string), buf, offset, length)
-}
-
-function ucs2Write (buf, string, offset, length) {
-  return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length)
-}
-
-Buffer.prototype.write = function write (string, offset, length, encoding) {
-  // Buffer#write(string)
-  if (offset === undefined) {
-    encoding = 'utf8'
-    length = this.length
-    offset = 0
-  // Buffer#write(string, encoding)
-  } else if (length === undefined && typeof offset === 'string') {
-    encoding = offset
-    length = this.length
-    offset = 0
-  // Buffer#write(string, offset[, length][, encoding])
-  } else if (isFinite(offset)) {
-    offset = offset >>> 0
-    if (isFinite(length)) {
-      length = length >>> 0
-      if (encoding === undefined) encoding = 'utf8'
-    } else {
-      encoding = length
-      length = undefined
-    }
-  } else {
-    throw new Error(
-      'Buffer.write(string, encoding, offset[, length]) is no longer supported'
-    )
-  }
-
-  var remaining = this.length - offset
-  if (length === undefined || length > remaining) length = remaining
-
-  if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
-    throw new RangeError('Attempt to write outside buffer bounds')
-  }
-
-  if (!encoding) encoding = 'utf8'
-
-  var loweredCase = false
-  for (;;) {
-    switch (encoding) {
-      case 'hex':
-        return hexWrite(this, string, offset, length)
-
-      case 'utf8':
-      case 'utf-8':
-        return utf8Write(this, string, offset, length)
-
-      case 'ascii':
-        return asciiWrite(this, string, offset, length)
-
-      case 'latin1':
-      case 'binary':
-        return latin1Write(this, string, offset, length)
-
-      case 'base64':
-        // Warning: maxLength not taken into account in base64Write
-        return base64Write(this, string, offset, length)
-
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return ucs2Write(this, string, offset, length)
-
-      default:
-        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
-        encoding = ('' + encoding).toLowerCase()
-        loweredCase = true
-    }
-  }
-}
-
-Buffer.prototype.toJSON = function toJSON () {
-  return {
-    type: 'Buffer',
-    data: Array.prototype.slice.call(this._arr || this, 0)
-  }
-}
-
-function base64Slice (buf, start, end) {
-  if (start === 0 && end === buf.length) {
-    return base64.fromByteArray(buf)
-  } else {
-    return base64.fromByteArray(buf.slice(start, end))
-  }
-}
-
-function utf8Slice (buf, start, end) {
-  end = Math.min(buf.length, end)
-  var res = []
-
-  var i = start
-  while (i < end) {
-    var firstByte = buf[i]
-    var codePoint = null
-    var bytesPerSequence = (firstByte > 0xEF) ? 4
-      : (firstByte > 0xDF) ? 3
-        : (firstByte > 0xBF) ? 2
-          : 1
-
-    if (i + bytesPerSequence <= end) {
-      var secondByte, thirdByte, fourthByte, tempCodePoint
-
-      switch (bytesPerSequence) {
-        case 1:
-          if (firstByte < 0x80) {
-            codePoint = firstByte
-          }
-          break
-        case 2:
-          secondByte = buf[i + 1]
-          if ((secondByte & 0xC0) === 0x80) {
-            tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F)
-            if (tempCodePoint > 0x7F) {
-              codePoint = tempCodePoint
-            }
-          }
-          break
-        case 3:
-          secondByte = buf[i + 1]
-          thirdByte = buf[i + 2]
-          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
-            tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F)
-            if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
-              codePoint = tempCodePoint
-            }
-          }
-          break
-        case 4:
-          secondByte = buf[i + 1]
-          thirdByte = buf[i + 2]
-          fourthByte = buf[i + 3]
-          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
-            tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F)
-            if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
-              codePoint = tempCodePoint
-            }
-          }
-      }
-    }
-
-    if (codePoint === null) {
-      // we did not generate a valid codePoint so insert a
-      // replacement char (U+FFFD) and advance only 1 byte
-      codePoint = 0xFFFD
-      bytesPerSequence = 1
-    } else if (codePoint > 0xFFFF) {
-      // encode to utf16 (surrogate pair dance)
-      codePoint -= 0x10000
-      res.push(codePoint >>> 10 & 0x3FF | 0xD800)
-      codePoint = 0xDC00 | codePoint & 0x3FF
-    }
-
-    res.push(codePoint)
-    i += bytesPerSequence
-  }
-
-  return decodeCodePointsArray(res)
-}
-
-// Based on http://stackoverflow.com/a/22747272/680742, the browser with
-// the lowest limit is Chrome, with 0x10000 args.
-// We go 1 magnitude less, for safety
-var MAX_ARGUMENTS_LENGTH = 0x1000
-
-function decodeCodePointsArray (codePoints) {
-  var len = codePoints.length
-  if (len <= MAX_ARGUMENTS_LENGTH) {
-    return String.fromCharCode.apply(String, codePoints) // avoid extra slice()
-  }
-
-  // Decode in chunks to avoid "call stack size exceeded".
-  var res = ''
-  var i = 0
-  while (i < len) {
-    res += String.fromCharCode.apply(
-      String,
-      codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH)
-    )
-  }
-  return res
-}
-
-function asciiSlice (buf, start, end) {
-  var ret = ''
-  end = Math.min(buf.length, end)
-
-  for (var i = start; i < end; ++i) {
-    ret += String.fromCharCode(buf[i] & 0x7F)
-  }
-  return ret
-}
-
-function latin1Slice (buf, start, end) {
-  var ret = ''
-  end = Math.min(buf.length, end)
-
-  for (var i = start; i < end; ++i) {
-    ret += String.fromCharCode(buf[i])
-  }
-  return ret
-}
-
-function hexSlice (buf, start, end) {
-  var len = buf.length
-
-  if (!start || start < 0) start = 0
-  if (!end || end < 0 || end > len) end = len
-
-  var out = ''
-  for (var i = start; i < end; ++i) {
-    out += toHex(buf[i])
-  }
-  return out
-}
-
-function utf16leSlice (buf, start, end) {
-  var bytes = buf.slice(start, end)
-  var res = ''
-  for (var i = 0; i < bytes.length; i += 2) {
-    res += String.fromCharCode(bytes[i] + (bytes[i + 1] * 256))
-  }
-  return res
-}
-
-Buffer.prototype.slice = function slice (start, end) {
-  var len = this.length
-  start = ~~start
-  end = end === undefined ? len : ~~end
-
-  if (start < 0) {
-    start += len
-    if (start < 0) start = 0
-  } else if (start > len) {
-    start = len
-  }
-
-  if (end < 0) {
-    end += len
-    if (end < 0) end = 0
-  } else if (end > len) {
-    end = len
-  }
-
-  if (end < start) end = start
-
-  var newBuf = this.subarray(start, end)
-  // Return an augmented `Uint8Array` instance
-  newBuf.__proto__ = Buffer.prototype
-  return newBuf
-}
-
-/*
- * Need to make sure that buffer isn't trying to write out of bounds.
- */
-function checkOffset (offset, ext, length) {
-  if ((offset % 1) !== 0 || offset < 0) throw new RangeError('offset is not uint')
-  if (offset + ext > length) throw new RangeError('Trying to access beyond buffer length')
-}
-
-Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) checkOffset(offset, byteLength, this.length)
-
-  var val = this[offset]
-  var mul = 1
-  var i = 0
-  while (++i < byteLength && (mul *= 0x100)) {
-    val += this[offset + i] * mul
-  }
-
-  return val
-}
-
-Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) {
-    checkOffset(offset, byteLength, this.length)
-  }
-
-  var val = this[offset + --byteLength]
-  var mul = 1
-  while (byteLength > 0 && (mul *= 0x100)) {
-    val += this[offset + --byteLength] * mul
-  }
-
-  return val
-}
-
-Buffer.prototype.readUInt8 = function readUInt8 (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 1, this.length)
-  return this[offset]
-}
-
-Buffer.prototype.readUInt16LE = function readUInt16LE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 2, this.length)
-  return this[offset] | (this[offset + 1] << 8)
-}
-
-Buffer.prototype.readUInt16BE = function readUInt16BE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 2, this.length)
-  return (this[offset] << 8) | this[offset + 1]
-}
-
-Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-
-  return ((this[offset]) |
-      (this[offset + 1] << 8) |
-      (this[offset + 2] << 16)) +
-      (this[offset + 3] * 0x1000000)
-}
-
-Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-
-  return (this[offset] * 0x1000000) +
-    ((this[offset + 1] << 16) |
-    (this[offset + 2] << 8) |
-    this[offset + 3])
-}
-
-Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) checkOffset(offset, byteLength, this.length)
-
-  var val = this[offset]
-  var mul = 1
-  var i = 0
-  while (++i < byteLength && (mul *= 0x100)) {
-    val += this[offset + i] * mul
-  }
-  mul *= 0x80
-
-  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
-
-  return val
-}
-
-Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) checkOffset(offset, byteLength, this.length)
-
-  var i = byteLength
-  var mul = 1
-  var val = this[offset + --i]
-  while (i > 0 && (mul *= 0x100)) {
-    val += this[offset + --i] * mul
-  }
-  mul *= 0x80
-
-  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
-
-  return val
-}
-
-Buffer.prototype.readInt8 = function readInt8 (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 1, this.length)
-  if (!(this[offset] & 0x80)) return (this[offset])
-  return ((0xff - this[offset] + 1) * -1)
-}
-
-Buffer.prototype.readInt16LE = function readInt16LE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 2, this.length)
-  var val = this[offset] | (this[offset + 1] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
-}
-
-Buffer.prototype.readInt16BE = function readInt16BE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 2, this.length)
-  var val = this[offset + 1] | (this[offset] << 8)
-  return (val & 0x8000) ? val | 0xFFFF0000 : val
-}
-
-Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-
-  return (this[offset]) |
-    (this[offset + 1] << 8) |
-    (this[offset + 2] << 16) |
-    (this[offset + 3] << 24)
-}
-
-Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-
-  return (this[offset] << 24) |
-    (this[offset + 1] << 16) |
-    (this[offset + 2] << 8) |
-    (this[offset + 3])
-}
-
-Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, true, 23, 4)
-}
-
-Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 4, this.length)
-  return ieee754.read(this, offset, false, 23, 4)
-}
-
-Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, true, 52, 8)
-}
-
-Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
-  offset = offset >>> 0
-  if (!noAssert) checkOffset(offset, 8, this.length)
-  return ieee754.read(this, offset, false, 52, 8)
-}
-
-function checkInt (buf, value, offset, ext, max, min) {
-  if (!Buffer.isBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance')
-  if (value > max || value < min) throw new RangeError('"value" argument is out of bounds')
-  if (offset + ext > buf.length) throw new RangeError('Index out of range')
-}
-
-Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) {
-    var maxBytes = Math.pow(2, 8 * byteLength) - 1
-    checkInt(this, value, offset, byteLength, maxBytes, 0)
-  }
-
-  var mul = 1
-  var i = 0
-  this[offset] = value & 0xFF
-  while (++i < byteLength && (mul *= 0x100)) {
-    this[offset + i] = (value / mul) & 0xFF
-  }
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  byteLength = byteLength >>> 0
-  if (!noAssert) {
-    var maxBytes = Math.pow(2, 8 * byteLength) - 1
-    checkInt(this, value, offset, byteLength, maxBytes, 0)
-  }
-
-  var i = byteLength - 1
-  var mul = 1
-  this[offset + i] = value & 0xFF
-  while (--i >= 0 && (mul *= 0x100)) {
-    this[offset + i] = (value / mul) & 0xFF
-  }
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0)
-  this[offset] = (value & 0xff)
-  return offset + 1
-}
-
-Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
-  this[offset] = (value & 0xff)
-  this[offset + 1] = (value >>> 8)
-  return offset + 2
-}
-
-Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
-  this[offset] = (value >>> 8)
-  this[offset + 1] = (value & 0xff)
-  return offset + 2
-}
-
-Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
-  this[offset + 3] = (value >>> 24)
-  this[offset + 2] = (value >>> 16)
-  this[offset + 1] = (value >>> 8)
-  this[offset] = (value & 0xff)
-  return offset + 4
-}
-
-Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
-  this[offset] = (value >>> 24)
-  this[offset + 1] = (value >>> 16)
-  this[offset + 2] = (value >>> 8)
-  this[offset + 3] = (value & 0xff)
-  return offset + 4
-}
-
-Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    var limit = Math.pow(2, (8 * byteLength) - 1)
-
-    checkInt(this, value, offset, byteLength, limit - 1, -limit)
-  }
-
-  var i = 0
-  var mul = 1
-  var sub = 0
-  this[offset] = value & 0xFF
-  while (++i < byteLength && (mul *= 0x100)) {
-    if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) {
-      sub = 1
-    }
-    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
-  }
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    var limit = Math.pow(2, (8 * byteLength) - 1)
-
-    checkInt(this, value, offset, byteLength, limit - 1, -limit)
-  }
-
-  var i = byteLength - 1
-  var mul = 1
-  var sub = 0
-  this[offset + i] = value & 0xFF
-  while (--i >= 0 && (mul *= 0x100)) {
-    if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) {
-      sub = 1
-    }
-    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
-  }
-
-  return offset + byteLength
-}
-
-Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80)
-  if (value < 0) value = 0xff + value + 1
-  this[offset] = (value & 0xff)
-  return offset + 1
-}
-
-Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  this[offset] = (value & 0xff)
-  this[offset + 1] = (value >>> 8)
-  return offset + 2
-}
-
-Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
-  this[offset] = (value >>> 8)
-  this[offset + 1] = (value & 0xff)
-  return offset + 2
-}
-
-Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  this[offset] = (value & 0xff)
-  this[offset + 1] = (value >>> 8)
-  this[offset + 2] = (value >>> 16)
-  this[offset + 3] = (value >>> 24)
-  return offset + 4
-}
-
-Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
-  if (value < 0) value = 0xffffffff + value + 1
-  this[offset] = (value >>> 24)
-  this[offset + 1] = (value >>> 16)
-  this[offset + 2] = (value >>> 8)
-  this[offset + 3] = (value & 0xff)
-  return offset + 4
-}
-
-function checkIEEE754 (buf, value, offset, ext, max, min) {
-  if (offset + ext > buf.length) throw new RangeError('Index out of range')
-  if (offset < 0) throw new RangeError('Index out of range')
-}
-
-function writeFloat (buf, value, offset, littleEndian, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
-  }
-  ieee754.write(buf, value, offset, littleEndian, 23, 4)
-  return offset + 4
-}
-
-Buffer.prototype.writeFloatLE = function writeFloatLE (value, offset, noAssert) {
-  return writeFloat(this, value, offset, true, noAssert)
-}
-
-Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) {
-  return writeFloat(this, value, offset, false, noAssert)
-}
-
-function writeDouble (buf, value, offset, littleEndian, noAssert) {
-  value = +value
-  offset = offset >>> 0
-  if (!noAssert) {
-    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
-  }
-  ieee754.write(buf, value, offset, littleEndian, 52, 8)
-  return offset + 8
-}
-
-Buffer.prototype.writeDoubleLE = function writeDoubleLE (value, offset, noAssert) {
-  return writeDouble(this, value, offset, true, noAssert)
-}
-
-Buffer.prototype.writeDoubleBE = function writeDoubleBE (value, offset, noAssert) {
-  return writeDouble(this, value, offset, false, noAssert)
-}
-
-// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
-Buffer.prototype.copy = function copy (target, targetStart, start, end) {
-  if (!Buffer.isBuffer(target)) throw new TypeError('argument should be a Buffer')
-  if (!start) start = 0
-  if (!end && end !== 0) end = this.length
-  if (targetStart >= target.length) targetStart = target.length
-  if (!targetStart) targetStart = 0
-  if (end > 0 && end < start) end = start
-
-  // Copy 0 bytes; we're done
-  if (end === start) return 0
-  if (target.length === 0 || this.length === 0) return 0
-
-  // Fatal error conditions
-  if (targetStart < 0) {
-    throw new RangeError('targetStart out of bounds')
-  }
-  if (start < 0 || start >= this.length) throw new RangeError('Index out of range')
-  if (end < 0) throw new RangeError('sourceEnd out of bounds')
-
-  // Are we oob?
-  if (end > this.length) end = this.length
-  if (target.length - targetStart < end - start) {
-    end = target.length - targetStart + start
-  }
-
-  var len = end - start
-
-  if (this === target && typeof Uint8Array.prototype.copyWithin === 'function') {
-    // Use built-in when available, missing from IE11
-    this.copyWithin(targetStart, start, end)
-  } else if (this === target && start < targetStart && targetStart < end) {
-    // descending copy from end
-    for (var i = len - 1; i >= 0; --i) {
-      target[i + targetStart] = this[i + start]
-    }
-  } else {
-    Uint8Array.prototype.set.call(
-      target,
-      this.subarray(start, end),
-      targetStart
-    )
-  }
-
-  return len
-}
-
-// Usage:
-//    buffer.fill(number[, offset[, end]])
-//    buffer.fill(buffer[, offset[, end]])
-//    buffer.fill(string[, offset[, end]][, encoding])
-Buffer.prototype.fill = function fill (val, start, end, encoding) {
-  // Handle string cases:
-  if (typeof val === 'string') {
-    if (typeof start === 'string') {
-      encoding = start
-      start = 0
-      end = this.length
-    } else if (typeof end === 'string') {
-      encoding = end
-      end = this.length
-    }
-    if (encoding !== undefined && typeof encoding !== 'string') {
-      throw new TypeError('encoding must be a string')
-    }
-    if (typeof encoding === 'string' && !Buffer.isEncoding(encoding)) {
-      throw new TypeError('Unknown encoding: ' + encoding)
-    }
-    if (val.length === 1) {
-      var code = val.charCodeAt(0)
-      if ((encoding === 'utf8' && code < 128) ||
-          encoding === 'latin1') {
-        // Fast path: If `val` fits into a single byte, use that numeric value.
-        val = code
-      }
-    }
-  } else if (typeof val === 'number') {
-    val = val & 255
-  }
-
-  // Invalid ranges are not set to a default, so can range check early.
-  if (start < 0 || this.length < start || this.length < end) {
-    throw new RangeError('Out of range index')
-  }
-
-  if (end <= start) {
-    return this
-  }
-
-  start = start >>> 0
-  end = end === undefined ? this.length : end >>> 0
-
-  if (!val) val = 0
-
-  var i
-  if (typeof val === 'number') {
-    for (i = start; i < end; ++i) {
-      this[i] = val
-    }
-  } else {
-    var bytes = Buffer.isBuffer(val)
-      ? val
-      : Buffer.from(val, encoding)
-    var len = bytes.length
-    if (len === 0) {
-      throw new TypeError('The value "' + val +
-        '" is invalid for argument "value"')
-    }
-    for (i = 0; i < end - start; ++i) {
-      this[i + start] = bytes[i % len]
-    }
-  }
-
-  return this
-}
-
-// HELPER FUNCTIONS
-// ================
-
-var INVALID_BASE64_RE = /[^+/0-9A-Za-z-_]/g
-
-function base64clean (str) {
-  // Node takes equal signs as end of the Base64 encoding
-  str = str.split('=')[0]
-  // Node strips out invalid characters like \n and \t from the string, base64-js does not
-  str = str.trim().replace(INVALID_BASE64_RE, '')
-  // Node converts strings with length < 2 to ''
-  if (str.length < 2) return ''
-  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
-  while (str.length % 4 !== 0) {
-    str = str + '='
-  }
-  return str
-}
-
-function toHex (n) {
-  if (n < 16) return '0' + n.toString(16)
-  return n.toString(16)
-}
-
-function utf8ToBytes (string, units) {
-  units = units || Infinity
-  var codePoint
-  var length = string.length
-  var leadSurrogate = null
-  var bytes = []
-
-  for (var i = 0; i < length; ++i) {
-    codePoint = string.charCodeAt(i)
-
-    // is surrogate component
-    if (codePoint > 0xD7FF && codePoint < 0xE000) {
-      // last char was a lead
-      if (!leadSurrogate) {
-        // no lead yet
-        if (codePoint > 0xDBFF) {
-          // unexpected trail
-          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-          continue
-        } else if (i + 1 === length) {
-          // unpaired lead
-          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-          continue
-        }
-
-        // valid lead
-        leadSurrogate = codePoint
-
-        continue
-      }
-
-      // 2 leads in a row
-      if (codePoint < 0xDC00) {
-        if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-        leadSurrogate = codePoint
-        continue
-      }
-
-      // valid surrogate pair
-      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
-    } else if (leadSurrogate) {
-      // valid bmp char, but last char was a lead
-      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
-    }
-
-    leadSurrogate = null
-
-    // encode utf8
-    if (codePoint < 0x80) {
-      if ((units -= 1) < 0) break
-      bytes.push(codePoint)
-    } else if (codePoint < 0x800) {
-      if ((units -= 2) < 0) break
-      bytes.push(
-        codePoint >> 0x6 | 0xC0,
-        codePoint & 0x3F | 0x80
-      )
-    } else if (codePoint < 0x10000) {
-      if ((units -= 3) < 0) break
-      bytes.push(
-        codePoint >> 0xC | 0xE0,
-        codePoint >> 0x6 & 0x3F | 0x80,
-        codePoint & 0x3F | 0x80
-      )
-    } else if (codePoint < 0x110000) {
-      if ((units -= 4) < 0) break
-      bytes.push(
-        codePoint >> 0x12 | 0xF0,
-        codePoint >> 0xC & 0x3F | 0x80,
-        codePoint >> 0x6 & 0x3F | 0x80,
-        codePoint & 0x3F | 0x80
-      )
-    } else {
-      throw new Error('Invalid code point')
-    }
-  }
-
-  return bytes
-}
-
-function asciiToBytes (str) {
-  var byteArray = []
-  for (var i = 0; i < str.length; ++i) {
-    // Node's code seems to be doing this and not & 0x7F..
-    byteArray.push(str.charCodeAt(i) & 0xFF)
-  }
-  return byteArray
-}
-
-function utf16leToBytes (str, units) {
-  var c, hi, lo
-  var byteArray = []
-  for (var i = 0; i < str.length; ++i) {
-    if ((units -= 2) < 0) break
-
-    c = str.charCodeAt(i)
-    hi = c >> 8
-    lo = c % 256
-    byteArray.push(lo)
-    byteArray.push(hi)
-  }
-
-  return byteArray
-}
-
-function base64ToBytes (str) {
-  return base64.toByteArray(base64clean(str))
-}
-
-function blitBuffer (src, dst, offset, length) {
-  for (var i = 0; i < length; ++i) {
-    if ((i + offset >= dst.length) || (i >= src.length)) break
-    dst[i + offset] = src[i]
-  }
-  return i
-}
-
-// ArrayBuffer or Uint8Array objects from other contexts (i.e. iframes) do not pass
-// the `instanceof` check but they should be treated as of that type.
-// See: https://github.com/feross/buffer/issues/166
-function isInstance (obj, type) {
-  return obj instanceof type ||
-    (obj != null && obj.constructor != null && obj.constructor.name != null &&
-      obj.constructor.name === type.name)
-}
-function numberIsNaN (obj) {
-  // For IE11 support
-  return obj !== obj // eslint-disable-line no-self-compare
-}
-
-}).call(this,require("buffer").Buffer)
-},{"base64-js":88,"buffer":90,"ieee754":107}],91:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var objectCreate = Object.create || objectCreatePolyfill
-var objectKeys = Object.keys || objectKeysPolyfill
-var bind = Function.prototype.bind || functionBindPolyfill
-
-function EventEmitter() {
-  if (!this._events || !Object.prototype.hasOwnProperty.call(this, '_events')) {
-    this._events = objectCreate(null);
-    this._eventsCount = 0;
-  }
-
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-var defaultMaxListeners = 10;
-
-var hasDefineProperty;
-try {
-  var o = {};
-  if (Object.defineProperty) Object.defineProperty(o, 'x', { value: 0 });
-  hasDefineProperty = o.x === 0;
-} catch (err) { hasDefineProperty = false }
-if (hasDefineProperty) {
-  Object.defineProperty(EventEmitter, 'defaultMaxListeners', {
-    enumerable: true,
-    get: function() {
-      return defaultMaxListeners;
-    },
-    set: function(arg) {
-      // check whether the input is a positive number (whose value is zero or
-      // greater and not a NaN).
-      if (typeof arg !== 'number' || arg < 0 || arg !== arg)
-        throw new TypeError('"defaultMaxListeners" must be a positive number');
-      defaultMaxListeners = arg;
-    }
-  });
-} else {
-  EventEmitter.defaultMaxListeners = defaultMaxListeners;
-}
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
-  if (typeof n !== 'number' || n < 0 || isNaN(n))
-    throw new TypeError('"n" argument must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-function $getMaxListeners(that) {
-  if (that._maxListeners === undefined)
-    return EventEmitter.defaultMaxListeners;
-  return that._maxListeners;
-}
-
-EventEmitter.prototype.getMaxListeners = function getMaxListeners() {
-  return $getMaxListeners(this);
-};
-
-// These standalone emit* functions are used to optimize calling of event
-// handlers for fast cases because emit() itself often has a variable number of
-// arguments and can be deoptimized because of that. These functions always have
-// the same number of arguments and thus do not get deoptimized, so the code
-// inside them can execute faster.
-function emitNone(handler, isFn, self) {
-  if (isFn)
-    handler.call(self);
-  else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
-      listeners[i].call(self);
-  }
-}
-function emitOne(handler, isFn, self, arg1) {
-  if (isFn)
-    handler.call(self, arg1);
-  else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
-      listeners[i].call(self, arg1);
-  }
-}
-function emitTwo(handler, isFn, self, arg1, arg2) {
-  if (isFn)
-    handler.call(self, arg1, arg2);
-  else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
-      listeners[i].call(self, arg1, arg2);
-  }
-}
-function emitThree(handler, isFn, self, arg1, arg2, arg3) {
-  if (isFn)
-    handler.call(self, arg1, arg2, arg3);
-  else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
-      listeners[i].call(self, arg1, arg2, arg3);
-  }
-}
-
-function emitMany(handler, isFn, self, args) {
-  if (isFn)
-    handler.apply(self, args);
-  else {
-    var len = handler.length;
-    var listeners = arrayClone(handler, len);
-    for (var i = 0; i < len; ++i)
-      listeners[i].apply(self, args);
-  }
-}
-
-EventEmitter.prototype.emit = function emit(type) {
-  var er, handler, len, args, i, events;
-  var doError = (type === 'error');
-
-  events = this._events;
-  if (events)
-    doError = (doError && events.error == null);
-  else if (!doError)
-    return false;
-
-  // If there is no 'error' event listener then throw.
-  if (doError) {
-    if (arguments.length > 1)
-      er = arguments[1];
-    if (er instanceof Error) {
-      throw er; // Unhandled 'error' event
-    } else {
-      // At least give some kind of context to the user
-      var err = new Error('Unhandled "error" event. (' + er + ')');
-      err.context = er;
-      throw err;
-    }
-    return false;
-  }
-
-  handler = events[type];
-
-  if (!handler)
-    return false;
-
-  var isFn = typeof handler === 'function';
-  len = arguments.length;
-  switch (len) {
-      // fast cases
-    case 1:
-      emitNone(handler, isFn, this);
-      break;
-    case 2:
-      emitOne(handler, isFn, this, arguments[1]);
-      break;
-    case 3:
-      emitTwo(handler, isFn, this, arguments[1], arguments[2]);
-      break;
-    case 4:
-      emitThree(handler, isFn, this, arguments[1], arguments[2], arguments[3]);
-      break;
-      // slower
-    default:
-      args = new Array(len - 1);
-      for (i = 1; i < len; i++)
-        args[i - 1] = arguments[i];
-      emitMany(handler, isFn, this, args);
-  }
-
-  return true;
-};
-
-function _addListener(target, type, listener, prepend) {
-  var m;
-  var events;
-  var existing;
-
-  if (typeof listener !== 'function')
-    throw new TypeError('"listener" argument must be a function');
-
-  events = target._events;
-  if (!events) {
-    events = target._events = objectCreate(null);
-    target._eventsCount = 0;
-  } else {
-    // To avoid recursion in the case that type === "newListener"! Before
-    // adding it to the listeners, first emit "newListener".
-    if (events.newListener) {
-      target.emit('newListener', type,
-          listener.listener ? listener.listener : listener);
-
-      // Re-assign `events` because a newListener handler could have caused the
-      // this._events to be assigned to a new object
-      events = target._events;
-    }
-    existing = events[type];
-  }
-
-  if (!existing) {
-    // Optimize the case of one listener. Don't need the extra array object.
-    existing = events[type] = listener;
-    ++target._eventsCount;
-  } else {
-    if (typeof existing === 'function') {
-      // Adding the second element, need to change to array.
-      existing = events[type] =
-          prepend ? [listener, existing] : [existing, listener];
-    } else {
-      // If we've already got an array, just append.
-      if (prepend) {
-        existing.unshift(listener);
-      } else {
-        existing.push(listener);
-      }
-    }
-
-    // Check for listener leak
-    if (!existing.warned) {
-      m = $getMaxListeners(target);
-      if (m && m > 0 && existing.length > m) {
-        existing.warned = true;
-        var w = new Error('Possible EventEmitter memory leak detected. ' +
-            existing.length + ' "' + String(type) + '" listeners ' +
-            'added. Use emitter.setMaxListeners() to ' +
-            'increase limit.');
-        w.name = 'MaxListenersExceededWarning';
-        w.emitter = target;
-        w.type = type;
-        w.count = existing.length;
-        if (typeof console === 'object' && console.warn) {
-          console.warn('%s: %s', w.name, w.message);
-        }
-      }
-    }
-  }
-
-  return target;
-}
-
-EventEmitter.prototype.addListener = function addListener(type, listener) {
-  return _addListener(this, type, listener, false);
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.prependListener =
-    function prependListener(type, listener) {
-      return _addListener(this, type, listener, true);
-    };
-
-function onceWrapper() {
-  if (!this.fired) {
-    this.target.removeListener(this.type, this.wrapFn);
-    this.fired = true;
-    switch (arguments.length) {
-      case 0:
-        return this.listener.call(this.target);
-      case 1:
-        return this.listener.call(this.target, arguments[0]);
-      case 2:
-        return this.listener.call(this.target, arguments[0], arguments[1]);
-      case 3:
-        return this.listener.call(this.target, arguments[0], arguments[1],
-            arguments[2]);
-      default:
-        var args = new Array(arguments.length);
-        for (var i = 0; i < args.length; ++i)
-          args[i] = arguments[i];
-        this.listener.apply(this.target, args);
-    }
-  }
-}
-
-function _onceWrap(target, type, listener) {
-  var state = { fired: false, wrapFn: undefined, target: target, type: type, listener: listener };
-  var wrapped = bind.call(onceWrapper, state);
-  wrapped.listener = listener;
-  state.wrapFn = wrapped;
-  return wrapped;
-}
-
-EventEmitter.prototype.once = function once(type, listener) {
-  if (typeof listener !== 'function')
-    throw new TypeError('"listener" argument must be a function');
-  this.on(type, _onceWrap(this, type, listener));
-  return this;
-};
-
-EventEmitter.prototype.prependOnceListener =
-    function prependOnceListener(type, listener) {
-      if (typeof listener !== 'function')
-        throw new TypeError('"listener" argument must be a function');
-      this.prependListener(type, _onceWrap(this, type, listener));
-      return this;
-    };
-
-// Emits a 'removeListener' event if and only if the listener was removed.
-EventEmitter.prototype.removeListener =
-    function removeListener(type, listener) {
-      var list, events, position, i, originalListener;
-
-      if (typeof listener !== 'function')
-        throw new TypeError('"listener" argument must be a function');
-
-      events = this._events;
-      if (!events)
-        return this;
-
-      list = events[type];
-      if (!list)
-        return this;
-
-      if (list === listener || list.listener === listener) {
-        if (--this._eventsCount === 0)
-          this._events = objectCreate(null);
-        else {
-          delete events[type];
-          if (events.removeListener)
-            this.emit('removeListener', type, list.listener || listener);
-        }
-      } else if (typeof list !== 'function') {
-        position = -1;
-
-        for (i = list.length - 1; i >= 0; i--) {
-          if (list[i] === listener || list[i].listener === listener) {
-            originalListener = list[i].listener;
-            position = i;
-            break;
-          }
-        }
-
-        if (position < 0)
-          return this;
-
-        if (position === 0)
-          list.shift();
-        else
-          spliceOne(list, position);
-
-        if (list.length === 1)
-          events[type] = list[0];
-
-        if (events.removeListener)
-          this.emit('removeListener', type, originalListener || listener);
-      }
-
-      return this;
-    };
-
-EventEmitter.prototype.removeAllListeners =
-    function removeAllListeners(type) {
-      var listeners, events, i;
-
-      events = this._events;
-      if (!events)
-        return this;
-
-      // not listening for removeListener, no need to emit
-      if (!events.removeListener) {
-        if (arguments.length === 0) {
-          this._events = objectCreate(null);
-          this._eventsCount = 0;
-        } else if (events[type]) {
-          if (--this._eventsCount === 0)
-            this._events = objectCreate(null);
-          else
-            delete events[type];
-        }
-        return this;
-      }
-
-      // emit removeListener for all listeners on all events
-      if (arguments.length === 0) {
-        var keys = objectKeys(events);
-        var key;
-        for (i = 0; i < keys.length; ++i) {
-          key = keys[i];
-          if (key === 'removeListener') continue;
-          this.removeAllListeners(key);
-        }
-        this.removeAllListeners('removeListener');
-        this._events = objectCreate(null);
-        this._eventsCount = 0;
-        return this;
-      }
-
-      listeners = events[type];
-
-      if (typeof listeners === 'function') {
-        this.removeListener(type, listeners);
-      } else if (listeners) {
-        // LIFO order
-        for (i = listeners.length - 1; i >= 0; i--) {
-          this.removeListener(type, listeners[i]);
-        }
-      }
-
-      return this;
-    };
-
-function _listeners(target, type, unwrap) {
-  var events = target._events;
-
-  if (!events)
-    return [];
-
-  var evlistener = events[type];
-  if (!evlistener)
-    return [];
-
-  if (typeof evlistener === 'function')
-    return unwrap ? [evlistener.listener || evlistener] : [evlistener];
-
-  return unwrap ? unwrapListeners(evlistener) : arrayClone(evlistener, evlistener.length);
-}
-
-EventEmitter.prototype.listeners = function listeners(type) {
-  return _listeners(this, type, true);
-};
-
-EventEmitter.prototype.rawListeners = function rawListeners(type) {
-  return _listeners(this, type, false);
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  if (typeof emitter.listenerCount === 'function') {
-    return emitter.listenerCount(type);
-  } else {
-    return listenerCount.call(emitter, type);
-  }
-};
-
-EventEmitter.prototype.listenerCount = listenerCount;
-function listenerCount(type) {
-  var events = this._events;
-
-  if (events) {
-    var evlistener = events[type];
-
-    if (typeof evlistener === 'function') {
-      return 1;
-    } else if (evlistener) {
-      return evlistener.length;
-    }
-  }
-
-  return 0;
-}
-
-EventEmitter.prototype.eventNames = function eventNames() {
-  return this._eventsCount > 0 ? Reflect.ownKeys(this._events) : [];
-};
-
-// About 1.5x faster than the two-arg version of Array#splice().
-function spliceOne(list, index) {
-  for (var i = index, k = i + 1, n = list.length; k < n; i += 1, k += 1)
-    list[i] = list[k];
-  list.pop();
-}
-
-function arrayClone(arr, n) {
-  var copy = new Array(n);
-  for (var i = 0; i < n; ++i)
-    copy[i] = arr[i];
-  return copy;
-}
-
-function unwrapListeners(arr) {
-  var ret = new Array(arr.length);
-  for (var i = 0; i < ret.length; ++i) {
-    ret[i] = arr[i].listener || arr[i];
-  }
-  return ret;
-}
-
-function objectCreatePolyfill(proto) {
-  var F = function() {};
-  F.prototype = proto;
-  return new F;
-}
-function objectKeysPolyfill(obj) {
-  var keys = [];
-  for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj, k)) {
-    keys.push(k);
-  }
-  return k;
-}
-function functionBindPolyfill(context) {
-  var fn = this;
-  return function () {
-    return fn.apply(context, arguments);
-  };
-}
-
-},{}],92:[function(require,module,exports){
-(function (global){
-/*! https://mths.be/punycode v1.4.1 by @mathias */
-;(function(root) {
-
-	/** Detect free variables */
-	var freeExports = typeof exports == 'object' && exports &&
-		!exports.nodeType && exports;
-	var freeModule = typeof module == 'object' && module &&
-		!module.nodeType && module;
-	var freeGlobal = typeof global == 'object' && global;
-	if (
-		freeGlobal.global === freeGlobal ||
-		freeGlobal.window === freeGlobal ||
-		freeGlobal.self === freeGlobal
-	) {
-		root = freeGlobal;
-	}
-
-	/**
-	 * The `punycode` object.
-	 * @name punycode
-	 * @type Object
-	 */
-	var punycode,
-
-	/** Highest positive signed 32-bit float value */
-	maxInt = 2147483647, // aka. 0x7FFFFFFF or 2^31-1
-
-	/** Bootstring parameters */
-	base = 36,
-	tMin = 1,
-	tMax = 26,
-	skew = 38,
-	damp = 700,
-	initialBias = 72,
-	initialN = 128, // 0x80
-	delimiter = '-', // '\x2D'
-
-	/** Regular expressions */
-	regexPunycode = /^xn--/,
-	regexNonASCII = /[^\x20-\x7E]/, // unprintable ASCII chars + non-ASCII chars
-	regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g, // RFC 3490 separators
-
-	/** Error messages */
-	errors = {
-		'overflow': 'Overflow: input needs wider integers to process',
-		'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
-		'invalid-input': 'Invalid input'
-	},
-
-	/** Convenience shortcuts */
-	baseMinusTMin = base - tMin,
-	floor = Math.floor,
-	stringFromCharCode = String.fromCharCode,
-
-	/** Temporary variable */
-	key;
-
-	/*--------------------------------------------------------------------------*/
-
-	/**
-	 * A generic error utility function.
-	 * @private
-	 * @param {String} type The error type.
-	 * @returns {Error} Throws a `RangeError` with the applicable error message.
-	 */
-	function error(type) {
-		throw new RangeError(errors[type]);
-	}
-
-	/**
-	 * A generic `Array#map` utility function.
-	 * @private
-	 * @param {Array} array The array to iterate over.
-	 * @param {Function} callback The function that gets called for every array
-	 * item.
-	 * @returns {Array} A new array of values returned by the callback function.
-	 */
-	function map(array, fn) {
-		var length = array.length;
-		var result = [];
-		while (length--) {
-			result[length] = fn(array[length]);
-		}
-		return result;
-	}
-
-	/**
-	 * A simple `Array#map`-like wrapper to work with domain name strings or email
-	 * addresses.
-	 * @private
-	 * @param {String} domain The domain name or email address.
-	 * @param {Function} callback The function that gets called for every
-	 * character.
-	 * @returns {Array} A new string of characters returned by the callback
-	 * function.
-	 */
-	function mapDomain(string, fn) {
-		var parts = string.split('@');
-		var result = '';
-		if (parts.length > 1) {
-			// In email addresses, only the domain name should be punycoded. Leave
-			// the local part (i.e. everything up to `@`) intact.
-			result = parts[0] + '@';
-			string = parts[1];
-		}
-		// Avoid `split(regex)` for IE8 compatibility. See #17.
-		string = string.replace(regexSeparators, '\x2E');
-		var labels = string.split('.');
-		var encoded = map(labels, fn).join('.');
-		return result + encoded;
-	}
-
-	/**
-	 * Creates an array containing the numeric code points of each Unicode
-	 * character in the string. While JavaScript uses UCS-2 internally,
-	 * this function will convert a pair of surrogate halves (each of which
-	 * UCS-2 exposes as separate characters) into a single code point,
-	 * matching UTF-16.
-	 * @see `punycode.ucs2.encode`
-	 * @see <https://mathiasbynens.be/notes/javascript-encoding>
-	 * @memberOf punycode.ucs2
-	 * @name decode
-	 * @param {String} string The Unicode input string (UCS-2).
-	 * @returns {Array} The new array of code points.
-	 */
-	function ucs2decode(string) {
-		var output = [],
-		    counter = 0,
-		    length = string.length,
-		    value,
-		    extra;
-		while (counter < length) {
-			value = string.charCodeAt(counter++);
-			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
-				// high surrogate, and there is a next character
-				extra = string.charCodeAt(counter++);
-				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
-					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
-				} else {
-					// unmatched surrogate; only append this code unit, in case the next
-					// code unit is the high surrogate of a surrogate pair
-					output.push(value);
-					counter--;
-				}
-			} else {
-				output.push(value);
-			}
-		}
-		return output;
-	}
-
-	/**
-	 * Creates a string based on an array of numeric code points.
-	 * @see `punycode.ucs2.decode`
-	 * @memberOf punycode.ucs2
-	 * @name encode
-	 * @param {Array} codePoints The array of numeric code points.
-	 * @returns {String} The new Unicode string (UCS-2).
-	 */
-	function ucs2encode(array) {
-		return map(array, function(value) {
-			var output = '';
-			if (value > 0xFFFF) {
-				value -= 0x10000;
-				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
-				value = 0xDC00 | value & 0x3FF;
-			}
-			output += stringFromCharCode(value);
-			return output;
-		}).join('');
-	}
-
-	/**
-	 * Converts a basic code point into a digit/integer.
-	 * @see `digitToBasic()`
-	 * @private
-	 * @param {Number} codePoint The basic numeric code point value.
-	 * @returns {Number} The numeric value of a basic code point (for use in
-	 * representing integers) in the range `0` to `base - 1`, or `base` if
-	 * the code point does not represent a value.
-	 */
-	function basicToDigit(codePoint) {
-		if (codePoint - 48 < 10) {
-			return codePoint - 22;
-		}
-		if (codePoint - 65 < 26) {
-			return codePoint - 65;
-		}
-		if (codePoint - 97 < 26) {
-			return codePoint - 97;
-		}
-		return base;
-	}
-
-	/**
-	 * Converts a digit/integer into a basic code point.
-	 * @see `basicToDigit()`
-	 * @private
-	 * @param {Number} digit The numeric value of a basic code point.
-	 * @returns {Number} The basic code point whose value (when used for
-	 * representing integers) is `digit`, which needs to be in the range
-	 * `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
-	 * used; else, the lowercase form is used. The behavior is undefined
-	 * if `flag` is non-zero and `digit` has no uppercase form.
-	 */
-	function digitToBasic(digit, flag) {
-		//  0..25 map to ASCII a..z or A..Z
-		// 26..35 map to ASCII 0..9
-		return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
-	}
-
-	/**
-	 * Bias adaptation function as per section 3.4 of RFC 3492.
-	 * https://tools.ietf.org/html/rfc3492#section-3.4
-	 * @private
-	 */
-	function adapt(delta, numPoints, firstTime) {
-		var k = 0;
-		delta = firstTime ? floor(delta / damp) : delta >> 1;
-		delta += floor(delta / numPoints);
-		for (/* no initialization */; delta > baseMinusTMin * tMax >> 1; k += base) {
-			delta = floor(delta / baseMinusTMin);
-		}
-		return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
-	}
-
-	/**
-	 * Converts a Punycode string of ASCII-only symbols to a string of Unicode
-	 * symbols.
-	 * @memberOf punycode
-	 * @param {String} input The Punycode string of ASCII-only symbols.
-	 * @returns {String} The resulting string of Unicode symbols.
-	 */
-	function decode(input) {
-		// Don't use UCS-2
-		var output = [],
-		    inputLength = input.length,
-		    out,
-		    i = 0,
-		    n = initialN,
-		    bias = initialBias,
-		    basic,
-		    j,
-		    index,
-		    oldi,
-		    w,
-		    k,
-		    digit,
-		    t,
-		    /** Cached calculation results */
-		    baseMinusT;
-
-		// Handle the basic code points: let `basic` be the number of input code
-		// points before the last delimiter, or `0` if there is none, then copy
-		// the first basic code points to the output.
-
-		basic = input.lastIndexOf(delimiter);
-		if (basic < 0) {
-			basic = 0;
-		}
-
-		for (j = 0; j < basic; ++j) {
-			// if it's not a basic code point
-			if (input.charCodeAt(j) >= 0x80) {
-				error('not-basic');
-			}
-			output.push(input.charCodeAt(j));
-		}
-
-		// Main decoding loop: start just after the last delimiter if any basic code
-		// points were copied; start at the beginning otherwise.
-
-		for (index = basic > 0 ? basic + 1 : 0; index < inputLength; /* no final expression */) {
-
-			// `index` is the index of the next character to be consumed.
-			// Decode a generalized variable-length integer into `delta`,
-			// which gets added to `i`. The overflow checking is easier
-			// if we increase `i` as we go, then subtract off its starting
-			// value at the end to obtain `delta`.
-			for (oldi = i, w = 1, k = base; /* no condition */; k += base) {
-
-				if (index >= inputLength) {
-					error('invalid-input');
-				}
-
-				digit = basicToDigit(input.charCodeAt(index++));
-
-				if (digit >= base || digit > floor((maxInt - i) / w)) {
-					error('overflow');
-				}
-
-				i += digit * w;
-				t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
-
-				if (digit < t) {
-					break;
-				}
-
-				baseMinusT = base - t;
-				if (w > floor(maxInt / baseMinusT)) {
-					error('overflow');
-				}
-
-				w *= baseMinusT;
-
-			}
-
-			out = output.length + 1;
-			bias = adapt(i - oldi, out, oldi == 0);
-
-			// `i` was supposed to wrap around from `out` to `0`,
-			// incrementing `n` each time, so we'll fix that now:
-			if (floor(i / out) > maxInt - n) {
-				error('overflow');
-			}
-
-			n += floor(i / out);
-			i %= out;
-
-			// Insert `n` at position `i` of the output
-			output.splice(i++, 0, n);
-
-		}
-
-		return ucs2encode(output);
-	}
-
-	/**
-	 * Converts a string of Unicode symbols (e.g. a domain name label) to a
-	 * Punycode string of ASCII-only symbols.
-	 * @memberOf punycode
-	 * @param {String} input The string of Unicode symbols.
-	 * @returns {String} The resulting Punycode string of ASCII-only symbols.
-	 */
-	function encode(input) {
-		var n,
-		    delta,
-		    handledCPCount,
-		    basicLength,
-		    bias,
-		    j,
-		    m,
-		    q,
-		    k,
-		    t,
-		    currentValue,
-		    output = [],
-		    /** `inputLength` will hold the number of code points in `input`. */
-		    inputLength,
-		    /** Cached calculation results */
-		    handledCPCountPlusOne,
-		    baseMinusT,
-		    qMinusT;
-
-		// Convert the input in UCS-2 to Unicode
-		input = ucs2decode(input);
-
-		// Cache the length
-		inputLength = input.length;
-
-		// Initialize the state
-		n = initialN;
-		delta = 0;
-		bias = initialBias;
-
-		// Handle the basic code points
-		for (j = 0; j < inputLength; ++j) {
-			currentValue = input[j];
-			if (currentValue < 0x80) {
-				output.push(stringFromCharCode(currentValue));
-			}
-		}
-
-		handledCPCount = basicLength = output.length;
-
-		// `handledCPCount` is the number of code points that have been handled;
-		// `basicLength` is the number of basic code points.
-
-		// Finish the basic string - if it is not empty - with a delimiter
-		if (basicLength) {
-			output.push(delimiter);
-		}
-
-		// Main encoding loop:
-		while (handledCPCount < inputLength) {
-
-			// All non-basic code points < n have been handled already. Find the next
-			// larger one:
-			for (m = maxInt, j = 0; j < inputLength; ++j) {
-				currentValue = input[j];
-				if (currentValue >= n && currentValue < m) {
-					m = currentValue;
-				}
-			}
-
-			// Increase `delta` enough to advance the decoder's <n,i> state to <m,0>,
-			// but guard against overflow
-			handledCPCountPlusOne = handledCPCount + 1;
-			if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
-				error('overflow');
-			}
-
-			delta += (m - n) * handledCPCountPlusOne;
-			n = m;
-
-			for (j = 0; j < inputLength; ++j) {
-				currentValue = input[j];
-
-				if (currentValue < n && ++delta > maxInt) {
-					error('overflow');
-				}
-
-				if (currentValue == n) {
-					// Represent delta as a generalized variable-length integer
-					for (q = delta, k = base; /* no condition */; k += base) {
-						t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
-						if (q < t) {
-							break;
-						}
-						qMinusT = q - t;
-						baseMinusT = base - t;
-						output.push(
-							stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0))
-						);
-						q = floor(qMinusT / baseMinusT);
-					}
-
-					output.push(stringFromCharCode(digitToBasic(q, 0)));
-					bias = adapt(delta, handledCPCountPlusOne, handledCPCount == basicLength);
-					delta = 0;
-					++handledCPCount;
-				}
-			}
-
-			++delta;
-			++n;
-
-		}
-		return output.join('');
-	}
-
-	/**
-	 * Converts a Punycode string representing a domain name or an email address
-	 * to Unicode. Only the Punycoded parts of the input will be converted, i.e.
-	 * it doesn't matter if you call it on a string that has already been
-	 * converted to Unicode.
-	 * @memberOf punycode
-	 * @param {String} input The Punycoded domain name or email address to
-	 * convert to Unicode.
-	 * @returns {String} The Unicode representation of the given Punycode
-	 * string.
-	 */
-	function toUnicode(input) {
-		return mapDomain(input, function(string) {
-			return regexPunycode.test(string)
-				? decode(string.slice(4).toLowerCase())
-				: string;
-		});
-	}
-
-	/**
-	 * Converts a Unicode string representing a domain name or an email address to
-	 * Punycode. Only the non-ASCII parts of the domain name will be converted,
-	 * i.e. it doesn't matter if you call it with a domain that's already in
-	 * ASCII.
-	 * @memberOf punycode
-	 * @param {String} input The domain name or email address to convert, as a
-	 * Unicode string.
-	 * @returns {String} The Punycode representation of the given domain name or
-	 * email address.
-	 */
-	function toASCII(input) {
-		return mapDomain(input, function(string) {
-			return regexNonASCII.test(string)
-				? 'xn--' + encode(string)
-				: string;
-		});
-	}
-
-	/*--------------------------------------------------------------------------*/
-
-	/** Define the public API */
-	punycode = {
-		/**
-		 * A string representing the current Punycode.js version number.
-		 * @memberOf punycode
-		 * @type String
-		 */
-		'version': '1.4.1',
-		/**
-		 * An object of methods to convert from JavaScript's internal character
-		 * representation (UCS-2) to Unicode code points, and back.
-		 * @see <https://mathiasbynens.be/notes/javascript-encoding>
-		 * @memberOf punycode
-		 * @type Object
-		 */
-		'ucs2': {
-			'decode': ucs2decode,
-			'encode': ucs2encode
-		},
-		'decode': decode,
-		'encode': encode,
-		'toASCII': toASCII,
-		'toUnicode': toUnicode
-	};
-
-	/** Expose `punycode` */
-	// Some AMD build optimizers, like r.js, check for specific condition patterns
-	// like the following:
-	if (
-		typeof define == 'function' &&
-		typeof define.amd == 'object' &&
-		define.amd
-	) {
-		define('punycode', function() {
-			return punycode;
-		});
-	} else if (freeExports && freeModule) {
-		if (module.exports == freeExports) {
-			// in Node.js, io.js, or RingoJS v0.8.0+
-			freeModule.exports = punycode;
-		} else {
-			// in Narwhal or RingoJS v0.7.0-
-			for (key in punycode) {
-				punycode.hasOwnProperty(key) && (freeExports[key] = punycode[key]);
-			}
-		}
-	} else {
-		// in Rhino or a web browser
-		root.punycode = punycode;
-	}
-
-}(this));
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],93:[function(require,module,exports){
-(function (setImmediate,clearImmediate){
-var nextTick = require('process/browser.js').nextTick;
-var apply = Function.prototype.apply;
-var slice = Array.prototype.slice;
-var immediateIds = {};
-var nextImmediateId = 0;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) { timeout.close(); };
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// That's not how node.js implements it but the exposed api is the same.
-exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
-  var id = nextImmediateId++;
-  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
-
-  immediateIds[id] = true;
-
-  nextTick(function onNextTick() {
-    if (immediateIds[id]) {
-      // fn.call() is faster so we optimize for the common use-case
-      // @see http://jsperf.com/call-apply-segu
-      if (args) {
-        fn.apply(null, args);
-      } else {
-        fn.call(null);
-      }
-      // Prevent ids from leaking
-      exports.clearImmediate(id);
-    }
-  });
-
-  return id;
-};
-
-exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
-  delete immediateIds[id];
-};
-}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
-},{"process/browser.js":142,"timers":93}],94:[function(require,module,exports){
-(function (Buffer){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// NOTE: These type checking functions intentionally don't use `instanceof`
-// because it is fragile and can be easily faked with `Object.create()`.
-
-function isArray(arg) {
-  if (Array.isArray) {
-    return Array.isArray(arg);
-  }
-  return objectToString(arg) === '[object Array]';
-}
-exports.isArray = isArray;
-
-function isBoolean(arg) {
-  return typeof arg === 'boolean';
-}
-exports.isBoolean = isBoolean;
-
-function isNull(arg) {
-  return arg === null;
-}
-exports.isNull = isNull;
-
-function isNullOrUndefined(arg) {
-  return arg == null;
-}
-exports.isNullOrUndefined = isNullOrUndefined;
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-exports.isNumber = isNumber;
-
-function isString(arg) {
-  return typeof arg === 'string';
-}
-exports.isString = isString;
-
-function isSymbol(arg) {
-  return typeof arg === 'symbol';
-}
-exports.isSymbol = isSymbol;
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-exports.isUndefined = isUndefined;
-
-function isRegExp(re) {
-  return objectToString(re) === '[object RegExp]';
-}
-exports.isRegExp = isRegExp;
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-exports.isObject = isObject;
-
-function isDate(d) {
-  return objectToString(d) === '[object Date]';
-}
-exports.isDate = isDate;
-
-function isError(e) {
-  return (objectToString(e) === '[object Error]' || e instanceof Error);
-}
-exports.isError = isError;
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-exports.isFunction = isFunction;
-
-function isPrimitive(arg) {
-  return arg === null ||
-         typeof arg === 'boolean' ||
-         typeof arg === 'number' ||
-         typeof arg === 'string' ||
-         typeof arg === 'symbol' ||  // ES6 symbol
-         typeof arg === 'undefined';
-}
-exports.isPrimitive = isPrimitive;
-
-exports.isBuffer = Buffer.isBuffer;
-
-function objectToString(o) {
-  return Object.prototype.toString.call(o);
-}
-
-}).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":109}],95:[function(require,module,exports){
+},{"./helpers/bind":79}],89:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var scrubber = require('./lib/scrub');
 var objectKeys = require('./lib/keys');
@@ -17767,7 +15775,7 @@ Proto.prototype.apply = function (f, args) {
     catch (err) { this.emit('error', err) }
 };
 
-},{"./lib/foreach":96,"./lib/is_enum":97,"./lib/keys":98,"./lib/scrub":99,"events":91}],96:[function(require,module,exports){
+},{"./lib/foreach":90,"./lib/is_enum":91,"./lib/keys":92,"./lib/scrub":93,"events":152}],90:[function(require,module,exports){
 module.exports = function forEach (xs, f) {
     if (xs.forEach) return xs.forEach(f)
     for (var i = 0; i < xs.length; i++) {
@@ -17775,7 +15783,7 @@ module.exports = function forEach (xs, f) {
     }
 }
 
-},{}],97:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 var objectKeys = require('./keys');
 
 module.exports = function (obj, key) {
@@ -17789,14 +15797,14 @@ module.exports = function (obj, key) {
     return false;
 };
 
-},{"./keys":98}],98:[function(require,module,exports){
+},{"./keys":92}],92:[function(require,module,exports){
 module.exports = Object.keys || function (obj) {
     var keys = [];
     for (var key in obj) keys.push(key);
     return keys;
 };
 
-},{}],99:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 var traverse = require('traverse');
 var objectKeys = require('./keys');
 var forEach = require('./foreach');
@@ -17870,14 +15878,14 @@ Scrubber.prototype.unscrub = function (msg, f) {
     return args;
 };
 
-},{"./foreach":96,"./keys":98,"traverse":176}],100:[function(require,module,exports){
+},{"./foreach":90,"./keys":92,"traverse":141}],94:[function(require,module,exports){
 var dnode = require('./lib/dnode');
 
 module.exports = function (cons, opts) {
     return new dnode(cons, opts);
 };
 
-},{"./lib/dnode":101}],101:[function(require,module,exports){
+},{"./lib/dnode":95}],95:[function(require,module,exports){
 (function (process){
 var protocol = require('dnode-protocol');
 var Stream = require('stream');
@@ -18034,7 +16042,7 @@ dnode.prototype.destroy = function () {
 };
 
 }).call(this,require('_process'))
-},{"_process":142,"dnode-protocol":95,"jsonify":112,"stream":174}],102:[function(require,module,exports){
+},{"_process":157,"dnode-protocol":89,"jsonify":102,"stream":172}],96:[function(require,module,exports){
 /*!
   * domready (c) Dustin Diaz 2014 - License MIT
   */
@@ -18066,7 +16074,7 @@ dnode.prototype.destroy = function () {
 
 });
 
-},{}],103:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 'use strict';
 
 // do not edit .js files directly - edit src/index.jst
@@ -18114,7 +16122,7 @@ module.exports = function equal(a, b) {
   return a!==a && b!==b;
 };
 
-},{}],104:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 'use strict';
 
 module.exports = function (data, opts) {
@@ -18175,7 +16183,7 @@ module.exports = function (data, opts) {
     })(data);
 };
 
-},{}],105:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 /**
  * @fileoverview gl-matrix - High performance matrix and vector operations
  * @author Brandon Jones
@@ -22425,7 +20433,7 @@ if(typeof(exports) !== 'undefined') {
   })(shim.exports);
 })(this);
 
-},{}],106:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 /*
  Highcharts JS v8.1.0 (2020-05-05)
 
@@ -22947,153 +20955,8 @@ b.visible&&(b.isDirty=!0)});e.linkedSeries.forEach(function(c){c.setVisible(b,!1
 f.find,q=f.isArray,M=f.isObject,K=f.merge,J=f.objectEach,L=f.pick,x=f.splat,F=f.uniqueKey;d=d.Chart;d.prototype.setResponsive=function(d,f){var q=this.options.responsive,w=[],n=this.currentResponsive;!f&&q&&q.rules&&q.rules.forEach(function(d){"undefined"===typeof d._id&&(d._id=F());this.matchResponsiveRule(d,w)},this);f=K.apply(0,w.map(function(d){return A(q.rules,function(f){return f._id===d}).chartOptions}));f.isResponsiveOptions=!0;w=w.toString()||void 0;w!==(n&&n.ruleIds)&&(n&&this.update(n.undoOptions,
 d,!0),w?(n=this.currentOptions(f),n.isResponsiveOptions=!0,this.currentResponsive={ruleIds:w,mergedOptions:f,undoOptions:n},this.update(f,d,!0)):this.currentResponsive=void 0)};d.prototype.matchResponsiveRule=function(d,f){var q=d.condition;(q.callback||function(){return this.chartWidth<=L(q.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=L(q.maxHeight,Number.MAX_VALUE)&&this.chartWidth>=L(q.minWidth,0)&&this.chartHeight>=L(q.minHeight,0)}).call(this)&&f.push(d._id)};d.prototype.currentOptions=function(d){function f(d,
 t,w,m){var b;J(d,function(d,n){if(!m&&-1<A.collectionsWithUpdate.indexOf(n))for(d=x(d),w[n]=[],b=0;b<d.length;b++)t[n][b]&&(w[n][b]={},f(d[b],t[n][b],w[n][b],m+1));else M(d)?(w[n]=q(d)?[]:{},f(d,t[n]||{},w[n],m+1)):w[n]="undefined"===typeof t[n]?null:t[n]})}var A=this,w={};f(d,this.options,w,0);return w}});Q(A,"masters/highcharts.src.js",[A["parts/Globals.js"]],function(d){return d});A["masters/highcharts.src.js"]._modules=A;return A["masters/highcharts.src.js"]});
-
-},{}],107:[function(require,module,exports){
-exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
-
-  i += d
-
-  e = s & ((1 << (-nBits)) - 1)
-  s >>= (-nBits)
-  nBits += eLen
-  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
-
-  m = e & ((1 << (-nBits)) - 1)
-  e >>= (-nBits)
-  nBits += mLen
-  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
-
-  if (e === 0) {
-    e = 1 - eBias
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity)
-  } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
-}
-
-exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
-
-  value = Math.abs(value)
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0
-    e = eMax
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2)
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--
-      c *= 2
-    }
-    if (e + eBias >= 1) {
-      value += rt / c
-    } else {
-      value += rt * Math.pow(2, 1 - eBias)
-    }
-    if (value * c >= 2) {
-      e++
-      c /= 2
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0
-      e = eMax
-    } else if (e + eBias >= 1) {
-      m = ((value * c) - 1) * Math.pow(2, mLen)
-      e = e + eBias
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
-      e = 0
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-
-  e = (e << mLen) | m
-  eLen += mLen
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-
-  buffer[offset + i - d] |= s * 128
-}
-
-},{}],108:[function(require,module,exports){
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    if (superCtor) {
-      ctor.super_ = superCtor
-      ctor.prototype = Object.create(superCtor.prototype, {
-        constructor: {
-          value: ctor,
-          enumerable: false,
-          writable: true,
-          configurable: true
-        }
-      })
-    }
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    if (superCtor) {
-      ctor.super_ = superCtor
-      var TempCtor = function () {}
-      TempCtor.prototype = superCtor.prototype
-      ctor.prototype = new TempCtor()
-      ctor.prototype.constructor = ctor
-    }
-  }
-}
-
-},{}],109:[function(require,module,exports){
-/*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-
-// The _isBuffer check is for Safari 5-7 support, because it's missing
-// Object.prototype.constructor. Remove this eventually
-module.exports = function (obj) {
-  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
-}
-
-function isBuffer (obj) {
-  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-}
-
-// For Node v0.10 support. Remove this eventually.
-function isSlowBuffer (obj) {
-  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
-}
-
-},{}],110:[function(require,module,exports){
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
-};
-
-},{}],111:[function(require,module,exports){
+//# sourceMappingURL=highcharts.js.map
+},{}],101:[function(require,module,exports){
 'use strict';
 
 var traverse = module.exports = function (schema, opts, cb) {
@@ -23184,11 +21047,11 @@ function escapeJsonPtr(str) {
   return str.replace(/~/g, '~0').replace(/\//g, '~1');
 }
 
-},{}],112:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 exports.parse = require('./lib/parse');
 exports.stringify = require('./lib/stringify');
 
-},{"./lib/parse":113,"./lib/stringify":114}],113:[function(require,module,exports){
+},{"./lib/parse":103,"./lib/stringify":104}],103:[function(require,module,exports){
 var at, // The index of the current character
     ch, // The current character
     escapee = {
@@ -23463,7 +21326,7 @@ module.exports = function (source, reviver) {
     }({'': result}, '')) : result;
 };
 
-},{}],114:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
     escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
     gap,
@@ -23619,7 +21482,7 @@ module.exports = function (value, replacer, space) {
     return str('', {'': value});
 };
 
-},{}],115:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 var Pointable = require('./pointable'),
   glMatrix = require("gl-matrix")
   , vec3 = glMatrix.vec3
@@ -23784,7 +21647,7 @@ Bone.prototype.direction = function(){
 
 };
 
-},{"./pointable":129,"gl-matrix":105,"underscore":177}],116:[function(require,module,exports){
+},{"./pointable":119,"gl-matrix":99,"underscore":142}],106:[function(require,module,exports){
 var CircularBuffer = module.exports = function(size) {
   this.pos = 0;
   this._buf = [];
@@ -23803,7 +21666,7 @@ CircularBuffer.prototype.push = function(o) {
   return this.pos++;
 }
 
-},{}],117:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 var chooseProtocol = require('../protocol').chooseProtocol
   , EventEmitter = require('events').EventEmitter
   , _ = require('underscore');
@@ -23971,7 +21834,7 @@ BaseConnection.prototype.reportFocus = function(state) {
 }
 
 _.extend(BaseConnection.prototype, EventEmitter.prototype);
-},{"../protocol":130,"events":91,"underscore":177}],118:[function(require,module,exports){
+},{"../protocol":120,"events":152,"underscore":142}],108:[function(require,module,exports){
 var BaseConnection = module.exports = require('./base')
   , _ = require('underscore');
 
@@ -24071,7 +21934,7 @@ BrowserConnection.prototype.stopFocusLoop = function() {
   delete this.focusDetectorTimer;
 }
 
-},{"./base":117,"underscore":177}],119:[function(require,module,exports){
+},{"./base":107,"underscore":142}],109:[function(require,module,exports){
 var WebSocket = require('ws')
   , BaseConnection = require('./base')
   , _ = require('underscore');
@@ -24096,7 +21959,7 @@ NodeConnection.prototype.setupSocket = function() {
   return socket;
 }
 
-},{"./base":117,"underscore":177,"ws":135}],120:[function(require,module,exports){
+},{"./base":107,"underscore":142,"ws":125}],110:[function(require,module,exports){
 (function (process){
 var Frame = require('./frame')
   , Hand = require('./hand')
@@ -24842,7 +22705,7 @@ Controller.prototype.useRegisteredPlugins = function(){
 _.extend(Controller.prototype, EventEmitter.prototype);
 
 }).call(this,require('_process'))
-},{"./circular_buffer":116,"./connection/browser":118,"./connection/node":119,"./dialog":121,"./finger":122,"./frame":123,"./gesture":124,"./hand":125,"./pipeline":128,"./pointable":129,"_process":142,"events":91,"underscore":177}],121:[function(require,module,exports){
+},{"./circular_buffer":106,"./connection/browser":108,"./connection/node":109,"./dialog":111,"./finger":112,"./frame":113,"./gesture":114,"./hand":115,"./pipeline":118,"./pointable":119,"_process":157,"events":152,"underscore":142}],111:[function(require,module,exports){
 (function (process){
 var Dialog = module.exports = function(message, options){
   this.options = (options || {});
@@ -24991,7 +22854,7 @@ Dialog.warnBones = function(){
 
 }
 }).call(this,require('_process'))
-},{"_process":142}],122:[function(require,module,exports){
+},{"_process":157}],112:[function(require,module,exports){
 var Pointable = require('./pointable'),
   Bone = require('./bone')
   , Dialog = require('./dialog')
@@ -25182,7 +23045,7 @@ Finger.prototype.toString = function() {
 
 Finger.Invalid = { valid: false };
 
-},{"./bone":115,"./dialog":121,"./pointable":129,"underscore":177}],123:[function(require,module,exports){
+},{"./bone":105,"./dialog":111,"./pointable":119,"underscore":142}],113:[function(require,module,exports){
 var Hand = require("./hand")
   , Pointable = require("./pointable")
   , createGesture = require("./gesture").createGesture
@@ -25687,7 +23550,7 @@ Frame.Invalid = {
   translation: function() { return vec3.create(); }
 };
 
-},{"./finger":122,"./gesture":124,"./hand":125,"./interaction_box":127,"./pointable":129,"gl-matrix":105,"underscore":177}],124:[function(require,module,exports){
+},{"./finger":112,"./gesture":114,"./hand":115,"./interaction_box":117,"./pointable":119,"gl-matrix":99,"underscore":142}],114:[function(require,module,exports){
 var glMatrix = require("gl-matrix")
   , vec3 = glMatrix.vec3
   , EventEmitter = require('events').EventEmitter
@@ -26172,7 +24035,7 @@ KeyTapGesture.prototype.toString = function() {
   return "KeyTapGesture ["+JSON.stringify(this)+"]";
 }
 
-},{"events":91,"gl-matrix":105,"underscore":177}],125:[function(require,module,exports){
+},{"events":152,"gl-matrix":99,"underscore":142}],115:[function(require,module,exports){
 var Pointable = require("./pointable")
   , Bone = require('./bone')
   , glMatrix = require("gl-matrix")
@@ -26626,7 +24489,7 @@ Hand.Invalid = {
   translation: function() { return vec3.create(); }
 };
 
-},{"./bone":115,"./pointable":129,"gl-matrix":105,"underscore":177}],126:[function(require,module,exports){
+},{"./bone":105,"./pointable":119,"gl-matrix":99,"underscore":142}],116:[function(require,module,exports){
 /**
  * Leap is the global namespace of the Leap API.
  * @namespace Leap
@@ -26713,7 +24576,7 @@ module.exports = {
   }
 }
 
-},{"./circular_buffer":116,"./controller":120,"./finger":122,"./frame":123,"./gesture":124,"./hand":125,"./interaction_box":127,"./pointable":129,"./protocol":130,"./ui":131,"./version.js":134,"events":91,"gl-matrix":105,"underscore":177}],127:[function(require,module,exports){
+},{"./circular_buffer":106,"./controller":110,"./finger":112,"./frame":113,"./gesture":114,"./hand":115,"./interaction_box":117,"./pointable":119,"./protocol":120,"./ui":121,"./version.js":124,"events":152,"gl-matrix":99,"underscore":142}],117:[function(require,module,exports){
 var glMatrix = require("gl-matrix")
   , vec3 = glMatrix.vec3;
 
@@ -26855,7 +24718,7 @@ InteractionBox.prototype.toString = function() {
  */
 InteractionBox.Invalid = { valid: false };
 
-},{"gl-matrix":105}],128:[function(require,module,exports){
+},{"gl-matrix":99}],118:[function(require,module,exports){
 var Pipeline = module.exports = function (controller) {
   this.steps = [];
   this.controller = controller;
@@ -26909,7 +24772,7 @@ Pipeline.prototype.addWrappedStep = function (type, callback) {
   this.addStep(step);
   return step;
 };
-},{}],129:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 var glMatrix = require("gl-matrix")
   , vec3 = glMatrix.vec3;
 
@@ -27126,7 +24989,7 @@ Pointable.prototype.hand = function(){
  */
 Pointable.Invalid = { valid: false };
 
-},{"gl-matrix":105}],130:[function(require,module,exports){
+},{"gl-matrix":99}],120:[function(require,module,exports){
 var Frame = require('./frame')
   , Hand = require('./hand')
   , Pointable = require('./pointable')
@@ -27202,12 +25065,12 @@ var JSONProtocol = exports.JSONProtocol = function(header) {
 
 
 
-},{"./finger":122,"./frame":123,"./hand":125,"./pointable":129,"events":91,"underscore":177}],131:[function(require,module,exports){
+},{"./finger":112,"./frame":113,"./hand":115,"./pointable":119,"events":152,"underscore":142}],121:[function(require,module,exports){
 exports.UI = {
   Region: require("./ui/region"),
   Cursor: require("./ui/cursor")
 };
-},{"./ui/cursor":132,"./ui/region":133}],132:[function(require,module,exports){
+},{"./ui/cursor":122,"./ui/region":123}],122:[function(require,module,exports){
 var Cursor = module.exports = function() {
   return function(frame) {
     var pointable = frame.pointables.sort(function(a, b) { return a.z - b.z })[0]
@@ -27218,7 +25081,7 @@ var Cursor = module.exports = function() {
   }
 }
 
-},{}],133:[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter
   , _ = require('underscore')
 
@@ -27306,7 +25169,7 @@ Region.prototype.mapToXY = function(position, width, height) {
 }
 
 _.extend(Region.prototype, EventEmitter.prototype)
-},{"events":91,"underscore":177}],134:[function(require,module,exports){
+},{"events":152,"underscore":142}],124:[function(require,module,exports){
 // This file is automatically updated from package.json by grunt.
 module.exports = {
   full: '0.6.4',
@@ -27314,7 +25177,7 @@ module.exports = {
   minor: 6,
   dot: 4
 }
-},{}],135:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
 (function (global){
 /// shim for browser packaging
 
@@ -27323,7 +25186,7 @@ module.exports = function() {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],136:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 'use strict'
 
 // A linked list to keep track of recently-used-ness
@@ -27659,12 +25522,12 @@ const forEachStep = (self, fn, node, thisp) => {
 
 module.exports = LRUCache
 
-},{"yallist":183}],137:[function(require,module,exports){
+},{"yallist":145}],127:[function(require,module,exports){
 var leapConnector = require('./src/leapConnector');
 
 
 module.exports.leap = leapConnector;
-},{"./src/leapConnector":138}],138:[function(require,module,exports){
+},{"./src/leapConnector":128}],128:[function(require,module,exports){
 var Leap = require('leapjs');
 var Pointer = require('./pointer')
 
@@ -27863,7 +25726,7 @@ LeapConnector.prototype.onFrame = function(frame) {
 
 module.exports = LeapConnector;
 
-},{"./pointer":139,"leapjs":126}],139:[function(require,module,exports){
+},{"./pointer":129,"leapjs":116}],129:[function(require,module,exports){
 // adapted from a forum post by cabbibo:
 // https://github.com/leapmotion/leapjs/issues/31
 // http://cabbibo.com/leap/lmlab/mouse/test.html
@@ -28036,7 +25899,7 @@ function convert(velocityX, velocityY, type){
 
 module.exports = point;
 module.exports.reset = params.resetPosition;
-},{}],140:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -32464,2771 +30327,7 @@ numeric.svd= function svd(A) {
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],141:[function(require,module,exports){
-(function (process){
-'use strict';
-
-if (typeof process === 'undefined' ||
-    !process.version ||
-    process.version.indexOf('v0.') === 0 ||
-    process.version.indexOf('v1.') === 0 && process.version.indexOf('v1.8.') !== 0) {
-  module.exports = { nextTick: nextTick };
-} else {
-  module.exports = process
-}
-
-function nextTick(fn, arg1, arg2, arg3) {
-  if (typeof fn !== 'function') {
-    throw new TypeError('"callback" argument must be a function');
-  }
-  var len = arguments.length;
-  var args, i;
-  switch (len) {
-  case 0:
-  case 1:
-    return process.nextTick(fn);
-  case 2:
-    return process.nextTick(function afterTickOne() {
-      fn.call(null, arg1);
-    });
-  case 3:
-    return process.nextTick(function afterTickTwo() {
-      fn.call(null, arg1, arg2);
-    });
-  case 4:
-    return process.nextTick(function afterTickThree() {
-      fn.call(null, arg1, arg2, arg3);
-    });
-  default:
-    args = new Array(len - 1);
-    i = 0;
-    while (i < args.length) {
-      args[i++] = arguments[i];
-    }
-    return process.nextTick(function afterTick() {
-      fn.apply(null, args);
-    });
-  }
-}
-
-
-}).call(this,require('_process'))
-},{"_process":142}],142:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],143:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-// If obj.hasOwnProperty has been overridden, then calling
-// obj.hasOwnProperty(prop) will break.
-// See: https://github.com/joyent/node/issues/1707
-function hasOwnProperty(obj, prop) {
-  return Object.prototype.hasOwnProperty.call(obj, prop);
-}
-
-module.exports = function(qs, sep, eq, options) {
-  sep = sep || '&';
-  eq = eq || '=';
-  var obj = {};
-
-  if (typeof qs !== 'string' || qs.length === 0) {
-    return obj;
-  }
-
-  var regexp = /\+/g;
-  qs = qs.split(sep);
-
-  var maxKeys = 1000;
-  if (options && typeof options.maxKeys === 'number') {
-    maxKeys = options.maxKeys;
-  }
-
-  var len = qs.length;
-  // maxKeys <= 0 means that we should not limit keys count
-  if (maxKeys > 0 && len > maxKeys) {
-    len = maxKeys;
-  }
-
-  for (var i = 0; i < len; ++i) {
-    var x = qs[i].replace(regexp, '%20'),
-        idx = x.indexOf(eq),
-        kstr, vstr, k, v;
-
-    if (idx >= 0) {
-      kstr = x.substr(0, idx);
-      vstr = x.substr(idx + 1);
-    } else {
-      kstr = x;
-      vstr = '';
-    }
-
-    k = decodeURIComponent(kstr);
-    v = decodeURIComponent(vstr);
-
-    if (!hasOwnProperty(obj, k)) {
-      obj[k] = v;
-    } else if (isArray(obj[k])) {
-      obj[k].push(v);
-    } else {
-      obj[k] = [obj[k], v];
-    }
-  }
-
-  return obj;
-};
-
-var isArray = Array.isArray || function (xs) {
-  return Object.prototype.toString.call(xs) === '[object Array]';
-};
-
-},{}],144:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-var stringifyPrimitive = function(v) {
-  switch (typeof v) {
-    case 'string':
-      return v;
-
-    case 'boolean':
-      return v ? 'true' : 'false';
-
-    case 'number':
-      return isFinite(v) ? v : '';
-
-    default:
-      return '';
-  }
-};
-
-module.exports = function(obj, sep, eq, name) {
-  sep = sep || '&';
-  eq = eq || '=';
-  if (obj === null) {
-    obj = undefined;
-  }
-
-  if (typeof obj === 'object') {
-    return map(objectKeys(obj), function(k) {
-      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
-      if (isArray(obj[k])) {
-        return map(obj[k], function(v) {
-          return ks + encodeURIComponent(stringifyPrimitive(v));
-        }).join(sep);
-      } else {
-        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
-      }
-    }).join(sep);
-
-  }
-
-  if (!name) return '';
-  return encodeURIComponent(stringifyPrimitive(name)) + eq +
-         encodeURIComponent(stringifyPrimitive(obj));
-};
-
-var isArray = Array.isArray || function (xs) {
-  return Object.prototype.toString.call(xs) === '[object Array]';
-};
-
-function map (xs, f) {
-  if (xs.map) return xs.map(f);
-  var res = [];
-  for (var i = 0; i < xs.length; i++) {
-    res.push(f(xs[i], i));
-  }
-  return res;
-}
-
-var objectKeys = Object.keys || function (obj) {
-  var res = [];
-  for (var key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) res.push(key);
-  }
-  return res;
-};
-
-},{}],145:[function(require,module,exports){
-'use strict';
-
-exports.decode = exports.parse = require('./decode');
-exports.encode = exports.stringify = require('./encode');
-
-},{"./decode":143,"./encode":144}],146:[function(require,module,exports){
-module.exports = require('./lib/_stream_duplex.js');
-
-},{"./lib/_stream_duplex.js":147}],147:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// a duplex stream is just a stream that is both readable and writable.
-// Since JS doesn't have multiple prototypal inheritance, this class
-// prototypally inherits from Readable, and then parasitically from
-// Writable.
-
-'use strict';
-
-/*<replacement>*/
-
-var pna = require('process-nextick-args');
-/*</replacement>*/
-
-/*<replacement>*/
-var objectKeys = Object.keys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    keys.push(key);
-  }return keys;
-};
-/*</replacement>*/
-
-module.exports = Duplex;
-
-/*<replacement>*/
-var util = Object.create(require('core-util-is'));
-util.inherits = require('inherits');
-/*</replacement>*/
-
-var Readable = require('./_stream_readable');
-var Writable = require('./_stream_writable');
-
-util.inherits(Duplex, Readable);
-
-{
-  // avoid scope creep, the keys array can then be collected
-  var keys = objectKeys(Writable.prototype);
-  for (var v = 0; v < keys.length; v++) {
-    var method = keys[v];
-    if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
-  }
-}
-
-function Duplex(options) {
-  if (!(this instanceof Duplex)) return new Duplex(options);
-
-  Readable.call(this, options);
-  Writable.call(this, options);
-
-  if (options && options.readable === false) this.readable = false;
-
-  if (options && options.writable === false) this.writable = false;
-
-  this.allowHalfOpen = true;
-  if (options && options.allowHalfOpen === false) this.allowHalfOpen = false;
-
-  this.once('end', onend);
-}
-
-Object.defineProperty(Duplex.prototype, 'writableHighWaterMark', {
-  // making it explicit this property is not enumerable
-  // because otherwise some prototype manipulation in
-  // userland will fail
-  enumerable: false,
-  get: function () {
-    return this._writableState.highWaterMark;
-  }
-});
-
-// the no-half-open enforcer
-function onend() {
-  // if we allow half-open state, or if the writable side ended,
-  // then we're ok.
-  if (this.allowHalfOpen || this._writableState.ended) return;
-
-  // no more data can be written.
-  // But allow more writes to happen in this tick.
-  pna.nextTick(onEndNT, this);
-}
-
-function onEndNT(self) {
-  self.end();
-}
-
-Object.defineProperty(Duplex.prototype, 'destroyed', {
-  get: function () {
-    if (this._readableState === undefined || this._writableState === undefined) {
-      return false;
-    }
-    return this._readableState.destroyed && this._writableState.destroyed;
-  },
-  set: function (value) {
-    // we ignore the value if the stream
-    // has not been initialized yet
-    if (this._readableState === undefined || this._writableState === undefined) {
-      return;
-    }
-
-    // backward compatibility, the user is explicitly
-    // managing destroyed
-    this._readableState.destroyed = value;
-    this._writableState.destroyed = value;
-  }
-});
-
-Duplex.prototype._destroy = function (err, cb) {
-  this.push(null);
-  this.end();
-
-  pna.nextTick(cb, err);
-};
-},{"./_stream_readable":149,"./_stream_writable":151,"core-util-is":94,"inherits":108,"process-nextick-args":141}],148:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// a passthrough stream.
-// basically just the most minimal sort of Transform stream.
-// Every written chunk gets output as-is.
-
-'use strict';
-
-module.exports = PassThrough;
-
-var Transform = require('./_stream_transform');
-
-/*<replacement>*/
-var util = Object.create(require('core-util-is'));
-util.inherits = require('inherits');
-/*</replacement>*/
-
-util.inherits(PassThrough, Transform);
-
-function PassThrough(options) {
-  if (!(this instanceof PassThrough)) return new PassThrough(options);
-
-  Transform.call(this, options);
-}
-
-PassThrough.prototype._transform = function (chunk, encoding, cb) {
-  cb(null, chunk);
-};
-},{"./_stream_transform":150,"core-util-is":94,"inherits":108}],149:[function(require,module,exports){
-(function (process,global){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-/*<replacement>*/
-
-var pna = require('process-nextick-args');
-/*</replacement>*/
-
-module.exports = Readable;
-
-/*<replacement>*/
-var isArray = require('isarray');
-/*</replacement>*/
-
-/*<replacement>*/
-var Duplex;
-/*</replacement>*/
-
-Readable.ReadableState = ReadableState;
-
-/*<replacement>*/
-var EE = require('events').EventEmitter;
-
-var EElistenerCount = function (emitter, type) {
-  return emitter.listeners(type).length;
-};
-/*</replacement>*/
-
-/*<replacement>*/
-var Stream = require('./internal/streams/stream');
-/*</replacement>*/
-
-/*<replacement>*/
-
-var Buffer = require('safe-buffer').Buffer;
-var OurUint8Array = global.Uint8Array || function () {};
-function _uint8ArrayToBuffer(chunk) {
-  return Buffer.from(chunk);
-}
-function _isUint8Array(obj) {
-  return Buffer.isBuffer(obj) || obj instanceof OurUint8Array;
-}
-
-/*</replacement>*/
-
-/*<replacement>*/
-var util = Object.create(require('core-util-is'));
-util.inherits = require('inherits');
-/*</replacement>*/
-
-/*<replacement>*/
-var debugUtil = require('util');
-var debug = void 0;
-if (debugUtil && debugUtil.debuglog) {
-  debug = debugUtil.debuglog('stream');
-} else {
-  debug = function () {};
-}
-/*</replacement>*/
-
-var BufferList = require('./internal/streams/BufferList');
-var destroyImpl = require('./internal/streams/destroy');
-var StringDecoder;
-
-util.inherits(Readable, Stream);
-
-var kProxyEvents = ['error', 'close', 'destroy', 'pause', 'resume'];
-
-function prependListener(emitter, event, fn) {
-  // Sadly this is not cacheable as some libraries bundle their own
-  // event emitter implementation with them.
-  if (typeof emitter.prependListener === 'function') return emitter.prependListener(event, fn);
-
-  // This is a hack to make sure that our error handler is attached before any
-  // userland ones.  NEVER DO THIS. This is here only because this code needs
-  // to continue to work with older versions of Node.js that do not include
-  // the prependListener() method. The goal is to eventually remove this hack.
-  if (!emitter._events || !emitter._events[event]) emitter.on(event, fn);else if (isArray(emitter._events[event])) emitter._events[event].unshift(fn);else emitter._events[event] = [fn, emitter._events[event]];
-}
-
-function ReadableState(options, stream) {
-  Duplex = Duplex || require('./_stream_duplex');
-
-  options = options || {};
-
-  // Duplex streams are both readable and writable, but share
-  // the same options object.
-  // However, some cases require setting options to different
-  // values for the readable and the writable sides of the duplex stream.
-  // These options can be provided separately as readableXXX and writableXXX.
-  var isDuplex = stream instanceof Duplex;
-
-  // object stream flag. Used to make read(n) ignore n and to
-  // make all the buffer merging and length checks go away
-  this.objectMode = !!options.objectMode;
-
-  if (isDuplex) this.objectMode = this.objectMode || !!options.readableObjectMode;
-
-  // the point at which it stops calling _read() to fill the buffer
-  // Note: 0 is a valid value, means "don't call _read preemptively ever"
-  var hwm = options.highWaterMark;
-  var readableHwm = options.readableHighWaterMark;
-  var defaultHwm = this.objectMode ? 16 : 16 * 1024;
-
-  if (hwm || hwm === 0) this.highWaterMark = hwm;else if (isDuplex && (readableHwm || readableHwm === 0)) this.highWaterMark = readableHwm;else this.highWaterMark = defaultHwm;
-
-  // cast to ints.
-  this.highWaterMark = Math.floor(this.highWaterMark);
-
-  // A linked list is used to store data chunks instead of an array because the
-  // linked list can remove elements from the beginning faster than
-  // array.shift()
-  this.buffer = new BufferList();
-  this.length = 0;
-  this.pipes = null;
-  this.pipesCount = 0;
-  this.flowing = null;
-  this.ended = false;
-  this.endEmitted = false;
-  this.reading = false;
-
-  // a flag to be able to tell if the event 'readable'/'data' is emitted
-  // immediately, or on a later tick.  We set this to true at first, because
-  // any actions that shouldn't happen until "later" should generally also
-  // not happen before the first read call.
-  this.sync = true;
-
-  // whenever we return null, then we set a flag to say
-  // that we're awaiting a 'readable' event emission.
-  this.needReadable = false;
-  this.emittedReadable = false;
-  this.readableListening = false;
-  this.resumeScheduled = false;
-
-  // has it been destroyed
-  this.destroyed = false;
-
-  // Crypto is kind of old and crusty.  Historically, its default string
-  // encoding is 'binary' so we have to make this configurable.
-  // Everything else in the universe uses 'utf8', though.
-  this.defaultEncoding = options.defaultEncoding || 'utf8';
-
-  // the number of writers that are awaiting a drain event in .pipe()s
-  this.awaitDrain = 0;
-
-  // if true, a maybeReadMore has been scheduled
-  this.readingMore = false;
-
-  this.decoder = null;
-  this.encoding = null;
-  if (options.encoding) {
-    if (!StringDecoder) StringDecoder = require('string_decoder/').StringDecoder;
-    this.decoder = new StringDecoder(options.encoding);
-    this.encoding = options.encoding;
-  }
-}
-
-function Readable(options) {
-  Duplex = Duplex || require('./_stream_duplex');
-
-  if (!(this instanceof Readable)) return new Readable(options);
-
-  this._readableState = new ReadableState(options, this);
-
-  // legacy
-  this.readable = true;
-
-  if (options) {
-    if (typeof options.read === 'function') this._read = options.read;
-
-    if (typeof options.destroy === 'function') this._destroy = options.destroy;
-  }
-
-  Stream.call(this);
-}
-
-Object.defineProperty(Readable.prototype, 'destroyed', {
-  get: function () {
-    if (this._readableState === undefined) {
-      return false;
-    }
-    return this._readableState.destroyed;
-  },
-  set: function (value) {
-    // we ignore the value if the stream
-    // has not been initialized yet
-    if (!this._readableState) {
-      return;
-    }
-
-    // backward compatibility, the user is explicitly
-    // managing destroyed
-    this._readableState.destroyed = value;
-  }
-});
-
-Readable.prototype.destroy = destroyImpl.destroy;
-Readable.prototype._undestroy = destroyImpl.undestroy;
-Readable.prototype._destroy = function (err, cb) {
-  this.push(null);
-  cb(err);
-};
-
-// Manually shove something into the read() buffer.
-// This returns true if the highWaterMark has not been hit yet,
-// similar to how Writable.write() returns true if you should
-// write() some more.
-Readable.prototype.push = function (chunk, encoding) {
-  var state = this._readableState;
-  var skipChunkCheck;
-
-  if (!state.objectMode) {
-    if (typeof chunk === 'string') {
-      encoding = encoding || state.defaultEncoding;
-      if (encoding !== state.encoding) {
-        chunk = Buffer.from(chunk, encoding);
-        encoding = '';
-      }
-      skipChunkCheck = true;
-    }
-  } else {
-    skipChunkCheck = true;
-  }
-
-  return readableAddChunk(this, chunk, encoding, false, skipChunkCheck);
-};
-
-// Unshift should *always* be something directly out of read()
-Readable.prototype.unshift = function (chunk) {
-  return readableAddChunk(this, chunk, null, true, false);
-};
-
-function readableAddChunk(stream, chunk, encoding, addToFront, skipChunkCheck) {
-  var state = stream._readableState;
-  if (chunk === null) {
-    state.reading = false;
-    onEofChunk(stream, state);
-  } else {
-    var er;
-    if (!skipChunkCheck) er = chunkInvalid(state, chunk);
-    if (er) {
-      stream.emit('error', er);
-    } else if (state.objectMode || chunk && chunk.length > 0) {
-      if (typeof chunk !== 'string' && !state.objectMode && Object.getPrototypeOf(chunk) !== Buffer.prototype) {
-        chunk = _uint8ArrayToBuffer(chunk);
-      }
-
-      if (addToFront) {
-        if (state.endEmitted) stream.emit('error', new Error('stream.unshift() after end event'));else addChunk(stream, state, chunk, true);
-      } else if (state.ended) {
-        stream.emit('error', new Error('stream.push() after EOF'));
-      } else {
-        state.reading = false;
-        if (state.decoder && !encoding) {
-          chunk = state.decoder.write(chunk);
-          if (state.objectMode || chunk.length !== 0) addChunk(stream, state, chunk, false);else maybeReadMore(stream, state);
-        } else {
-          addChunk(stream, state, chunk, false);
-        }
-      }
-    } else if (!addToFront) {
-      state.reading = false;
-    }
-  }
-
-  return needMoreData(state);
-}
-
-function addChunk(stream, state, chunk, addToFront) {
-  if (state.flowing && state.length === 0 && !state.sync) {
-    stream.emit('data', chunk);
-    stream.read(0);
-  } else {
-    // update the buffer info.
-    state.length += state.objectMode ? 1 : chunk.length;
-    if (addToFront) state.buffer.unshift(chunk);else state.buffer.push(chunk);
-
-    if (state.needReadable) emitReadable(stream);
-  }
-  maybeReadMore(stream, state);
-}
-
-function chunkInvalid(state, chunk) {
-  var er;
-  if (!_isUint8Array(chunk) && typeof chunk !== 'string' && chunk !== undefined && !state.objectMode) {
-    er = new TypeError('Invalid non-string/buffer chunk');
-  }
-  return er;
-}
-
-// if it's past the high water mark, we can push in some more.
-// Also, if we have no data yet, we can stand some
-// more bytes.  This is to work around cases where hwm=0,
-// such as the repl.  Also, if the push() triggered a
-// readable event, and the user called read(largeNumber) such that
-// needReadable was set, then we ought to push more, so that another
-// 'readable' event will be triggered.
-function needMoreData(state) {
-  return !state.ended && (state.needReadable || state.length < state.highWaterMark || state.length === 0);
-}
-
-Readable.prototype.isPaused = function () {
-  return this._readableState.flowing === false;
-};
-
-// backwards compatibility.
-Readable.prototype.setEncoding = function (enc) {
-  if (!StringDecoder) StringDecoder = require('string_decoder/').StringDecoder;
-  this._readableState.decoder = new StringDecoder(enc);
-  this._readableState.encoding = enc;
-  return this;
-};
-
-// Don't raise the hwm > 8MB
-var MAX_HWM = 0x800000;
-function computeNewHighWaterMark(n) {
-  if (n >= MAX_HWM) {
-    n = MAX_HWM;
-  } else {
-    // Get the next highest power of 2 to prevent increasing hwm excessively in
-    // tiny amounts
-    n--;
-    n |= n >>> 1;
-    n |= n >>> 2;
-    n |= n >>> 4;
-    n |= n >>> 8;
-    n |= n >>> 16;
-    n++;
-  }
-  return n;
-}
-
-// This function is designed to be inlinable, so please take care when making
-// changes to the function body.
-function howMuchToRead(n, state) {
-  if (n <= 0 || state.length === 0 && state.ended) return 0;
-  if (state.objectMode) return 1;
-  if (n !== n) {
-    // Only flow one buffer at a time
-    if (state.flowing && state.length) return state.buffer.head.data.length;else return state.length;
-  }
-  // If we're asking for more than the current hwm, then raise the hwm.
-  if (n > state.highWaterMark) state.highWaterMark = computeNewHighWaterMark(n);
-  if (n <= state.length) return n;
-  // Don't have enough
-  if (!state.ended) {
-    state.needReadable = true;
-    return 0;
-  }
-  return state.length;
-}
-
-// you can override either this method, or the async _read(n) below.
-Readable.prototype.read = function (n) {
-  debug('read', n);
-  n = parseInt(n, 10);
-  var state = this._readableState;
-  var nOrig = n;
-
-  if (n !== 0) state.emittedReadable = false;
-
-  // if we're doing read(0) to trigger a readable event, but we
-  // already have a bunch of data in the buffer, then just trigger
-  // the 'readable' event and move on.
-  if (n === 0 && state.needReadable && (state.length >= state.highWaterMark || state.ended)) {
-    debug('read: emitReadable', state.length, state.ended);
-    if (state.length === 0 && state.ended) endReadable(this);else emitReadable(this);
-    return null;
-  }
-
-  n = howMuchToRead(n, state);
-
-  // if we've ended, and we're now clear, then finish it up.
-  if (n === 0 && state.ended) {
-    if (state.length === 0) endReadable(this);
-    return null;
-  }
-
-  // All the actual chunk generation logic needs to be
-  // *below* the call to _read.  The reason is that in certain
-  // synthetic stream cases, such as passthrough streams, _read
-  // may be a completely synchronous operation which may change
-  // the state of the read buffer, providing enough data when
-  // before there was *not* enough.
-  //
-  // So, the steps are:
-  // 1. Figure out what the state of things will be after we do
-  // a read from the buffer.
-  //
-  // 2. If that resulting state will trigger a _read, then call _read.
-  // Note that this may be asynchronous, or synchronous.  Yes, it is
-  // deeply ugly to write APIs this way, but that still doesn't mean
-  // that the Readable class should behave improperly, as streams are
-  // designed to be sync/async agnostic.
-  // Take note if the _read call is sync or async (ie, if the read call
-  // has returned yet), so that we know whether or not it's safe to emit
-  // 'readable' etc.
-  //
-  // 3. Actually pull the requested chunks out of the buffer and return.
-
-  // if we need a readable event, then we need to do some reading.
-  var doRead = state.needReadable;
-  debug('need readable', doRead);
-
-  // if we currently have less than the highWaterMark, then also read some
-  if (state.length === 0 || state.length - n < state.highWaterMark) {
-    doRead = true;
-    debug('length less than watermark', doRead);
-  }
-
-  // however, if we've ended, then there's no point, and if we're already
-  // reading, then it's unnecessary.
-  if (state.ended || state.reading) {
-    doRead = false;
-    debug('reading or ended', doRead);
-  } else if (doRead) {
-    debug('do read');
-    state.reading = true;
-    state.sync = true;
-    // if the length is currently zero, then we *need* a readable event.
-    if (state.length === 0) state.needReadable = true;
-    // call internal read method
-    this._read(state.highWaterMark);
-    state.sync = false;
-    // If _read pushed data synchronously, then `reading` will be false,
-    // and we need to re-evaluate how much data we can return to the user.
-    if (!state.reading) n = howMuchToRead(nOrig, state);
-  }
-
-  var ret;
-  if (n > 0) ret = fromList(n, state);else ret = null;
-
-  if (ret === null) {
-    state.needReadable = true;
-    n = 0;
-  } else {
-    state.length -= n;
-  }
-
-  if (state.length === 0) {
-    // If we have nothing in the buffer, then we want to know
-    // as soon as we *do* get something into the buffer.
-    if (!state.ended) state.needReadable = true;
-
-    // If we tried to read() past the EOF, then emit end on the next tick.
-    if (nOrig !== n && state.ended) endReadable(this);
-  }
-
-  if (ret !== null) this.emit('data', ret);
-
-  return ret;
-};
-
-function onEofChunk(stream, state) {
-  if (state.ended) return;
-  if (state.decoder) {
-    var chunk = state.decoder.end();
-    if (chunk && chunk.length) {
-      state.buffer.push(chunk);
-      state.length += state.objectMode ? 1 : chunk.length;
-    }
-  }
-  state.ended = true;
-
-  // emit 'readable' now to make sure it gets picked up.
-  emitReadable(stream);
-}
-
-// Don't emit readable right away in sync mode, because this can trigger
-// another read() call => stack overflow.  This way, it might trigger
-// a nextTick recursion warning, but that's not so bad.
-function emitReadable(stream) {
-  var state = stream._readableState;
-  state.needReadable = false;
-  if (!state.emittedReadable) {
-    debug('emitReadable', state.flowing);
-    state.emittedReadable = true;
-    if (state.sync) pna.nextTick(emitReadable_, stream);else emitReadable_(stream);
-  }
-}
-
-function emitReadable_(stream) {
-  debug('emit readable');
-  stream.emit('readable');
-  flow(stream);
-}
-
-// at this point, the user has presumably seen the 'readable' event,
-// and called read() to consume some data.  that may have triggered
-// in turn another _read(n) call, in which case reading = true if
-// it's in progress.
-// However, if we're not ended, or reading, and the length < hwm,
-// then go ahead and try to read some more preemptively.
-function maybeReadMore(stream, state) {
-  if (!state.readingMore) {
-    state.readingMore = true;
-    pna.nextTick(maybeReadMore_, stream, state);
-  }
-}
-
-function maybeReadMore_(stream, state) {
-  var len = state.length;
-  while (!state.reading && !state.flowing && !state.ended && state.length < state.highWaterMark) {
-    debug('maybeReadMore read 0');
-    stream.read(0);
-    if (len === state.length)
-      // didn't get any data, stop spinning.
-      break;else len = state.length;
-  }
-  state.readingMore = false;
-}
-
-// abstract method.  to be overridden in specific implementation classes.
-// call cb(er, data) where data is <= n in length.
-// for virtual (non-string, non-buffer) streams, "length" is somewhat
-// arbitrary, and perhaps not very meaningful.
-Readable.prototype._read = function (n) {
-  this.emit('error', new Error('_read() is not implemented'));
-};
-
-Readable.prototype.pipe = function (dest, pipeOpts) {
-  var src = this;
-  var state = this._readableState;
-
-  switch (state.pipesCount) {
-    case 0:
-      state.pipes = dest;
-      break;
-    case 1:
-      state.pipes = [state.pipes, dest];
-      break;
-    default:
-      state.pipes.push(dest);
-      break;
-  }
-  state.pipesCount += 1;
-  debug('pipe count=%d opts=%j', state.pipesCount, pipeOpts);
-
-  var doEnd = (!pipeOpts || pipeOpts.end !== false) && dest !== process.stdout && dest !== process.stderr;
-
-  var endFn = doEnd ? onend : unpipe;
-  if (state.endEmitted) pna.nextTick(endFn);else src.once('end', endFn);
-
-  dest.on('unpipe', onunpipe);
-  function onunpipe(readable, unpipeInfo) {
-    debug('onunpipe');
-    if (readable === src) {
-      if (unpipeInfo && unpipeInfo.hasUnpiped === false) {
-        unpipeInfo.hasUnpiped = true;
-        cleanup();
-      }
-    }
-  }
-
-  function onend() {
-    debug('onend');
-    dest.end();
-  }
-
-  // when the dest drains, it reduces the awaitDrain counter
-  // on the source.  This would be more elegant with a .once()
-  // handler in flow(), but adding and removing repeatedly is
-  // too slow.
-  var ondrain = pipeOnDrain(src);
-  dest.on('drain', ondrain);
-
-  var cleanedUp = false;
-  function cleanup() {
-    debug('cleanup');
-    // cleanup event handlers once the pipe is broken
-    dest.removeListener('close', onclose);
-    dest.removeListener('finish', onfinish);
-    dest.removeListener('drain', ondrain);
-    dest.removeListener('error', onerror);
-    dest.removeListener('unpipe', onunpipe);
-    src.removeListener('end', onend);
-    src.removeListener('end', unpipe);
-    src.removeListener('data', ondata);
-
-    cleanedUp = true;
-
-    // if the reader is waiting for a drain event from this
-    // specific writer, then it would cause it to never start
-    // flowing again.
-    // So, if this is awaiting a drain, then we just call it now.
-    // If we don't know, then assume that we are waiting for one.
-    if (state.awaitDrain && (!dest._writableState || dest._writableState.needDrain)) ondrain();
-  }
-
-  // If the user pushes more data while we're writing to dest then we'll end up
-  // in ondata again. However, we only want to increase awaitDrain once because
-  // dest will only emit one 'drain' event for the multiple writes.
-  // => Introduce a guard on increasing awaitDrain.
-  var increasedAwaitDrain = false;
-  src.on('data', ondata);
-  function ondata(chunk) {
-    debug('ondata');
-    increasedAwaitDrain = false;
-    var ret = dest.write(chunk);
-    if (false === ret && !increasedAwaitDrain) {
-      // If the user unpiped during `dest.write()`, it is possible
-      // to get stuck in a permanently paused state if that write
-      // also returned false.
-      // => Check whether `dest` is still a piping destination.
-      if ((state.pipesCount === 1 && state.pipes === dest || state.pipesCount > 1 && indexOf(state.pipes, dest) !== -1) && !cleanedUp) {
-        debug('false write response, pause', src._readableState.awaitDrain);
-        src._readableState.awaitDrain++;
-        increasedAwaitDrain = true;
-      }
-      src.pause();
-    }
-  }
-
-  // if the dest has an error, then stop piping into it.
-  // however, don't suppress the throwing behavior for this.
-  function onerror(er) {
-    debug('onerror', er);
-    unpipe();
-    dest.removeListener('error', onerror);
-    if (EElistenerCount(dest, 'error') === 0) dest.emit('error', er);
-  }
-
-  // Make sure our error handler is attached before userland ones.
-  prependListener(dest, 'error', onerror);
-
-  // Both close and finish should trigger unpipe, but only once.
-  function onclose() {
-    dest.removeListener('finish', onfinish);
-    unpipe();
-  }
-  dest.once('close', onclose);
-  function onfinish() {
-    debug('onfinish');
-    dest.removeListener('close', onclose);
-    unpipe();
-  }
-  dest.once('finish', onfinish);
-
-  function unpipe() {
-    debug('unpipe');
-    src.unpipe(dest);
-  }
-
-  // tell the dest that it's being piped to
-  dest.emit('pipe', src);
-
-  // start the flow if it hasn't been started already.
-  if (!state.flowing) {
-    debug('pipe resume');
-    src.resume();
-  }
-
-  return dest;
-};
-
-function pipeOnDrain(src) {
-  return function () {
-    var state = src._readableState;
-    debug('pipeOnDrain', state.awaitDrain);
-    if (state.awaitDrain) state.awaitDrain--;
-    if (state.awaitDrain === 0 && EElistenerCount(src, 'data')) {
-      state.flowing = true;
-      flow(src);
-    }
-  };
-}
-
-Readable.prototype.unpipe = function (dest) {
-  var state = this._readableState;
-  var unpipeInfo = { hasUnpiped: false };
-
-  // if we're not piping anywhere, then do nothing.
-  if (state.pipesCount === 0) return this;
-
-  // just one destination.  most common case.
-  if (state.pipesCount === 1) {
-    // passed in one, but it's not the right one.
-    if (dest && dest !== state.pipes) return this;
-
-    if (!dest) dest = state.pipes;
-
-    // got a match.
-    state.pipes = null;
-    state.pipesCount = 0;
-    state.flowing = false;
-    if (dest) dest.emit('unpipe', this, unpipeInfo);
-    return this;
-  }
-
-  // slow case. multiple pipe destinations.
-
-  if (!dest) {
-    // remove all.
-    var dests = state.pipes;
-    var len = state.pipesCount;
-    state.pipes = null;
-    state.pipesCount = 0;
-    state.flowing = false;
-
-    for (var i = 0; i < len; i++) {
-      dests[i].emit('unpipe', this, unpipeInfo);
-    }return this;
-  }
-
-  // try to find the right one.
-  var index = indexOf(state.pipes, dest);
-  if (index === -1) return this;
-
-  state.pipes.splice(index, 1);
-  state.pipesCount -= 1;
-  if (state.pipesCount === 1) state.pipes = state.pipes[0];
-
-  dest.emit('unpipe', this, unpipeInfo);
-
-  return this;
-};
-
-// set up data events if they are asked for
-// Ensure readable listeners eventually get something
-Readable.prototype.on = function (ev, fn) {
-  var res = Stream.prototype.on.call(this, ev, fn);
-
-  if (ev === 'data') {
-    // Start flowing on next tick if stream isn't explicitly paused
-    if (this._readableState.flowing !== false) this.resume();
-  } else if (ev === 'readable') {
-    var state = this._readableState;
-    if (!state.endEmitted && !state.readableListening) {
-      state.readableListening = state.needReadable = true;
-      state.emittedReadable = false;
-      if (!state.reading) {
-        pna.nextTick(nReadingNextTick, this);
-      } else if (state.length) {
-        emitReadable(this);
-      }
-    }
-  }
-
-  return res;
-};
-Readable.prototype.addListener = Readable.prototype.on;
-
-function nReadingNextTick(self) {
-  debug('readable nexttick read 0');
-  self.read(0);
-}
-
-// pause() and resume() are remnants of the legacy readable stream API
-// If the user uses them, then switch into old mode.
-Readable.prototype.resume = function () {
-  var state = this._readableState;
-  if (!state.flowing) {
-    debug('resume');
-    state.flowing = true;
-    resume(this, state);
-  }
-  return this;
-};
-
-function resume(stream, state) {
-  if (!state.resumeScheduled) {
-    state.resumeScheduled = true;
-    pna.nextTick(resume_, stream, state);
-  }
-}
-
-function resume_(stream, state) {
-  if (!state.reading) {
-    debug('resume read 0');
-    stream.read(0);
-  }
-
-  state.resumeScheduled = false;
-  state.awaitDrain = 0;
-  stream.emit('resume');
-  flow(stream);
-  if (state.flowing && !state.reading) stream.read(0);
-}
-
-Readable.prototype.pause = function () {
-  debug('call pause flowing=%j', this._readableState.flowing);
-  if (false !== this._readableState.flowing) {
-    debug('pause');
-    this._readableState.flowing = false;
-    this.emit('pause');
-  }
-  return this;
-};
-
-function flow(stream) {
-  var state = stream._readableState;
-  debug('flow', state.flowing);
-  while (state.flowing && stream.read() !== null) {}
-}
-
-// wrap an old-style stream as the async data source.
-// This is *not* part of the readable stream interface.
-// It is an ugly unfortunate mess of history.
-Readable.prototype.wrap = function (stream) {
-  var _this = this;
-
-  var state = this._readableState;
-  var paused = false;
-
-  stream.on('end', function () {
-    debug('wrapped end');
-    if (state.decoder && !state.ended) {
-      var chunk = state.decoder.end();
-      if (chunk && chunk.length) _this.push(chunk);
-    }
-
-    _this.push(null);
-  });
-
-  stream.on('data', function (chunk) {
-    debug('wrapped data');
-    if (state.decoder) chunk = state.decoder.write(chunk);
-
-    // don't skip over falsy values in objectMode
-    if (state.objectMode && (chunk === null || chunk === undefined)) return;else if (!state.objectMode && (!chunk || !chunk.length)) return;
-
-    var ret = _this.push(chunk);
-    if (!ret) {
-      paused = true;
-      stream.pause();
-    }
-  });
-
-  // proxy all the other methods.
-  // important when wrapping filters and duplexes.
-  for (var i in stream) {
-    if (this[i] === undefined && typeof stream[i] === 'function') {
-      this[i] = function (method) {
-        return function () {
-          return stream[method].apply(stream, arguments);
-        };
-      }(i);
-    }
-  }
-
-  // proxy certain important events.
-  for (var n = 0; n < kProxyEvents.length; n++) {
-    stream.on(kProxyEvents[n], this.emit.bind(this, kProxyEvents[n]));
-  }
-
-  // when we try to consume some more bytes, simply unpause the
-  // underlying stream.
-  this._read = function (n) {
-    debug('wrapped _read', n);
-    if (paused) {
-      paused = false;
-      stream.resume();
-    }
-  };
-
-  return this;
-};
-
-Object.defineProperty(Readable.prototype, 'readableHighWaterMark', {
-  // making it explicit this property is not enumerable
-  // because otherwise some prototype manipulation in
-  // userland will fail
-  enumerable: false,
-  get: function () {
-    return this._readableState.highWaterMark;
-  }
-});
-
-// exposed for testing purposes only.
-Readable._fromList = fromList;
-
-// Pluck off n bytes from an array of buffers.
-// Length is the combined lengths of all the buffers in the list.
-// This function is designed to be inlinable, so please take care when making
-// changes to the function body.
-function fromList(n, state) {
-  // nothing buffered
-  if (state.length === 0) return null;
-
-  var ret;
-  if (state.objectMode) ret = state.buffer.shift();else if (!n || n >= state.length) {
-    // read it all, truncate the list
-    if (state.decoder) ret = state.buffer.join('');else if (state.buffer.length === 1) ret = state.buffer.head.data;else ret = state.buffer.concat(state.length);
-    state.buffer.clear();
-  } else {
-    // read part of list
-    ret = fromListPartial(n, state.buffer, state.decoder);
-  }
-
-  return ret;
-}
-
-// Extracts only enough buffered data to satisfy the amount requested.
-// This function is designed to be inlinable, so please take care when making
-// changes to the function body.
-function fromListPartial(n, list, hasStrings) {
-  var ret;
-  if (n < list.head.data.length) {
-    // slice is the same for buffers and strings
-    ret = list.head.data.slice(0, n);
-    list.head.data = list.head.data.slice(n);
-  } else if (n === list.head.data.length) {
-    // first chunk is a perfect match
-    ret = list.shift();
-  } else {
-    // result spans more than one buffer
-    ret = hasStrings ? copyFromBufferString(n, list) : copyFromBuffer(n, list);
-  }
-  return ret;
-}
-
-// Copies a specified amount of characters from the list of buffered data
-// chunks.
-// This function is designed to be inlinable, so please take care when making
-// changes to the function body.
-function copyFromBufferString(n, list) {
-  var p = list.head;
-  var c = 1;
-  var ret = p.data;
-  n -= ret.length;
-  while (p = p.next) {
-    var str = p.data;
-    var nb = n > str.length ? str.length : n;
-    if (nb === str.length) ret += str;else ret += str.slice(0, n);
-    n -= nb;
-    if (n === 0) {
-      if (nb === str.length) {
-        ++c;
-        if (p.next) list.head = p.next;else list.head = list.tail = null;
-      } else {
-        list.head = p;
-        p.data = str.slice(nb);
-      }
-      break;
-    }
-    ++c;
-  }
-  list.length -= c;
-  return ret;
-}
-
-// Copies a specified amount of bytes from the list of buffered data chunks.
-// This function is designed to be inlinable, so please take care when making
-// changes to the function body.
-function copyFromBuffer(n, list) {
-  var ret = Buffer.allocUnsafe(n);
-  var p = list.head;
-  var c = 1;
-  p.data.copy(ret);
-  n -= p.data.length;
-  while (p = p.next) {
-    var buf = p.data;
-    var nb = n > buf.length ? buf.length : n;
-    buf.copy(ret, ret.length - n, 0, nb);
-    n -= nb;
-    if (n === 0) {
-      if (nb === buf.length) {
-        ++c;
-        if (p.next) list.head = p.next;else list.head = list.tail = null;
-      } else {
-        list.head = p;
-        p.data = buf.slice(nb);
-      }
-      break;
-    }
-    ++c;
-  }
-  list.length -= c;
-  return ret;
-}
-
-function endReadable(stream) {
-  var state = stream._readableState;
-
-  // If we get here before consuming all the bytes, then that is a
-  // bug in node.  Should never happen.
-  if (state.length > 0) throw new Error('"endReadable()" called on non-empty stream');
-
-  if (!state.endEmitted) {
-    state.ended = true;
-    pna.nextTick(endReadableNT, state, stream);
-  }
-}
-
-function endReadableNT(state, stream) {
-  // Check that we didn't get one last unshift.
-  if (!state.endEmitted && state.length === 0) {
-    state.endEmitted = true;
-    stream.readable = false;
-    stream.emit('end');
-  }
-}
-
-function indexOf(xs, x) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    if (xs[i] === x) return i;
-  }
-  return -1;
-}
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":147,"./internal/streams/BufferList":152,"./internal/streams/destroy":153,"./internal/streams/stream":154,"_process":142,"core-util-is":94,"events":91,"inherits":108,"isarray":110,"process-nextick-args":141,"safe-buffer":159,"string_decoder/":175,"util":89}],150:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// a transform stream is a readable/writable stream where you do
-// something with the data.  Sometimes it's called a "filter",
-// but that's not a great name for it, since that implies a thing where
-// some bits pass through, and others are simply ignored.  (That would
-// be a valid example of a transform, of course.)
-//
-// While the output is causally related to the input, it's not a
-// necessarily symmetric or synchronous transformation.  For example,
-// a zlib stream might take multiple plain-text writes(), and then
-// emit a single compressed chunk some time in the future.
-//
-// Here's how this works:
-//
-// The Transform stream has all the aspects of the readable and writable
-// stream classes.  When you write(chunk), that calls _write(chunk,cb)
-// internally, and returns false if there's a lot of pending writes
-// buffered up.  When you call read(), that calls _read(n) until
-// there's enough pending readable data buffered up.
-//
-// In a transform stream, the written data is placed in a buffer.  When
-// _read(n) is called, it transforms the queued up data, calling the
-// buffered _write cb's as it consumes chunks.  If consuming a single
-// written chunk would result in multiple output chunks, then the first
-// outputted bit calls the readcb, and subsequent chunks just go into
-// the read buffer, and will cause it to emit 'readable' if necessary.
-//
-// This way, back-pressure is actually determined by the reading side,
-// since _read has to be called to start processing a new chunk.  However,
-// a pathological inflate type of transform can cause excessive buffering
-// here.  For example, imagine a stream where every byte of input is
-// interpreted as an integer from 0-255, and then results in that many
-// bytes of output.  Writing the 4 bytes {ff,ff,ff,ff} would result in
-// 1kb of data being output.  In this case, you could write a very small
-// amount of input, and end up with a very large amount of output.  In
-// such a pathological inflating mechanism, there'd be no way to tell
-// the system to stop doing the transform.  A single 4MB write could
-// cause the system to run out of memory.
-//
-// However, even in such a pathological case, only a single written chunk
-// would be consumed, and then the rest would wait (un-transformed) until
-// the results of the previous transformed chunk were consumed.
-
-'use strict';
-
-module.exports = Transform;
-
-var Duplex = require('./_stream_duplex');
-
-/*<replacement>*/
-var util = Object.create(require('core-util-is'));
-util.inherits = require('inherits');
-/*</replacement>*/
-
-util.inherits(Transform, Duplex);
-
-function afterTransform(er, data) {
-  var ts = this._transformState;
-  ts.transforming = false;
-
-  var cb = ts.writecb;
-
-  if (!cb) {
-    return this.emit('error', new Error('write callback called multiple times'));
-  }
-
-  ts.writechunk = null;
-  ts.writecb = null;
-
-  if (data != null) // single equals check for both `null` and `undefined`
-    this.push(data);
-
-  cb(er);
-
-  var rs = this._readableState;
-  rs.reading = false;
-  if (rs.needReadable || rs.length < rs.highWaterMark) {
-    this._read(rs.highWaterMark);
-  }
-}
-
-function Transform(options) {
-  if (!(this instanceof Transform)) return new Transform(options);
-
-  Duplex.call(this, options);
-
-  this._transformState = {
-    afterTransform: afterTransform.bind(this),
-    needTransform: false,
-    transforming: false,
-    writecb: null,
-    writechunk: null,
-    writeencoding: null
-  };
-
-  // start out asking for a readable event once data is transformed.
-  this._readableState.needReadable = true;
-
-  // we have implemented the _read method, and done the other things
-  // that Readable wants before the first _read call, so unset the
-  // sync guard flag.
-  this._readableState.sync = false;
-
-  if (options) {
-    if (typeof options.transform === 'function') this._transform = options.transform;
-
-    if (typeof options.flush === 'function') this._flush = options.flush;
-  }
-
-  // When the writable side finishes, then flush out anything remaining.
-  this.on('prefinish', prefinish);
-}
-
-function prefinish() {
-  var _this = this;
-
-  if (typeof this._flush === 'function') {
-    this._flush(function (er, data) {
-      done(_this, er, data);
-    });
-  } else {
-    done(this, null, null);
-  }
-}
-
-Transform.prototype.push = function (chunk, encoding) {
-  this._transformState.needTransform = false;
-  return Duplex.prototype.push.call(this, chunk, encoding);
-};
-
-// This is the part where you do stuff!
-// override this function in implementation classes.
-// 'chunk' is an input chunk.
-//
-// Call `push(newChunk)` to pass along transformed output
-// to the readable side.  You may call 'push' zero or more times.
-//
-// Call `cb(err)` when you are done with this chunk.  If you pass
-// an error, then that'll put the hurt on the whole operation.  If you
-// never call cb(), then you'll never get another chunk.
-Transform.prototype._transform = function (chunk, encoding, cb) {
-  throw new Error('_transform() is not implemented');
-};
-
-Transform.prototype._write = function (chunk, encoding, cb) {
-  var ts = this._transformState;
-  ts.writecb = cb;
-  ts.writechunk = chunk;
-  ts.writeencoding = encoding;
-  if (!ts.transforming) {
-    var rs = this._readableState;
-    if (ts.needTransform || rs.needReadable || rs.length < rs.highWaterMark) this._read(rs.highWaterMark);
-  }
-};
-
-// Doesn't matter what the args are here.
-// _transform does all the work.
-// That we got here means that the readable side wants more data.
-Transform.prototype._read = function (n) {
-  var ts = this._transformState;
-
-  if (ts.writechunk !== null && ts.writecb && !ts.transforming) {
-    ts.transforming = true;
-    this._transform(ts.writechunk, ts.writeencoding, ts.afterTransform);
-  } else {
-    // mark that we need a transform, so that any data that comes in
-    // will get processed, now that we've asked for it.
-    ts.needTransform = true;
-  }
-};
-
-Transform.prototype._destroy = function (err, cb) {
-  var _this2 = this;
-
-  Duplex.prototype._destroy.call(this, err, function (err2) {
-    cb(err2);
-    _this2.emit('close');
-  });
-};
-
-function done(stream, er, data) {
-  if (er) return stream.emit('error', er);
-
-  if (data != null) // single equals check for both `null` and `undefined`
-    stream.push(data);
-
-  // if there's nothing in the write buffer, then that means
-  // that nothing more will ever be provided
-  if (stream._writableState.length) throw new Error('Calling transform done when ws.length != 0');
-
-  if (stream._transformState.transforming) throw new Error('Calling transform done when still transforming');
-
-  return stream.push(null);
-}
-},{"./_stream_duplex":147,"core-util-is":94,"inherits":108}],151:[function(require,module,exports){
-(function (process,global,setImmediate){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// A bit simpler than readable streams.
-// Implement an async ._write(chunk, encoding, cb), and it'll handle all
-// the drain event emission and buffering.
-
-'use strict';
-
-/*<replacement>*/
-
-var pna = require('process-nextick-args');
-/*</replacement>*/
-
-module.exports = Writable;
-
-/* <replacement> */
-function WriteReq(chunk, encoding, cb) {
-  this.chunk = chunk;
-  this.encoding = encoding;
-  this.callback = cb;
-  this.next = null;
-}
-
-// It seems a linked list but it is not
-// there will be only 2 of these for each stream
-function CorkedRequest(state) {
-  var _this = this;
-
-  this.next = null;
-  this.entry = null;
-  this.finish = function () {
-    onCorkedFinish(_this, state);
-  };
-}
-/* </replacement> */
-
-/*<replacement>*/
-var asyncWrite = !process.browser && ['v0.10', 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : pna.nextTick;
-/*</replacement>*/
-
-/*<replacement>*/
-var Duplex;
-/*</replacement>*/
-
-Writable.WritableState = WritableState;
-
-/*<replacement>*/
-var util = Object.create(require('core-util-is'));
-util.inherits = require('inherits');
-/*</replacement>*/
-
-/*<replacement>*/
-var internalUtil = {
-  deprecate: require('util-deprecate')
-};
-/*</replacement>*/
-
-/*<replacement>*/
-var Stream = require('./internal/streams/stream');
-/*</replacement>*/
-
-/*<replacement>*/
-
-var Buffer = require('safe-buffer').Buffer;
-var OurUint8Array = global.Uint8Array || function () {};
-function _uint8ArrayToBuffer(chunk) {
-  return Buffer.from(chunk);
-}
-function _isUint8Array(obj) {
-  return Buffer.isBuffer(obj) || obj instanceof OurUint8Array;
-}
-
-/*</replacement>*/
-
-var destroyImpl = require('./internal/streams/destroy');
-
-util.inherits(Writable, Stream);
-
-function nop() {}
-
-function WritableState(options, stream) {
-  Duplex = Duplex || require('./_stream_duplex');
-
-  options = options || {};
-
-  // Duplex streams are both readable and writable, but share
-  // the same options object.
-  // However, some cases require setting options to different
-  // values for the readable and the writable sides of the duplex stream.
-  // These options can be provided separately as readableXXX and writableXXX.
-  var isDuplex = stream instanceof Duplex;
-
-  // object stream flag to indicate whether or not this stream
-  // contains buffers or objects.
-  this.objectMode = !!options.objectMode;
-
-  if (isDuplex) this.objectMode = this.objectMode || !!options.writableObjectMode;
-
-  // the point at which write() starts returning false
-  // Note: 0 is a valid value, means that we always return false if
-  // the entire buffer is not flushed immediately on write()
-  var hwm = options.highWaterMark;
-  var writableHwm = options.writableHighWaterMark;
-  var defaultHwm = this.objectMode ? 16 : 16 * 1024;
-
-  if (hwm || hwm === 0) this.highWaterMark = hwm;else if (isDuplex && (writableHwm || writableHwm === 0)) this.highWaterMark = writableHwm;else this.highWaterMark = defaultHwm;
-
-  // cast to ints.
-  this.highWaterMark = Math.floor(this.highWaterMark);
-
-  // if _final has been called
-  this.finalCalled = false;
-
-  // drain event flag.
-  this.needDrain = false;
-  // at the start of calling end()
-  this.ending = false;
-  // when end() has been called, and returned
-  this.ended = false;
-  // when 'finish' is emitted
-  this.finished = false;
-
-  // has it been destroyed
-  this.destroyed = false;
-
-  // should we decode strings into buffers before passing to _write?
-  // this is here so that some node-core streams can optimize string
-  // handling at a lower level.
-  var noDecode = options.decodeStrings === false;
-  this.decodeStrings = !noDecode;
-
-  // Crypto is kind of old and crusty.  Historically, its default string
-  // encoding is 'binary' so we have to make this configurable.
-  // Everything else in the universe uses 'utf8', though.
-  this.defaultEncoding = options.defaultEncoding || 'utf8';
-
-  // not an actual buffer we keep track of, but a measurement
-  // of how much we're waiting to get pushed to some underlying
-  // socket or file.
-  this.length = 0;
-
-  // a flag to see when we're in the middle of a write.
-  this.writing = false;
-
-  // when true all writes will be buffered until .uncork() call
-  this.corked = 0;
-
-  // a flag to be able to tell if the onwrite cb is called immediately,
-  // or on a later tick.  We set this to true at first, because any
-  // actions that shouldn't happen until "later" should generally also
-  // not happen before the first write call.
-  this.sync = true;
-
-  // a flag to know if we're processing previously buffered items, which
-  // may call the _write() callback in the same tick, so that we don't
-  // end up in an overlapped onwrite situation.
-  this.bufferProcessing = false;
-
-  // the callback that's passed to _write(chunk,cb)
-  this.onwrite = function (er) {
-    onwrite(stream, er);
-  };
-
-  // the callback that the user supplies to write(chunk,encoding,cb)
-  this.writecb = null;
-
-  // the amount that is being written when _write is called.
-  this.writelen = 0;
-
-  this.bufferedRequest = null;
-  this.lastBufferedRequest = null;
-
-  // number of pending user-supplied write callbacks
-  // this must be 0 before 'finish' can be emitted
-  this.pendingcb = 0;
-
-  // emit prefinish if the only thing we're waiting for is _write cbs
-  // This is relevant for synchronous Transform streams
-  this.prefinished = false;
-
-  // True if the error was already emitted and should not be thrown again
-  this.errorEmitted = false;
-
-  // count buffered requests
-  this.bufferedRequestCount = 0;
-
-  // allocate the first CorkedRequest, there is always
-  // one allocated and free to use, and we maintain at most two
-  this.corkedRequestsFree = new CorkedRequest(this);
-}
-
-WritableState.prototype.getBuffer = function getBuffer() {
-  var current = this.bufferedRequest;
-  var out = [];
-  while (current) {
-    out.push(current);
-    current = current.next;
-  }
-  return out;
-};
-
-(function () {
-  try {
-    Object.defineProperty(WritableState.prototype, 'buffer', {
-      get: internalUtil.deprecate(function () {
-        return this.getBuffer();
-      }, '_writableState.buffer is deprecated. Use _writableState.getBuffer ' + 'instead.', 'DEP0003')
-    });
-  } catch (_) {}
-})();
-
-// Test _writableState for inheritance to account for Duplex streams,
-// whose prototype chain only points to Readable.
-var realHasInstance;
-if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.prototype[Symbol.hasInstance] === 'function') {
-  realHasInstance = Function.prototype[Symbol.hasInstance];
-  Object.defineProperty(Writable, Symbol.hasInstance, {
-    value: function (object) {
-      if (realHasInstance.call(this, object)) return true;
-      if (this !== Writable) return false;
-
-      return object && object._writableState instanceof WritableState;
-    }
-  });
-} else {
-  realHasInstance = function (object) {
-    return object instanceof this;
-  };
-}
-
-function Writable(options) {
-  Duplex = Duplex || require('./_stream_duplex');
-
-  // Writable ctor is applied to Duplexes, too.
-  // `realHasInstance` is necessary because using plain `instanceof`
-  // would return false, as no `_writableState` property is attached.
-
-  // Trying to use the custom `instanceof` for Writable here will also break the
-  // Node.js LazyTransform implementation, which has a non-trivial getter for
-  // `_writableState` that would lead to infinite recursion.
-  if (!realHasInstance.call(Writable, this) && !(this instanceof Duplex)) {
-    return new Writable(options);
-  }
-
-  this._writableState = new WritableState(options, this);
-
-  // legacy.
-  this.writable = true;
-
-  if (options) {
-    if (typeof options.write === 'function') this._write = options.write;
-
-    if (typeof options.writev === 'function') this._writev = options.writev;
-
-    if (typeof options.destroy === 'function') this._destroy = options.destroy;
-
-    if (typeof options.final === 'function') this._final = options.final;
-  }
-
-  Stream.call(this);
-}
-
-// Otherwise people can pipe Writable streams, which is just wrong.
-Writable.prototype.pipe = function () {
-  this.emit('error', new Error('Cannot pipe, not readable'));
-};
-
-function writeAfterEnd(stream, cb) {
-  var er = new Error('write after end');
-  // TODO: defer error events consistently everywhere, not just the cb
-  stream.emit('error', er);
-  pna.nextTick(cb, er);
-}
-
-// Checks that a user-supplied chunk is valid, especially for the particular
-// mode the stream is in. Currently this means that `null` is never accepted
-// and undefined/non-string values are only allowed in object mode.
-function validChunk(stream, state, chunk, cb) {
-  var valid = true;
-  var er = false;
-
-  if (chunk === null) {
-    er = new TypeError('May not write null values to stream');
-  } else if (typeof chunk !== 'string' && chunk !== undefined && !state.objectMode) {
-    er = new TypeError('Invalid non-string/buffer chunk');
-  }
-  if (er) {
-    stream.emit('error', er);
-    pna.nextTick(cb, er);
-    valid = false;
-  }
-  return valid;
-}
-
-Writable.prototype.write = function (chunk, encoding, cb) {
-  var state = this._writableState;
-  var ret = false;
-  var isBuf = !state.objectMode && _isUint8Array(chunk);
-
-  if (isBuf && !Buffer.isBuffer(chunk)) {
-    chunk = _uint8ArrayToBuffer(chunk);
-  }
-
-  if (typeof encoding === 'function') {
-    cb = encoding;
-    encoding = null;
-  }
-
-  if (isBuf) encoding = 'buffer';else if (!encoding) encoding = state.defaultEncoding;
-
-  if (typeof cb !== 'function') cb = nop;
-
-  if (state.ended) writeAfterEnd(this, cb);else if (isBuf || validChunk(this, state, chunk, cb)) {
-    state.pendingcb++;
-    ret = writeOrBuffer(this, state, isBuf, chunk, encoding, cb);
-  }
-
-  return ret;
-};
-
-Writable.prototype.cork = function () {
-  var state = this._writableState;
-
-  state.corked++;
-};
-
-Writable.prototype.uncork = function () {
-  var state = this._writableState;
-
-  if (state.corked) {
-    state.corked--;
-
-    if (!state.writing && !state.corked && !state.finished && !state.bufferProcessing && state.bufferedRequest) clearBuffer(this, state);
-  }
-};
-
-Writable.prototype.setDefaultEncoding = function setDefaultEncoding(encoding) {
-  // node::ParseEncoding() requires lower case.
-  if (typeof encoding === 'string') encoding = encoding.toLowerCase();
-  if (!(['hex', 'utf8', 'utf-8', 'ascii', 'binary', 'base64', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', 'raw'].indexOf((encoding + '').toLowerCase()) > -1)) throw new TypeError('Unknown encoding: ' + encoding);
-  this._writableState.defaultEncoding = encoding;
-  return this;
-};
-
-function decodeChunk(state, chunk, encoding) {
-  if (!state.objectMode && state.decodeStrings !== false && typeof chunk === 'string') {
-    chunk = Buffer.from(chunk, encoding);
-  }
-  return chunk;
-}
-
-Object.defineProperty(Writable.prototype, 'writableHighWaterMark', {
-  // making it explicit this property is not enumerable
-  // because otherwise some prototype manipulation in
-  // userland will fail
-  enumerable: false,
-  get: function () {
-    return this._writableState.highWaterMark;
-  }
-});
-
-// if we're already writing something, then just put this
-// in the queue, and wait our turn.  Otherwise, call _write
-// If we return false, then we need a drain event, so set that flag.
-function writeOrBuffer(stream, state, isBuf, chunk, encoding, cb) {
-  if (!isBuf) {
-    var newChunk = decodeChunk(state, chunk, encoding);
-    if (chunk !== newChunk) {
-      isBuf = true;
-      encoding = 'buffer';
-      chunk = newChunk;
-    }
-  }
-  var len = state.objectMode ? 1 : chunk.length;
-
-  state.length += len;
-
-  var ret = state.length < state.highWaterMark;
-  // we must ensure that previous needDrain will not be reset to false.
-  if (!ret) state.needDrain = true;
-
-  if (state.writing || state.corked) {
-    var last = state.lastBufferedRequest;
-    state.lastBufferedRequest = {
-      chunk: chunk,
-      encoding: encoding,
-      isBuf: isBuf,
-      callback: cb,
-      next: null
-    };
-    if (last) {
-      last.next = state.lastBufferedRequest;
-    } else {
-      state.bufferedRequest = state.lastBufferedRequest;
-    }
-    state.bufferedRequestCount += 1;
-  } else {
-    doWrite(stream, state, false, len, chunk, encoding, cb);
-  }
-
-  return ret;
-}
-
-function doWrite(stream, state, writev, len, chunk, encoding, cb) {
-  state.writelen = len;
-  state.writecb = cb;
-  state.writing = true;
-  state.sync = true;
-  if (writev) stream._writev(chunk, state.onwrite);else stream._write(chunk, encoding, state.onwrite);
-  state.sync = false;
-}
-
-function onwriteError(stream, state, sync, er, cb) {
-  --state.pendingcb;
-
-  if (sync) {
-    // defer the callback if we are being called synchronously
-    // to avoid piling up things on the stack
-    pna.nextTick(cb, er);
-    // this can emit finish, and it will always happen
-    // after error
-    pna.nextTick(finishMaybe, stream, state);
-    stream._writableState.errorEmitted = true;
-    stream.emit('error', er);
-  } else {
-    // the caller expect this to happen before if
-    // it is async
-    cb(er);
-    stream._writableState.errorEmitted = true;
-    stream.emit('error', er);
-    // this can emit finish, but finish must
-    // always follow error
-    finishMaybe(stream, state);
-  }
-}
-
-function onwriteStateUpdate(state) {
-  state.writing = false;
-  state.writecb = null;
-  state.length -= state.writelen;
-  state.writelen = 0;
-}
-
-function onwrite(stream, er) {
-  var state = stream._writableState;
-  var sync = state.sync;
-  var cb = state.writecb;
-
-  onwriteStateUpdate(state);
-
-  if (er) onwriteError(stream, state, sync, er, cb);else {
-    // Check if we're actually ready to finish, but don't emit yet
-    var finished = needFinish(state);
-
-    if (!finished && !state.corked && !state.bufferProcessing && state.bufferedRequest) {
-      clearBuffer(stream, state);
-    }
-
-    if (sync) {
-      /*<replacement>*/
-      asyncWrite(afterWrite, stream, state, finished, cb);
-      /*</replacement>*/
-    } else {
-      afterWrite(stream, state, finished, cb);
-    }
-  }
-}
-
-function afterWrite(stream, state, finished, cb) {
-  if (!finished) onwriteDrain(stream, state);
-  state.pendingcb--;
-  cb();
-  finishMaybe(stream, state);
-}
-
-// Must force callback to be called on nextTick, so that we don't
-// emit 'drain' before the write() consumer gets the 'false' return
-// value, and has a chance to attach a 'drain' listener.
-function onwriteDrain(stream, state) {
-  if (state.length === 0 && state.needDrain) {
-    state.needDrain = false;
-    stream.emit('drain');
-  }
-}
-
-// if there's something in the buffer waiting, then process it
-function clearBuffer(stream, state) {
-  state.bufferProcessing = true;
-  var entry = state.bufferedRequest;
-
-  if (stream._writev && entry && entry.next) {
-    // Fast case, write everything using _writev()
-    var l = state.bufferedRequestCount;
-    var buffer = new Array(l);
-    var holder = state.corkedRequestsFree;
-    holder.entry = entry;
-
-    var count = 0;
-    var allBuffers = true;
-    while (entry) {
-      buffer[count] = entry;
-      if (!entry.isBuf) allBuffers = false;
-      entry = entry.next;
-      count += 1;
-    }
-    buffer.allBuffers = allBuffers;
-
-    doWrite(stream, state, true, state.length, buffer, '', holder.finish);
-
-    // doWrite is almost always async, defer these to save a bit of time
-    // as the hot path ends with doWrite
-    state.pendingcb++;
-    state.lastBufferedRequest = null;
-    if (holder.next) {
-      state.corkedRequestsFree = holder.next;
-      holder.next = null;
-    } else {
-      state.corkedRequestsFree = new CorkedRequest(state);
-    }
-    state.bufferedRequestCount = 0;
-  } else {
-    // Slow case, write chunks one-by-one
-    while (entry) {
-      var chunk = entry.chunk;
-      var encoding = entry.encoding;
-      var cb = entry.callback;
-      var len = state.objectMode ? 1 : chunk.length;
-
-      doWrite(stream, state, false, len, chunk, encoding, cb);
-      entry = entry.next;
-      state.bufferedRequestCount--;
-      // if we didn't call the onwrite immediately, then
-      // it means that we need to wait until it does.
-      // also, that means that the chunk and cb are currently
-      // being processed, so move the buffer counter past them.
-      if (state.writing) {
-        break;
-      }
-    }
-
-    if (entry === null) state.lastBufferedRequest = null;
-  }
-
-  state.bufferedRequest = entry;
-  state.bufferProcessing = false;
-}
-
-Writable.prototype._write = function (chunk, encoding, cb) {
-  cb(new Error('_write() is not implemented'));
-};
-
-Writable.prototype._writev = null;
-
-Writable.prototype.end = function (chunk, encoding, cb) {
-  var state = this._writableState;
-
-  if (typeof chunk === 'function') {
-    cb = chunk;
-    chunk = null;
-    encoding = null;
-  } else if (typeof encoding === 'function') {
-    cb = encoding;
-    encoding = null;
-  }
-
-  if (chunk !== null && chunk !== undefined) this.write(chunk, encoding);
-
-  // .end() fully uncorks
-  if (state.corked) {
-    state.corked = 1;
-    this.uncork();
-  }
-
-  // ignore unnecessary end() calls.
-  if (!state.ending && !state.finished) endWritable(this, state, cb);
-};
-
-function needFinish(state) {
-  return state.ending && state.length === 0 && state.bufferedRequest === null && !state.finished && !state.writing;
-}
-function callFinal(stream, state) {
-  stream._final(function (err) {
-    state.pendingcb--;
-    if (err) {
-      stream.emit('error', err);
-    }
-    state.prefinished = true;
-    stream.emit('prefinish');
-    finishMaybe(stream, state);
-  });
-}
-function prefinish(stream, state) {
-  if (!state.prefinished && !state.finalCalled) {
-    if (typeof stream._final === 'function') {
-      state.pendingcb++;
-      state.finalCalled = true;
-      pna.nextTick(callFinal, stream, state);
-    } else {
-      state.prefinished = true;
-      stream.emit('prefinish');
-    }
-  }
-}
-
-function finishMaybe(stream, state) {
-  var need = needFinish(state);
-  if (need) {
-    prefinish(stream, state);
-    if (state.pendingcb === 0) {
-      state.finished = true;
-      stream.emit('finish');
-    }
-  }
-  return need;
-}
-
-function endWritable(stream, state, cb) {
-  state.ending = true;
-  finishMaybe(stream, state);
-  if (cb) {
-    if (state.finished) pna.nextTick(cb);else stream.once('finish', cb);
-  }
-  state.ended = true;
-  stream.writable = false;
-}
-
-function onCorkedFinish(corkReq, state, err) {
-  var entry = corkReq.entry;
-  corkReq.entry = null;
-  while (entry) {
-    var cb = entry.callback;
-    state.pendingcb--;
-    cb(err);
-    entry = entry.next;
-  }
-  if (state.corkedRequestsFree) {
-    state.corkedRequestsFree.next = corkReq;
-  } else {
-    state.corkedRequestsFree = corkReq;
-  }
-}
-
-Object.defineProperty(Writable.prototype, 'destroyed', {
-  get: function () {
-    if (this._writableState === undefined) {
-      return false;
-    }
-    return this._writableState.destroyed;
-  },
-  set: function (value) {
-    // we ignore the value if the stream
-    // has not been initialized yet
-    if (!this._writableState) {
-      return;
-    }
-
-    // backward compatibility, the user is explicitly
-    // managing destroyed
-    this._writableState.destroyed = value;
-  }
-});
-
-Writable.prototype.destroy = destroyImpl.destroy;
-Writable.prototype._undestroy = destroyImpl.undestroy;
-Writable.prototype._destroy = function (err, cb) {
-  this.end();
-  cb(err);
-};
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate)
-},{"./_stream_duplex":147,"./internal/streams/destroy":153,"./internal/streams/stream":154,"_process":142,"core-util-is":94,"inherits":108,"process-nextick-args":141,"safe-buffer":159,"timers":93,"util-deprecate":181}],152:[function(require,module,exports){
-'use strict';
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Buffer = require('safe-buffer').Buffer;
-var util = require('util');
-
-function copyBuffer(src, target, offset) {
-  src.copy(target, offset);
-}
-
-module.exports = function () {
-  function BufferList() {
-    _classCallCheck(this, BufferList);
-
-    this.head = null;
-    this.tail = null;
-    this.length = 0;
-  }
-
-  BufferList.prototype.push = function push(v) {
-    var entry = { data: v, next: null };
-    if (this.length > 0) this.tail.next = entry;else this.head = entry;
-    this.tail = entry;
-    ++this.length;
-  };
-
-  BufferList.prototype.unshift = function unshift(v) {
-    var entry = { data: v, next: this.head };
-    if (this.length === 0) this.tail = entry;
-    this.head = entry;
-    ++this.length;
-  };
-
-  BufferList.prototype.shift = function shift() {
-    if (this.length === 0) return;
-    var ret = this.head.data;
-    if (this.length === 1) this.head = this.tail = null;else this.head = this.head.next;
-    --this.length;
-    return ret;
-  };
-
-  BufferList.prototype.clear = function clear() {
-    this.head = this.tail = null;
-    this.length = 0;
-  };
-
-  BufferList.prototype.join = function join(s) {
-    if (this.length === 0) return '';
-    var p = this.head;
-    var ret = '' + p.data;
-    while (p = p.next) {
-      ret += s + p.data;
-    }return ret;
-  };
-
-  BufferList.prototype.concat = function concat(n) {
-    if (this.length === 0) return Buffer.alloc(0);
-    if (this.length === 1) return this.head.data;
-    var ret = Buffer.allocUnsafe(n >>> 0);
-    var p = this.head;
-    var i = 0;
-    while (p) {
-      copyBuffer(p.data, ret, i);
-      i += p.data.length;
-      p = p.next;
-    }
-    return ret;
-  };
-
-  return BufferList;
-}();
-
-if (util && util.inspect && util.inspect.custom) {
-  module.exports.prototype[util.inspect.custom] = function () {
-    var obj = util.inspect({ length: this.length });
-    return this.constructor.name + ' ' + obj;
-  };
-}
-},{"safe-buffer":159,"util":89}],153:[function(require,module,exports){
-'use strict';
-
-/*<replacement>*/
-
-var pna = require('process-nextick-args');
-/*</replacement>*/
-
-// undocumented cb() API, needed for core, not for public API
-function destroy(err, cb) {
-  var _this = this;
-
-  var readableDestroyed = this._readableState && this._readableState.destroyed;
-  var writableDestroyed = this._writableState && this._writableState.destroyed;
-
-  if (readableDestroyed || writableDestroyed) {
-    if (cb) {
-      cb(err);
-    } else if (err && (!this._writableState || !this._writableState.errorEmitted)) {
-      pna.nextTick(emitErrorNT, this, err);
-    }
-    return this;
-  }
-
-  // we set destroyed to true before firing error callbacks in order
-  // to make it re-entrance safe in case destroy() is called within callbacks
-
-  if (this._readableState) {
-    this._readableState.destroyed = true;
-  }
-
-  // if this is a duplex stream mark the writable part as destroyed as well
-  if (this._writableState) {
-    this._writableState.destroyed = true;
-  }
-
-  this._destroy(err || null, function (err) {
-    if (!cb && err) {
-      pna.nextTick(emitErrorNT, _this, err);
-      if (_this._writableState) {
-        _this._writableState.errorEmitted = true;
-      }
-    } else if (cb) {
-      cb(err);
-    }
-  });
-
-  return this;
-}
-
-function undestroy() {
-  if (this._readableState) {
-    this._readableState.destroyed = false;
-    this._readableState.reading = false;
-    this._readableState.ended = false;
-    this._readableState.endEmitted = false;
-  }
-
-  if (this._writableState) {
-    this._writableState.destroyed = false;
-    this._writableState.ended = false;
-    this._writableState.ending = false;
-    this._writableState.finished = false;
-    this._writableState.errorEmitted = false;
-  }
-}
-
-function emitErrorNT(self, err) {
-  self.emit('error', err);
-}
-
-module.exports = {
-  destroy: destroy,
-  undestroy: undestroy
-};
-},{"process-nextick-args":141}],154:[function(require,module,exports){
-module.exports = require('events').EventEmitter;
-
-},{"events":91}],155:[function(require,module,exports){
-module.exports = require('./readable').PassThrough
-
-},{"./readable":156}],156:[function(require,module,exports){
-exports = module.exports = require('./lib/_stream_readable.js');
-exports.Stream = exports;
-exports.Readable = exports;
-exports.Writable = require('./lib/_stream_writable.js');
-exports.Duplex = require('./lib/_stream_duplex.js');
-exports.Transform = require('./lib/_stream_transform.js');
-exports.PassThrough = require('./lib/_stream_passthrough.js');
-
-},{"./lib/_stream_duplex.js":147,"./lib/_stream_passthrough.js":148,"./lib/_stream_readable.js":149,"./lib/_stream_transform.js":150,"./lib/_stream_writable.js":151}],157:[function(require,module,exports){
-module.exports = require('./readable').Transform
-
-},{"./readable":156}],158:[function(require,module,exports){
-module.exports = require('./lib/_stream_writable.js');
-
-},{"./lib/_stream_writable.js":151}],159:[function(require,module,exports){
-/* eslint-disable node/no-deprecated-api */
-var buffer = require('buffer')
-var Buffer = buffer.Buffer
-
-// alternative to using Object.keys for old browsers
-function copyProps (src, dst) {
-  for (var key in src) {
-    dst[key] = src[key]
-  }
-}
-if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
-  module.exports = buffer
-} else {
-  // Copy properties from require('buffer')
-  copyProps(buffer, exports)
-  exports.Buffer = SafeBuffer
-}
-
-function SafeBuffer (arg, encodingOrOffset, length) {
-  return Buffer(arg, encodingOrOffset, length)
-}
-
-// Copy static methods from Buffer
-copyProps(Buffer, SafeBuffer)
-
-SafeBuffer.from = function (arg, encodingOrOffset, length) {
-  if (typeof arg === 'number') {
-    throw new TypeError('Argument must not be a number')
-  }
-  return Buffer(arg, encodingOrOffset, length)
-}
-
-SafeBuffer.alloc = function (size, fill, encoding) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  var buf = Buffer(size)
-  if (fill !== undefined) {
-    if (typeof encoding === 'string') {
-      buf.fill(fill, encoding)
-    } else {
-      buf.fill(fill)
-    }
-  } else {
-    buf.fill(0)
-  }
-  return buf
-}
-
-SafeBuffer.allocUnsafe = function (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  return Buffer(size)
-}
-
-SafeBuffer.allocUnsafeSlow = function (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  return buffer.SlowBuffer(size)
-}
-
-},{"buffer":90}],160:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 // A library of seedable RNGs implemented in Javascript.
 //
 // Usage:
@@ -35290,7 +30389,7 @@ sr.tychei = tychei;
 
 module.exports = sr;
 
-},{"./lib/alea":161,"./lib/tychei":162,"./lib/xor128":163,"./lib/xor4096":164,"./lib/xorshift7":165,"./lib/xorwow":166,"./seedrandom":167}],161:[function(require,module,exports){
+},{"./lib/alea":132,"./lib/tychei":133,"./lib/xor128":134,"./lib/xor4096":135,"./lib/xorshift7":136,"./lib/xorwow":137,"./seedrandom":138}],132:[function(require,module,exports){
 // A port of an algorithm by Johannes Baagøe <baagoe@baagoe.com>, 2010
 // http://baagoe.com/en/RandomMusings/javascript/
 // https://github.com/nquinlan/better-random-numbers-for-javascript-mirror
@@ -35406,7 +30505,7 @@ if (module && module.exports) {
 
 
 
-},{}],162:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 // A Javascript implementaion of the "Tyche-i" prng algorithm by
 // Samuel Neves and Filipe Araujo.
 // See https://eden.dei.uc.pt/~sneves/pubs/2011-snfa2.pdf
@@ -35511,7 +30610,7 @@ if (module && module.exports) {
 
 
 
-},{}],163:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 // A Javascript implementaion of the "xor128" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -35594,7 +30693,7 @@ if (module && module.exports) {
 
 
 
-},{}],164:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 // A Javascript implementaion of Richard Brent's Xorgens xor4096 algorithm.
 //
 // This fast non-cryptographic random number generator is designed for
@@ -35742,7 +30841,7 @@ if (module && module.exports) {
   (typeof define) == 'function' && define   // present with an AMD loader
 );
 
-},{}],165:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 // A Javascript implementaion of the "xorshift7" algorithm by
 // François Panneton and Pierre L'ecuyer:
 // "On the Xorgshift Random Number Generators"
@@ -35841,7 +30940,7 @@ if (module && module.exports) {
 );
 
 
-},{}],166:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 // A Javascript implementaion of the "xorwow" prng algorithm by
 // George Marsaglia.  See http://www.jstatsoft.org/v08/i14/paper
 
@@ -35929,7 +31028,7 @@ if (module && module.exports) {
 
 
 
-},{}],167:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 /*
 Copyright 2019 David Bau.
 
@@ -36184,197 +31283,7 @@ if ((typeof module) == 'object' && module.exports) {
   Math    // math: package containing random, pow, and seedrandom
 );
 
-},{"crypto":89}],168:[function(require,module,exports){
-(function (process,global){
-(function (global, undefined) {
-    "use strict";
-
-    if (global.setImmediate) {
-        return;
-    }
-
-    var nextHandle = 1; // Spec says greater than zero
-    var tasksByHandle = {};
-    var currentlyRunningATask = false;
-    var doc = global.document;
-    var registerImmediate;
-
-    function setImmediate(callback) {
-      // Callback can either be a function or a string
-      if (typeof callback !== "function") {
-        callback = new Function("" + callback);
-      }
-      // Copy function arguments
-      var args = new Array(arguments.length - 1);
-      for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i + 1];
-      }
-      // Store and register the task
-      var task = { callback: callback, args: args };
-      tasksByHandle[nextHandle] = task;
-      registerImmediate(nextHandle);
-      return nextHandle++;
-    }
-
-    function clearImmediate(handle) {
-        delete tasksByHandle[handle];
-    }
-
-    function run(task) {
-        var callback = task.callback;
-        var args = task.args;
-        switch (args.length) {
-        case 0:
-            callback();
-            break;
-        case 1:
-            callback(args[0]);
-            break;
-        case 2:
-            callback(args[0], args[1]);
-            break;
-        case 3:
-            callback(args[0], args[1], args[2]);
-            break;
-        default:
-            callback.apply(undefined, args);
-            break;
-        }
-    }
-
-    function runIfPresent(handle) {
-        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
-        // So if we're currently running a task, we'll need to delay this invocation.
-        if (currentlyRunningATask) {
-            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
-            // "too much recursion" error.
-            setTimeout(runIfPresent, 0, handle);
-        } else {
-            var task = tasksByHandle[handle];
-            if (task) {
-                currentlyRunningATask = true;
-                try {
-                    run(task);
-                } finally {
-                    clearImmediate(handle);
-                    currentlyRunningATask = false;
-                }
-            }
-        }
-    }
-
-    function installNextTickImplementation() {
-        registerImmediate = function(handle) {
-            process.nextTick(function () { runIfPresent(handle); });
-        };
-    }
-
-    function canUsePostMessage() {
-        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
-        // where `global.postMessage` means something completely different and can't be used for this purpose.
-        if (global.postMessage && !global.importScripts) {
-            var postMessageIsAsynchronous = true;
-            var oldOnMessage = global.onmessage;
-            global.onmessage = function() {
-                postMessageIsAsynchronous = false;
-            };
-            global.postMessage("", "*");
-            global.onmessage = oldOnMessage;
-            return postMessageIsAsynchronous;
-        }
-    }
-
-    function installPostMessageImplementation() {
-        // Installs an event handler on `global` for the `message` event: see
-        // * https://developer.mozilla.org/en/DOM/window.postMessage
-        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
-
-        var messagePrefix = "setImmediate$" + Math.random() + "$";
-        var onGlobalMessage = function(event) {
-            if (event.source === global &&
-                typeof event.data === "string" &&
-                event.data.indexOf(messagePrefix) === 0) {
-                runIfPresent(+event.data.slice(messagePrefix.length));
-            }
-        };
-
-        if (global.addEventListener) {
-            global.addEventListener("message", onGlobalMessage, false);
-        } else {
-            global.attachEvent("onmessage", onGlobalMessage);
-        }
-
-        registerImmediate = function(handle) {
-            global.postMessage(messagePrefix + handle, "*");
-        };
-    }
-
-    function installMessageChannelImplementation() {
-        var channel = new MessageChannel();
-        channel.port1.onmessage = function(event) {
-            var handle = event.data;
-            runIfPresent(handle);
-        };
-
-        registerImmediate = function(handle) {
-            channel.port2.postMessage(handle);
-        };
-    }
-
-    function installReadyStateChangeImplementation() {
-        var html = doc.documentElement;
-        registerImmediate = function(handle) {
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var script = doc.createElement("script");
-            script.onreadystatechange = function () {
-                runIfPresent(handle);
-                script.onreadystatechange = null;
-                html.removeChild(script);
-                script = null;
-            };
-            html.appendChild(script);
-        };
-    }
-
-    function installSetTimeoutImplementation() {
-        registerImmediate = function(handle) {
-            setTimeout(runIfPresent, 0, handle);
-        };
-    }
-
-    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
-    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
-
-    // Don't get fooled by e.g. browserify environments.
-    if ({}.toString.call(global.process) === "[object process]") {
-        // For Node.js before 0.9
-        installNextTickImplementation();
-
-    } else if (canUsePostMessage()) {
-        // For non-IE10 modern browsers
-        installPostMessageImplementation();
-
-    } else if (global.MessageChannel) {
-        // For web workers, where supported
-        installMessageChannelImplementation();
-
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
-        installReadyStateChangeImplementation();
-
-    } else {
-        // For older browsers
-        installSetTimeoutImplementation();
-    }
-
-    attachTo.setImmediate = setImmediate;
-    attachTo.clearImmediate = clearImmediate;
-}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
-
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":142}],169:[function(require,module,exports){
+},{"crypto":148}],139:[function(require,module,exports){
 var Stream = require('stream');
 var sockjs = require('sockjs-client');
 var resolve = require('url').resolve;
@@ -36439,7 +31348,7 @@ module.exports = function (u, cb) {
     return stream;
 };
 
-},{"sockjs-client":170,"stream":174,"url":179}],170:[function(require,module,exports){
+},{"sockjs-client":140,"stream":172,"url":174}],140:[function(require,module,exports){
 /* SockJS client, version 0.3.1.7.ga67f.dirty, http://sockjs.org, MIT License
 
 Copyright (c) 2011-2012 VMware, Inc.
@@ -38764,1280 +33673,7 @@ if (typeof module === 'object' && module && module.exports) {
 // [*] End of lib/all.js
 
 
-},{}],171:[function(require,module,exports){
-/**
- * Copyright 2014, Yahoo! Inc.
- * Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
- */
-module.exports = {
-        StorageLRU: require('./src/StorageLRU'),
-        asyncify: require('./src/asyncify')
-    }
-
-},{"./src/StorageLRU":172,"./src/asyncify":173}],172:[function(require,module,exports){
-(function (setImmediate){
-/**
- * Copyright 2014, Yahoo! Inc.
- * Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
- */
-'use strict';
-
-var ERR_DISABLED = {code: 1, message: 'disabled'};
-var ERR_DESERIALIZE = {code: 2, message: 'cannot deserialize'};
-var ERR_SERIALIZE = {code: 3, message: 'cannot serialize'};
-var ERR_CACHECONTROL = {code: 4, message: 'bad cacheControl'};
-var ERR_INVALIDKEY = {code: 5, message: 'invalid key'};
-var ERR_NOTENOUGHSPACE = {code: 6, message: 'not enough space'};
-var ERR_REVALIDATE = {code: 7, message: 'revalidate failed'};
-    // cache control fields
-var MAX_AGE = 'max-age';
-var STALE_WHILE_REVALIDATE = 'stale-while-revalidate';
-var DEFAULT_KEY_PREFIX = '';
-var DEFAULT_PRIORITY = 3;
-var DEFAULT_PURGE_LOAD_INCREASE = 500;
-var DEFAULT_PURGE_ATTEMPTS = 2;
-var CUR_VERSION = '1';
-
-var asyncEachSeries = require('async-each-series');
-require('setimmediate');
-
- 
-function isDefined (x) { return x !== undefined; }
-
-function getIntegerOrDefault (x, defaultVal) {
-    if ((typeof x !== 'number') || (x % 1 !== 0)) {
-        return defaultVal;
-    }
-    return x;
-}
-
-function cloneError (err, moreInfo) {
-    var message = err.message;
-    if (moreInfo) {
-        message += ': ' + moreInfo;
-    }
-    return {code: err.code, message: message};
-}
-
-function merge () {
-    var merged = {};
-    for (var i = 0, len = arguments.length; i < len; i++) {
-        var obj = arguments[i];
-        for (var key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                merged[key] = obj[key];
-            }
-        }
-    }
-    return merged;
-}
-
-function nowInSec () {
-    return Math.floor(new Date().getTime() / 1000);
-}
-
-/*
- * Use this to sort meta records array.  Item to be purged first
- * should be the first in the array after sort.
- */
-function defaultPurgeComparator (meta1, meta2) {
-    // purge bad entries first
-    if (meta1.bad !== meta2.bad) {
-        return meta1.bad ? -1 : 1;
-    }
-    // purge truly stale one first
-    var now = nowInSec();
-    var stale1 = now >= (meta1.expires + meta1.stale);
-    var stale2 = now >= (meta2.expires + meta2.stale);
-    if (stale1 !== stale2) {
-        return stale1 ? -1 : 1;
-    }
-
-    // both fetchable (not truly staled); purge lowest priority one first
-    if (meta1.priority !== meta2.priority) {
-        return (meta1.priority > meta2.priority) ? -1 : 1;
-    }
-
-    // same priority; purge least access one first
-    if (meta1.access !== meta2.access) {
-        return (meta1.access < meta2.access) ? -1 : 1;
-    }
-    // compare size. big ones go first.
-    if (meta1.size > meta2.size) {
-        return -1;
-    } else if (meta1.size === meta2.size) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
-function Meta (storageInterface, parser, options) {
-    this.storage = storageInterface;
-    this.parser = parser;
-    this.options = options || {};
-    this.records = [];
-}
-
-Meta.prototype.getMetaFromItem = function (key, item) {
-    var meta;
-    try {
-        meta = this.parser.parse(item).meta;
-        meta.key = key;
-    } catch (ignore) {
-        // ignore
-        meta = {key: key, bad: true, size: item.length};
-    }
-    return meta;
-};
-
-Meta.prototype.updateMetaRecord = function (key, callback) {
-    var self = this;
-
-    self.storage.getItem(key, function getItemCallback (err, item) {
-        if (!err) {
-            self.records.push(self.getMetaFromItem(key, item));
-        }
-        callback && callback();
-    });
-};
-
-Meta.prototype.generateRecordsHash = function () {
-    var self = this;
-    var retval = {};
-    self.records.forEach(function recordsIterator (record) {
-        retval[record.key] = true;
-    });
-    return retval;
-};
-
-Meta.prototype.init = function (scanSize, callback) {
-    // expensive operation
-    // go through all items in storage, get meta data
-    var self = this;
-    var storage = self.storage;
-    var keyPrefix = self.options.keyPrefix;
-    var doneInserting = 0;
-    if (scanSize <= 0) {
-        callback && callback();
-        return;
-    }
-
-    storage.keys(scanSize, function getKeysCallback (err, keys) {
-        var numKeys = keys.length;
-        if (numKeys <= 0) {
-            callback && callback();
-            return;
-        }
-        // generate the records hash
-        var recordsHash = self.generateRecordsHash();
-        keys.forEach(function keyIterator (key) {
-            // if the keyPrefix is different from the current options or we already have a record, ignore this key
-            if (!recordsHash[key] && (!keyPrefix || key.indexOf(keyPrefix) === 0)) {
-                self.updateMetaRecord(key, function updateMetaRecordCallback () {
-                    doneInserting += 1;
-                    recordsHash[key] = true;
-                    if (doneInserting === numKeys) {
-                       callback && callback();
-                    }
-                });
-            } else {
-                doneInserting += 1;
-                if (doneInserting === numKeys) {
-                    callback && callback();
-                }
-            }
-        });
-    });
-};
-
-Meta.prototype.sort = function (comparator) {
-    this.records.sort(comparator);
-};
-Meta.prototype.update = function (key, meta) {
-    for (var i = 0, len = this.records.length; i < len; i++) {
-        var record = this.records[i];
-        if (record.key === key) {
-            record.bad = false; // in case it was a bad record before
-            this.records[i] = merge(record, meta);
-            return this.records[i];
-        }
-    }
-    // record does not exist. create a new one.
-    meta = merge(meta, {key: key});
-    this.records.push(meta);
-    return meta;
-};
-Meta.prototype.remove = function (key) {
-    for (var i = 0, len = this.records.length; i < len; i++) {
-        if (this.records[i].key === key) {
-            this.records.splice(i, 1);
-            return;
-        }
-    }
-};
-Meta.prototype.numRecords = function () {
-    return this.records.length;
-};
-
-function Parser () {}
-Parser.prototype.format = function (meta, value) {
-    if (meta && meta.access > 0 && meta.expires > 0 && meta.stale >= 0 && meta.priority > 0 && meta.maxAge > 0) {
-        return '[' + [CUR_VERSION, meta.access, meta.expires, meta.maxAge, meta.stale, meta.priority].join(':') + ']' + value;
-    }
-    throw new Error('invalid meta');
-};
-Parser.prototype.parse = function (item) {
-    // format is:
-    // [<version>:<access_time_in_sec>:<expires_time_in_sec>:<max_age_in_sec>:<stale_time_in_sec>:<priority>]<value_string_can_be_very_long>
-    // in the future, parse version out first; then fields depending on version
-    var pos = item && item.indexOf(']');
-    if (!pos) {
-        throw new Error('missing meta');
-    }
-    var meta = item.substring(1, pos).split(':');
-    if (meta.length !== 6) {
-        throw new Error('invalid number of meta fields');
-    }
-    meta = {
-        version: meta[0],
-        access: parseInt(meta[1], 10),
-        expires: parseInt(meta[2], 10),
-        maxAge: parseInt(meta[3], 10),
-        stale: parseInt(meta[4], 10),
-        priority: parseInt(meta[5], 10),
-        size: item.length
-    };
-    if (isNaN(meta.access) || isNaN(meta.expires) || isNaN(meta.maxAge) || isNaN(meta.stale) || meta.access <= 0 || meta.expires <= 0 || meta.maxAge <= 0 || meta.stale < 0 || meta.priority <= 0) {
-        throw new Error('invalid meta fields');
-    }
-    return {
-        meta: meta,
-        value: item.substring(pos + 1)
-    };
-};
-
-function Stats (meta) {
-    this.hit = 0;
-    this.miss = 0;
-    this.stale = 0;
-    this.error = 0;
-    this.revalidateSuccess = 0;
-    this.revalidateFailure = 0;
-}
-Stats.prototype.toJSON = function () {
-    var stats = {
-        hit: this.hit,
-        miss: this.miss,
-        stale: this.stale,
-        error: this.error,
-        revalidateSuccess: this.revalidateSuccess,
-        revalidateFailure: this.revalidateFailure
-    };
-    return stats;
-};
-
-/**
- * @class StorageLRU
- * @constructor
- * @param {Object} storageInterface  A storage object (such as window.localStorage, but not limited to localStorage)
- *                   that conforms to the localStorage API.
- * @param {Object} [options]
- * @param {Number} [options.recheckDelay=-1]  If the underline storage is disabled, this option defines the delay time interval
- *                   for re-checking whether the underline storage is re-enabled.  Default value is -1, which
- *                   means no re-checking.
- * @param {String} [options.keyPrefix=''] Storage key prefix.
- * @param {Number} [options.purgeFactor=1]  Extra space to purge. E.g. if space needed for a new item is 1000 characters, LRU will actually
- *                   try to purge (1000 + 1000 * purgeFactor) characters.
- * @param {Number} [options.maxPurgeAttempts=2] The number of times to load 'purgeLoadIncrease' more keys if purge cannot initially
- *                    find enough space.
- * @param {Number} [options.purgeLoadIncrease=500] The number of extra keys to load with each purgeLoadAttempt when purge cannot initially
- *                    find enough space.
- * @param {Function} [options.purgedFn] The callback function to be executed, if an item is purged.  *Note* This function will be
- *                   asynchronously called, meaning, you won't be able to cancel the purge.
- * @param {Function} [options.purgeComparator] If you really want to, you can customize the comparator used to determine items'
- *                   purge order.  The default comparator purges in this precendence order (from high to low):
- *                      bad entry (invalid meta info),
- *                      truly stale (passed stale-while-revaliate window),
- *                      lowest priority,
- *                      least recently accessed,
- *                      bigger byte size
- * @param {Function} [options.revalidateFn] The function to be executed to refetch the item if it becomes expired but still
- *                   in the stale-while-revalidate window.
- */
-function StorageLRU (storageInterface, options) {
-    var self = this;
-    options = options || {};
-    var callback = options.onInit;
-    self.options = {};
-    self.options.recheckDelay = isDefined(options.recheckDelay) ? options.recheckDelay : -1;
-    self.options.keyPrefix = options.keyPrefix || DEFAULT_KEY_PREFIX;
-    self.options.purgeLoadIncrease = getIntegerOrDefault(options.purgeLoadIncrease, DEFAULT_PURGE_LOAD_INCREASE);
-    self.options.maxPurgeAttempts = getIntegerOrDefault(options.maxPurgeAttempts, DEFAULT_PURGE_ATTEMPTS);
-    self.options.purgedFn = options.purgedFn;
-    var metaOptions = {
-        keyPrefix: self.options.keyPrefix
-    };
-    self._storage = storageInterface;
-    self._purgeComparator = options.purgeComparator || defaultPurgeComparator;
-    self._revalidateFn = options.revalidateFn;
-    self._parser = new Parser();
-    self._meta = new Meta(self._storage, self._parser, metaOptions);
-    self._stats = new Stats();
-    self._enabled = true;
-}
-
-/**
- * Reports statistics information.
- * @method stats
- * @return {Object} statistics information, including:
- *   - hit: Number of cache hits
- *   - miss: Number of cache misses
- *   - error: Number of errors occurred during getItem
- *   - stale: Number of occurrances where stale items were returned (cache hit with data that
- *            expired but still within stale-while-revalidate window)
- */
-StorageLRU.prototype.stats = function () {
-    return this._stats.toJSON();
-};
-
-/**
- * Gets a number of the keys of the items in the underline storage
- * @method keys
- * @param {Number} the number of keys to return
- * @param {Funtion} callback
- */
-StorageLRU.prototype.keys = function (num, callback) {
-    return this._storage.keys(num, callback);
-};
-
-/**
- * Gets the item with the given key in the underline storage.  Note that if the item has exipired but
- * is still in stale-while-revalidate window, its value will be revalidated if revalidateFn is provided
- * when the StorageLRU instance was created.
- * @method getItem
- * @param {String} key  The key string
- * @param {Object} options
- * @param {Boolean} [options.json=false]  Whether the value should be deserialized to a JSON object.
- * @param {Function} callback The callback function.
- * @param {Object} callback.error The error object (an object with code, message fields) if get failed.
- * @param {String|Object} callback.value The value.
- * @param {Object} callback.meta Meta information. Containing isStale field.  isStale=true means this
- *                    item has expired (max-age reached), but still within stale-while-revalidate window.
- *                    isStale=false means this item has not reached its max-age.
- */
-StorageLRU.prototype.getItem = function (key, options, callback) {
-    if (!key) {
-        callback && callback(cloneError(ERR_INVALIDKEY, key));
-        return;
-    }
-    var self = this;
-    var prefixedKey = self._prefix(key);
-    self._storage.getItem(prefixedKey, function getItemCallback (err, value) {
-        if (err || value === null || value === undefined) {
-            self._stats.miss++;
-            self._meta.remove(prefixedKey);
-            callback(cloneError(ERR_INVALIDKEY, key));
-            return;
-        }
-
-        var deserialized;
-        try {
-            deserialized = self._deserialize(value, options);
-        } catch (e) {
-            self._stats.error++;
-            callback(cloneError(ERR_DESERIALIZE, e.message));
-            return;
-        }
-        var meta = deserialized.meta,
-            now = nowInSec();
-
-        if ((meta.expires + meta.stale) < now) {
-            // item exists, but expired and passed stale-while-revalidate window.
-            // count as hit miss.
-            self._stats.miss++;
-            self.removeItem(key);
-            callback();
-            return;
-        }
-
-        // this is a cache hit
-        self._stats.hit++;
-
-        // update the access timestamp in the underline storage
-        try {
-            meta.access = now;
-            var serializedValue = self._serialize(deserialized.value, meta, options);
-            self._storage.setItem(prefixedKey, serializedValue, function setItemCallback (err) {
-                if (!err) {
-                    meta = self._meta.update(prefixedKey, meta);
-                }
-            });
-        } catch (ignore) {}
-
-        // is the item already expired but still in the stale-while-revalidate window?
-        var isStale = meta.expires < now;
-        if (isStale) {
-            self._stats.stale++;
-            try {
-                self._revalidate(key, meta, {json: !!(options && options.json)});
-            } catch (ignore) {}
-        }
-        callback(null, deserialized.value, {isStale: isStale});
-    });
-};
-
-/**
- * Calls the revalidateFn to fetch a fresh copy of a stale item.
- * @method _revalidate
- * @param {String} key The item key
- * @param {Object} meta  The meta record for this item
- * @param {Object} options
- * @param {Boolean} [options.json=false]  Whether the value is a JSON object.
- * @param {Function} [callback]
- * @param {Object} callback.error The error object (an object with code, message fields) if revalidateFn failed to fetch the item.
- * @private
- */
-StorageLRU.prototype._revalidate = function (key, meta, options, callback) {
-    var self = this;
-
-    // if revalidateFn is defined, refetch item and save it to storage
-    if ('function' !== typeof self._revalidateFn) {
-        callback && callback();
-        return;
-    }
-
-    self._revalidateFn(key, function revalidated (err, value) {
-        if (err) {
-            self._stats.revalidateFailure++;
-            callback && callback(cloneError(ERR_REVALIDATE, err.message));
-            return;
-        }
-        try {
-            var now = nowInSec();
-
-            // update the size and expires fields, and inherit other fields.
-            // Especially, do not update access timestamp.
-            var newMeta = {
-                access: meta.access,
-                maxAge: meta.maxAge,
-                expires: now + meta.maxAge,
-                stale: meta.stale,
-                priority: meta.priority
-            };
-
-            // save into the underline storage and update meta record
-            var serializedValue = self._serialize(value, newMeta, options);
-            var prefixedKey = self._prefix(key);
-            self._storage.setItem(prefixedKey, serializedValue, function setItemCallback (err) {
-                if (!err) {
-                    newMeta.size = serializedValue.length;
-                    self._meta.update(prefixedKey, newMeta);
-
-                    self._stats.revalidateSuccess++;
-                } else {
-                    self._stats.revalidateFailure++;
-                }
-            });
-        } catch (e) {
-            self._stats.revalidateFailure++;
-            callback && callback(cloneError(ERR_REVALIDATE, e.message));
-            return;
-        }
-        callback && callback();
-    });
-};
-
-/**
- * Saves the item with the given key in the underline storage
- * @method setItem
- * @param {String} key  The key string
- * @param {String|Object} value  The value string or JSON object
- * @param {Object} options
- * @param {Boolean} options.cacheControl  Required.  Use the syntax as HTTP Cache-Control header.  To be
- *                   able to use LRU, you need to have a positive "max-age" value (in seconds), e.g. "max-age=300".
- *                   Another very useful field is "stale-while-revalidate", e.g. "max-age=300,stale-while-revalidate=6000".
- *                   If an item has expired (max-age reached), but still within stale-while-revalidate window,
- *                   LRU will allow retrieval the item, but tag it with isStale=true in the callback.
- *                   **Note**:
- *                    - LRU does not try to refetch the item when it is stale-while-revaliate.
- *                    - Having "no-cache" or "no-store" will abort the operation with invalid cache control error. 
- * @param {Boolean} [options.json=false]  Whether the value should be serialized to a string before saving.
- * @param {Number} [options.priority=3]  The priority of the item.  Items with lower priority will be purged before
- *                    items with higher priority, assuming other conditions are the same.
- * @param {Function} [callback] The callback function.
- * @param {Object} callback.error The error object (an object with code, message fields) if setItem failed.
- */
-StorageLRU.prototype.setItem = function (key, value, options, callback) {
-    if (!key) {
-        callback && callback(cloneError(ERR_INVALIDKEY, key));
-        return;
-    }
-
-    var self = this;
-    if (!self._enabled) {
-        callback && callback(cloneError(ERR_DISABLED));
-        return;
-    }
-
-    // parse cache control
-    var cacheControl = self._parseCacheControl(options && options.cacheControl);
-    if (cacheControl['no-cache'] || cacheControl['no-store'] || !cacheControl[MAX_AGE] || cacheControl[MAX_AGE] <= 0) {
-        callback && callback(cloneError(ERR_CACHECONTROL));
-        return;
-    }
-
-    // serialize value (along with meta data)
-    var now = nowInSec();
-    var priority = (options && options.priority) || DEFAULT_PRIORITY;
-    var meta = {
-        expires: now + cacheControl[MAX_AGE],
-        maxAge: cacheControl[MAX_AGE],
-        stale: cacheControl[STALE_WHILE_REVALIDATE] || 0,
-        priority: priority,
-        access: now
-    };
-    var serializedValue;
-    try {
-        serializedValue = self._serialize(value, meta, options);
-    } catch (serializeError) {
-        callback && callback(cloneError(ERR_SERIALIZE));
-        return;
-    }
-
-    // save into the underline storage and update meta record
-    var prefixedKey = self._prefix(key);
-    self._storage.setItem(prefixedKey, serializedValue, function setItemCallback (err) {
-        if (!err) {
-            meta.size = serializedValue.length;
-            self._meta.update(prefixedKey, meta);
-            callback && callback();
-            return;
-        } else {
-            //check to see if there is at least 1 valid key
-            self.keys(1, function getKeysCallback (err, keysArr) {
-                if (keysArr.length === 0) {
-                    // if numItems is 0, private mode is on or storage is disabled.
-                    // callback with error and return
-                    self._markAsDisabled();
-                    callback && callback(cloneError(ERR_DISABLED));
-                    return;
-                }
-                // purge and save again
-                var spaceNeeded = serializedValue.length;
-                self.purge(spaceNeeded, function purgeCallback (err) {
-                    if (err) {
-                        // not enough space purged
-                        callback && callback(cloneError(ERR_NOTENOUGHSPACE));
-                        return;
-                    }
-                    // purged enough space, now try to save again
-                    self._storage.setItem(prefixedKey, serializedValue, function setItemCallback (err) {
-                        if (err) {
-                            callback && callback(cloneError(ERR_NOTENOUGHSPACE));
-                        } else {
-                            self._meta.update(prefixedKey, meta);
-                            // setItem succeeded after the purge
-                            callback && callback();
-                        }
-                    });
-                });
-            });
-        }
-    });
-};
-
-/**
- * @method removeItem
- * @param {String} key  The key string
- * @param {Function} [callback] The callback function.
- * @param {Object} callback.error The error object (an object with code, message fields) if removeItem failed.
- */
-StorageLRU.prototype.removeItem = function (key, callback) {
-    if (!key) {
-        callback && callback(cloneError(ERR_INVALIDKEY, key));
-        return;
-    }
-    var self = this;
-    key = self._prefix(key);
-    self._storage.removeItem(key, function removeItemCallback (err) {
-        if (err) {
-            callback && callback(cloneError(ERR_INVALIDKEY, key));
-            return;
-        }
-        self._meta.remove(key);
-        callback && callback();
-    });
-};
-
-/**
- * @method _parseCacheControl
- * @param {String} str  The cache control string, following HTTP Cache-Control header syntax.
- * @return {Object} 
- * @private
- */
-StorageLRU.prototype._parseCacheControl = function (str) {
-    var cacheControl = {};
-    if (str) {
-        var parts = str.toLowerCase().split(',');
-        for (var i = 0, len = parts.length; i < len; i++) {
-            var kv = parts[i].split('=');
-            if (kv.length === 2) {
-                cacheControl[kv[0]] = kv[1];
-            } else if (kv.length === 1) {
-                cacheControl[kv[0]] = true;
-            }
-        }
-        if (cacheControl[MAX_AGE]) {
-            cacheControl[MAX_AGE] = parseInt(cacheControl[MAX_AGE], 10) || 0;
-        }
-        if (cacheControl[STALE_WHILE_REVALIDATE]) {
-            cacheControl[STALE_WHILE_REVALIDATE] = parseInt(cacheControl[STALE_WHILE_REVALIDATE], 10) || 0;
-        }
-    }
-    return cacheControl;
-};
-
-/**
- * Prefix the item key with the keyPrefix defined in "options" when LRU instance was created.
- * @method _prefix
- * @param {String} key  The item key.
- * @return {String} The prefixed key.
- * @private
- */
-StorageLRU.prototype._prefix = function (key) {
-    return this.options.keyPrefix + key;
-};
-
-/**
- * Remove the prefix from the prefixed item key.
- * The keyPrefix is defined in "options" when LRU instance was created.
- * @method _deprefix
- * @param {String} prefixedKey  The prefixed item key.
- * @return {String} The item key.
- * @private
- */
-StorageLRU.prototype._deprefix = function (prefixedKey) {
-    var prefix = this.options.keyPrefix;
-    return prefix ? prefixedKey.substring(prefix.length) : prefixedKey;
-};
-
-/**
- * Mark the storage as disabled.  For example, when in Safari private mode, localStorage
- * is disabled.  During setItem(), LRU will check whether the underline storage
- * is disabled.
- * If the LRU was created with a recheckDelay option, LRU will re-check whether the underline
- * storage is disabled. after the specified delay time.
- * @method _markAsDisabled
- * @private
- */
-StorageLRU.prototype._markAsDisabled = function () {
-    var self = this;
-    self._enabled = false;
-    // set a timeout to mark the cache back to enabled so that status can be checked again
-    var recheckDelay = self.options.recheckDelay;
-    if (recheckDelay > 0) {
-        setTimeout(function reEnable() {
-            self._enabled = true;
-        }, recheckDelay);
-    }
-};
-
-/**
- * Serializes the item value and meta info into a string.
- * @method _serialize
- * @param {String|Object} value
- * @param {Object} meta  Meta info for this item, such as access ts, expire ts, stale-while-revalidate window size
- * @param {Object} options
- * @param {Boolean} [options.json=false]
- * @return {String} the serialized string to store in underline storage
- * @private
- * @throw Error
- */
-StorageLRU.prototype._serialize = function (value, meta, options) {
-    var v = (options && options.json) ? JSON.stringify(value) : value;
-    return this._parser.format(meta, v);
-};
-
-/**
- * De-serializes the stored string into item value and meta info.
- * @method _deserialize
- * @param {String} str The stored string
- * @param {Object} options
- * @param {Boolean} [options.json=false]
- * @return {Object} An object containing "value" (for item value) and "meta" (Meta data object for this item, such as access ts, expire ts, stale-while-revalidate window size).
- * @private
- * @throw Error
- */
-StorageLRU.prototype._deserialize = function (str, options) {
-    var parsed = this._parser.parse(str);
-    return {
-        meta: parsed.meta,
-        value: options.json? JSON.parse(parsed.value) : parsed.value
-    };
-};
-
-/**
- * Purge the underline storage to make room for new data.  If options.purgedFn is defined
- * when LRU instance was created, this function will invoke it with the array if purged keys asynchronously.
- * If the meta data for all objects has not yet been built, then it will occur in this function.
- * @method purge
- * @param {Number} spaceNeeded The char count of space needed for the new data.  Note that
- *                   if options.purgeFactor is defined when LRU instance was created, extra space
- *                   will be purged. E.g. if spaceNeeded is 1000 characters, LRU will actually
- *                   try to purge (1000 + 1000 * purgeFactor) characters.
- * @param {Boolean} forcePurge True if we want to ignore un-initialized records, else false;
- * @param {Function} callback  
- * @param {Error} callback.error  if the space that we were able to purge was less than spaceNeeded.
- */
-StorageLRU.prototype.purge = function (spaceNeeded, callback) {
-    var self = this;
-    var factor = Math.max(0, self.options.purgeFactor) || 1;
-    var padding = Math.round(spaceNeeded * factor);
-
-    var removeData = {
-        purged: [],
-        recordsToRemove: [],
-        size: spaceNeeded + padding
-    };
-
-    var attempts = [];
-    for (var i = 0; i < self.options.maxPurgeAttempts; i++) {
-        attempts.push((i + 1) * self.options.purgeLoadIncrease);
-    }
-
-    asyncEachSeries(attempts, function purgeAttempt(loadSize, attemptDone) {
-        removeData.recordsToRemove = [];
-        removeData.purged = [];
-
-        self._meta.init(loadSize, function doneInit() {
-            self._meta.sort(self._purgeComparator);
-            asyncEachSeries(self._meta.records, function removeItem(record, cb) {
-                // mark record to remove, to remove in batch later for performance
-                record.remove = true;
-                removeData.purged.push(self._deprefix(record.key)); // record purged key
-                self._storage.removeItem(record.key, function removeItemCallback (err) {
-                    // if there was an error removing, remove the record but assume we still need some space
-                    if (!err) {
-                        removeData.size = removeData.size - record.size;
-                    }
-                    if (removeData.size > 0) {
-                        cb(); // keep removing
-                    } else {
-                        cb(true); // done removing
-                    }
-                });
-            }, function itemsRemoved(ignore) {
-                // remove records that were marked to remove
-                self._meta.records = self._meta.records.filter(function shouldKeepRecord(record) {
-                    return record.remove !== true;
-                });
-
-                // invoke purgedFn if it is defined
-                var purgedCallback = self.options.purgedFn;
-                var purged = removeData.purged;
-                if (purgedCallback && purged.length > 0) {
-                    // execute the purged callback asynchronously to prevent library users
-                    // from potentially slow down the purge process by executing long tasks
-                    // in this callback.
-                    setImmediate(function purgeTimeout() {
-                        purgedCallback(purged);
-                    });
-                }
-
-                if (removeData.size <= padding) {
-                    // removed enough space, stop subsequent purge attempts
-                    attemptDone(true);
-                } else {
-                    attemptDone();
-                }
-            });
-        });
-    }, function attemptsDone() {
-        // async series reached the end, either because all attempts were tried,
-        // or enough space was already freed.
-
-        // if enough space was made for spaceNeeded, consider purge as success
-        if (callback) {
-            if (removeData.size <= padding) {
-                callback();
-            } else {
-                callback(new Error('still need ' + (removeData.size - padding)));
-            }
-        }
-    });
-};
-
-module.exports = StorageLRU;
-}).call(this,require("timers").setImmediate)
-},{"async-each-series":61,"setimmediate":168,"timers":93}],173:[function(require,module,exports){
-/**
- * 
- * A simple mixin to go around syncronous storage interfaces (such as html5 local storage).
- * 
- * @param {Object} syncObject The syncronous storage object.
- */
-function asyncify (syncObject) {
-    var retval = {
-        getItem: function (key, callback) {
-            callback(null, syncObject.getItem(key));
-        },
-        setItem: function (key, value, callback) {
-            try {
-                syncObject.setItem(key, value);
-            } catch (e) {
-                callback(e);
-                return;
-            }
-            callback(null, value);
-        },
-        removeItem: function (key, callback) {
-            syncObject.removeItem(key);
-            callback();
-        }
-    };
-     // be smart about wrapping local storage
-    if (!syncObject.keys && (typeof syncObject.length === 'number')) {
-        retval.keys = function getKeylistFromIndices (num, callback) {
-            var arr = [];
-            var limit = (num > syncObject.length) ? syncObject.length : num;
-            for (var i = 0, len = limit; i < len; i++) {
-                arr.push(syncObject.key(i));
-            }
-            callback(null, arr);
-        };
-    }
-    return retval;
-}
-
-module.exports = asyncify;
-},{}],174:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-module.exports = Stream;
-
-var EE = require('events').EventEmitter;
-var inherits = require('inherits');
-
-inherits(Stream, EE);
-Stream.Readable = require('readable-stream/readable.js');
-Stream.Writable = require('readable-stream/writable.js');
-Stream.Duplex = require('readable-stream/duplex.js');
-Stream.Transform = require('readable-stream/transform.js');
-Stream.PassThrough = require('readable-stream/passthrough.js');
-
-// Backwards-compat with node 0.4.x
-Stream.Stream = Stream;
-
-
-
-// old-style streams.  Note that the pipe method (the only relevant
-// part of this class) is overridden in the Readable class.
-
-function Stream() {
-  EE.call(this);
-}
-
-Stream.prototype.pipe = function(dest, options) {
-  var source = this;
-
-  function ondata(chunk) {
-    if (dest.writable) {
-      if (false === dest.write(chunk) && source.pause) {
-        source.pause();
-      }
-    }
-  }
-
-  source.on('data', ondata);
-
-  function ondrain() {
-    if (source.readable && source.resume) {
-      source.resume();
-    }
-  }
-
-  dest.on('drain', ondrain);
-
-  // If the 'end' option is not supplied, dest.end() will be called when
-  // source gets the 'end' or 'close' events.  Only dest.end() once.
-  if (!dest._isStdio && (!options || options.end !== false)) {
-    source.on('end', onend);
-    source.on('close', onclose);
-  }
-
-  var didOnEnd = false;
-  function onend() {
-    if (didOnEnd) return;
-    didOnEnd = true;
-
-    dest.end();
-  }
-
-
-  function onclose() {
-    if (didOnEnd) return;
-    didOnEnd = true;
-
-    if (typeof dest.destroy === 'function') dest.destroy();
-  }
-
-  // don't leave dangling pipes when there are errors.
-  function onerror(er) {
-    cleanup();
-    if (EE.listenerCount(this, 'error') === 0) {
-      throw er; // Unhandled stream error in pipe.
-    }
-  }
-
-  source.on('error', onerror);
-  dest.on('error', onerror);
-
-  // remove all the event listeners that were added.
-  function cleanup() {
-    source.removeListener('data', ondata);
-    dest.removeListener('drain', ondrain);
-
-    source.removeListener('end', onend);
-    source.removeListener('close', onclose);
-
-    source.removeListener('error', onerror);
-    dest.removeListener('error', onerror);
-
-    source.removeListener('end', cleanup);
-    source.removeListener('close', cleanup);
-
-    dest.removeListener('close', cleanup);
-  }
-
-  source.on('end', cleanup);
-  source.on('close', cleanup);
-
-  dest.on('close', cleanup);
-
-  dest.emit('pipe', source);
-
-  // Allow for unix-like usage: A.pipe(B).pipe(C)
-  return dest;
-};
-
-},{"events":91,"inherits":108,"readable-stream/duplex.js":146,"readable-stream/passthrough.js":155,"readable-stream/readable.js":156,"readable-stream/transform.js":157,"readable-stream/writable.js":158}],175:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-/*<replacement>*/
-
-var Buffer = require('safe-buffer').Buffer;
-/*</replacement>*/
-
-var isEncoding = Buffer.isEncoding || function (encoding) {
-  encoding = '' + encoding;
-  switch (encoding && encoding.toLowerCase()) {
-    case 'hex':case 'utf8':case 'utf-8':case 'ascii':case 'binary':case 'base64':case 'ucs2':case 'ucs-2':case 'utf16le':case 'utf-16le':case 'raw':
-      return true;
-    default:
-      return false;
-  }
-};
-
-function _normalizeEncoding(enc) {
-  if (!enc) return 'utf8';
-  var retried;
-  while (true) {
-    switch (enc) {
-      case 'utf8':
-      case 'utf-8':
-        return 'utf8';
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return 'utf16le';
-      case 'latin1':
-      case 'binary':
-        return 'latin1';
-      case 'base64':
-      case 'ascii':
-      case 'hex':
-        return enc;
-      default:
-        if (retried) return; // undefined
-        enc = ('' + enc).toLowerCase();
-        retried = true;
-    }
-  }
-};
-
-// Do not cache `Buffer.isEncoding` when checking encoding names as some
-// modules monkey-patch it to support additional encodings
-function normalizeEncoding(enc) {
-  var nenc = _normalizeEncoding(enc);
-  if (typeof nenc !== 'string' && (Buffer.isEncoding === isEncoding || !isEncoding(enc))) throw new Error('Unknown encoding: ' + enc);
-  return nenc || enc;
-}
-
-// StringDecoder provides an interface for efficiently splitting a series of
-// buffers into a series of JS strings without breaking apart multi-byte
-// characters.
-exports.StringDecoder = StringDecoder;
-function StringDecoder(encoding) {
-  this.encoding = normalizeEncoding(encoding);
-  var nb;
-  switch (this.encoding) {
-    case 'utf16le':
-      this.text = utf16Text;
-      this.end = utf16End;
-      nb = 4;
-      break;
-    case 'utf8':
-      this.fillLast = utf8FillLast;
-      nb = 4;
-      break;
-    case 'base64':
-      this.text = base64Text;
-      this.end = base64End;
-      nb = 3;
-      break;
-    default:
-      this.write = simpleWrite;
-      this.end = simpleEnd;
-      return;
-  }
-  this.lastNeed = 0;
-  this.lastTotal = 0;
-  this.lastChar = Buffer.allocUnsafe(nb);
-}
-
-StringDecoder.prototype.write = function (buf) {
-  if (buf.length === 0) return '';
-  var r;
-  var i;
-  if (this.lastNeed) {
-    r = this.fillLast(buf);
-    if (r === undefined) return '';
-    i = this.lastNeed;
-    this.lastNeed = 0;
-  } else {
-    i = 0;
-  }
-  if (i < buf.length) return r ? r + this.text(buf, i) : this.text(buf, i);
-  return r || '';
-};
-
-StringDecoder.prototype.end = utf8End;
-
-// Returns only complete characters in a Buffer
-StringDecoder.prototype.text = utf8Text;
-
-// Attempts to complete a partial non-UTF-8 character using bytes from a Buffer
-StringDecoder.prototype.fillLast = function (buf) {
-  if (this.lastNeed <= buf.length) {
-    buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, this.lastNeed);
-    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
-  }
-  buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, buf.length);
-  this.lastNeed -= buf.length;
-};
-
-// Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
-// continuation byte. If an invalid byte is detected, -2 is returned.
-function utf8CheckByte(byte) {
-  if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
-  return byte >> 6 === 0x02 ? -1 : -2;
-}
-
-// Checks at most 3 bytes at the end of a Buffer in order to detect an
-// incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
-// needed to complete the UTF-8 character (if applicable) are returned.
-function utf8CheckIncomplete(self, buf, i) {
-  var j = buf.length - 1;
-  if (j < i) return 0;
-  var nb = utf8CheckByte(buf[j]);
-  if (nb >= 0) {
-    if (nb > 0) self.lastNeed = nb - 1;
-    return nb;
-  }
-  if (--j < i || nb === -2) return 0;
-  nb = utf8CheckByte(buf[j]);
-  if (nb >= 0) {
-    if (nb > 0) self.lastNeed = nb - 2;
-    return nb;
-  }
-  if (--j < i || nb === -2) return 0;
-  nb = utf8CheckByte(buf[j]);
-  if (nb >= 0) {
-    if (nb > 0) {
-      if (nb === 2) nb = 0;else self.lastNeed = nb - 3;
-    }
-    return nb;
-  }
-  return 0;
-}
-
-// Validates as many continuation bytes for a multi-byte UTF-8 character as
-// needed or are available. If we see a non-continuation byte where we expect
-// one, we "replace" the validated continuation bytes we've seen so far with
-// a single UTF-8 replacement character ('\ufffd'), to match v8's UTF-8 decoding
-// behavior. The continuation byte check is included three times in the case
-// where all of the continuation bytes for a character exist in the same buffer.
-// It is also done this way as a slight performance increase instead of using a
-// loop.
-function utf8CheckExtraBytes(self, buf, p) {
-  if ((buf[0] & 0xC0) !== 0x80) {
-    self.lastNeed = 0;
-    return '\ufffd';
-  }
-  if (self.lastNeed > 1 && buf.length > 1) {
-    if ((buf[1] & 0xC0) !== 0x80) {
-      self.lastNeed = 1;
-      return '\ufffd';
-    }
-    if (self.lastNeed > 2 && buf.length > 2) {
-      if ((buf[2] & 0xC0) !== 0x80) {
-        self.lastNeed = 2;
-        return '\ufffd';
-      }
-    }
-  }
-}
-
-// Attempts to complete a multi-byte UTF-8 character using bytes from a Buffer.
-function utf8FillLast(buf) {
-  var p = this.lastTotal - this.lastNeed;
-  var r = utf8CheckExtraBytes(this, buf, p);
-  if (r !== undefined) return r;
-  if (this.lastNeed <= buf.length) {
-    buf.copy(this.lastChar, p, 0, this.lastNeed);
-    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
-  }
-  buf.copy(this.lastChar, p, 0, buf.length);
-  this.lastNeed -= buf.length;
-}
-
-// Returns all complete UTF-8 characters in a Buffer. If the Buffer ended on a
-// partial character, the character's bytes are buffered until the required
-// number of bytes are available.
-function utf8Text(buf, i) {
-  var total = utf8CheckIncomplete(this, buf, i);
-  if (!this.lastNeed) return buf.toString('utf8', i);
-  this.lastTotal = total;
-  var end = buf.length - (total - this.lastNeed);
-  buf.copy(this.lastChar, 0, end);
-  return buf.toString('utf8', i, end);
-}
-
-// For UTF-8, a replacement character is added when ending on a partial
-// character.
-function utf8End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) return r + '\ufffd';
-  return r;
-}
-
-// UTF-16LE typically needs two bytes per character, but even if we have an even
-// number of bytes available, we need to check if we end on a leading/high
-// surrogate. In that case, we need to wait for the next two bytes in order to
-// decode the last character properly.
-function utf16Text(buf, i) {
-  if ((buf.length - i) % 2 === 0) {
-    var r = buf.toString('utf16le', i);
-    if (r) {
-      var c = r.charCodeAt(r.length - 1);
-      if (c >= 0xD800 && c <= 0xDBFF) {
-        this.lastNeed = 2;
-        this.lastTotal = 4;
-        this.lastChar[0] = buf[buf.length - 2];
-        this.lastChar[1] = buf[buf.length - 1];
-        return r.slice(0, -1);
-      }
-    }
-    return r;
-  }
-  this.lastNeed = 1;
-  this.lastTotal = 2;
-  this.lastChar[0] = buf[buf.length - 1];
-  return buf.toString('utf16le', i, buf.length - 1);
-}
-
-// For UTF-16LE we do not explicitly append special replacement characters if we
-// end on a partial character, we simply let v8 handle that.
-function utf16End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) {
-    var end = this.lastTotal - this.lastNeed;
-    return r + this.lastChar.toString('utf16le', 0, end);
-  }
-  return r;
-}
-
-function base64Text(buf, i) {
-  var n = (buf.length - i) % 3;
-  if (n === 0) return buf.toString('base64', i);
-  this.lastNeed = 3 - n;
-  this.lastTotal = 3;
-  if (n === 1) {
-    this.lastChar[0] = buf[buf.length - 1];
-  } else {
-    this.lastChar[0] = buf[buf.length - 2];
-    this.lastChar[1] = buf[buf.length - 1];
-  }
-  return buf.toString('base64', i, buf.length - n);
-}
-
-function base64End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) return r + this.lastChar.toString('base64', 0, 3 - this.lastNeed);
-  return r;
-}
-
-// Pass bytes on through for single-byte encodings (e.g. ascii, latin1, hex)
-function simpleWrite(buf) {
-  return buf.toString(this.encoding);
-}
-
-function simpleEnd(buf) {
-  return buf && buf.length ? this.write(buf) : '';
-}
-},{"safe-buffer":159}],176:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 var traverse = module.exports = function (obj) {
     return new Traverse(obj);
 };
@@ -40353,7 +33989,7 @@ var hasOwnProperty = Object.hasOwnProperty || function (obj, key) {
     return key in obj;
 };
 
-},{}],177:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 //     Underscore.js 1.4.4
 //     http://underscorejs.org
 //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
@@ -41581,7 +35217,7 @@ var hasOwnProperty = Object.hasOwnProperty || function (obj, key) {
 
 }).call(this);
 
-},{}],178:[function(require,module,exports){
+},{}],143:[function(require,module,exports){
 /** @license URI.js v4.2.1 (c) 2011 Gary Court. License: http://github.com/garycourt/uri-js */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -42970,832 +36606,9 @@ exports.unescapeComponent = unescapeComponent;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
+//# sourceMappingURL=uri.all.js.map
 
-
-},{}],179:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-var punycode = require('punycode');
-var util = require('./util');
-
-exports.parse = urlParse;
-exports.resolve = urlResolve;
-exports.resolveObject = urlResolveObject;
-exports.format = urlFormat;
-
-exports.Url = Url;
-
-function Url() {
-  this.protocol = null;
-  this.slashes = null;
-  this.auth = null;
-  this.host = null;
-  this.port = null;
-  this.hostname = null;
-  this.hash = null;
-  this.search = null;
-  this.query = null;
-  this.pathname = null;
-  this.path = null;
-  this.href = null;
-}
-
-// Reference: RFC 3986, RFC 1808, RFC 2396
-
-// define these here so at least they only have to be
-// compiled once on the first module load.
-var protocolPattern = /^([a-z0-9.+-]+:)/i,
-    portPattern = /:[0-9]*$/,
-
-    // Special case for a simple path URL
-    simplePathPattern = /^(\/\/?(?!\/)[^\?\s]*)(\?[^\s]*)?$/,
-
-    // RFC 2396: characters reserved for delimiting URLs.
-    // We actually just auto-escape these.
-    delims = ['<', '>', '"', '`', ' ', '\r', '\n', '\t'],
-
-    // RFC 2396: characters not allowed for various reasons.
-    unwise = ['{', '}', '|', '\\', '^', '`'].concat(delims),
-
-    // Allowed by RFCs, but cause of XSS attacks.  Always escape these.
-    autoEscape = ['\''].concat(unwise),
-    // Characters that are never ever allowed in a hostname.
-    // Note that any invalid chars are also handled, but these
-    // are the ones that are *expected* to be seen, so we fast-path
-    // them.
-    nonHostChars = ['%', '/', '?', ';', '#'].concat(autoEscape),
-    hostEndingChars = ['/', '?', '#'],
-    hostnameMaxLen = 255,
-    hostnamePartPattern = /^[+a-z0-9A-Z_-]{0,63}$/,
-    hostnamePartStart = /^([+a-z0-9A-Z_-]{0,63})(.*)$/,
-    // protocols that can allow "unsafe" and "unwise" chars.
-    unsafeProtocol = {
-      'javascript': true,
-      'javascript:': true
-    },
-    // protocols that never have a hostname.
-    hostlessProtocol = {
-      'javascript': true,
-      'javascript:': true
-    },
-    // protocols that always contain a // bit.
-    slashedProtocol = {
-      'http': true,
-      'https': true,
-      'ftp': true,
-      'gopher': true,
-      'file': true,
-      'http:': true,
-      'https:': true,
-      'ftp:': true,
-      'gopher:': true,
-      'file:': true
-    },
-    querystring = require('querystring');
-
-function urlParse(url, parseQueryString, slashesDenoteHost) {
-  if (url && util.isObject(url) && url instanceof Url) return url;
-
-  var u = new Url;
-  u.parse(url, parseQueryString, slashesDenoteHost);
-  return u;
-}
-
-Url.prototype.parse = function(url, parseQueryString, slashesDenoteHost) {
-  if (!util.isString(url)) {
-    throw new TypeError("Parameter 'url' must be a string, not " + typeof url);
-  }
-
-  // Copy chrome, IE, opera backslash-handling behavior.
-  // Back slashes before the query string get converted to forward slashes
-  // See: https://code.google.com/p/chromium/issues/detail?id=25916
-  var queryIndex = url.indexOf('?'),
-      splitter =
-          (queryIndex !== -1 && queryIndex < url.indexOf('#')) ? '?' : '#',
-      uSplit = url.split(splitter),
-      slashRegex = /\\/g;
-  uSplit[0] = uSplit[0].replace(slashRegex, '/');
-  url = uSplit.join(splitter);
-
-  var rest = url;
-
-  // trim before proceeding.
-  // This is to support parse stuff like "  http://foo.com  \n"
-  rest = rest.trim();
-
-  if (!slashesDenoteHost && url.split('#').length === 1) {
-    // Try fast path regexp
-    var simplePath = simplePathPattern.exec(rest);
-    if (simplePath) {
-      this.path = rest;
-      this.href = rest;
-      this.pathname = simplePath[1];
-      if (simplePath[2]) {
-        this.search = simplePath[2];
-        if (parseQueryString) {
-          this.query = querystring.parse(this.search.substr(1));
-        } else {
-          this.query = this.search.substr(1);
-        }
-      } else if (parseQueryString) {
-        this.search = '';
-        this.query = {};
-      }
-      return this;
-    }
-  }
-
-  var proto = protocolPattern.exec(rest);
-  if (proto) {
-    proto = proto[0];
-    var lowerProto = proto.toLowerCase();
-    this.protocol = lowerProto;
-    rest = rest.substr(proto.length);
-  }
-
-  // figure out if it's got a host
-  // user@server is *always* interpreted as a hostname, and url
-  // resolution will treat //foo/bar as host=foo,path=bar because that's
-  // how the browser resolves relative URLs.
-  if (slashesDenoteHost || proto || rest.match(/^\/\/[^@\/]+@[^@\/]+/)) {
-    var slashes = rest.substr(0, 2) === '//';
-    if (slashes && !(proto && hostlessProtocol[proto])) {
-      rest = rest.substr(2);
-      this.slashes = true;
-    }
-  }
-
-  if (!hostlessProtocol[proto] &&
-      (slashes || (proto && !slashedProtocol[proto]))) {
-
-    // there's a hostname.
-    // the first instance of /, ?, ;, or # ends the host.
-    //
-    // If there is an @ in the hostname, then non-host chars *are* allowed
-    // to the left of the last @ sign, unless some host-ending character
-    // comes *before* the @-sign.
-    // URLs are obnoxious.
-    //
-    // ex:
-    // http://a@b@c/ => user:a@b host:c
-    // http://a@b?@c => user:a host:c path:/?@c
-
-    // v0.12 TODO(isaacs): This is not quite how Chrome does things.
-    // Review our test case against browsers more comprehensively.
-
-    // find the first instance of any hostEndingChars
-    var hostEnd = -1;
-    for (var i = 0; i < hostEndingChars.length; i++) {
-      var hec = rest.indexOf(hostEndingChars[i]);
-      if (hec !== -1 && (hostEnd === -1 || hec < hostEnd))
-        hostEnd = hec;
-    }
-
-    // at this point, either we have an explicit point where the
-    // auth portion cannot go past, or the last @ char is the decider.
-    var auth, atSign;
-    if (hostEnd === -1) {
-      // atSign can be anywhere.
-      atSign = rest.lastIndexOf('@');
-    } else {
-      // atSign must be in auth portion.
-      // http://a@b/c@d => host:b auth:a path:/c@d
-      atSign = rest.lastIndexOf('@', hostEnd);
-    }
-
-    // Now we have a portion which is definitely the auth.
-    // Pull that off.
-    if (atSign !== -1) {
-      auth = rest.slice(0, atSign);
-      rest = rest.slice(atSign + 1);
-      this.auth = decodeURIComponent(auth);
-    }
-
-    // the host is the remaining to the left of the first non-host char
-    hostEnd = -1;
-    for (var i = 0; i < nonHostChars.length; i++) {
-      var hec = rest.indexOf(nonHostChars[i]);
-      if (hec !== -1 && (hostEnd === -1 || hec < hostEnd))
-        hostEnd = hec;
-    }
-    // if we still have not hit it, then the entire thing is a host.
-    if (hostEnd === -1)
-      hostEnd = rest.length;
-
-    this.host = rest.slice(0, hostEnd);
-    rest = rest.slice(hostEnd);
-
-    // pull out port.
-    this.parseHost();
-
-    // we've indicated that there is a hostname,
-    // so even if it's empty, it has to be present.
-    this.hostname = this.hostname || '';
-
-    // if hostname begins with [ and ends with ]
-    // assume that it's an IPv6 address.
-    var ipv6Hostname = this.hostname[0] === '[' &&
-        this.hostname[this.hostname.length - 1] === ']';
-
-    // validate a little.
-    if (!ipv6Hostname) {
-      var hostparts = this.hostname.split(/\./);
-      for (var i = 0, l = hostparts.length; i < l; i++) {
-        var part = hostparts[i];
-        if (!part) continue;
-        if (!part.match(hostnamePartPattern)) {
-          var newpart = '';
-          for (var j = 0, k = part.length; j < k; j++) {
-            if (part.charCodeAt(j) > 127) {
-              // we replace non-ASCII char with a temporary placeholder
-              // we need this to make sure size of hostname is not
-              // broken by replacing non-ASCII by nothing
-              newpart += 'x';
-            } else {
-              newpart += part[j];
-            }
-          }
-          // we test again with ASCII char only
-          if (!newpart.match(hostnamePartPattern)) {
-            var validParts = hostparts.slice(0, i);
-            var notHost = hostparts.slice(i + 1);
-            var bit = part.match(hostnamePartStart);
-            if (bit) {
-              validParts.push(bit[1]);
-              notHost.unshift(bit[2]);
-            }
-            if (notHost.length) {
-              rest = '/' + notHost.join('.') + rest;
-            }
-            this.hostname = validParts.join('.');
-            break;
-          }
-        }
-      }
-    }
-
-    if (this.hostname.length > hostnameMaxLen) {
-      this.hostname = '';
-    } else {
-      // hostnames are always lower case.
-      this.hostname = this.hostname.toLowerCase();
-    }
-
-    if (!ipv6Hostname) {
-      // IDNA Support: Returns a punycoded representation of "domain".
-      // It only converts parts of the domain name that
-      // have non-ASCII characters, i.e. it doesn't matter if
-      // you call it with a domain that already is ASCII-only.
-      this.hostname = punycode.toASCII(this.hostname);
-    }
-
-    var p = this.port ? ':' + this.port : '';
-    var h = this.hostname || '';
-    this.host = h + p;
-    this.href += this.host;
-
-    // strip [ and ] from the hostname
-    // the host field still retains them, though
-    if (ipv6Hostname) {
-      this.hostname = this.hostname.substr(1, this.hostname.length - 2);
-      if (rest[0] !== '/') {
-        rest = '/' + rest;
-      }
-    }
-  }
-
-  // now rest is set to the post-host stuff.
-  // chop off any delim chars.
-  if (!unsafeProtocol[lowerProto]) {
-
-    // First, make 100% sure that any "autoEscape" chars get
-    // escaped, even if encodeURIComponent doesn't think they
-    // need to be.
-    for (var i = 0, l = autoEscape.length; i < l; i++) {
-      var ae = autoEscape[i];
-      if (rest.indexOf(ae) === -1)
-        continue;
-      var esc = encodeURIComponent(ae);
-      if (esc === ae) {
-        esc = escape(ae);
-      }
-      rest = rest.split(ae).join(esc);
-    }
-  }
-
-
-  // chop off from the tail first.
-  var hash = rest.indexOf('#');
-  if (hash !== -1) {
-    // got a fragment string.
-    this.hash = rest.substr(hash);
-    rest = rest.slice(0, hash);
-  }
-  var qm = rest.indexOf('?');
-  if (qm !== -1) {
-    this.search = rest.substr(qm);
-    this.query = rest.substr(qm + 1);
-    if (parseQueryString) {
-      this.query = querystring.parse(this.query);
-    }
-    rest = rest.slice(0, qm);
-  } else if (parseQueryString) {
-    // no query string, but parseQueryString still requested
-    this.search = '';
-    this.query = {};
-  }
-  if (rest) this.pathname = rest;
-  if (slashedProtocol[lowerProto] &&
-      this.hostname && !this.pathname) {
-    this.pathname = '/';
-  }
-
-  //to support http.request
-  if (this.pathname || this.search) {
-    var p = this.pathname || '';
-    var s = this.search || '';
-    this.path = p + s;
-  }
-
-  // finally, reconstruct the href based on what has been validated.
-  this.href = this.format();
-  return this;
-};
-
-// format a parsed object into a url string
-function urlFormat(obj) {
-  // ensure it's an object, and not a string url.
-  // If it's an obj, this is a no-op.
-  // this way, you can call url_format() on strings
-  // to clean up potentially wonky urls.
-  if (util.isString(obj)) obj = urlParse(obj);
-  if (!(obj instanceof Url)) return Url.prototype.format.call(obj);
-  return obj.format();
-}
-
-Url.prototype.format = function() {
-  var auth = this.auth || '';
-  if (auth) {
-    auth = encodeURIComponent(auth);
-    auth = auth.replace(/%3A/i, ':');
-    auth += '@';
-  }
-
-  var protocol = this.protocol || '',
-      pathname = this.pathname || '',
-      hash = this.hash || '',
-      host = false,
-      query = '';
-
-  if (this.host) {
-    host = auth + this.host;
-  } else if (this.hostname) {
-    host = auth + (this.hostname.indexOf(':') === -1 ?
-        this.hostname :
-        '[' + this.hostname + ']');
-    if (this.port) {
-      host += ':' + this.port;
-    }
-  }
-
-  if (this.query &&
-      util.isObject(this.query) &&
-      Object.keys(this.query).length) {
-    query = querystring.stringify(this.query);
-  }
-
-  var search = this.search || (query && ('?' + query)) || '';
-
-  if (protocol && protocol.substr(-1) !== ':') protocol += ':';
-
-  // only the slashedProtocols get the //.  Not mailto:, xmpp:, etc.
-  // unless they had them to begin with.
-  if (this.slashes ||
-      (!protocol || slashedProtocol[protocol]) && host !== false) {
-    host = '//' + (host || '');
-    if (pathname && pathname.charAt(0) !== '/') pathname = '/' + pathname;
-  } else if (!host) {
-    host = '';
-  }
-
-  if (hash && hash.charAt(0) !== '#') hash = '#' + hash;
-  if (search && search.charAt(0) !== '?') search = '?' + search;
-
-  pathname = pathname.replace(/[?#]/g, function(match) {
-    return encodeURIComponent(match);
-  });
-  search = search.replace('#', '%23');
-
-  return protocol + host + pathname + search + hash;
-};
-
-function urlResolve(source, relative) {
-  return urlParse(source, false, true).resolve(relative);
-}
-
-Url.prototype.resolve = function(relative) {
-  return this.resolveObject(urlParse(relative, false, true)).format();
-};
-
-function urlResolveObject(source, relative) {
-  if (!source) return relative;
-  return urlParse(source, false, true).resolveObject(relative);
-}
-
-Url.prototype.resolveObject = function(relative) {
-  if (util.isString(relative)) {
-    var rel = new Url();
-    rel.parse(relative, false, true);
-    relative = rel;
-  }
-
-  var result = new Url();
-  var tkeys = Object.keys(this);
-  for (var tk = 0; tk < tkeys.length; tk++) {
-    var tkey = tkeys[tk];
-    result[tkey] = this[tkey];
-  }
-
-  // hash is always overridden, no matter what.
-  // even href="" will remove it.
-  result.hash = relative.hash;
-
-  // if the relative url is empty, then there's nothing left to do here.
-  if (relative.href === '') {
-    result.href = result.format();
-    return result;
-  }
-
-  // hrefs like //foo/bar always cut to the protocol.
-  if (relative.slashes && !relative.protocol) {
-    // take everything except the protocol from relative
-    var rkeys = Object.keys(relative);
-    for (var rk = 0; rk < rkeys.length; rk++) {
-      var rkey = rkeys[rk];
-      if (rkey !== 'protocol')
-        result[rkey] = relative[rkey];
-    }
-
-    //urlParse appends trailing / to urls like http://www.example.com
-    if (slashedProtocol[result.protocol] &&
-        result.hostname && !result.pathname) {
-      result.path = result.pathname = '/';
-    }
-
-    result.href = result.format();
-    return result;
-  }
-
-  if (relative.protocol && relative.protocol !== result.protocol) {
-    // if it's a known url protocol, then changing
-    // the protocol does weird things
-    // first, if it's not file:, then we MUST have a host,
-    // and if there was a path
-    // to begin with, then we MUST have a path.
-    // if it is file:, then the host is dropped,
-    // because that's known to be hostless.
-    // anything else is assumed to be absolute.
-    if (!slashedProtocol[relative.protocol]) {
-      var keys = Object.keys(relative);
-      for (var v = 0; v < keys.length; v++) {
-        var k = keys[v];
-        result[k] = relative[k];
-      }
-      result.href = result.format();
-      return result;
-    }
-
-    result.protocol = relative.protocol;
-    if (!relative.host && !hostlessProtocol[relative.protocol]) {
-      var relPath = (relative.pathname || '').split('/');
-      while (relPath.length && !(relative.host = relPath.shift()));
-      if (!relative.host) relative.host = '';
-      if (!relative.hostname) relative.hostname = '';
-      if (relPath[0] !== '') relPath.unshift('');
-      if (relPath.length < 2) relPath.unshift('');
-      result.pathname = relPath.join('/');
-    } else {
-      result.pathname = relative.pathname;
-    }
-    result.search = relative.search;
-    result.query = relative.query;
-    result.host = relative.host || '';
-    result.auth = relative.auth;
-    result.hostname = relative.hostname || relative.host;
-    result.port = relative.port;
-    // to support http.request
-    if (result.pathname || result.search) {
-      var p = result.pathname || '';
-      var s = result.search || '';
-      result.path = p + s;
-    }
-    result.slashes = result.slashes || relative.slashes;
-    result.href = result.format();
-    return result;
-  }
-
-  var isSourceAbs = (result.pathname && result.pathname.charAt(0) === '/'),
-      isRelAbs = (
-          relative.host ||
-          relative.pathname && relative.pathname.charAt(0) === '/'
-      ),
-      mustEndAbs = (isRelAbs || isSourceAbs ||
-                    (result.host && relative.pathname)),
-      removeAllDots = mustEndAbs,
-      srcPath = result.pathname && result.pathname.split('/') || [],
-      relPath = relative.pathname && relative.pathname.split('/') || [],
-      psychotic = result.protocol && !slashedProtocol[result.protocol];
-
-  // if the url is a non-slashed url, then relative
-  // links like ../.. should be able
-  // to crawl up to the hostname, as well.  This is strange.
-  // result.protocol has already been set by now.
-  // Later on, put the first path part into the host field.
-  if (psychotic) {
-    result.hostname = '';
-    result.port = null;
-    if (result.host) {
-      if (srcPath[0] === '') srcPath[0] = result.host;
-      else srcPath.unshift(result.host);
-    }
-    result.host = '';
-    if (relative.protocol) {
-      relative.hostname = null;
-      relative.port = null;
-      if (relative.host) {
-        if (relPath[0] === '') relPath[0] = relative.host;
-        else relPath.unshift(relative.host);
-      }
-      relative.host = null;
-    }
-    mustEndAbs = mustEndAbs && (relPath[0] === '' || srcPath[0] === '');
-  }
-
-  if (isRelAbs) {
-    // it's absolute.
-    result.host = (relative.host || relative.host === '') ?
-                  relative.host : result.host;
-    result.hostname = (relative.hostname || relative.hostname === '') ?
-                      relative.hostname : result.hostname;
-    result.search = relative.search;
-    result.query = relative.query;
-    srcPath = relPath;
-    // fall through to the dot-handling below.
-  } else if (relPath.length) {
-    // it's relative
-    // throw away the existing file, and take the new path instead.
-    if (!srcPath) srcPath = [];
-    srcPath.pop();
-    srcPath = srcPath.concat(relPath);
-    result.search = relative.search;
-    result.query = relative.query;
-  } else if (!util.isNullOrUndefined(relative.search)) {
-    // just pull out the search.
-    // like href='?foo'.
-    // Put this after the other two cases because it simplifies the booleans
-    if (psychotic) {
-      result.hostname = result.host = srcPath.shift();
-      //occationaly the auth can get stuck only in host
-      //this especially happens in cases like
-      //url.resolveObject('mailto:local1@domain1', 'local2@domain2')
-      var authInHost = result.host && result.host.indexOf('@') > 0 ?
-                       result.host.split('@') : false;
-      if (authInHost) {
-        result.auth = authInHost.shift();
-        result.host = result.hostname = authInHost.shift();
-      }
-    }
-    result.search = relative.search;
-    result.query = relative.query;
-    //to support http.request
-    if (!util.isNull(result.pathname) || !util.isNull(result.search)) {
-      result.path = (result.pathname ? result.pathname : '') +
-                    (result.search ? result.search : '');
-    }
-    result.href = result.format();
-    return result;
-  }
-
-  if (!srcPath.length) {
-    // no path at all.  easy.
-    // we've already handled the other stuff above.
-    result.pathname = null;
-    //to support http.request
-    if (result.search) {
-      result.path = '/' + result.search;
-    } else {
-      result.path = null;
-    }
-    result.href = result.format();
-    return result;
-  }
-
-  // if a url ENDs in . or .., then it must get a trailing slash.
-  // however, if it ends in anything else non-slashy,
-  // then it must NOT get a trailing slash.
-  var last = srcPath.slice(-1)[0];
-  var hasTrailingSlash = (
-      (result.host || relative.host || srcPath.length > 1) &&
-      (last === '.' || last === '..') || last === '');
-
-  // strip single dots, resolve double dots to parent dir
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = srcPath.length; i >= 0; i--) {
-    last = srcPath[i];
-    if (last === '.') {
-      srcPath.splice(i, 1);
-    } else if (last === '..') {
-      srcPath.splice(i, 1);
-      up++;
-    } else if (up) {
-      srcPath.splice(i, 1);
-      up--;
-    }
-  }
-
-  // if the path is allowed to go above the root, restore leading ..s
-  if (!mustEndAbs && !removeAllDots) {
-    for (; up--; up) {
-      srcPath.unshift('..');
-    }
-  }
-
-  if (mustEndAbs && srcPath[0] !== '' &&
-      (!srcPath[0] || srcPath[0].charAt(0) !== '/')) {
-    srcPath.unshift('');
-  }
-
-  if (hasTrailingSlash && (srcPath.join('/').substr(-1) !== '/')) {
-    srcPath.push('');
-  }
-
-  var isAbsolute = srcPath[0] === '' ||
-      (srcPath[0] && srcPath[0].charAt(0) === '/');
-
-  // put the host back
-  if (psychotic) {
-    result.hostname = result.host = isAbsolute ? '' :
-                                    srcPath.length ? srcPath.shift() : '';
-    //occationaly the auth can get stuck only in host
-    //this especially happens in cases like
-    //url.resolveObject('mailto:local1@domain1', 'local2@domain2')
-    var authInHost = result.host && result.host.indexOf('@') > 0 ?
-                     result.host.split('@') : false;
-    if (authInHost) {
-      result.auth = authInHost.shift();
-      result.host = result.hostname = authInHost.shift();
-    }
-  }
-
-  mustEndAbs = mustEndAbs || (result.host && srcPath.length);
-
-  if (mustEndAbs && !isAbsolute) {
-    srcPath.unshift('');
-  }
-
-  if (!srcPath.length) {
-    result.pathname = null;
-    result.path = null;
-  } else {
-    result.pathname = srcPath.join('/');
-  }
-
-  //to support request.http
-  if (!util.isNull(result.pathname) || !util.isNull(result.search)) {
-    result.path = (result.pathname ? result.pathname : '') +
-                  (result.search ? result.search : '');
-  }
-  result.auth = relative.auth || result.auth;
-  result.slashes = result.slashes || relative.slashes;
-  result.href = result.format();
-  return result;
-};
-
-Url.prototype.parseHost = function() {
-  var host = this.host;
-  var port = portPattern.exec(host);
-  if (port) {
-    port = port[0];
-    if (port !== ':') {
-      this.port = port.substr(1);
-    }
-    host = host.substr(0, host.length - port.length);
-  }
-  if (host) this.hostname = host;
-};
-
-},{"./util":180,"punycode":92,"querystring":145}],180:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  isString: function(arg) {
-    return typeof(arg) === 'string';
-  },
-  isObject: function(arg) {
-    return typeof(arg) === 'object' && arg !== null;
-  },
-  isNull: function(arg) {
-    return arg === null;
-  },
-  isNullOrUndefined: function(arg) {
-    return arg == null;
-  }
-};
-
-},{}],181:[function(require,module,exports){
-(function (global){
-
-/**
- * Module exports.
- */
-
-module.exports = deprecate;
-
-/**
- * Mark that a method should not be used.
- * Returns a modified function which warns once by default.
- *
- * If `localStorage.noDeprecation = true` is set, then it is a no-op.
- *
- * If `localStorage.throwDeprecation = true` is set, then deprecated functions
- * will throw an Error when invoked.
- *
- * If `localStorage.traceDeprecation = true` is set, then deprecated functions
- * will invoke `console.trace()` instead of `console.error()`.
- *
- * @param {Function} fn - the function to deprecate
- * @param {String} msg - the string to print to the console when `fn` is invoked
- * @returns {Function} a new "deprecated" version of `fn`
- * @api public
- */
-
-function deprecate (fn, msg) {
-  if (config('noDeprecation')) {
-    return fn;
-  }
-
-  var warned = false;
-  function deprecated() {
-    if (!warned) {
-      if (config('throwDeprecation')) {
-        throw new Error(msg);
-      } else if (config('traceDeprecation')) {
-        console.trace(msg);
-      } else {
-        console.warn(msg);
-      }
-      warned = true;
-    }
-    return fn.apply(this, arguments);
-  }
-
-  return deprecated;
-}
-
-/**
- * Checks `localStorage` for boolean values for the given `name`.
- *
- * @param {String} name
- * @returns {Boolean}
- * @api private
- */
-
-function config (name) {
-  // accessing global.localStorage can trigger a DOMException in sandboxed iframes
-  try {
-    if (!global.localStorage) return false;
-  } catch (_) {
-    return false;
-  }
-  var val = global.localStorage[name];
-  if (null == val) return false;
-  return String(val).toLowerCase() === 'true';
-}
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],182:[function(require,module,exports){
+},{}],144:[function(require,module,exports){
 'use strict'
 module.exports = function (Yallist) {
   Yallist.prototype[Symbol.iterator] = function* () {
@@ -43805,7 +36618,7 @@ module.exports = function (Yallist) {
   }
 }
 
-},{}],183:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 'use strict'
 module.exports = Yallist
 
@@ -44233,7 +37046,7 @@ try {
   require('./iterator.js')(Yallist)
 } catch (er) {}
 
-},{"./iterator.js":182}],184:[function(require,module,exports){
+},{"./iterator.js":144}],146:[function(require,module,exports){
 
 var Cluster = function (psshEntry) {
 	this.members = null;
@@ -44354,4 +37167,5873 @@ module.exports = Cluster;
 
 
 
-},{}]},{},[2,3,4,5,6,7,8,9,10,1,11,12,15,16,17,13]);
+},{}],147:[function(require,module,exports){
+var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+;(function (exports) {
+	'use strict';
+
+  var Arr = (typeof Uint8Array !== 'undefined')
+    ? Uint8Array
+    : Array
+
+	var PLUS   = '+'.charCodeAt(0)
+	var SLASH  = '/'.charCodeAt(0)
+	var NUMBER = '0'.charCodeAt(0)
+	var LOWER  = 'a'.charCodeAt(0)
+	var UPPER  = 'A'.charCodeAt(0)
+	var PLUS_URL_SAFE = '-'.charCodeAt(0)
+	var SLASH_URL_SAFE = '_'.charCodeAt(0)
+
+	function decode (elt) {
+		var code = elt.charCodeAt(0)
+		if (code === PLUS ||
+		    code === PLUS_URL_SAFE)
+			return 62 // '+'
+		if (code === SLASH ||
+		    code === SLASH_URL_SAFE)
+			return 63 // '/'
+		if (code < NUMBER)
+			return -1 //no match
+		if (code < NUMBER + 10)
+			return code - NUMBER + 26 + 26
+		if (code < UPPER + 26)
+			return code - UPPER
+		if (code < LOWER + 26)
+			return code - LOWER + 26
+	}
+
+	function b64ToByteArray (b64) {
+		var i, j, l, tmp, placeHolders, arr
+
+		if (b64.length % 4 > 0) {
+			throw new Error('Invalid string. Length must be a multiple of 4')
+		}
+
+		// the number of equal signs (place holders)
+		// if there are two placeholders, than the two characters before it
+		// represent one byte
+		// if there is only one, then the three characters before it represent 2 bytes
+		// this is just a cheap hack to not do indexOf twice
+		var len = b64.length
+		placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
+
+		// base64 is 4/3 + up to two characters of the original data
+		arr = new Arr(b64.length * 3 / 4 - placeHolders)
+
+		// if there are placeholders, only get up to the last complete 4 chars
+		l = placeHolders > 0 ? b64.length - 4 : b64.length
+
+		var L = 0
+
+		function push (v) {
+			arr[L++] = v
+		}
+
+		for (i = 0, j = 0; i < l; i += 4, j += 3) {
+			tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
+			push((tmp & 0xFF0000) >> 16)
+			push((tmp & 0xFF00) >> 8)
+			push(tmp & 0xFF)
+		}
+
+		if (placeHolders === 2) {
+			tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
+			push(tmp & 0xFF)
+		} else if (placeHolders === 1) {
+			tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
+			push((tmp >> 8) & 0xFF)
+			push(tmp & 0xFF)
+		}
+
+		return arr
+	}
+
+	function uint8ToBase64 (uint8) {
+		var i,
+			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
+			output = "",
+			temp, length
+
+		function encode (num) {
+			return lookup.charAt(num)
+		}
+
+		function tripletToBase64 (num) {
+			return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
+		}
+
+		// go through the array every three bytes, we'll deal with trailing stuff later
+		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
+			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+			output += tripletToBase64(temp)
+		}
+
+		// pad the end with zeros, but make sure to not forget the extra bytes
+		switch (extraBytes) {
+			case 1:
+				temp = uint8[uint8.length - 1]
+				output += encode(temp >> 2)
+				output += encode((temp << 4) & 0x3F)
+				output += '=='
+				break
+			case 2:
+				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
+				output += encode(temp >> 10)
+				output += encode((temp >> 4) & 0x3F)
+				output += encode((temp << 2) & 0x3F)
+				output += '='
+				break
+		}
+
+		return output
+	}
+
+	exports.toByteArray = b64ToByteArray
+	exports.fromByteArray = uint8ToBase64
+}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
+
+},{}],148:[function(require,module,exports){
+
+},{}],149:[function(require,module,exports){
+(function (global){
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <http://feross.org>
+ * @license  MIT
+ */
+/* eslint-disable no-proto */
+
+'use strict'
+
+var base64 = require('base64-js')
+var ieee754 = require('ieee754')
+var isArray = require('isarray')
+
+exports.Buffer = Buffer
+exports.SlowBuffer = SlowBuffer
+exports.INSPECT_MAX_BYTES = 50
+Buffer.poolSize = 8192 // not used by this implementation
+
+var rootParent = {}
+
+/**
+ * If `Buffer.TYPED_ARRAY_SUPPORT`:
+ *   === true    Use Uint8Array implementation (fastest)
+ *   === false   Use Object implementation (most compatible, even IE6)
+ *
+ * Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
+ * Opera 11.6+, iOS 4.2+.
+ *
+ * Due to various browser bugs, sometimes the Object implementation will be used even
+ * when the browser supports typed arrays.
+ *
+ * Note:
+ *
+ *   - Firefox 4-29 lacks support for adding new properties to `Uint8Array` instances,
+ *     See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
+ *
+ *   - Safari 5-7 lacks support for changing the `Object.prototype.constructor` property
+ *     on objects.
+ *
+ *   - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
+ *
+ *   - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
+ *     incorrect length in some situations.
+
+ * We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they
+ * get the Object implementation, which is slower but behaves correctly.
+ */
+Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== undefined
+  ? global.TYPED_ARRAY_SUPPORT
+  : typedArraySupport()
+
+function typedArraySupport () {
+  function Bar () {}
+  try {
+    var arr = new Uint8Array(1)
+    arr.foo = function () { return 42 }
+    arr.constructor = Bar
+    return arr.foo() === 42 && // typed array instances can be augmented
+        arr.constructor === Bar && // constructor can be set
+        typeof arr.subarray === 'function' && // chrome 9-10 lack `subarray`
+        arr.subarray(1, 1).byteLength === 0 // ie10 has broken `subarray`
+  } catch (e) {
+    return false
+  }
+}
+
+function kMaxLength () {
+  return Buffer.TYPED_ARRAY_SUPPORT
+    ? 0x7fffffff
+    : 0x3fffffff
+}
+
+/**
+ * Class: Buffer
+ * =============
+ *
+ * The Buffer constructor returns instances of `Uint8Array` that are augmented
+ * with function properties for all the node `Buffer` API functions. We use
+ * `Uint8Array` so that square bracket notation works as expected -- it returns
+ * a single octet.
+ *
+ * By augmenting the instances, we can avoid modifying the `Uint8Array`
+ * prototype.
+ */
+function Buffer (arg) {
+  if (!(this instanceof Buffer)) {
+    // Avoid going through an ArgumentsAdaptorTrampoline in the common case.
+    if (arguments.length > 1) return new Buffer(arg, arguments[1])
+    return new Buffer(arg)
+  }
+
+  if (!Buffer.TYPED_ARRAY_SUPPORT) {
+    this.length = 0
+    this.parent = undefined
+  }
+
+  // Common case.
+  if (typeof arg === 'number') {
+    return fromNumber(this, arg)
+  }
+
+  // Slightly less common case.
+  if (typeof arg === 'string') {
+    return fromString(this, arg, arguments.length > 1 ? arguments[1] : 'utf8')
+  }
+
+  // Unusual.
+  return fromObject(this, arg)
+}
+
+function fromNumber (that, length) {
+  that = allocate(that, length < 0 ? 0 : checked(length) | 0)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) {
+    for (var i = 0; i < length; i++) {
+      that[i] = 0
+    }
+  }
+  return that
+}
+
+function fromString (that, string, encoding) {
+  if (typeof encoding !== 'string' || encoding === '') encoding = 'utf8'
+
+  // Assumption: byteLength() return value is always < kMaxLength.
+  var length = byteLength(string, encoding) | 0
+  that = allocate(that, length)
+
+  that.write(string, encoding)
+  return that
+}
+
+function fromObject (that, object) {
+  if (Buffer.isBuffer(object)) return fromBuffer(that, object)
+
+  if (isArray(object)) return fromArray(that, object)
+
+  if (object == null) {
+    throw new TypeError('must start with number, buffer, array or string')
+  }
+
+  if (typeof ArrayBuffer !== 'undefined') {
+    if (object.buffer instanceof ArrayBuffer) {
+      return fromTypedArray(that, object)
+    }
+    if (object instanceof ArrayBuffer) {
+      return fromArrayBuffer(that, object)
+    }
+  }
+
+  if (object.length) return fromArrayLike(that, object)
+
+  return fromJsonObject(that, object)
+}
+
+function fromBuffer (that, buffer) {
+  var length = checked(buffer.length) | 0
+  that = allocate(that, length)
+  buffer.copy(that, 0, 0, length)
+  return that
+}
+
+function fromArray (that, array) {
+  var length = checked(array.length) | 0
+  that = allocate(that, length)
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+// Duplicate of fromArray() to keep fromArray() monomorphic.
+function fromTypedArray (that, array) {
+  var length = checked(array.length) | 0
+  that = allocate(that, length)
+  // Truncating the elements is probably not what people expect from typed
+  // arrays with BYTES_PER_ELEMENT > 1 but it's compatible with the behavior
+  // of the old Buffer constructor.
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+function fromArrayBuffer (that, array) {
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Return an augmented `Uint8Array` instance, for best performance
+    array.byteLength
+    that = Buffer._augment(new Uint8Array(array))
+  } else {
+    // Fallback: Return an object instance of the Buffer class
+    that = fromTypedArray(that, new Uint8Array(array))
+  }
+  return that
+}
+
+function fromArrayLike (that, array) {
+  var length = checked(array.length) | 0
+  that = allocate(that, length)
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+// Deserialize { type: 'Buffer', data: [1,2,3,...] } into a Buffer object.
+// Returns a zero-length buffer for inputs that don't conform to the spec.
+function fromJsonObject (that, object) {
+  var array
+  var length = 0
+
+  if (object.type === 'Buffer' && isArray(object.data)) {
+    array = object.data
+    length = checked(array.length) | 0
+  }
+  that = allocate(that, length)
+
+  for (var i = 0; i < length; i += 1) {
+    that[i] = array[i] & 255
+  }
+  return that
+}
+
+if (Buffer.TYPED_ARRAY_SUPPORT) {
+  Buffer.prototype.__proto__ = Uint8Array.prototype
+  Buffer.__proto__ = Uint8Array
+} else {
+  // pre-set for values that may exist in the future
+  Buffer.prototype.length = undefined
+  Buffer.prototype.parent = undefined
+}
+
+function allocate (that, length) {
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    // Return an augmented `Uint8Array` instance, for best performance
+    that = Buffer._augment(new Uint8Array(length))
+    that.__proto__ = Buffer.prototype
+  } else {
+    // Fallback: Return an object instance of the Buffer class
+    that.length = length
+    that._isBuffer = true
+  }
+
+  var fromPool = length !== 0 && length <= Buffer.poolSize >>> 1
+  if (fromPool) that.parent = rootParent
+
+  return that
+}
+
+function checked (length) {
+  // Note: cannot use `length < kMaxLength` here because that fails when
+  // length is NaN (which is otherwise coerced to zero.)
+  if (length >= kMaxLength()) {
+    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
+                         'size: 0x' + kMaxLength().toString(16) + ' bytes')
+  }
+  return length | 0
+}
+
+function SlowBuffer (subject, encoding) {
+  if (!(this instanceof SlowBuffer)) return new SlowBuffer(subject, encoding)
+
+  var buf = new Buffer(subject, encoding)
+  delete buf.parent
+  return buf
+}
+
+Buffer.isBuffer = function isBuffer (b) {
+  return !!(b != null && b._isBuffer)
+}
+
+Buffer.compare = function compare (a, b) {
+  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
+    throw new TypeError('Arguments must be Buffers')
+  }
+
+  if (a === b) return 0
+
+  var x = a.length
+  var y = b.length
+
+  var i = 0
+  var len = Math.min(x, y)
+  while (i < len) {
+    if (a[i] !== b[i]) break
+
+    ++i
+  }
+
+  if (i !== len) {
+    x = a[i]
+    y = b[i]
+  }
+
+  if (x < y) return -1
+  if (y < x) return 1
+  return 0
+}
+
+Buffer.isEncoding = function isEncoding (encoding) {
+  switch (String(encoding).toLowerCase()) {
+    case 'hex':
+    case 'utf8':
+    case 'utf-8':
+    case 'ascii':
+    case 'binary':
+    case 'base64':
+    case 'raw':
+    case 'ucs2':
+    case 'ucs-2':
+    case 'utf16le':
+    case 'utf-16le':
+      return true
+    default:
+      return false
+  }
+}
+
+Buffer.concat = function concat (list, length) {
+  if (!isArray(list)) throw new TypeError('list argument must be an Array of Buffers.')
+
+  if (list.length === 0) {
+    return new Buffer(0)
+  }
+
+  var i
+  if (length === undefined) {
+    length = 0
+    for (i = 0; i < list.length; i++) {
+      length += list[i].length
+    }
+  }
+
+  var buf = new Buffer(length)
+  var pos = 0
+  for (i = 0; i < list.length; i++) {
+    var item = list[i]
+    item.copy(buf, pos)
+    pos += item.length
+  }
+  return buf
+}
+
+function byteLength (string, encoding) {
+  if (typeof string !== 'string') string = '' + string
+
+  var len = string.length
+  if (len === 0) return 0
+
+  // Use a for loop to avoid recursion
+  var loweredCase = false
+  for (;;) {
+    switch (encoding) {
+      case 'ascii':
+      case 'binary':
+      // Deprecated
+      case 'raw':
+      case 'raws':
+        return len
+      case 'utf8':
+      case 'utf-8':
+        return utf8ToBytes(string).length
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return len * 2
+      case 'hex':
+        return len >>> 1
+      case 'base64':
+        return base64ToBytes(string).length
+      default:
+        if (loweredCase) return utf8ToBytes(string).length // assume utf8
+        encoding = ('' + encoding).toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+Buffer.byteLength = byteLength
+
+function slowToString (encoding, start, end) {
+  var loweredCase = false
+
+  start = start | 0
+  end = end === undefined || end === Infinity ? this.length : end | 0
+
+  if (!encoding) encoding = 'utf8'
+  if (start < 0) start = 0
+  if (end > this.length) end = this.length
+  if (end <= start) return ''
+
+  while (true) {
+    switch (encoding) {
+      case 'hex':
+        return hexSlice(this, start, end)
+
+      case 'utf8':
+      case 'utf-8':
+        return utf8Slice(this, start, end)
+
+      case 'ascii':
+        return asciiSlice(this, start, end)
+
+      case 'binary':
+        return binarySlice(this, start, end)
+
+      case 'base64':
+        return base64Slice(this, start, end)
+
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return utf16leSlice(this, start, end)
+
+      default:
+        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+        encoding = (encoding + '').toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+
+Buffer.prototype.toString = function toString () {
+  var length = this.length | 0
+  if (length === 0) return ''
+  if (arguments.length === 0) return utf8Slice(this, 0, length)
+  return slowToString.apply(this, arguments)
+}
+
+Buffer.prototype.equals = function equals (b) {
+  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  if (this === b) return true
+  return Buffer.compare(this, b) === 0
+}
+
+Buffer.prototype.inspect = function inspect () {
+  var str = ''
+  var max = exports.INSPECT_MAX_BYTES
+  if (this.length > 0) {
+    str = this.toString('hex', 0, max).match(/.{2}/g).join(' ')
+    if (this.length > max) str += ' ... '
+  }
+  return '<Buffer ' + str + '>'
+}
+
+Buffer.prototype.compare = function compare (b) {
+  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  if (this === b) return 0
+  return Buffer.compare(this, b)
+}
+
+Buffer.prototype.indexOf = function indexOf (val, byteOffset) {
+  if (byteOffset > 0x7fffffff) byteOffset = 0x7fffffff
+  else if (byteOffset < -0x80000000) byteOffset = -0x80000000
+  byteOffset >>= 0
+
+  if (this.length === 0) return -1
+  if (byteOffset >= this.length) return -1
+
+  // Negative offsets start from the end of the buffer
+  if (byteOffset < 0) byteOffset = Math.max(this.length + byteOffset, 0)
+
+  if (typeof val === 'string') {
+    if (val.length === 0) return -1 // special case: looking for empty string always fails
+    return String.prototype.indexOf.call(this, val, byteOffset)
+  }
+  if (Buffer.isBuffer(val)) {
+    return arrayIndexOf(this, val, byteOffset)
+  }
+  if (typeof val === 'number') {
+    if (Buffer.TYPED_ARRAY_SUPPORT && Uint8Array.prototype.indexOf === 'function') {
+      return Uint8Array.prototype.indexOf.call(this, val, byteOffset)
+    }
+    return arrayIndexOf(this, [ val ], byteOffset)
+  }
+
+  function arrayIndexOf (arr, val, byteOffset) {
+    var foundIndex = -1
+    for (var i = 0; byteOffset + i < arr.length; i++) {
+      if (arr[byteOffset + i] === val[foundIndex === -1 ? 0 : i - foundIndex]) {
+        if (foundIndex === -1) foundIndex = i
+        if (i - foundIndex + 1 === val.length) return byteOffset + foundIndex
+      } else {
+        foundIndex = -1
+      }
+    }
+    return -1
+  }
+
+  throw new TypeError('val must be string, number or Buffer')
+}
+
+// `get` is deprecated
+Buffer.prototype.get = function get (offset) {
+  console.log('.get() is deprecated. Access using array indexes instead.')
+  return this.readUInt8(offset)
+}
+
+// `set` is deprecated
+Buffer.prototype.set = function set (v, offset) {
+  console.log('.set() is deprecated. Access using array indexes instead.')
+  return this.writeUInt8(v, offset)
+}
+
+function hexWrite (buf, string, offset, length) {
+  offset = Number(offset) || 0
+  var remaining = buf.length - offset
+  if (!length) {
+    length = remaining
+  } else {
+    length = Number(length)
+    if (length > remaining) {
+      length = remaining
+    }
+  }
+
+  // must be an even number of digits
+  var strLen = string.length
+  if (strLen % 2 !== 0) throw new Error('Invalid hex string')
+
+  if (length > strLen / 2) {
+    length = strLen / 2
+  }
+  for (var i = 0; i < length; i++) {
+    var parsed = parseInt(string.substr(i * 2, 2), 16)
+    if (isNaN(parsed)) throw new Error('Invalid hex string')
+    buf[offset + i] = parsed
+  }
+  return i
+}
+
+function utf8Write (buf, string, offset, length) {
+  return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
+}
+
+function asciiWrite (buf, string, offset, length) {
+  return blitBuffer(asciiToBytes(string), buf, offset, length)
+}
+
+function binaryWrite (buf, string, offset, length) {
+  return asciiWrite(buf, string, offset, length)
+}
+
+function base64Write (buf, string, offset, length) {
+  return blitBuffer(base64ToBytes(string), buf, offset, length)
+}
+
+function ucs2Write (buf, string, offset, length) {
+  return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length)
+}
+
+Buffer.prototype.write = function write (string, offset, length, encoding) {
+  // Buffer#write(string)
+  if (offset === undefined) {
+    encoding = 'utf8'
+    length = this.length
+    offset = 0
+  // Buffer#write(string, encoding)
+  } else if (length === undefined && typeof offset === 'string') {
+    encoding = offset
+    length = this.length
+    offset = 0
+  // Buffer#write(string, offset[, length][, encoding])
+  } else if (isFinite(offset)) {
+    offset = offset | 0
+    if (isFinite(length)) {
+      length = length | 0
+      if (encoding === undefined) encoding = 'utf8'
+    } else {
+      encoding = length
+      length = undefined
+    }
+  // legacy write(string, encoding, offset, length) - remove in v0.13
+  } else {
+    var swap = encoding
+    encoding = offset
+    offset = length | 0
+    length = swap
+  }
+
+  var remaining = this.length - offset
+  if (length === undefined || length > remaining) length = remaining
+
+  if ((string.length > 0 && (length < 0 || offset < 0)) || offset > this.length) {
+    throw new RangeError('attempt to write outside buffer bounds')
+  }
+
+  if (!encoding) encoding = 'utf8'
+
+  var loweredCase = false
+  for (;;) {
+    switch (encoding) {
+      case 'hex':
+        return hexWrite(this, string, offset, length)
+
+      case 'utf8':
+      case 'utf-8':
+        return utf8Write(this, string, offset, length)
+
+      case 'ascii':
+        return asciiWrite(this, string, offset, length)
+
+      case 'binary':
+        return binaryWrite(this, string, offset, length)
+
+      case 'base64':
+        // Warning: maxLength not taken into account in base64Write
+        return base64Write(this, string, offset, length)
+
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return ucs2Write(this, string, offset, length)
+
+      default:
+        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+        encoding = ('' + encoding).toLowerCase()
+        loweredCase = true
+    }
+  }
+}
+
+Buffer.prototype.toJSON = function toJSON () {
+  return {
+    type: 'Buffer',
+    data: Array.prototype.slice.call(this._arr || this, 0)
+  }
+}
+
+function base64Slice (buf, start, end) {
+  if (start === 0 && end === buf.length) {
+    return base64.fromByteArray(buf)
+  } else {
+    return base64.fromByteArray(buf.slice(start, end))
+  }
+}
+
+function utf8Slice (buf, start, end) {
+  end = Math.min(buf.length, end)
+  var res = []
+
+  var i = start
+  while (i < end) {
+    var firstByte = buf[i]
+    var codePoint = null
+    var bytesPerSequence = (firstByte > 0xEF) ? 4
+      : (firstByte > 0xDF) ? 3
+      : (firstByte > 0xBF) ? 2
+      : 1
+
+    if (i + bytesPerSequence <= end) {
+      var secondByte, thirdByte, fourthByte, tempCodePoint
+
+      switch (bytesPerSequence) {
+        case 1:
+          if (firstByte < 0x80) {
+            codePoint = firstByte
+          }
+          break
+        case 2:
+          secondByte = buf[i + 1]
+          if ((secondByte & 0xC0) === 0x80) {
+            tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F)
+            if (tempCodePoint > 0x7F) {
+              codePoint = tempCodePoint
+            }
+          }
+          break
+        case 3:
+          secondByte = buf[i + 1]
+          thirdByte = buf[i + 2]
+          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
+            tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F)
+            if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
+              codePoint = tempCodePoint
+            }
+          }
+          break
+        case 4:
+          secondByte = buf[i + 1]
+          thirdByte = buf[i + 2]
+          fourthByte = buf[i + 3]
+          if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
+            tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F)
+            if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
+              codePoint = tempCodePoint
+            }
+          }
+      }
+    }
+
+    if (codePoint === null) {
+      // we did not generate a valid codePoint so insert a
+      // replacement char (U+FFFD) and advance only 1 byte
+      codePoint = 0xFFFD
+      bytesPerSequence = 1
+    } else if (codePoint > 0xFFFF) {
+      // encode to utf16 (surrogate pair dance)
+      codePoint -= 0x10000
+      res.push(codePoint >>> 10 & 0x3FF | 0xD800)
+      codePoint = 0xDC00 | codePoint & 0x3FF
+    }
+
+    res.push(codePoint)
+    i += bytesPerSequence
+  }
+
+  return decodeCodePointsArray(res)
+}
+
+// Based on http://stackoverflow.com/a/22747272/680742, the browser with
+// the lowest limit is Chrome, with 0x10000 args.
+// We go 1 magnitude less, for safety
+var MAX_ARGUMENTS_LENGTH = 0x1000
+
+function decodeCodePointsArray (codePoints) {
+  var len = codePoints.length
+  if (len <= MAX_ARGUMENTS_LENGTH) {
+    return String.fromCharCode.apply(String, codePoints) // avoid extra slice()
+  }
+
+  // Decode in chunks to avoid "call stack size exceeded".
+  var res = ''
+  var i = 0
+  while (i < len) {
+    res += String.fromCharCode.apply(
+      String,
+      codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH)
+    )
+  }
+  return res
+}
+
+function asciiSlice (buf, start, end) {
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    ret += String.fromCharCode(buf[i] & 0x7F)
+  }
+  return ret
+}
+
+function binarySlice (buf, start, end) {
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    ret += String.fromCharCode(buf[i])
+  }
+  return ret
+}
+
+function hexSlice (buf, start, end) {
+  var len = buf.length
+
+  if (!start || start < 0) start = 0
+  if (!end || end < 0 || end > len) end = len
+
+  var out = ''
+  for (var i = start; i < end; i++) {
+    out += toHex(buf[i])
+  }
+  return out
+}
+
+function utf16leSlice (buf, start, end) {
+  var bytes = buf.slice(start, end)
+  var res = ''
+  for (var i = 0; i < bytes.length; i += 2) {
+    res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256)
+  }
+  return res
+}
+
+Buffer.prototype.slice = function slice (start, end) {
+  var len = this.length
+  start = ~~start
+  end = end === undefined ? len : ~~end
+
+  if (start < 0) {
+    start += len
+    if (start < 0) start = 0
+  } else if (start > len) {
+    start = len
+  }
+
+  if (end < 0) {
+    end += len
+    if (end < 0) end = 0
+  } else if (end > len) {
+    end = len
+  }
+
+  if (end < start) end = start
+
+  var newBuf
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    newBuf = Buffer._augment(this.subarray(start, end))
+  } else {
+    var sliceLen = end - start
+    newBuf = new Buffer(sliceLen, undefined)
+    for (var i = 0; i < sliceLen; i++) {
+      newBuf[i] = this[i + start]
+    }
+  }
+
+  if (newBuf.length) newBuf.parent = this.parent || this
+
+  return newBuf
+}
+
+/*
+ * Need to make sure that buffer isn't trying to write out of bounds.
+ */
+function checkOffset (offset, ext, length) {
+  if ((offset % 1) !== 0 || offset < 0) throw new RangeError('offset is not uint')
+  if (offset + ext > length) throw new RangeError('Trying to access beyond buffer length')
+}
+
+Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert) {
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100)) {
+    val += this[offset + i] * mul
+  }
+
+  return val
+}
+
+Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert) {
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) {
+    checkOffset(offset, byteLength, this.length)
+  }
+
+  var val = this[offset + --byteLength]
+  var mul = 1
+  while (byteLength > 0 && (mul *= 0x100)) {
+    val += this[offset + --byteLength] * mul
+  }
+
+  return val
+}
+
+Buffer.prototype.readUInt8 = function readUInt8 (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 1, this.length)
+  return this[offset]
+}
+
+Buffer.prototype.readUInt16LE = function readUInt16LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  return this[offset] | (this[offset + 1] << 8)
+}
+
+Buffer.prototype.readUInt16BE = function readUInt16BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  return (this[offset] << 8) | this[offset + 1]
+}
+
+Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return ((this[offset]) |
+      (this[offset + 1] << 8) |
+      (this[offset + 2] << 16)) +
+      (this[offset + 3] * 0x1000000)
+}
+
+Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return (this[offset] * 0x1000000) +
+    ((this[offset + 1] << 16) |
+    (this[offset + 2] << 8) |
+    this[offset + 3])
+}
+
+Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100)) {
+    val += this[offset + i] * mul
+  }
+  mul *= 0x80
+
+  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
+
+  return val
+}
+
+Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
+
+  var i = byteLength
+  var mul = 1
+  var val = this[offset + --i]
+  while (i > 0 && (mul *= 0x100)) {
+    val += this[offset + --i] * mul
+  }
+  mul *= 0x80
+
+  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
+
+  return val
+}
+
+Buffer.prototype.readInt8 = function readInt8 (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 1, this.length)
+  if (!(this[offset] & 0x80)) return (this[offset])
+  return ((0xff - this[offset] + 1) * -1)
+}
+
+Buffer.prototype.readInt16LE = function readInt16LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  var val = this[offset] | (this[offset + 1] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt16BE = function readInt16BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
+  var val = this[offset + 1] | (this[offset] << 8)
+  return (val & 0x8000) ? val | 0xFFFF0000 : val
+}
+
+Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return (this[offset]) |
+    (this[offset + 1] << 8) |
+    (this[offset + 2] << 16) |
+    (this[offset + 3] << 24)
+}
+
+Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+
+  return (this[offset] << 24) |
+    (this[offset + 1] << 16) |
+    (this[offset + 2] << 8) |
+    (this[offset + 3])
+}
+
+Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, true, 23, 4)
+}
+
+Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
+  return ieee754.read(this, offset, false, 23, 4)
+}
+
+Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, true, 52, 8)
+}
+
+Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 8, this.length)
+  return ieee754.read(this, offset, false, 52, 8)
+}
+
+function checkInt (buf, value, offset, ext, max, min) {
+  if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
+  if (value > max || value < min) throw new RangeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('index out of range')
+}
+
+Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+
+  var mul = 1
+  var i = 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100)) {
+    this[offset + i] = (value / mul) & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset | 0
+  byteLength = byteLength | 0
+  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+
+  var i = byteLength - 1
+  var mul = 1
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100)) {
+    this[offset + i] = (value / mul) & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+  this[offset] = (value & 0xff)
+  return offset + 1
+}
+
+function objectWriteUInt16 (buf, value, offset, littleEndian) {
+  if (value < 0) value = 0xffff + value + 1
+  for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; i++) {
+    buf[offset + i] = (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
+      (littleEndian ? i : 1 - i) * 8
+  }
+}
+
+Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value & 0xff)
+    this[offset + 1] = (value >>> 8)
+  } else {
+    objectWriteUInt16(this, value, offset, true)
+  }
+  return offset + 2
+}
+
+Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 8)
+    this[offset + 1] = (value & 0xff)
+  } else {
+    objectWriteUInt16(this, value, offset, false)
+  }
+  return offset + 2
+}
+
+function objectWriteUInt32 (buf, value, offset, littleEndian) {
+  if (value < 0) value = 0xffffffff + value + 1
+  for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; i++) {
+    buf[offset + i] = (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
+  }
+}
+
+Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset + 3] = (value >>> 24)
+    this[offset + 2] = (value >>> 16)
+    this[offset + 1] = (value >>> 8)
+    this[offset] = (value & 0xff)
+  } else {
+    objectWriteUInt32(this, value, offset, true)
+  }
+  return offset + 4
+}
+
+Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 24)
+    this[offset + 1] = (value >>> 16)
+    this[offset + 2] = (value >>> 8)
+    this[offset + 3] = (value & 0xff)
+  } else {
+    objectWriteUInt32(this, value, offset, false)
+  }
+  return offset + 4
+}
+
+Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) {
+    var limit = Math.pow(2, 8 * byteLength - 1)
+
+    checkInt(this, value, offset, byteLength, limit - 1, -limit)
+  }
+
+  var i = 0
+  var mul = 1
+  var sub = value < 0 ? 1 : 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100)) {
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) {
+    var limit = Math.pow(2, 8 * byteLength - 1)
+
+    checkInt(this, value, offset, byteLength, limit - 1, -limit)
+  }
+
+  var i = byteLength - 1
+  var mul = 1
+  var sub = value < 0 ? 1 : 0
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100)) {
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+  }
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80)
+  if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
+  if (value < 0) value = 0xff + value + 1
+  this[offset] = (value & 0xff)
+  return offset + 1
+}
+
+Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value & 0xff)
+    this[offset + 1] = (value >>> 8)
+  } else {
+    objectWriteUInt16(this, value, offset, true)
+  }
+  return offset + 2
+}
+
+Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 8)
+    this[offset + 1] = (value & 0xff)
+  } else {
+    objectWriteUInt16(this, value, offset, false)
+  }
+  return offset + 2
+}
+
+Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value & 0xff)
+    this[offset + 1] = (value >>> 8)
+    this[offset + 2] = (value >>> 16)
+    this[offset + 3] = (value >>> 24)
+  } else {
+    objectWriteUInt32(this, value, offset, true)
+  }
+  return offset + 4
+}
+
+Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) {
+  value = +value
+  offset = offset | 0
+  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (value < 0) value = 0xffffffff + value + 1
+  if (Buffer.TYPED_ARRAY_SUPPORT) {
+    this[offset] = (value >>> 24)
+    this[offset + 1] = (value >>> 16)
+    this[offset + 2] = (value >>> 8)
+    this[offset + 3] = (value & 0xff)
+  } else {
+    objectWriteUInt32(this, value, offset, false)
+  }
+  return offset + 4
+}
+
+function checkIEEE754 (buf, value, offset, ext, max, min) {
+  if (value > max || value < min) throw new RangeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('index out of range')
+  if (offset < 0) throw new RangeError('index out of range')
+}
+
+function writeFloat (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
+  }
+  ieee754.write(buf, value, offset, littleEndian, 23, 4)
+  return offset + 4
+}
+
+Buffer.prototype.writeFloatLE = function writeFloatLE (value, offset, noAssert) {
+  return writeFloat(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) {
+  return writeFloat(this, value, offset, false, noAssert)
+}
+
+function writeDouble (buf, value, offset, littleEndian, noAssert) {
+  if (!noAssert) {
+    checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
+  }
+  ieee754.write(buf, value, offset, littleEndian, 52, 8)
+  return offset + 8
+}
+
+Buffer.prototype.writeDoubleLE = function writeDoubleLE (value, offset, noAssert) {
+  return writeDouble(this, value, offset, true, noAssert)
+}
+
+Buffer.prototype.writeDoubleBE = function writeDoubleBE (value, offset, noAssert) {
+  return writeDouble(this, value, offset, false, noAssert)
+}
+
+// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+Buffer.prototype.copy = function copy (target, targetStart, start, end) {
+  if (!start) start = 0
+  if (!end && end !== 0) end = this.length
+  if (targetStart >= target.length) targetStart = target.length
+  if (!targetStart) targetStart = 0
+  if (end > 0 && end < start) end = start
+
+  // Copy 0 bytes; we're done
+  if (end === start) return 0
+  if (target.length === 0 || this.length === 0) return 0
+
+  // Fatal error conditions
+  if (targetStart < 0) {
+    throw new RangeError('targetStart out of bounds')
+  }
+  if (start < 0 || start >= this.length) throw new RangeError('sourceStart out of bounds')
+  if (end < 0) throw new RangeError('sourceEnd out of bounds')
+
+  // Are we oob?
+  if (end > this.length) end = this.length
+  if (target.length - targetStart < end - start) {
+    end = target.length - targetStart + start
+  }
+
+  var len = end - start
+  var i
+
+  if (this === target && start < targetStart && targetStart < end) {
+    // descending copy from end
+    for (i = len - 1; i >= 0; i--) {
+      target[i + targetStart] = this[i + start]
+    }
+  } else if (len < 1000 || !Buffer.TYPED_ARRAY_SUPPORT) {
+    // ascending copy from start
+    for (i = 0; i < len; i++) {
+      target[i + targetStart] = this[i + start]
+    }
+  } else {
+    target._set(this.subarray(start, start + len), targetStart)
+  }
+
+  return len
+}
+
+// fill(value, start=0, end=buffer.length)
+Buffer.prototype.fill = function fill (value, start, end) {
+  if (!value) value = 0
+  if (!start) start = 0
+  if (!end) end = this.length
+
+  if (end < start) throw new RangeError('end < start')
+
+  // Fill 0 bytes; we're done
+  if (end === start) return
+  if (this.length === 0) return
+
+  if (start < 0 || start >= this.length) throw new RangeError('start out of bounds')
+  if (end < 0 || end > this.length) throw new RangeError('end out of bounds')
+
+  var i
+  if (typeof value === 'number') {
+    for (i = start; i < end; i++) {
+      this[i] = value
+    }
+  } else {
+    var bytes = utf8ToBytes(value.toString())
+    var len = bytes.length
+    for (i = start; i < end; i++) {
+      this[i] = bytes[i % len]
+    }
+  }
+
+  return this
+}
+
+/**
+ * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
+ * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
+ */
+Buffer.prototype.toArrayBuffer = function toArrayBuffer () {
+  if (typeof Uint8Array !== 'undefined') {
+    if (Buffer.TYPED_ARRAY_SUPPORT) {
+      return (new Buffer(this)).buffer
+    } else {
+      var buf = new Uint8Array(this.length)
+      for (var i = 0, len = buf.length; i < len; i += 1) {
+        buf[i] = this[i]
+      }
+      return buf.buffer
+    }
+  } else {
+    throw new TypeError('Buffer.toArrayBuffer not supported in this browser')
+  }
+}
+
+// HELPER FUNCTIONS
+// ================
+
+var BP = Buffer.prototype
+
+/**
+ * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
+ */
+Buffer._augment = function _augment (arr) {
+  arr.constructor = Buffer
+  arr._isBuffer = true
+
+  // save reference to original Uint8Array set method before overwriting
+  arr._set = arr.set
+
+  // deprecated
+  arr.get = BP.get
+  arr.set = BP.set
+
+  arr.write = BP.write
+  arr.toString = BP.toString
+  arr.toLocaleString = BP.toString
+  arr.toJSON = BP.toJSON
+  arr.equals = BP.equals
+  arr.compare = BP.compare
+  arr.indexOf = BP.indexOf
+  arr.copy = BP.copy
+  arr.slice = BP.slice
+  arr.readUIntLE = BP.readUIntLE
+  arr.readUIntBE = BP.readUIntBE
+  arr.readUInt8 = BP.readUInt8
+  arr.readUInt16LE = BP.readUInt16LE
+  arr.readUInt16BE = BP.readUInt16BE
+  arr.readUInt32LE = BP.readUInt32LE
+  arr.readUInt32BE = BP.readUInt32BE
+  arr.readIntLE = BP.readIntLE
+  arr.readIntBE = BP.readIntBE
+  arr.readInt8 = BP.readInt8
+  arr.readInt16LE = BP.readInt16LE
+  arr.readInt16BE = BP.readInt16BE
+  arr.readInt32LE = BP.readInt32LE
+  arr.readInt32BE = BP.readInt32BE
+  arr.readFloatLE = BP.readFloatLE
+  arr.readFloatBE = BP.readFloatBE
+  arr.readDoubleLE = BP.readDoubleLE
+  arr.readDoubleBE = BP.readDoubleBE
+  arr.writeUInt8 = BP.writeUInt8
+  arr.writeUIntLE = BP.writeUIntLE
+  arr.writeUIntBE = BP.writeUIntBE
+  arr.writeUInt16LE = BP.writeUInt16LE
+  arr.writeUInt16BE = BP.writeUInt16BE
+  arr.writeUInt32LE = BP.writeUInt32LE
+  arr.writeUInt32BE = BP.writeUInt32BE
+  arr.writeIntLE = BP.writeIntLE
+  arr.writeIntBE = BP.writeIntBE
+  arr.writeInt8 = BP.writeInt8
+  arr.writeInt16LE = BP.writeInt16LE
+  arr.writeInt16BE = BP.writeInt16BE
+  arr.writeInt32LE = BP.writeInt32LE
+  arr.writeInt32BE = BP.writeInt32BE
+  arr.writeFloatLE = BP.writeFloatLE
+  arr.writeFloatBE = BP.writeFloatBE
+  arr.writeDoubleLE = BP.writeDoubleLE
+  arr.writeDoubleBE = BP.writeDoubleBE
+  arr.fill = BP.fill
+  arr.inspect = BP.inspect
+  arr.toArrayBuffer = BP.toArrayBuffer
+
+  return arr
+}
+
+var INVALID_BASE64_RE = /[^+\/0-9A-Za-z-_]/g
+
+function base64clean (str) {
+  // Node strips out invalid characters like \n and \t from the string, base64-js does not
+  str = stringtrim(str).replace(INVALID_BASE64_RE, '')
+  // Node converts strings with length < 2 to ''
+  if (str.length < 2) return ''
+  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
+  while (str.length % 4 !== 0) {
+    str = str + '='
+  }
+  return str
+}
+
+function stringtrim (str) {
+  if (str.trim) return str.trim()
+  return str.replace(/^\s+|\s+$/g, '')
+}
+
+function toHex (n) {
+  if (n < 16) return '0' + n.toString(16)
+  return n.toString(16)
+}
+
+function utf8ToBytes (string, units) {
+  units = units || Infinity
+  var codePoint
+  var length = string.length
+  var leadSurrogate = null
+  var bytes = []
+
+  for (var i = 0; i < length; i++) {
+    codePoint = string.charCodeAt(i)
+
+    // is surrogate component
+    if (codePoint > 0xD7FF && codePoint < 0xE000) {
+      // last char was a lead
+      if (!leadSurrogate) {
+        // no lead yet
+        if (codePoint > 0xDBFF) {
+          // unexpected trail
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        } else if (i + 1 === length) {
+          // unpaired lead
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        }
+
+        // valid lead
+        leadSurrogate = codePoint
+
+        continue
+      }
+
+      // 2 leads in a row
+      if (codePoint < 0xDC00) {
+        if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+        leadSurrogate = codePoint
+        continue
+      }
+
+      // valid surrogate pair
+      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
+    } else if (leadSurrogate) {
+      // valid bmp char, but last char was a lead
+      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+    }
+
+    leadSurrogate = null
+
+    // encode utf8
+    if (codePoint < 0x80) {
+      if ((units -= 1) < 0) break
+      bytes.push(codePoint)
+    } else if (codePoint < 0x800) {
+      if ((units -= 2) < 0) break
+      bytes.push(
+        codePoint >> 0x6 | 0xC0,
+        codePoint & 0x3F | 0x80
+      )
+    } else if (codePoint < 0x10000) {
+      if ((units -= 3) < 0) break
+      bytes.push(
+        codePoint >> 0xC | 0xE0,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      )
+    } else if (codePoint < 0x110000) {
+      if ((units -= 4) < 0) break
+      bytes.push(
+        codePoint >> 0x12 | 0xF0,
+        codePoint >> 0xC & 0x3F | 0x80,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      )
+    } else {
+      throw new Error('Invalid code point')
+    }
+  }
+
+  return bytes
+}
+
+function asciiToBytes (str) {
+  var byteArray = []
+  for (var i = 0; i < str.length; i++) {
+    // Node's code seems to be doing this and not & 0x7F..
+    byteArray.push(str.charCodeAt(i) & 0xFF)
+  }
+  return byteArray
+}
+
+function utf16leToBytes (str, units) {
+  var c, hi, lo
+  var byteArray = []
+  for (var i = 0; i < str.length; i++) {
+    if ((units -= 2) < 0) break
+
+    c = str.charCodeAt(i)
+    hi = c >> 8
+    lo = c % 256
+    byteArray.push(lo)
+    byteArray.push(hi)
+  }
+
+  return byteArray
+}
+
+function base64ToBytes (str) {
+  return base64.toByteArray(base64clean(str))
+}
+
+function blitBuffer (src, dst, offset, length) {
+  for (var i = 0; i < length; i++) {
+    if ((i + offset >= dst.length) || (i >= src.length)) break
+    dst[i + offset] = src[i]
+  }
+  return i
+}
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"base64-js":147,"ieee754":153,"isarray":150}],150:[function(require,module,exports){
+var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
+
+},{}],151:[function(require,module,exports){
+(function (Buffer){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+
+function isArray(arg) {
+  if (Array.isArray) {
+    return Array.isArray(arg);
+  }
+  return objectToString(arg) === '[object Array]';
+}
+exports.isArray = isArray;
+
+function isBoolean(arg) {
+  return typeof arg === 'boolean';
+}
+exports.isBoolean = isBoolean;
+
+function isNull(arg) {
+  return arg === null;
+}
+exports.isNull = isNull;
+
+function isNullOrUndefined(arg) {
+  return arg == null;
+}
+exports.isNullOrUndefined = isNullOrUndefined;
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+exports.isNumber = isNumber;
+
+function isString(arg) {
+  return typeof arg === 'string';
+}
+exports.isString = isString;
+
+function isSymbol(arg) {
+  return typeof arg === 'symbol';
+}
+exports.isSymbol = isSymbol;
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+exports.isUndefined = isUndefined;
+
+function isRegExp(re) {
+  return objectToString(re) === '[object RegExp]';
+}
+exports.isRegExp = isRegExp;
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+exports.isObject = isObject;
+
+function isDate(d) {
+  return objectToString(d) === '[object Date]';
+}
+exports.isDate = isDate;
+
+function isError(e) {
+  return (objectToString(e) === '[object Error]' || e instanceof Error);
+}
+exports.isError = isError;
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+exports.isFunction = isFunction;
+
+function isPrimitive(arg) {
+  return arg === null ||
+         typeof arg === 'boolean' ||
+         typeof arg === 'number' ||
+         typeof arg === 'string' ||
+         typeof arg === 'symbol' ||  // ES6 symbol
+         typeof arg === 'undefined';
+}
+exports.isPrimitive = isPrimitive;
+
+exports.isBuffer = Buffer.isBuffer;
+
+function objectToString(o) {
+  return Object.prototype.toString.call(o);
+}
+
+}).call(this,{"isBuffer":require("../../is-buffer/index.js")})
+},{"../../is-buffer/index.js":155}],152:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      }
+      throw TypeError('Uncaught, unspecified "error" event.');
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        len = arguments.length;
+        args = new Array(len - 1);
+        for (i = 1; i < len; i++)
+          args[i - 1] = arguments[i];
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    len = arguments.length;
+    args = new Array(len - 1);
+    for (i = 1; i < len; i++)
+      args[i - 1] = arguments[i];
+
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    var m;
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  var ret;
+  if (!emitter._events || !emitter._events[type])
+    ret = 0;
+  else if (isFunction(emitter._events[type]))
+    ret = 1;
+  else
+    ret = emitter._events[type].length;
+  return ret;
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+},{}],153:[function(require,module,exports){
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = (nBytes * 8) - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
+
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = (nBytes * 8) - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = ((value * c) - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+
+},{}],154:[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    if (superCtor) {
+      ctor.super_ = superCtor
+      ctor.prototype = Object.create(superCtor.prototype, {
+        constructor: {
+          value: ctor,
+          enumerable: false,
+          writable: true,
+          configurable: true
+        }
+      })
+    }
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    if (superCtor) {
+      ctor.super_ = superCtor
+      var TempCtor = function () {}
+      TempCtor.prototype = superCtor.prototype
+      ctor.prototype = new TempCtor()
+      ctor.prototype.constructor = ctor
+    }
+  }
+}
+
+},{}],155:[function(require,module,exports){
+/*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+// The _isBuffer check is for Safari 5-7 support, because it's missing
+// Object.prototype.constructor. Remove this eventually
+module.exports = function (obj) {
+  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
+}
+
+function isBuffer (obj) {
+  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+}
+
+// For Node v0.10 support. Remove this eventually.
+function isSlowBuffer (obj) {
+  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
+}
+
+},{}],156:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+},{}],157:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    draining = true;
+    var currentQueue;
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        var i = -1;
+        while (++i < len) {
+            currentQueue[i]();
+        }
+        len = queue.length;
+    }
+    draining = false;
+}
+process.nextTick = function (fun) {
+    queue.push(fun);
+    if (!draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],158:[function(require,module,exports){
+(function (global){
+/*! http://mths.be/punycode v1.2.4 by @mathias */
+;(function(root) {
+
+	/** Detect free variables */
+	var freeExports = typeof exports == 'object' && exports;
+	var freeModule = typeof module == 'object' && module &&
+		module.exports == freeExports && module;
+	var freeGlobal = typeof global == 'object' && global;
+	if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+		root = freeGlobal;
+	}
+
+	/**
+	 * The `punycode` object.
+	 * @name punycode
+	 * @type Object
+	 */
+	var punycode,
+
+	/** Highest positive signed 32-bit float value */
+	maxInt = 2147483647, // aka. 0x7FFFFFFF or 2^31-1
+
+	/** Bootstring parameters */
+	base = 36,
+	tMin = 1,
+	tMax = 26,
+	skew = 38,
+	damp = 700,
+	initialBias = 72,
+	initialN = 128, // 0x80
+	delimiter = '-', // '\x2D'
+
+	/** Regular expressions */
+	regexPunycode = /^xn--/,
+	regexNonASCII = /[^ -~]/, // unprintable ASCII chars + non-ASCII chars
+	regexSeparators = /\x2E|\u3002|\uFF0E|\uFF61/g, // RFC 3490 separators
+
+	/** Error messages */
+	errors = {
+		'overflow': 'Overflow: input needs wider integers to process',
+		'not-basic': 'Illegal input >= 0x80 (not a basic code point)',
+		'invalid-input': 'Invalid input'
+	},
+
+	/** Convenience shortcuts */
+	baseMinusTMin = base - tMin,
+	floor = Math.floor,
+	stringFromCharCode = String.fromCharCode,
+
+	/** Temporary variable */
+	key;
+
+	/*--------------------------------------------------------------------------*/
+
+	/**
+	 * A generic error utility function.
+	 * @private
+	 * @param {String} type The error type.
+	 * @returns {Error} Throws a `RangeError` with the applicable error message.
+	 */
+	function error(type) {
+		throw RangeError(errors[type]);
+	}
+
+	/**
+	 * A generic `Array#map` utility function.
+	 * @private
+	 * @param {Array} array The array to iterate over.
+	 * @param {Function} callback The function that gets called for every array
+	 * item.
+	 * @returns {Array} A new array of values returned by the callback function.
+	 */
+	function map(array, fn) {
+		var length = array.length;
+		while (length--) {
+			array[length] = fn(array[length]);
+		}
+		return array;
+	}
+
+	/**
+	 * A simple `Array#map`-like wrapper to work with domain name strings.
+	 * @private
+	 * @param {String} domain The domain name.
+	 * @param {Function} callback The function that gets called for every
+	 * character.
+	 * @returns {Array} A new string of characters returned by the callback
+	 * function.
+	 */
+	function mapDomain(string, fn) {
+		return map(string.split(regexSeparators), fn).join('.');
+	}
+
+	/**
+	 * Creates an array containing the numeric code points of each Unicode
+	 * character in the string. While JavaScript uses UCS-2 internally,
+	 * this function will convert a pair of surrogate halves (each of which
+	 * UCS-2 exposes as separate characters) into a single code point,
+	 * matching UTF-16.
+	 * @see `punycode.ucs2.encode`
+	 * @see <http://mathiasbynens.be/notes/javascript-encoding>
+	 * @memberOf punycode.ucs2
+	 * @name decode
+	 * @param {String} string The Unicode input string (UCS-2).
+	 * @returns {Array} The new array of code points.
+	 */
+	function ucs2decode(string) {
+		var output = [],
+		    counter = 0,
+		    length = string.length,
+		    value,
+		    extra;
+		while (counter < length) {
+			value = string.charCodeAt(counter++);
+			if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+				// high surrogate, and there is a next character
+				extra = string.charCodeAt(counter++);
+				if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+					output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+				} else {
+					// unmatched surrogate; only append this code unit, in case the next
+					// code unit is the high surrogate of a surrogate pair
+					output.push(value);
+					counter--;
+				}
+			} else {
+				output.push(value);
+			}
+		}
+		return output;
+	}
+
+	/**
+	 * Creates a string based on an array of numeric code points.
+	 * @see `punycode.ucs2.decode`
+	 * @memberOf punycode.ucs2
+	 * @name encode
+	 * @param {Array} codePoints The array of numeric code points.
+	 * @returns {String} The new Unicode string (UCS-2).
+	 */
+	function ucs2encode(array) {
+		return map(array, function(value) {
+			var output = '';
+			if (value > 0xFFFF) {
+				value -= 0x10000;
+				output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
+				value = 0xDC00 | value & 0x3FF;
+			}
+			output += stringFromCharCode(value);
+			return output;
+		}).join('');
+	}
+
+	/**
+	 * Converts a basic code point into a digit/integer.
+	 * @see `digitToBasic()`
+	 * @private
+	 * @param {Number} codePoint The basic numeric code point value.
+	 * @returns {Number} The numeric value of a basic code point (for use in
+	 * representing integers) in the range `0` to `base - 1`, or `base` if
+	 * the code point does not represent a value.
+	 */
+	function basicToDigit(codePoint) {
+		if (codePoint - 48 < 10) {
+			return codePoint - 22;
+		}
+		if (codePoint - 65 < 26) {
+			return codePoint - 65;
+		}
+		if (codePoint - 97 < 26) {
+			return codePoint - 97;
+		}
+		return base;
+	}
+
+	/**
+	 * Converts a digit/integer into a basic code point.
+	 * @see `basicToDigit()`
+	 * @private
+	 * @param {Number} digit The numeric value of a basic code point.
+	 * @returns {Number} The basic code point whose value (when used for
+	 * representing integers) is `digit`, which needs to be in the range
+	 * `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
+	 * used; else, the lowercase form is used. The behavior is undefined
+	 * if `flag` is non-zero and `digit` has no uppercase form.
+	 */
+	function digitToBasic(digit, flag) {
+		//  0..25 map to ASCII a..z or A..Z
+		// 26..35 map to ASCII 0..9
+		return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
+	}
+
+	/**
+	 * Bias adaptation function as per section 3.4 of RFC 3492.
+	 * http://tools.ietf.org/html/rfc3492#section-3.4
+	 * @private
+	 */
+	function adapt(delta, numPoints, firstTime) {
+		var k = 0;
+		delta = firstTime ? floor(delta / damp) : delta >> 1;
+		delta += floor(delta / numPoints);
+		for (/* no initialization */; delta > baseMinusTMin * tMax >> 1; k += base) {
+			delta = floor(delta / baseMinusTMin);
+		}
+		return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
+	}
+
+	/**
+	 * Converts a Punycode string of ASCII-only symbols to a string of Unicode
+	 * symbols.
+	 * @memberOf punycode
+	 * @param {String} input The Punycode string of ASCII-only symbols.
+	 * @returns {String} The resulting string of Unicode symbols.
+	 */
+	function decode(input) {
+		// Don't use UCS-2
+		var output = [],
+		    inputLength = input.length,
+		    out,
+		    i = 0,
+		    n = initialN,
+		    bias = initialBias,
+		    basic,
+		    j,
+		    index,
+		    oldi,
+		    w,
+		    k,
+		    digit,
+		    t,
+		    /** Cached calculation results */
+		    baseMinusT;
+
+		// Handle the basic code points: let `basic` be the number of input code
+		// points before the last delimiter, or `0` if there is none, then copy
+		// the first basic code points to the output.
+
+		basic = input.lastIndexOf(delimiter);
+		if (basic < 0) {
+			basic = 0;
+		}
+
+		for (j = 0; j < basic; ++j) {
+			// if it's not a basic code point
+			if (input.charCodeAt(j) >= 0x80) {
+				error('not-basic');
+			}
+			output.push(input.charCodeAt(j));
+		}
+
+		// Main decoding loop: start just after the last delimiter if any basic code
+		// points were copied; start at the beginning otherwise.
+
+		for (index = basic > 0 ? basic + 1 : 0; index < inputLength; /* no final expression */) {
+
+			// `index` is the index of the next character to be consumed.
+			// Decode a generalized variable-length integer into `delta`,
+			// which gets added to `i`. The overflow checking is easier
+			// if we increase `i` as we go, then subtract off its starting
+			// value at the end to obtain `delta`.
+			for (oldi = i, w = 1, k = base; /* no condition */; k += base) {
+
+				if (index >= inputLength) {
+					error('invalid-input');
+				}
+
+				digit = basicToDigit(input.charCodeAt(index++));
+
+				if (digit >= base || digit > floor((maxInt - i) / w)) {
+					error('overflow');
+				}
+
+				i += digit * w;
+				t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+
+				if (digit < t) {
+					break;
+				}
+
+				baseMinusT = base - t;
+				if (w > floor(maxInt / baseMinusT)) {
+					error('overflow');
+				}
+
+				w *= baseMinusT;
+
+			}
+
+			out = output.length + 1;
+			bias = adapt(i - oldi, out, oldi == 0);
+
+			// `i` was supposed to wrap around from `out` to `0`,
+			// incrementing `n` each time, so we'll fix that now:
+			if (floor(i / out) > maxInt - n) {
+				error('overflow');
+			}
+
+			n += floor(i / out);
+			i %= out;
+
+			// Insert `n` at position `i` of the output
+			output.splice(i++, 0, n);
+
+		}
+
+		return ucs2encode(output);
+	}
+
+	/**
+	 * Converts a string of Unicode symbols to a Punycode string of ASCII-only
+	 * symbols.
+	 * @memberOf punycode
+	 * @param {String} input The string of Unicode symbols.
+	 * @returns {String} The resulting Punycode string of ASCII-only symbols.
+	 */
+	function encode(input) {
+		var n,
+		    delta,
+		    handledCPCount,
+		    basicLength,
+		    bias,
+		    j,
+		    m,
+		    q,
+		    k,
+		    t,
+		    currentValue,
+		    output = [],
+		    /** `inputLength` will hold the number of code points in `input`. */
+		    inputLength,
+		    /** Cached calculation results */
+		    handledCPCountPlusOne,
+		    baseMinusT,
+		    qMinusT;
+
+		// Convert the input in UCS-2 to Unicode
+		input = ucs2decode(input);
+
+		// Cache the length
+		inputLength = input.length;
+
+		// Initialize the state
+		n = initialN;
+		delta = 0;
+		bias = initialBias;
+
+		// Handle the basic code points
+		for (j = 0; j < inputLength; ++j) {
+			currentValue = input[j];
+			if (currentValue < 0x80) {
+				output.push(stringFromCharCode(currentValue));
+			}
+		}
+
+		handledCPCount = basicLength = output.length;
+
+		// `handledCPCount` is the number of code points that have been handled;
+		// `basicLength` is the number of basic code points.
+
+		// Finish the basic string - if it is not empty - with a delimiter
+		if (basicLength) {
+			output.push(delimiter);
+		}
+
+		// Main encoding loop:
+		while (handledCPCount < inputLength) {
+
+			// All non-basic code points < n have been handled already. Find the next
+			// larger one:
+			for (m = maxInt, j = 0; j < inputLength; ++j) {
+				currentValue = input[j];
+				if (currentValue >= n && currentValue < m) {
+					m = currentValue;
+				}
+			}
+
+			// Increase `delta` enough to advance the decoder's <n,i> state to <m,0>,
+			// but guard against overflow
+			handledCPCountPlusOne = handledCPCount + 1;
+			if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
+				error('overflow');
+			}
+
+			delta += (m - n) * handledCPCountPlusOne;
+			n = m;
+
+			for (j = 0; j < inputLength; ++j) {
+				currentValue = input[j];
+
+				if (currentValue < n && ++delta > maxInt) {
+					error('overflow');
+				}
+
+				if (currentValue == n) {
+					// Represent delta as a generalized variable-length integer
+					for (q = delta, k = base; /* no condition */; k += base) {
+						t = k <= bias ? tMin : (k >= bias + tMax ? tMax : k - bias);
+						if (q < t) {
+							break;
+						}
+						qMinusT = q - t;
+						baseMinusT = base - t;
+						output.push(
+							stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0))
+						);
+						q = floor(qMinusT / baseMinusT);
+					}
+
+					output.push(stringFromCharCode(digitToBasic(q, 0)));
+					bias = adapt(delta, handledCPCountPlusOne, handledCPCount == basicLength);
+					delta = 0;
+					++handledCPCount;
+				}
+			}
+
+			++delta;
+			++n;
+
+		}
+		return output.join('');
+	}
+
+	/**
+	 * Converts a Punycode string representing a domain name to Unicode. Only the
+	 * Punycoded parts of the domain name will be converted, i.e. it doesn't
+	 * matter if you call it on a string that has already been converted to
+	 * Unicode.
+	 * @memberOf punycode
+	 * @param {String} domain The Punycode domain name to convert to Unicode.
+	 * @returns {String} The Unicode representation of the given Punycode
+	 * string.
+	 */
+	function toUnicode(domain) {
+		return mapDomain(domain, function(string) {
+			return regexPunycode.test(string)
+				? decode(string.slice(4).toLowerCase())
+				: string;
+		});
+	}
+
+	/**
+	 * Converts a Unicode string representing a domain name to Punycode. Only the
+	 * non-ASCII parts of the domain name will be converted, i.e. it doesn't
+	 * matter if you call it with a domain that's already in ASCII.
+	 * @memberOf punycode
+	 * @param {String} domain The domain name to convert, as a Unicode string.
+	 * @returns {String} The Punycode representation of the given domain name.
+	 */
+	function toASCII(domain) {
+		return mapDomain(domain, function(string) {
+			return regexNonASCII.test(string)
+				? 'xn--' + encode(string)
+				: string;
+		});
+	}
+
+	/*--------------------------------------------------------------------------*/
+
+	/** Define the public API */
+	punycode = {
+		/**
+		 * A string representing the current Punycode.js version number.
+		 * @memberOf punycode
+		 * @type String
+		 */
+		'version': '1.2.4',
+		/**
+		 * An object of methods to convert from JavaScript's internal character
+		 * representation (UCS-2) to Unicode code points, and back.
+		 * @see <http://mathiasbynens.be/notes/javascript-encoding>
+		 * @memberOf punycode
+		 * @type Object
+		 */
+		'ucs2': {
+			'decode': ucs2decode,
+			'encode': ucs2encode
+		},
+		'decode': decode,
+		'encode': encode,
+		'toASCII': toASCII,
+		'toUnicode': toUnicode
+	};
+
+	/** Expose `punycode` */
+	// Some AMD build optimizers, like r.js, check for specific condition patterns
+	// like the following:
+	if (
+		typeof define == 'function' &&
+		typeof define.amd == 'object' &&
+		define.amd
+	) {
+		define('punycode', function() {
+			return punycode;
+		});
+	} else if (freeExports && !freeExports.nodeType) {
+		if (freeModule) { // in Node.js or RingoJS v0.8.0+
+			freeModule.exports = punycode;
+		} else { // in Narwhal or RingoJS v0.7.0-
+			for (key in punycode) {
+				punycode.hasOwnProperty(key) && (freeExports[key] = punycode[key]);
+			}
+		}
+	} else { // in Rhino or a web browser
+		root.punycode = punycode;
+	}
+
+}(this));
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],159:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+// If obj.hasOwnProperty has been overridden, then calling
+// obj.hasOwnProperty(prop) will break.
+// See: https://github.com/joyent/node/issues/1707
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+module.exports = function(qs, sep, eq, options) {
+  sep = sep || '&';
+  eq = eq || '=';
+  var obj = {};
+
+  if (typeof qs !== 'string' || qs.length === 0) {
+    return obj;
+  }
+
+  var regexp = /\+/g;
+  qs = qs.split(sep);
+
+  var maxKeys = 1000;
+  if (options && typeof options.maxKeys === 'number') {
+    maxKeys = options.maxKeys;
+  }
+
+  var len = qs.length;
+  // maxKeys <= 0 means that we should not limit keys count
+  if (maxKeys > 0 && len > maxKeys) {
+    len = maxKeys;
+  }
+
+  for (var i = 0; i < len; ++i) {
+    var x = qs[i].replace(regexp, '%20'),
+        idx = x.indexOf(eq),
+        kstr, vstr, k, v;
+
+    if (idx >= 0) {
+      kstr = x.substr(0, idx);
+      vstr = x.substr(idx + 1);
+    } else {
+      kstr = x;
+      vstr = '';
+    }
+
+    k = decodeURIComponent(kstr);
+    v = decodeURIComponent(vstr);
+
+    if (!hasOwnProperty(obj, k)) {
+      obj[k] = v;
+    } else if (isArray(obj[k])) {
+      obj[k].push(v);
+    } else {
+      obj[k] = [obj[k], v];
+    }
+  }
+
+  return obj;
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+},{}],160:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+var stringifyPrimitive = function(v) {
+  switch (typeof v) {
+    case 'string':
+      return v;
+
+    case 'boolean':
+      return v ? 'true' : 'false';
+
+    case 'number':
+      return isFinite(v) ? v : '';
+
+    default:
+      return '';
+  }
+};
+
+module.exports = function(obj, sep, eq, name) {
+  sep = sep || '&';
+  eq = eq || '=';
+  if (obj === null) {
+    obj = undefined;
+  }
+
+  if (typeof obj === 'object') {
+    return map(objectKeys(obj), function(k) {
+      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
+      if (isArray(obj[k])) {
+        return map(obj[k], function(v) {
+          return ks + encodeURIComponent(stringifyPrimitive(v));
+        }).join(sep);
+      } else {
+        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
+      }
+    }).join(sep);
+
+  }
+
+  if (!name) return '';
+  return encodeURIComponent(stringifyPrimitive(name)) + eq +
+         encodeURIComponent(stringifyPrimitive(obj));
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+function map (xs, f) {
+  if (xs.map) return xs.map(f);
+  var res = [];
+  for (var i = 0; i < xs.length; i++) {
+    res.push(f(xs[i], i));
+  }
+  return res;
+}
+
+var objectKeys = Object.keys || function (obj) {
+  var res = [];
+  for (var key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) res.push(key);
+  }
+  return res;
+};
+
+},{}],161:[function(require,module,exports){
+'use strict';
+
+exports.decode = exports.parse = require('./decode');
+exports.encode = exports.stringify = require('./encode');
+
+},{"./decode":159,"./encode":160}],162:[function(require,module,exports){
+module.exports = require("./lib/_stream_duplex.js")
+
+},{"./lib/_stream_duplex.js":163}],163:[function(require,module,exports){
+(function (process){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// a duplex stream is just a stream that is both readable and writable.
+// Since JS doesn't have multiple prototypal inheritance, this class
+// prototypally inherits from Readable, and then parasitically from
+// Writable.
+
+module.exports = Duplex;
+
+/*<replacement>*/
+var objectKeys = Object.keys || function (obj) {
+  var keys = [];
+  for (var key in obj) keys.push(key);
+  return keys;
+}
+/*</replacement>*/
+
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+var Readable = require('./_stream_readable');
+var Writable = require('./_stream_writable');
+
+util.inherits(Duplex, Readable);
+
+forEach(objectKeys(Writable.prototype), function(method) {
+  if (!Duplex.prototype[method])
+    Duplex.prototype[method] = Writable.prototype[method];
+});
+
+function Duplex(options) {
+  if (!(this instanceof Duplex))
+    return new Duplex(options);
+
+  Readable.call(this, options);
+  Writable.call(this, options);
+
+  if (options && options.readable === false)
+    this.readable = false;
+
+  if (options && options.writable === false)
+    this.writable = false;
+
+  this.allowHalfOpen = true;
+  if (options && options.allowHalfOpen === false)
+    this.allowHalfOpen = false;
+
+  this.once('end', onend);
+}
+
+// the no-half-open enforcer
+function onend() {
+  // if we allow half-open state, or if the writable side ended,
+  // then we're ok.
+  if (this.allowHalfOpen || this._writableState.ended)
+    return;
+
+  // no more data can be written.
+  // But allow more writes to happen in this tick.
+  process.nextTick(this.end.bind(this));
+}
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}
+
+}).call(this,require('_process'))
+},{"./_stream_readable":165,"./_stream_writable":167,"_process":157,"core-util-is":151,"inherits":154}],164:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// a passthrough stream.
+// basically just the most minimal sort of Transform stream.
+// Every written chunk gets output as-is.
+
+module.exports = PassThrough;
+
+var Transform = require('./_stream_transform');
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+util.inherits(PassThrough, Transform);
+
+function PassThrough(options) {
+  if (!(this instanceof PassThrough))
+    return new PassThrough(options);
+
+  Transform.call(this, options);
+}
+
+PassThrough.prototype._transform = function(chunk, encoding, cb) {
+  cb(null, chunk);
+};
+
+},{"./_stream_transform":166,"core-util-is":151,"inherits":154}],165:[function(require,module,exports){
+(function (process){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module.exports = Readable;
+
+/*<replacement>*/
+var isArray = require('isarray');
+/*</replacement>*/
+
+
+/*<replacement>*/
+var Buffer = require('buffer').Buffer;
+/*</replacement>*/
+
+Readable.ReadableState = ReadableState;
+
+var EE = require('events').EventEmitter;
+
+/*<replacement>*/
+if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {
+  return emitter.listeners(type).length;
+};
+/*</replacement>*/
+
+var Stream = require('stream');
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+var StringDecoder;
+
+
+/*<replacement>*/
+var debug = require('util');
+if (debug && debug.debuglog) {
+  debug = debug.debuglog('stream');
+} else {
+  debug = function () {};
+}
+/*</replacement>*/
+
+
+util.inherits(Readable, Stream);
+
+function ReadableState(options, stream) {
+  var Duplex = require('./_stream_duplex');
+
+  options = options || {};
+
+  // the point at which it stops calling _read() to fill the buffer
+  // Note: 0 is a valid value, means "don't call _read preemptively ever"
+  var hwm = options.highWaterMark;
+  var defaultHwm = options.objectMode ? 16 : 16 * 1024;
+  this.highWaterMark = (hwm || hwm === 0) ? hwm : defaultHwm;
+
+  // cast to ints.
+  this.highWaterMark = ~~this.highWaterMark;
+
+  this.buffer = [];
+  this.length = 0;
+  this.pipes = null;
+  this.pipesCount = 0;
+  this.flowing = null;
+  this.ended = false;
+  this.endEmitted = false;
+  this.reading = false;
+
+  // a flag to be able to tell if the onwrite cb is called immediately,
+  // or on a later tick.  We set this to true at first, because any
+  // actions that shouldn't happen until "later" should generally also
+  // not happen before the first write call.
+  this.sync = true;
+
+  // whenever we return null, then we set a flag to say
+  // that we're awaiting a 'readable' event emission.
+  this.needReadable = false;
+  this.emittedReadable = false;
+  this.readableListening = false;
+
+
+  // object stream flag. Used to make read(n) ignore n and to
+  // make all the buffer merging and length checks go away
+  this.objectMode = !!options.objectMode;
+
+  if (stream instanceof Duplex)
+    this.objectMode = this.objectMode || !!options.readableObjectMode;
+
+  // Crypto is kind of old and crusty.  Historically, its default string
+  // encoding is 'binary' so we have to make this configurable.
+  // Everything else in the universe uses 'utf8', though.
+  this.defaultEncoding = options.defaultEncoding || 'utf8';
+
+  // when piping, we only care about 'readable' events that happen
+  // after read()ing all the bytes and not getting any pushback.
+  this.ranOut = false;
+
+  // the number of writers that are awaiting a drain event in .pipe()s
+  this.awaitDrain = 0;
+
+  // if true, a maybeReadMore has been scheduled
+  this.readingMore = false;
+
+  this.decoder = null;
+  this.encoding = null;
+  if (options.encoding) {
+    if (!StringDecoder)
+      StringDecoder = require('string_decoder/').StringDecoder;
+    this.decoder = new StringDecoder(options.encoding);
+    this.encoding = options.encoding;
+  }
+}
+
+function Readable(options) {
+  var Duplex = require('./_stream_duplex');
+
+  if (!(this instanceof Readable))
+    return new Readable(options);
+
+  this._readableState = new ReadableState(options, this);
+
+  // legacy
+  this.readable = true;
+
+  Stream.call(this);
+}
+
+// Manually shove something into the read() buffer.
+// This returns true if the highWaterMark has not been hit yet,
+// similar to how Writable.write() returns true if you should
+// write() some more.
+Readable.prototype.push = function(chunk, encoding) {
+  var state = this._readableState;
+
+  if (util.isString(chunk) && !state.objectMode) {
+    encoding = encoding || state.defaultEncoding;
+    if (encoding !== state.encoding) {
+      chunk = new Buffer(chunk, encoding);
+      encoding = '';
+    }
+  }
+
+  return readableAddChunk(this, state, chunk, encoding, false);
+};
+
+// Unshift should *always* be something directly out of read()
+Readable.prototype.unshift = function(chunk) {
+  var state = this._readableState;
+  return readableAddChunk(this, state, chunk, '', true);
+};
+
+function readableAddChunk(stream, state, chunk, encoding, addToFront) {
+  var er = chunkInvalid(state, chunk);
+  if (er) {
+    stream.emit('error', er);
+  } else if (util.isNullOrUndefined(chunk)) {
+    state.reading = false;
+    if (!state.ended)
+      onEofChunk(stream, state);
+  } else if (state.objectMode || chunk && chunk.length > 0) {
+    if (state.ended && !addToFront) {
+      var e = new Error('stream.push() after EOF');
+      stream.emit('error', e);
+    } else if (state.endEmitted && addToFront) {
+      var e = new Error('stream.unshift() after end event');
+      stream.emit('error', e);
+    } else {
+      if (state.decoder && !addToFront && !encoding)
+        chunk = state.decoder.write(chunk);
+
+      if (!addToFront)
+        state.reading = false;
+
+      // if we want the data now, just emit it.
+      if (state.flowing && state.length === 0 && !state.sync) {
+        stream.emit('data', chunk);
+        stream.read(0);
+      } else {
+        // update the buffer info.
+        state.length += state.objectMode ? 1 : chunk.length;
+        if (addToFront)
+          state.buffer.unshift(chunk);
+        else
+          state.buffer.push(chunk);
+
+        if (state.needReadable)
+          emitReadable(stream);
+      }
+
+      maybeReadMore(stream, state);
+    }
+  } else if (!addToFront) {
+    state.reading = false;
+  }
+
+  return needMoreData(state);
+}
+
+
+
+// if it's past the high water mark, we can push in some more.
+// Also, if we have no data yet, we can stand some
+// more bytes.  This is to work around cases where hwm=0,
+// such as the repl.  Also, if the push() triggered a
+// readable event, and the user called read(largeNumber) such that
+// needReadable was set, then we ought to push more, so that another
+// 'readable' event will be triggered.
+function needMoreData(state) {
+  return !state.ended &&
+         (state.needReadable ||
+          state.length < state.highWaterMark ||
+          state.length === 0);
+}
+
+// backwards compatibility.
+Readable.prototype.setEncoding = function(enc) {
+  if (!StringDecoder)
+    StringDecoder = require('string_decoder/').StringDecoder;
+  this._readableState.decoder = new StringDecoder(enc);
+  this._readableState.encoding = enc;
+  return this;
+};
+
+// Don't raise the hwm > 128MB
+var MAX_HWM = 0x800000;
+function roundUpToNextPowerOf2(n) {
+  if (n >= MAX_HWM) {
+    n = MAX_HWM;
+  } else {
+    // Get the next highest power of 2
+    n--;
+    for (var p = 1; p < 32; p <<= 1) n |= n >> p;
+    n++;
+  }
+  return n;
+}
+
+function howMuchToRead(n, state) {
+  if (state.length === 0 && state.ended)
+    return 0;
+
+  if (state.objectMode)
+    return n === 0 ? 0 : 1;
+
+  if (isNaN(n) || util.isNull(n)) {
+    // only flow one buffer at a time
+    if (state.flowing && state.buffer.length)
+      return state.buffer[0].length;
+    else
+      return state.length;
+  }
+
+  if (n <= 0)
+    return 0;
+
+  // If we're asking for more than the target buffer level,
+  // then raise the water mark.  Bump up to the next highest
+  // power of 2, to prevent increasing it excessively in tiny
+  // amounts.
+  if (n > state.highWaterMark)
+    state.highWaterMark = roundUpToNextPowerOf2(n);
+
+  // don't have that much.  return null, unless we've ended.
+  if (n > state.length) {
+    if (!state.ended) {
+      state.needReadable = true;
+      return 0;
+    } else
+      return state.length;
+  }
+
+  return n;
+}
+
+// you can override either this method, or the async _read(n) below.
+Readable.prototype.read = function(n) {
+  debug('read', n);
+  var state = this._readableState;
+  var nOrig = n;
+
+  if (!util.isNumber(n) || n > 0)
+    state.emittedReadable = false;
+
+  // if we're doing read(0) to trigger a readable event, but we
+  // already have a bunch of data in the buffer, then just trigger
+  // the 'readable' event and move on.
+  if (n === 0 &&
+      state.needReadable &&
+      (state.length >= state.highWaterMark || state.ended)) {
+    debug('read: emitReadable', state.length, state.ended);
+    if (state.length === 0 && state.ended)
+      endReadable(this);
+    else
+      emitReadable(this);
+    return null;
+  }
+
+  n = howMuchToRead(n, state);
+
+  // if we've ended, and we're now clear, then finish it up.
+  if (n === 0 && state.ended) {
+    if (state.length === 0)
+      endReadable(this);
+    return null;
+  }
+
+  // All the actual chunk generation logic needs to be
+  // *below* the call to _read.  The reason is that in certain
+  // synthetic stream cases, such as passthrough streams, _read
+  // may be a completely synchronous operation which may change
+  // the state of the read buffer, providing enough data when
+  // before there was *not* enough.
+  //
+  // So, the steps are:
+  // 1. Figure out what the state of things will be after we do
+  // a read from the buffer.
+  //
+  // 2. If that resulting state will trigger a _read, then call _read.
+  // Note that this may be asynchronous, or synchronous.  Yes, it is
+  // deeply ugly to write APIs this way, but that still doesn't mean
+  // that the Readable class should behave improperly, as streams are
+  // designed to be sync/async agnostic.
+  // Take note if the _read call is sync or async (ie, if the read call
+  // has returned yet), so that we know whether or not it's safe to emit
+  // 'readable' etc.
+  //
+  // 3. Actually pull the requested chunks out of the buffer and return.
+
+  // if we need a readable event, then we need to do some reading.
+  var doRead = state.needReadable;
+  debug('need readable', doRead);
+
+  // if we currently have less than the highWaterMark, then also read some
+  if (state.length === 0 || state.length - n < state.highWaterMark) {
+    doRead = true;
+    debug('length less than watermark', doRead);
+  }
+
+  // however, if we've ended, then there's no point, and if we're already
+  // reading, then it's unnecessary.
+  if (state.ended || state.reading) {
+    doRead = false;
+    debug('reading or ended', doRead);
+  }
+
+  if (doRead) {
+    debug('do read');
+    state.reading = true;
+    state.sync = true;
+    // if the length is currently zero, then we *need* a readable event.
+    if (state.length === 0)
+      state.needReadable = true;
+    // call internal read method
+    this._read(state.highWaterMark);
+    state.sync = false;
+  }
+
+  // If _read pushed data synchronously, then `reading` will be false,
+  // and we need to re-evaluate how much data we can return to the user.
+  if (doRead && !state.reading)
+    n = howMuchToRead(nOrig, state);
+
+  var ret;
+  if (n > 0)
+    ret = fromList(n, state);
+  else
+    ret = null;
+
+  if (util.isNull(ret)) {
+    state.needReadable = true;
+    n = 0;
+  }
+
+  state.length -= n;
+
+  // If we have nothing in the buffer, then we want to know
+  // as soon as we *do* get something into the buffer.
+  if (state.length === 0 && !state.ended)
+    state.needReadable = true;
+
+  // If we tried to read() past the EOF, then emit end on the next tick.
+  if (nOrig !== n && state.ended && state.length === 0)
+    endReadable(this);
+
+  if (!util.isNull(ret))
+    this.emit('data', ret);
+
+  return ret;
+};
+
+function chunkInvalid(state, chunk) {
+  var er = null;
+  if (!util.isBuffer(chunk) &&
+      !util.isString(chunk) &&
+      !util.isNullOrUndefined(chunk) &&
+      !state.objectMode) {
+    er = new TypeError('Invalid non-string/buffer chunk');
+  }
+  return er;
+}
+
+
+function onEofChunk(stream, state) {
+  if (state.decoder && !state.ended) {
+    var chunk = state.decoder.end();
+    if (chunk && chunk.length) {
+      state.buffer.push(chunk);
+      state.length += state.objectMode ? 1 : chunk.length;
+    }
+  }
+  state.ended = true;
+
+  // emit 'readable' now to make sure it gets picked up.
+  emitReadable(stream);
+}
+
+// Don't emit readable right away in sync mode, because this can trigger
+// another read() call => stack overflow.  This way, it might trigger
+// a nextTick recursion warning, but that's not so bad.
+function emitReadable(stream) {
+  var state = stream._readableState;
+  state.needReadable = false;
+  if (!state.emittedReadable) {
+    debug('emitReadable', state.flowing);
+    state.emittedReadable = true;
+    if (state.sync)
+      process.nextTick(function() {
+        emitReadable_(stream);
+      });
+    else
+      emitReadable_(stream);
+  }
+}
+
+function emitReadable_(stream) {
+  debug('emit readable');
+  stream.emit('readable');
+  flow(stream);
+}
+
+
+// at this point, the user has presumably seen the 'readable' event,
+// and called read() to consume some data.  that may have triggered
+// in turn another _read(n) call, in which case reading = true if
+// it's in progress.
+// However, if we're not ended, or reading, and the length < hwm,
+// then go ahead and try to read some more preemptively.
+function maybeReadMore(stream, state) {
+  if (!state.readingMore) {
+    state.readingMore = true;
+    process.nextTick(function() {
+      maybeReadMore_(stream, state);
+    });
+  }
+}
+
+function maybeReadMore_(stream, state) {
+  var len = state.length;
+  while (!state.reading && !state.flowing && !state.ended &&
+         state.length < state.highWaterMark) {
+    debug('maybeReadMore read 0');
+    stream.read(0);
+    if (len === state.length)
+      // didn't get any data, stop spinning.
+      break;
+    else
+      len = state.length;
+  }
+  state.readingMore = false;
+}
+
+// abstract method.  to be overridden in specific implementation classes.
+// call cb(er, data) where data is <= n in length.
+// for virtual (non-string, non-buffer) streams, "length" is somewhat
+// arbitrary, and perhaps not very meaningful.
+Readable.prototype._read = function(n) {
+  this.emit('error', new Error('not implemented'));
+};
+
+Readable.prototype.pipe = function(dest, pipeOpts) {
+  var src = this;
+  var state = this._readableState;
+
+  switch (state.pipesCount) {
+    case 0:
+      state.pipes = dest;
+      break;
+    case 1:
+      state.pipes = [state.pipes, dest];
+      break;
+    default:
+      state.pipes.push(dest);
+      break;
+  }
+  state.pipesCount += 1;
+  debug('pipe count=%d opts=%j', state.pipesCount, pipeOpts);
+
+  var doEnd = (!pipeOpts || pipeOpts.end !== false) &&
+              dest !== process.stdout &&
+              dest !== process.stderr;
+
+  var endFn = doEnd ? onend : cleanup;
+  if (state.endEmitted)
+    process.nextTick(endFn);
+  else
+    src.once('end', endFn);
+
+  dest.on('unpipe', onunpipe);
+  function onunpipe(readable) {
+    debug('onunpipe');
+    if (readable === src) {
+      cleanup();
+    }
+  }
+
+  function onend() {
+    debug('onend');
+    dest.end();
+  }
+
+  // when the dest drains, it reduces the awaitDrain counter
+  // on the source.  This would be more elegant with a .once()
+  // handler in flow(), but adding and removing repeatedly is
+  // too slow.
+  var ondrain = pipeOnDrain(src);
+  dest.on('drain', ondrain);
+
+  function cleanup() {
+    debug('cleanup');
+    // cleanup event handlers once the pipe is broken
+    dest.removeListener('close', onclose);
+    dest.removeListener('finish', onfinish);
+    dest.removeListener('drain', ondrain);
+    dest.removeListener('error', onerror);
+    dest.removeListener('unpipe', onunpipe);
+    src.removeListener('end', onend);
+    src.removeListener('end', cleanup);
+    src.removeListener('data', ondata);
+
+    // if the reader is waiting for a drain event from this
+    // specific writer, then it would cause it to never start
+    // flowing again.
+    // So, if this is awaiting a drain, then we just call it now.
+    // If we don't know, then assume that we are waiting for one.
+    if (state.awaitDrain &&
+        (!dest._writableState || dest._writableState.needDrain))
+      ondrain();
+  }
+
+  src.on('data', ondata);
+  function ondata(chunk) {
+    debug('ondata');
+    var ret = dest.write(chunk);
+    if (false === ret) {
+      debug('false write response, pause',
+            src._readableState.awaitDrain);
+      src._readableState.awaitDrain++;
+      src.pause();
+    }
+  }
+
+  // if the dest has an error, then stop piping into it.
+  // however, don't suppress the throwing behavior for this.
+  function onerror(er) {
+    debug('onerror', er);
+    unpipe();
+    dest.removeListener('error', onerror);
+    if (EE.listenerCount(dest, 'error') === 0)
+      dest.emit('error', er);
+  }
+  // This is a brutally ugly hack to make sure that our error handler
+  // is attached before any userland ones.  NEVER DO THIS.
+  if (!dest._events || !dest._events.error)
+    dest.on('error', onerror);
+  else if (isArray(dest._events.error))
+    dest._events.error.unshift(onerror);
+  else
+    dest._events.error = [onerror, dest._events.error];
+
+
+
+  // Both close and finish should trigger unpipe, but only once.
+  function onclose() {
+    dest.removeListener('finish', onfinish);
+    unpipe();
+  }
+  dest.once('close', onclose);
+  function onfinish() {
+    debug('onfinish');
+    dest.removeListener('close', onclose);
+    unpipe();
+  }
+  dest.once('finish', onfinish);
+
+  function unpipe() {
+    debug('unpipe');
+    src.unpipe(dest);
+  }
+
+  // tell the dest that it's being piped to
+  dest.emit('pipe', src);
+
+  // start the flow if it hasn't been started already.
+  if (!state.flowing) {
+    debug('pipe resume');
+    src.resume();
+  }
+
+  return dest;
+};
+
+function pipeOnDrain(src) {
+  return function() {
+    var state = src._readableState;
+    debug('pipeOnDrain', state.awaitDrain);
+    if (state.awaitDrain)
+      state.awaitDrain--;
+    if (state.awaitDrain === 0 && EE.listenerCount(src, 'data')) {
+      state.flowing = true;
+      flow(src);
+    }
+  };
+}
+
+
+Readable.prototype.unpipe = function(dest) {
+  var state = this._readableState;
+
+  // if we're not piping anywhere, then do nothing.
+  if (state.pipesCount === 0)
+    return this;
+
+  // just one destination.  most common case.
+  if (state.pipesCount === 1) {
+    // passed in one, but it's not the right one.
+    if (dest && dest !== state.pipes)
+      return this;
+
+    if (!dest)
+      dest = state.pipes;
+
+    // got a match.
+    state.pipes = null;
+    state.pipesCount = 0;
+    state.flowing = false;
+    if (dest)
+      dest.emit('unpipe', this);
+    return this;
+  }
+
+  // slow case. multiple pipe destinations.
+
+  if (!dest) {
+    // remove all.
+    var dests = state.pipes;
+    var len = state.pipesCount;
+    state.pipes = null;
+    state.pipesCount = 0;
+    state.flowing = false;
+
+    for (var i = 0; i < len; i++)
+      dests[i].emit('unpipe', this);
+    return this;
+  }
+
+  // try to find the right one.
+  var i = indexOf(state.pipes, dest);
+  if (i === -1)
+    return this;
+
+  state.pipes.splice(i, 1);
+  state.pipesCount -= 1;
+  if (state.pipesCount === 1)
+    state.pipes = state.pipes[0];
+
+  dest.emit('unpipe', this);
+
+  return this;
+};
+
+// set up data events if they are asked for
+// Ensure readable listeners eventually get something
+Readable.prototype.on = function(ev, fn) {
+  var res = Stream.prototype.on.call(this, ev, fn);
+
+  // If listening to data, and it has not explicitly been paused,
+  // then call resume to start the flow of data on the next tick.
+  if (ev === 'data' && false !== this._readableState.flowing) {
+    this.resume();
+  }
+
+  if (ev === 'readable' && this.readable) {
+    var state = this._readableState;
+    if (!state.readableListening) {
+      state.readableListening = true;
+      state.emittedReadable = false;
+      state.needReadable = true;
+      if (!state.reading) {
+        var self = this;
+        process.nextTick(function() {
+          debug('readable nexttick read 0');
+          self.read(0);
+        });
+      } else if (state.length) {
+        emitReadable(this, state);
+      }
+    }
+  }
+
+  return res;
+};
+Readable.prototype.addListener = Readable.prototype.on;
+
+// pause() and resume() are remnants of the legacy readable stream API
+// If the user uses them, then switch into old mode.
+Readable.prototype.resume = function() {
+  var state = this._readableState;
+  if (!state.flowing) {
+    debug('resume');
+    state.flowing = true;
+    if (!state.reading) {
+      debug('resume read 0');
+      this.read(0);
+    }
+    resume(this, state);
+  }
+  return this;
+};
+
+function resume(stream, state) {
+  if (!state.resumeScheduled) {
+    state.resumeScheduled = true;
+    process.nextTick(function() {
+      resume_(stream, state);
+    });
+  }
+}
+
+function resume_(stream, state) {
+  state.resumeScheduled = false;
+  stream.emit('resume');
+  flow(stream);
+  if (state.flowing && !state.reading)
+    stream.read(0);
+}
+
+Readable.prototype.pause = function() {
+  debug('call pause flowing=%j', this._readableState.flowing);
+  if (false !== this._readableState.flowing) {
+    debug('pause');
+    this._readableState.flowing = false;
+    this.emit('pause');
+  }
+  return this;
+};
+
+function flow(stream) {
+  var state = stream._readableState;
+  debug('flow', state.flowing);
+  if (state.flowing) {
+    do {
+      var chunk = stream.read();
+    } while (null !== chunk && state.flowing);
+  }
+}
+
+// wrap an old-style stream as the async data source.
+// This is *not* part of the readable stream interface.
+// It is an ugly unfortunate mess of history.
+Readable.prototype.wrap = function(stream) {
+  var state = this._readableState;
+  var paused = false;
+
+  var self = this;
+  stream.on('end', function() {
+    debug('wrapped end');
+    if (state.decoder && !state.ended) {
+      var chunk = state.decoder.end();
+      if (chunk && chunk.length)
+        self.push(chunk);
+    }
+
+    self.push(null);
+  });
+
+  stream.on('data', function(chunk) {
+    debug('wrapped data');
+    if (state.decoder)
+      chunk = state.decoder.write(chunk);
+    if (!chunk || !state.objectMode && !chunk.length)
+      return;
+
+    var ret = self.push(chunk);
+    if (!ret) {
+      paused = true;
+      stream.pause();
+    }
+  });
+
+  // proxy all the other methods.
+  // important when wrapping filters and duplexes.
+  for (var i in stream) {
+    if (util.isFunction(stream[i]) && util.isUndefined(this[i])) {
+      this[i] = function(method) { return function() {
+        return stream[method].apply(stream, arguments);
+      }}(i);
+    }
+  }
+
+  // proxy certain important events.
+  var events = ['error', 'close', 'destroy', 'pause', 'resume'];
+  forEach(events, function(ev) {
+    stream.on(ev, self.emit.bind(self, ev));
+  });
+
+  // when we try to consume some more bytes, simply unpause the
+  // underlying stream.
+  self._read = function(n) {
+    debug('wrapped _read', n);
+    if (paused) {
+      paused = false;
+      stream.resume();
+    }
+  };
+
+  return self;
+};
+
+
+
+// exposed for testing purposes only.
+Readable._fromList = fromList;
+
+// Pluck off n bytes from an array of buffers.
+// Length is the combined lengths of all the buffers in the list.
+function fromList(n, state) {
+  var list = state.buffer;
+  var length = state.length;
+  var stringMode = !!state.decoder;
+  var objectMode = !!state.objectMode;
+  var ret;
+
+  // nothing in the list, definitely empty.
+  if (list.length === 0)
+    return null;
+
+  if (length === 0)
+    ret = null;
+  else if (objectMode)
+    ret = list.shift();
+  else if (!n || n >= length) {
+    // read it all, truncate the array.
+    if (stringMode)
+      ret = list.join('');
+    else
+      ret = Buffer.concat(list, length);
+    list.length = 0;
+  } else {
+    // read just some of it.
+    if (n < list[0].length) {
+      // just take a part of the first list item.
+      // slice is the same for buffers and strings.
+      var buf = list[0];
+      ret = buf.slice(0, n);
+      list[0] = buf.slice(n);
+    } else if (n === list[0].length) {
+      // first list is a perfect match
+      ret = list.shift();
+    } else {
+      // complex case.
+      // we have enough to cover it, but it spans past the first buffer.
+      if (stringMode)
+        ret = '';
+      else
+        ret = new Buffer(n);
+
+      var c = 0;
+      for (var i = 0, l = list.length; i < l && c < n; i++) {
+        var buf = list[0];
+        var cpy = Math.min(n - c, buf.length);
+
+        if (stringMode)
+          ret += buf.slice(0, cpy);
+        else
+          buf.copy(ret, c, 0, cpy);
+
+        if (cpy < buf.length)
+          list[0] = buf.slice(cpy);
+        else
+          list.shift();
+
+        c += cpy;
+      }
+    }
+  }
+
+  return ret;
+}
+
+function endReadable(stream) {
+  var state = stream._readableState;
+
+  // If we get here before consuming all the bytes, then that is a
+  // bug in node.  Should never happen.
+  if (state.length > 0)
+    throw new Error('endReadable called on non-empty stream');
+
+  if (!state.endEmitted) {
+    state.ended = true;
+    process.nextTick(function() {
+      // Check that we didn't get one last unshift.
+      if (!state.endEmitted && state.length === 0) {
+        state.endEmitted = true;
+        stream.readable = false;
+        stream.emit('end');
+      }
+    });
+  }
+}
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}
+
+function indexOf (xs, x) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    if (xs[i] === x) return i;
+  }
+  return -1;
+}
+
+}).call(this,require('_process'))
+},{"./_stream_duplex":163,"_process":157,"buffer":149,"core-util-is":151,"events":152,"inherits":154,"isarray":156,"stream":172,"string_decoder/":173,"util":148}],166:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+// a transform stream is a readable/writable stream where you do
+// something with the data.  Sometimes it's called a "filter",
+// but that's not a great name for it, since that implies a thing where
+// some bits pass through, and others are simply ignored.  (That would
+// be a valid example of a transform, of course.)
+//
+// While the output is causally related to the input, it's not a
+// necessarily symmetric or synchronous transformation.  For example,
+// a zlib stream might take multiple plain-text writes(), and then
+// emit a single compressed chunk some time in the future.
+//
+// Here's how this works:
+//
+// The Transform stream has all the aspects of the readable and writable
+// stream classes.  When you write(chunk), that calls _write(chunk,cb)
+// internally, and returns false if there's a lot of pending writes
+// buffered up.  When you call read(), that calls _read(n) until
+// there's enough pending readable data buffered up.
+//
+// In a transform stream, the written data is placed in a buffer.  When
+// _read(n) is called, it transforms the queued up data, calling the
+// buffered _write cb's as it consumes chunks.  If consuming a single
+// written chunk would result in multiple output chunks, then the first
+// outputted bit calls the readcb, and subsequent chunks just go into
+// the read buffer, and will cause it to emit 'readable' if necessary.
+//
+// This way, back-pressure is actually determined by the reading side,
+// since _read has to be called to start processing a new chunk.  However,
+// a pathological inflate type of transform can cause excessive buffering
+// here.  For example, imagine a stream where every byte of input is
+// interpreted as an integer from 0-255, and then results in that many
+// bytes of output.  Writing the 4 bytes {ff,ff,ff,ff} would result in
+// 1kb of data being output.  In this case, you could write a very small
+// amount of input, and end up with a very large amount of output.  In
+// such a pathological inflating mechanism, there'd be no way to tell
+// the system to stop doing the transform.  A single 4MB write could
+// cause the system to run out of memory.
+//
+// However, even in such a pathological case, only a single written chunk
+// would be consumed, and then the rest would wait (un-transformed) until
+// the results of the previous transformed chunk were consumed.
+
+module.exports = Transform;
+
+var Duplex = require('./_stream_duplex');
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+util.inherits(Transform, Duplex);
+
+
+function TransformState(options, stream) {
+  this.afterTransform = function(er, data) {
+    return afterTransform(stream, er, data);
+  };
+
+  this.needTransform = false;
+  this.transforming = false;
+  this.writecb = null;
+  this.writechunk = null;
+}
+
+function afterTransform(stream, er, data) {
+  var ts = stream._transformState;
+  ts.transforming = false;
+
+  var cb = ts.writecb;
+
+  if (!cb)
+    return stream.emit('error', new Error('no writecb in Transform class'));
+
+  ts.writechunk = null;
+  ts.writecb = null;
+
+  if (!util.isNullOrUndefined(data))
+    stream.push(data);
+
+  if (cb)
+    cb(er);
+
+  var rs = stream._readableState;
+  rs.reading = false;
+  if (rs.needReadable || rs.length < rs.highWaterMark) {
+    stream._read(rs.highWaterMark);
+  }
+}
+
+
+function Transform(options) {
+  if (!(this instanceof Transform))
+    return new Transform(options);
+
+  Duplex.call(this, options);
+
+  this._transformState = new TransformState(options, this);
+
+  // when the writable side finishes, then flush out anything remaining.
+  var stream = this;
+
+  // start out asking for a readable event once data is transformed.
+  this._readableState.needReadable = true;
+
+  // we have implemented the _read method, and done the other things
+  // that Readable wants before the first _read call, so unset the
+  // sync guard flag.
+  this._readableState.sync = false;
+
+  this.once('prefinish', function() {
+    if (util.isFunction(this._flush))
+      this._flush(function(er) {
+        done(stream, er);
+      });
+    else
+      done(stream);
+  });
+}
+
+Transform.prototype.push = function(chunk, encoding) {
+  this._transformState.needTransform = false;
+  return Duplex.prototype.push.call(this, chunk, encoding);
+};
+
+// This is the part where you do stuff!
+// override this function in implementation classes.
+// 'chunk' is an input chunk.
+//
+// Call `push(newChunk)` to pass along transformed output
+// to the readable side.  You may call 'push' zero or more times.
+//
+// Call `cb(err)` when you are done with this chunk.  If you pass
+// an error, then that'll put the hurt on the whole operation.  If you
+// never call cb(), then you'll never get another chunk.
+Transform.prototype._transform = function(chunk, encoding, cb) {
+  throw new Error('not implemented');
+};
+
+Transform.prototype._write = function(chunk, encoding, cb) {
+  var ts = this._transformState;
+  ts.writecb = cb;
+  ts.writechunk = chunk;
+  ts.writeencoding = encoding;
+  if (!ts.transforming) {
+    var rs = this._readableState;
+    if (ts.needTransform ||
+        rs.needReadable ||
+        rs.length < rs.highWaterMark)
+      this._read(rs.highWaterMark);
+  }
+};
+
+// Doesn't matter what the args are here.
+// _transform does all the work.
+// That we got here means that the readable side wants more data.
+Transform.prototype._read = function(n) {
+  var ts = this._transformState;
+
+  if (!util.isNull(ts.writechunk) && ts.writecb && !ts.transforming) {
+    ts.transforming = true;
+    this._transform(ts.writechunk, ts.writeencoding, ts.afterTransform);
+  } else {
+    // mark that we need a transform, so that any data that comes in
+    // will get processed, now that we've asked for it.
+    ts.needTransform = true;
+  }
+};
+
+
+function done(stream, er) {
+  if (er)
+    return stream.emit('error', er);
+
+  // if there's nothing in the write buffer, then that means
+  // that nothing more will ever be provided
+  var ws = stream._writableState;
+  var ts = stream._transformState;
+
+  if (ws.length)
+    throw new Error('calling transform done when ws.length != 0');
+
+  if (ts.transforming)
+    throw new Error('calling transform done when still transforming');
+
+  return stream.push(null);
+}
+
+},{"./_stream_duplex":163,"core-util-is":151,"inherits":154}],167:[function(require,module,exports){
+(function (process){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// A bit simpler than readable streams.
+// Implement an async ._write(chunk, cb), and it'll handle all
+// the drain event emission and buffering.
+
+module.exports = Writable;
+
+/*<replacement>*/
+var Buffer = require('buffer').Buffer;
+/*</replacement>*/
+
+Writable.WritableState = WritableState;
+
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+var Stream = require('stream');
+
+util.inherits(Writable, Stream);
+
+function WriteReq(chunk, encoding, cb) {
+  this.chunk = chunk;
+  this.encoding = encoding;
+  this.callback = cb;
+}
+
+function WritableState(options, stream) {
+  var Duplex = require('./_stream_duplex');
+
+  options = options || {};
+
+  // the point at which write() starts returning false
+  // Note: 0 is a valid value, means that we always return false if
+  // the entire buffer is not flushed immediately on write()
+  var hwm = options.highWaterMark;
+  var defaultHwm = options.objectMode ? 16 : 16 * 1024;
+  this.highWaterMark = (hwm || hwm === 0) ? hwm : defaultHwm;
+
+  // object stream flag to indicate whether or not this stream
+  // contains buffers or objects.
+  this.objectMode = !!options.objectMode;
+
+  if (stream instanceof Duplex)
+    this.objectMode = this.objectMode || !!options.writableObjectMode;
+
+  // cast to ints.
+  this.highWaterMark = ~~this.highWaterMark;
+
+  this.needDrain = false;
+  // at the start of calling end()
+  this.ending = false;
+  // when end() has been called, and returned
+  this.ended = false;
+  // when 'finish' is emitted
+  this.finished = false;
+
+  // should we decode strings into buffers before passing to _write?
+  // this is here so that some node-core streams can optimize string
+  // handling at a lower level.
+  var noDecode = options.decodeStrings === false;
+  this.decodeStrings = !noDecode;
+
+  // Crypto is kind of old and crusty.  Historically, its default string
+  // encoding is 'binary' so we have to make this configurable.
+  // Everything else in the universe uses 'utf8', though.
+  this.defaultEncoding = options.defaultEncoding || 'utf8';
+
+  // not an actual buffer we keep track of, but a measurement
+  // of how much we're waiting to get pushed to some underlying
+  // socket or file.
+  this.length = 0;
+
+  // a flag to see when we're in the middle of a write.
+  this.writing = false;
+
+  // when true all writes will be buffered until .uncork() call
+  this.corked = 0;
+
+  // a flag to be able to tell if the onwrite cb is called immediately,
+  // or on a later tick.  We set this to true at first, because any
+  // actions that shouldn't happen until "later" should generally also
+  // not happen before the first write call.
+  this.sync = true;
+
+  // a flag to know if we're processing previously buffered items, which
+  // may call the _write() callback in the same tick, so that we don't
+  // end up in an overlapped onwrite situation.
+  this.bufferProcessing = false;
+
+  // the callback that's passed to _write(chunk,cb)
+  this.onwrite = function(er) {
+    onwrite(stream, er);
+  };
+
+  // the callback that the user supplies to write(chunk,encoding,cb)
+  this.writecb = null;
+
+  // the amount that is being written when _write is called.
+  this.writelen = 0;
+
+  this.buffer = [];
+
+  // number of pending user-supplied write callbacks
+  // this must be 0 before 'finish' can be emitted
+  this.pendingcb = 0;
+
+  // emit prefinish if the only thing we're waiting for is _write cbs
+  // This is relevant for synchronous Transform streams
+  this.prefinished = false;
+
+  // True if the error was already emitted and should not be thrown again
+  this.errorEmitted = false;
+}
+
+function Writable(options) {
+  var Duplex = require('./_stream_duplex');
+
+  // Writable ctor is applied to Duplexes, though they're not
+  // instanceof Writable, they're instanceof Readable.
+  if (!(this instanceof Writable) && !(this instanceof Duplex))
+    return new Writable(options);
+
+  this._writableState = new WritableState(options, this);
+
+  // legacy.
+  this.writable = true;
+
+  Stream.call(this);
+}
+
+// Otherwise people can pipe Writable streams, which is just wrong.
+Writable.prototype.pipe = function() {
+  this.emit('error', new Error('Cannot pipe. Not readable.'));
+};
+
+
+function writeAfterEnd(stream, state, cb) {
+  var er = new Error('write after end');
+  // TODO: defer error events consistently everywhere, not just the cb
+  stream.emit('error', er);
+  process.nextTick(function() {
+    cb(er);
+  });
+}
+
+// If we get something that is not a buffer, string, null, or undefined,
+// and we're not in objectMode, then that's an error.
+// Otherwise stream chunks are all considered to be of length=1, and the
+// watermarks determine how many objects to keep in the buffer, rather than
+// how many bytes or characters.
+function validChunk(stream, state, chunk, cb) {
+  var valid = true;
+  if (!util.isBuffer(chunk) &&
+      !util.isString(chunk) &&
+      !util.isNullOrUndefined(chunk) &&
+      !state.objectMode) {
+    var er = new TypeError('Invalid non-string/buffer chunk');
+    stream.emit('error', er);
+    process.nextTick(function() {
+      cb(er);
+    });
+    valid = false;
+  }
+  return valid;
+}
+
+Writable.prototype.write = function(chunk, encoding, cb) {
+  var state = this._writableState;
+  var ret = false;
+
+  if (util.isFunction(encoding)) {
+    cb = encoding;
+    encoding = null;
+  }
+
+  if (util.isBuffer(chunk))
+    encoding = 'buffer';
+  else if (!encoding)
+    encoding = state.defaultEncoding;
+
+  if (!util.isFunction(cb))
+    cb = function() {};
+
+  if (state.ended)
+    writeAfterEnd(this, state, cb);
+  else if (validChunk(this, state, chunk, cb)) {
+    state.pendingcb++;
+    ret = writeOrBuffer(this, state, chunk, encoding, cb);
+  }
+
+  return ret;
+};
+
+Writable.prototype.cork = function() {
+  var state = this._writableState;
+
+  state.corked++;
+};
+
+Writable.prototype.uncork = function() {
+  var state = this._writableState;
+
+  if (state.corked) {
+    state.corked--;
+
+    if (!state.writing &&
+        !state.corked &&
+        !state.finished &&
+        !state.bufferProcessing &&
+        state.buffer.length)
+      clearBuffer(this, state);
+  }
+};
+
+function decodeChunk(state, chunk, encoding) {
+  if (!state.objectMode &&
+      state.decodeStrings !== false &&
+      util.isString(chunk)) {
+    chunk = new Buffer(chunk, encoding);
+  }
+  return chunk;
+}
+
+// if we're already writing something, then just put this
+// in the queue, and wait our turn.  Otherwise, call _write
+// If we return false, then we need a drain event, so set that flag.
+function writeOrBuffer(stream, state, chunk, encoding, cb) {
+  chunk = decodeChunk(state, chunk, encoding);
+  if (util.isBuffer(chunk))
+    encoding = 'buffer';
+  var len = state.objectMode ? 1 : chunk.length;
+
+  state.length += len;
+
+  var ret = state.length < state.highWaterMark;
+  // we must ensure that previous needDrain will not be reset to false.
+  if (!ret)
+    state.needDrain = true;
+
+  if (state.writing || state.corked)
+    state.buffer.push(new WriteReq(chunk, encoding, cb));
+  else
+    doWrite(stream, state, false, len, chunk, encoding, cb);
+
+  return ret;
+}
+
+function doWrite(stream, state, writev, len, chunk, encoding, cb) {
+  state.writelen = len;
+  state.writecb = cb;
+  state.writing = true;
+  state.sync = true;
+  if (writev)
+    stream._writev(chunk, state.onwrite);
+  else
+    stream._write(chunk, encoding, state.onwrite);
+  state.sync = false;
+}
+
+function onwriteError(stream, state, sync, er, cb) {
+  if (sync)
+    process.nextTick(function() {
+      state.pendingcb--;
+      cb(er);
+    });
+  else {
+    state.pendingcb--;
+    cb(er);
+  }
+
+  stream._writableState.errorEmitted = true;
+  stream.emit('error', er);
+}
+
+function onwriteStateUpdate(state) {
+  state.writing = false;
+  state.writecb = null;
+  state.length -= state.writelen;
+  state.writelen = 0;
+}
+
+function onwrite(stream, er) {
+  var state = stream._writableState;
+  var sync = state.sync;
+  var cb = state.writecb;
+
+  onwriteStateUpdate(state);
+
+  if (er)
+    onwriteError(stream, state, sync, er, cb);
+  else {
+    // Check if we're actually ready to finish, but don't emit yet
+    var finished = needFinish(stream, state);
+
+    if (!finished &&
+        !state.corked &&
+        !state.bufferProcessing &&
+        state.buffer.length) {
+      clearBuffer(stream, state);
+    }
+
+    if (sync) {
+      process.nextTick(function() {
+        afterWrite(stream, state, finished, cb);
+      });
+    } else {
+      afterWrite(stream, state, finished, cb);
+    }
+  }
+}
+
+function afterWrite(stream, state, finished, cb) {
+  if (!finished)
+    onwriteDrain(stream, state);
+  state.pendingcb--;
+  cb();
+  finishMaybe(stream, state);
+}
+
+// Must force callback to be called on nextTick, so that we don't
+// emit 'drain' before the write() consumer gets the 'false' return
+// value, and has a chance to attach a 'drain' listener.
+function onwriteDrain(stream, state) {
+  if (state.length === 0 && state.needDrain) {
+    state.needDrain = false;
+    stream.emit('drain');
+  }
+}
+
+
+// if there's something in the buffer waiting, then process it
+function clearBuffer(stream, state) {
+  state.bufferProcessing = true;
+
+  if (stream._writev && state.buffer.length > 1) {
+    // Fast case, write everything using _writev()
+    var cbs = [];
+    for (var c = 0; c < state.buffer.length; c++)
+      cbs.push(state.buffer[c].callback);
+
+    // count the one we are adding, as well.
+    // TODO(isaacs) clean this up
+    state.pendingcb++;
+    doWrite(stream, state, true, state.length, state.buffer, '', function(err) {
+      for (var i = 0; i < cbs.length; i++) {
+        state.pendingcb--;
+        cbs[i](err);
+      }
+    });
+
+    // Clear buffer
+    state.buffer = [];
+  } else {
+    // Slow case, write chunks one-by-one
+    for (var c = 0; c < state.buffer.length; c++) {
+      var entry = state.buffer[c];
+      var chunk = entry.chunk;
+      var encoding = entry.encoding;
+      var cb = entry.callback;
+      var len = state.objectMode ? 1 : chunk.length;
+
+      doWrite(stream, state, false, len, chunk, encoding, cb);
+
+      // if we didn't call the onwrite immediately, then
+      // it means that we need to wait until it does.
+      // also, that means that the chunk and cb are currently
+      // being processed, so move the buffer counter past them.
+      if (state.writing) {
+        c++;
+        break;
+      }
+    }
+
+    if (c < state.buffer.length)
+      state.buffer = state.buffer.slice(c);
+    else
+      state.buffer.length = 0;
+  }
+
+  state.bufferProcessing = false;
+}
+
+Writable.prototype._write = function(chunk, encoding, cb) {
+  cb(new Error('not implemented'));
+
+};
+
+Writable.prototype._writev = null;
+
+Writable.prototype.end = function(chunk, encoding, cb) {
+  var state = this._writableState;
+
+  if (util.isFunction(chunk)) {
+    cb = chunk;
+    chunk = null;
+    encoding = null;
+  } else if (util.isFunction(encoding)) {
+    cb = encoding;
+    encoding = null;
+  }
+
+  if (!util.isNullOrUndefined(chunk))
+    this.write(chunk, encoding);
+
+  // .end() fully uncorks
+  if (state.corked) {
+    state.corked = 1;
+    this.uncork();
+  }
+
+  // ignore unnecessary end() calls.
+  if (!state.ending && !state.finished)
+    endWritable(this, state, cb);
+};
+
+
+function needFinish(stream, state) {
+  return (state.ending &&
+          state.length === 0 &&
+          !state.finished &&
+          !state.writing);
+}
+
+function prefinish(stream, state) {
+  if (!state.prefinished) {
+    state.prefinished = true;
+    stream.emit('prefinish');
+  }
+}
+
+function finishMaybe(stream, state) {
+  var need = needFinish(stream, state);
+  if (need) {
+    if (state.pendingcb === 0) {
+      prefinish(stream, state);
+      state.finished = true;
+      stream.emit('finish');
+    } else
+      prefinish(stream, state);
+  }
+  return need;
+}
+
+function endWritable(stream, state, cb) {
+  state.ending = true;
+  finishMaybe(stream, state);
+  if (cb) {
+    if (state.finished)
+      process.nextTick(cb);
+    else
+      stream.once('finish', cb);
+  }
+  state.ended = true;
+}
+
+}).call(this,require('_process'))
+},{"./_stream_duplex":163,"_process":157,"buffer":149,"core-util-is":151,"inherits":154,"stream":172}],168:[function(require,module,exports){
+module.exports = require("./lib/_stream_passthrough.js")
+
+},{"./lib/_stream_passthrough.js":164}],169:[function(require,module,exports){
+(function (process){
+exports = module.exports = require('./lib/_stream_readable.js');
+exports.Stream = require('stream');
+exports.Readable = exports;
+exports.Writable = require('./lib/_stream_writable.js');
+exports.Duplex = require('./lib/_stream_duplex.js');
+exports.Transform = require('./lib/_stream_transform.js');
+exports.PassThrough = require('./lib/_stream_passthrough.js');
+if (!process.browser && process.env.READABLE_STREAM === 'disable') {
+  module.exports = require('stream');
+}
+
+}).call(this,require('_process'))
+},{"./lib/_stream_duplex.js":163,"./lib/_stream_passthrough.js":164,"./lib/_stream_readable.js":165,"./lib/_stream_transform.js":166,"./lib/_stream_writable.js":167,"_process":157,"stream":172}],170:[function(require,module,exports){
+module.exports = require("./lib/_stream_transform.js")
+
+},{"./lib/_stream_transform.js":166}],171:[function(require,module,exports){
+module.exports = require("./lib/_stream_writable.js")
+
+},{"./lib/_stream_writable.js":167}],172:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module.exports = Stream;
+
+var EE = require('events').EventEmitter;
+var inherits = require('inherits');
+
+inherits(Stream, EE);
+Stream.Readable = require('readable-stream/readable.js');
+Stream.Writable = require('readable-stream/writable.js');
+Stream.Duplex = require('readable-stream/duplex.js');
+Stream.Transform = require('readable-stream/transform.js');
+Stream.PassThrough = require('readable-stream/passthrough.js');
+
+// Backwards-compat with node 0.4.x
+Stream.Stream = Stream;
+
+
+
+// old-style streams.  Note that the pipe method (the only relevant
+// part of this class) is overridden in the Readable class.
+
+function Stream() {
+  EE.call(this);
+}
+
+Stream.prototype.pipe = function(dest, options) {
+  var source = this;
+
+  function ondata(chunk) {
+    if (dest.writable) {
+      if (false === dest.write(chunk) && source.pause) {
+        source.pause();
+      }
+    }
+  }
+
+  source.on('data', ondata);
+
+  function ondrain() {
+    if (source.readable && source.resume) {
+      source.resume();
+    }
+  }
+
+  dest.on('drain', ondrain);
+
+  // If the 'end' option is not supplied, dest.end() will be called when
+  // source gets the 'end' or 'close' events.  Only dest.end() once.
+  if (!dest._isStdio && (!options || options.end !== false)) {
+    source.on('end', onend);
+    source.on('close', onclose);
+  }
+
+  var didOnEnd = false;
+  function onend() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    dest.end();
+  }
+
+
+  function onclose() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    if (typeof dest.destroy === 'function') dest.destroy();
+  }
+
+  // don't leave dangling pipes when there are errors.
+  function onerror(er) {
+    cleanup();
+    if (EE.listenerCount(this, 'error') === 0) {
+      throw er; // Unhandled stream error in pipe.
+    }
+  }
+
+  source.on('error', onerror);
+  dest.on('error', onerror);
+
+  // remove all the event listeners that were added.
+  function cleanup() {
+    source.removeListener('data', ondata);
+    dest.removeListener('drain', ondrain);
+
+    source.removeListener('end', onend);
+    source.removeListener('close', onclose);
+
+    source.removeListener('error', onerror);
+    dest.removeListener('error', onerror);
+
+    source.removeListener('end', cleanup);
+    source.removeListener('close', cleanup);
+
+    dest.removeListener('close', cleanup);
+  }
+
+  source.on('end', cleanup);
+  source.on('close', cleanup);
+
+  dest.on('close', cleanup);
+
+  dest.emit('pipe', source);
+
+  // Allow for unix-like usage: A.pipe(B).pipe(C)
+  return dest;
+};
+
+},{"events":152,"inherits":154,"readable-stream/duplex.js":162,"readable-stream/passthrough.js":168,"readable-stream/readable.js":169,"readable-stream/transform.js":170,"readable-stream/writable.js":171}],173:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var Buffer = require('buffer').Buffer;
+
+var isBufferEncoding = Buffer.isEncoding
+  || function(encoding) {
+       switch (encoding && encoding.toLowerCase()) {
+         case 'hex': case 'utf8': case 'utf-8': case 'ascii': case 'binary': case 'base64': case 'ucs2': case 'ucs-2': case 'utf16le': case 'utf-16le': case 'raw': return true;
+         default: return false;
+       }
+     }
+
+
+function assertEncoding(encoding) {
+  if (encoding && !isBufferEncoding(encoding)) {
+    throw new Error('Unknown encoding: ' + encoding);
+  }
+}
+
+// StringDecoder provides an interface for efficiently splitting a series of
+// buffers into a series of JS strings without breaking apart multi-byte
+// characters. CESU-8 is handled as part of the UTF-8 encoding.
+//
+// @TODO Handling all encodings inside a single object makes it very difficult
+// to reason about this code, so it should be split up in the future.
+// @TODO There should be a utf8-strict encoding that rejects invalid UTF-8 code
+// points as used by CESU-8.
+var StringDecoder = exports.StringDecoder = function(encoding) {
+  this.encoding = (encoding || 'utf8').toLowerCase().replace(/[-_]/, '');
+  assertEncoding(encoding);
+  switch (this.encoding) {
+    case 'utf8':
+      // CESU-8 represents each of Surrogate Pair by 3-bytes
+      this.surrogateSize = 3;
+      break;
+    case 'ucs2':
+    case 'utf16le':
+      // UTF-16 represents each of Surrogate Pair by 2-bytes
+      this.surrogateSize = 2;
+      this.detectIncompleteChar = utf16DetectIncompleteChar;
+      break;
+    case 'base64':
+      // Base-64 stores 3 bytes in 4 chars, and pads the remainder.
+      this.surrogateSize = 3;
+      this.detectIncompleteChar = base64DetectIncompleteChar;
+      break;
+    default:
+      this.write = passThroughWrite;
+      return;
+  }
+
+  // Enough space to store all bytes of a single character. UTF-8 needs 4
+  // bytes, but CESU-8 may require up to 6 (3 bytes per surrogate).
+  this.charBuffer = new Buffer(6);
+  // Number of bytes received for the current incomplete multi-byte character.
+  this.charReceived = 0;
+  // Number of bytes expected for the current incomplete multi-byte character.
+  this.charLength = 0;
+};
+
+
+// write decodes the given buffer and returns it as JS string that is
+// guaranteed to not contain any partial multi-byte characters. Any partial
+// character found at the end of the buffer is buffered up, and will be
+// returned when calling write again with the remaining bytes.
+//
+// Note: Converting a Buffer containing an orphan surrogate to a String
+// currently works, but converting a String to a Buffer (via `new Buffer`, or
+// Buffer#write) will replace incomplete surrogates with the unicode
+// replacement character. See https://codereview.chromium.org/121173009/ .
+StringDecoder.prototype.write = function(buffer) {
+  var charStr = '';
+  // if our last write ended with an incomplete multibyte character
+  while (this.charLength) {
+    // determine how many remaining bytes this buffer has to offer for this char
+    var available = (buffer.length >= this.charLength - this.charReceived) ?
+        this.charLength - this.charReceived :
+        buffer.length;
+
+    // add the new bytes to the char buffer
+    buffer.copy(this.charBuffer, this.charReceived, 0, available);
+    this.charReceived += available;
+
+    if (this.charReceived < this.charLength) {
+      // still not enough chars in this buffer? wait for more ...
+      return '';
+    }
+
+    // remove bytes belonging to the current character from the buffer
+    buffer = buffer.slice(available, buffer.length);
+
+    // get the character that was split
+    charStr = this.charBuffer.slice(0, this.charLength).toString(this.encoding);
+
+    // CESU-8: lead surrogate (D800-DBFF) is also the incomplete character
+    var charCode = charStr.charCodeAt(charStr.length - 1);
+    if (charCode >= 0xD800 && charCode <= 0xDBFF) {
+      this.charLength += this.surrogateSize;
+      charStr = '';
+      continue;
+    }
+    this.charReceived = this.charLength = 0;
+
+    // if there are no more bytes in this buffer, just emit our char
+    if (buffer.length === 0) {
+      return charStr;
+    }
+    break;
+  }
+
+  // determine and set charLength / charReceived
+  this.detectIncompleteChar(buffer);
+
+  var end = buffer.length;
+  if (this.charLength) {
+    // buffer the incomplete character bytes we got
+    buffer.copy(this.charBuffer, 0, buffer.length - this.charReceived, end);
+    end -= this.charReceived;
+  }
+
+  charStr += buffer.toString(this.encoding, 0, end);
+
+  var end = charStr.length - 1;
+  var charCode = charStr.charCodeAt(end);
+  // CESU-8: lead surrogate (D800-DBFF) is also the incomplete character
+  if (charCode >= 0xD800 && charCode <= 0xDBFF) {
+    var size = this.surrogateSize;
+    this.charLength += size;
+    this.charReceived += size;
+    this.charBuffer.copy(this.charBuffer, size, 0, size);
+    buffer.copy(this.charBuffer, 0, 0, size);
+    return charStr.substring(0, end);
+  }
+
+  // or just emit the charStr
+  return charStr;
+};
+
+// detectIncompleteChar determines if there is an incomplete UTF-8 character at
+// the end of the given buffer. If so, it sets this.charLength to the byte
+// length that character, and sets this.charReceived to the number of bytes
+// that are available for this character.
+StringDecoder.prototype.detectIncompleteChar = function(buffer) {
+  // determine how many bytes we have to check at the end of this buffer
+  var i = (buffer.length >= 3) ? 3 : buffer.length;
+
+  // Figure out if one of the last i bytes of our buffer announces an
+  // incomplete char.
+  for (; i > 0; i--) {
+    var c = buffer[buffer.length - i];
+
+    // See http://en.wikipedia.org/wiki/UTF-8#Description
+
+    // 110XXXXX
+    if (i == 1 && c >> 5 == 0x06) {
+      this.charLength = 2;
+      break;
+    }
+
+    // 1110XXXX
+    if (i <= 2 && c >> 4 == 0x0E) {
+      this.charLength = 3;
+      break;
+    }
+
+    // 11110XXX
+    if (i <= 3 && c >> 3 == 0x1E) {
+      this.charLength = 4;
+      break;
+    }
+  }
+  this.charReceived = i;
+};
+
+StringDecoder.prototype.end = function(buffer) {
+  var res = '';
+  if (buffer && buffer.length)
+    res = this.write(buffer);
+
+  if (this.charReceived) {
+    var cr = this.charReceived;
+    var buf = this.charBuffer;
+    var enc = this.encoding;
+    res += buf.slice(0, cr).toString(enc);
+  }
+
+  return res;
+};
+
+function passThroughWrite(buffer) {
+  return buffer.toString(this.encoding);
+}
+
+function utf16DetectIncompleteChar(buffer) {
+  this.charReceived = buffer.length % 2;
+  this.charLength = this.charReceived ? 2 : 0;
+}
+
+function base64DetectIncompleteChar(buffer) {
+  this.charReceived = buffer.length % 3;
+  this.charLength = this.charReceived ? 3 : 0;
+}
+
+},{"buffer":149}],174:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var punycode = require('punycode');
+
+exports.parse = urlParse;
+exports.resolve = urlResolve;
+exports.resolveObject = urlResolveObject;
+exports.format = urlFormat;
+
+exports.Url = Url;
+
+function Url() {
+  this.protocol = null;
+  this.slashes = null;
+  this.auth = null;
+  this.host = null;
+  this.port = null;
+  this.hostname = null;
+  this.hash = null;
+  this.search = null;
+  this.query = null;
+  this.pathname = null;
+  this.path = null;
+  this.href = null;
+}
+
+// Reference: RFC 3986, RFC 1808, RFC 2396
+
+// define these here so at least they only have to be
+// compiled once on the first module load.
+var protocolPattern = /^([a-z0-9.+-]+:)/i,
+    portPattern = /:[0-9]*$/,
+
+    // RFC 2396: characters reserved for delimiting URLs.
+    // We actually just auto-escape these.
+    delims = ['<', '>', '"', '`', ' ', '\r', '\n', '\t'],
+
+    // RFC 2396: characters not allowed for various reasons.
+    unwise = ['{', '}', '|', '\\', '^', '`'].concat(delims),
+
+    // Allowed by RFCs, but cause of XSS attacks.  Always escape these.
+    autoEscape = ['\''].concat(unwise),
+    // Characters that are never ever allowed in a hostname.
+    // Note that any invalid chars are also handled, but these
+    // are the ones that are *expected* to be seen, so we fast-path
+    // them.
+    nonHostChars = ['%', '/', '?', ';', '#'].concat(autoEscape),
+    hostEndingChars = ['/', '?', '#'],
+    hostnameMaxLen = 255,
+    hostnamePartPattern = /^[a-z0-9A-Z_-]{0,63}$/,
+    hostnamePartStart = /^([a-z0-9A-Z_-]{0,63})(.*)$/,
+    // protocols that can allow "unsafe" and "unwise" chars.
+    unsafeProtocol = {
+      'javascript': true,
+      'javascript:': true
+    },
+    // protocols that never have a hostname.
+    hostlessProtocol = {
+      'javascript': true,
+      'javascript:': true
+    },
+    // protocols that always contain a // bit.
+    slashedProtocol = {
+      'http': true,
+      'https': true,
+      'ftp': true,
+      'gopher': true,
+      'file': true,
+      'http:': true,
+      'https:': true,
+      'ftp:': true,
+      'gopher:': true,
+      'file:': true
+    },
+    querystring = require('querystring');
+
+function urlParse(url, parseQueryString, slashesDenoteHost) {
+  if (url && isObject(url) && url instanceof Url) return url;
+
+  var u = new Url;
+  u.parse(url, parseQueryString, slashesDenoteHost);
+  return u;
+}
+
+Url.prototype.parse = function(url, parseQueryString, slashesDenoteHost) {
+  if (!isString(url)) {
+    throw new TypeError("Parameter 'url' must be a string, not " + typeof url);
+  }
+
+  var rest = url;
+
+  // trim before proceeding.
+  // This is to support parse stuff like "  http://foo.com  \n"
+  rest = rest.trim();
+
+  var proto = protocolPattern.exec(rest);
+  if (proto) {
+    proto = proto[0];
+    var lowerProto = proto.toLowerCase();
+    this.protocol = lowerProto;
+    rest = rest.substr(proto.length);
+  }
+
+  // figure out if it's got a host
+  // user@server is *always* interpreted as a hostname, and url
+  // resolution will treat //foo/bar as host=foo,path=bar because that's
+  // how the browser resolves relative URLs.
+  if (slashesDenoteHost || proto || rest.match(/^\/\/[^@\/]+@[^@\/]+/)) {
+    var slashes = rest.substr(0, 2) === '//';
+    if (slashes && !(proto && hostlessProtocol[proto])) {
+      rest = rest.substr(2);
+      this.slashes = true;
+    }
+  }
+
+  if (!hostlessProtocol[proto] &&
+      (slashes || (proto && !slashedProtocol[proto]))) {
+
+    // there's a hostname.
+    // the first instance of /, ?, ;, or # ends the host.
+    //
+    // If there is an @ in the hostname, then non-host chars *are* allowed
+    // to the left of the last @ sign, unless some host-ending character
+    // comes *before* the @-sign.
+    // URLs are obnoxious.
+    //
+    // ex:
+    // http://a@b@c/ => user:a@b host:c
+    // http://a@b?@c => user:a host:c path:/?@c
+
+    // v0.12 TODO(isaacs): This is not quite how Chrome does things.
+    // Review our test case against browsers more comprehensively.
+
+    // find the first instance of any hostEndingChars
+    var hostEnd = -1;
+    for (var i = 0; i < hostEndingChars.length; i++) {
+      var hec = rest.indexOf(hostEndingChars[i]);
+      if (hec !== -1 && (hostEnd === -1 || hec < hostEnd))
+        hostEnd = hec;
+    }
+
+    // at this point, either we have an explicit point where the
+    // auth portion cannot go past, or the last @ char is the decider.
+    var auth, atSign;
+    if (hostEnd === -1) {
+      // atSign can be anywhere.
+      atSign = rest.lastIndexOf('@');
+    } else {
+      // atSign must be in auth portion.
+      // http://a@b/c@d => host:b auth:a path:/c@d
+      atSign = rest.lastIndexOf('@', hostEnd);
+    }
+
+    // Now we have a portion which is definitely the auth.
+    // Pull that off.
+    if (atSign !== -1) {
+      auth = rest.slice(0, atSign);
+      rest = rest.slice(atSign + 1);
+      this.auth = decodeURIComponent(auth);
+    }
+
+    // the host is the remaining to the left of the first non-host char
+    hostEnd = -1;
+    for (var i = 0; i < nonHostChars.length; i++) {
+      var hec = rest.indexOf(nonHostChars[i]);
+      if (hec !== -1 && (hostEnd === -1 || hec < hostEnd))
+        hostEnd = hec;
+    }
+    // if we still have not hit it, then the entire thing is a host.
+    if (hostEnd === -1)
+      hostEnd = rest.length;
+
+    this.host = rest.slice(0, hostEnd);
+    rest = rest.slice(hostEnd);
+
+    // pull out port.
+    this.parseHost();
+
+    // we've indicated that there is a hostname,
+    // so even if it's empty, it has to be present.
+    this.hostname = this.hostname || '';
+
+    // if hostname begins with [ and ends with ]
+    // assume that it's an IPv6 address.
+    var ipv6Hostname = this.hostname[0] === '[' &&
+        this.hostname[this.hostname.length - 1] === ']';
+
+    // validate a little.
+    if (!ipv6Hostname) {
+      var hostparts = this.hostname.split(/\./);
+      for (var i = 0, l = hostparts.length; i < l; i++) {
+        var part = hostparts[i];
+        if (!part) continue;
+        if (!part.match(hostnamePartPattern)) {
+          var newpart = '';
+          for (var j = 0, k = part.length; j < k; j++) {
+            if (part.charCodeAt(j) > 127) {
+              // we replace non-ASCII char with a temporary placeholder
+              // we need this to make sure size of hostname is not
+              // broken by replacing non-ASCII by nothing
+              newpart += 'x';
+            } else {
+              newpart += part[j];
+            }
+          }
+          // we test again with ASCII char only
+          if (!newpart.match(hostnamePartPattern)) {
+            var validParts = hostparts.slice(0, i);
+            var notHost = hostparts.slice(i + 1);
+            var bit = part.match(hostnamePartStart);
+            if (bit) {
+              validParts.push(bit[1]);
+              notHost.unshift(bit[2]);
+            }
+            if (notHost.length) {
+              rest = '/' + notHost.join('.') + rest;
+            }
+            this.hostname = validParts.join('.');
+            break;
+          }
+        }
+      }
+    }
+
+    if (this.hostname.length > hostnameMaxLen) {
+      this.hostname = '';
+    } else {
+      // hostnames are always lower case.
+      this.hostname = this.hostname.toLowerCase();
+    }
+
+    if (!ipv6Hostname) {
+      // IDNA Support: Returns a puny coded representation of "domain".
+      // It only converts the part of the domain name that
+      // has non ASCII characters. I.e. it dosent matter if
+      // you call it with a domain that already is in ASCII.
+      var domainArray = this.hostname.split('.');
+      var newOut = [];
+      for (var i = 0; i < domainArray.length; ++i) {
+        var s = domainArray[i];
+        newOut.push(s.match(/[^A-Za-z0-9_-]/) ?
+            'xn--' + punycode.encode(s) : s);
+      }
+      this.hostname = newOut.join('.');
+    }
+
+    var p = this.port ? ':' + this.port : '';
+    var h = this.hostname || '';
+    this.host = h + p;
+    this.href += this.host;
+
+    // strip [ and ] from the hostname
+    // the host field still retains them, though
+    if (ipv6Hostname) {
+      this.hostname = this.hostname.substr(1, this.hostname.length - 2);
+      if (rest[0] !== '/') {
+        rest = '/' + rest;
+      }
+    }
+  }
+
+  // now rest is set to the post-host stuff.
+  // chop off any delim chars.
+  if (!unsafeProtocol[lowerProto]) {
+
+    // First, make 100% sure that any "autoEscape" chars get
+    // escaped, even if encodeURIComponent doesn't think they
+    // need to be.
+    for (var i = 0, l = autoEscape.length; i < l; i++) {
+      var ae = autoEscape[i];
+      var esc = encodeURIComponent(ae);
+      if (esc === ae) {
+        esc = escape(ae);
+      }
+      rest = rest.split(ae).join(esc);
+    }
+  }
+
+
+  // chop off from the tail first.
+  var hash = rest.indexOf('#');
+  if (hash !== -1) {
+    // got a fragment string.
+    this.hash = rest.substr(hash);
+    rest = rest.slice(0, hash);
+  }
+  var qm = rest.indexOf('?');
+  if (qm !== -1) {
+    this.search = rest.substr(qm);
+    this.query = rest.substr(qm + 1);
+    if (parseQueryString) {
+      this.query = querystring.parse(this.query);
+    }
+    rest = rest.slice(0, qm);
+  } else if (parseQueryString) {
+    // no query string, but parseQueryString still requested
+    this.search = '';
+    this.query = {};
+  }
+  if (rest) this.pathname = rest;
+  if (slashedProtocol[lowerProto] &&
+      this.hostname && !this.pathname) {
+    this.pathname = '/';
+  }
+
+  //to support http.request
+  if (this.pathname || this.search) {
+    var p = this.pathname || '';
+    var s = this.search || '';
+    this.path = p + s;
+  }
+
+  // finally, reconstruct the href based on what has been validated.
+  this.href = this.format();
+  return this;
+};
+
+// format a parsed object into a url string
+function urlFormat(obj) {
+  // ensure it's an object, and not a string url.
+  // If it's an obj, this is a no-op.
+  // this way, you can call url_format() on strings
+  // to clean up potentially wonky urls.
+  if (isString(obj)) obj = urlParse(obj);
+  if (!(obj instanceof Url)) return Url.prototype.format.call(obj);
+  return obj.format();
+}
+
+Url.prototype.format = function() {
+  var auth = this.auth || '';
+  if (auth) {
+    auth = encodeURIComponent(auth);
+    auth = auth.replace(/%3A/i, ':');
+    auth += '@';
+  }
+
+  var protocol = this.protocol || '',
+      pathname = this.pathname || '',
+      hash = this.hash || '',
+      host = false,
+      query = '';
+
+  if (this.host) {
+    host = auth + this.host;
+  } else if (this.hostname) {
+    host = auth + (this.hostname.indexOf(':') === -1 ?
+        this.hostname :
+        '[' + this.hostname + ']');
+    if (this.port) {
+      host += ':' + this.port;
+    }
+  }
+
+  if (this.query &&
+      isObject(this.query) &&
+      Object.keys(this.query).length) {
+    query = querystring.stringify(this.query);
+  }
+
+  var search = this.search || (query && ('?' + query)) || '';
+
+  if (protocol && protocol.substr(-1) !== ':') protocol += ':';
+
+  // only the slashedProtocols get the //.  Not mailto:, xmpp:, etc.
+  // unless they had them to begin with.
+  if (this.slashes ||
+      (!protocol || slashedProtocol[protocol]) && host !== false) {
+    host = '//' + (host || '');
+    if (pathname && pathname.charAt(0) !== '/') pathname = '/' + pathname;
+  } else if (!host) {
+    host = '';
+  }
+
+  if (hash && hash.charAt(0) !== '#') hash = '#' + hash;
+  if (search && search.charAt(0) !== '?') search = '?' + search;
+
+  pathname = pathname.replace(/[?#]/g, function(match) {
+    return encodeURIComponent(match);
+  });
+  search = search.replace('#', '%23');
+
+  return protocol + host + pathname + search + hash;
+};
+
+function urlResolve(source, relative) {
+  return urlParse(source, false, true).resolve(relative);
+}
+
+Url.prototype.resolve = function(relative) {
+  return this.resolveObject(urlParse(relative, false, true)).format();
+};
+
+function urlResolveObject(source, relative) {
+  if (!source) return relative;
+  return urlParse(source, false, true).resolveObject(relative);
+}
+
+Url.prototype.resolveObject = function(relative) {
+  if (isString(relative)) {
+    var rel = new Url();
+    rel.parse(relative, false, true);
+    relative = rel;
+  }
+
+  var result = new Url();
+  Object.keys(this).forEach(function(k) {
+    result[k] = this[k];
+  }, this);
+
+  // hash is always overridden, no matter what.
+  // even href="" will remove it.
+  result.hash = relative.hash;
+
+  // if the relative url is empty, then there's nothing left to do here.
+  if (relative.href === '') {
+    result.href = result.format();
+    return result;
+  }
+
+  // hrefs like //foo/bar always cut to the protocol.
+  if (relative.slashes && !relative.protocol) {
+    // take everything except the protocol from relative
+    Object.keys(relative).forEach(function(k) {
+      if (k !== 'protocol')
+        result[k] = relative[k];
+    });
+
+    //urlParse appends trailing / to urls like http://www.example.com
+    if (slashedProtocol[result.protocol] &&
+        result.hostname && !result.pathname) {
+      result.path = result.pathname = '/';
+    }
+
+    result.href = result.format();
+    return result;
+  }
+
+  if (relative.protocol && relative.protocol !== result.protocol) {
+    // if it's a known url protocol, then changing
+    // the protocol does weird things
+    // first, if it's not file:, then we MUST have a host,
+    // and if there was a path
+    // to begin with, then we MUST have a path.
+    // if it is file:, then the host is dropped,
+    // because that's known to be hostless.
+    // anything else is assumed to be absolute.
+    if (!slashedProtocol[relative.protocol]) {
+      Object.keys(relative).forEach(function(k) {
+        result[k] = relative[k];
+      });
+      result.href = result.format();
+      return result;
+    }
+
+    result.protocol = relative.protocol;
+    if (!relative.host && !hostlessProtocol[relative.protocol]) {
+      var relPath = (relative.pathname || '').split('/');
+      while (relPath.length && !(relative.host = relPath.shift()));
+      if (!relative.host) relative.host = '';
+      if (!relative.hostname) relative.hostname = '';
+      if (relPath[0] !== '') relPath.unshift('');
+      if (relPath.length < 2) relPath.unshift('');
+      result.pathname = relPath.join('/');
+    } else {
+      result.pathname = relative.pathname;
+    }
+    result.search = relative.search;
+    result.query = relative.query;
+    result.host = relative.host || '';
+    result.auth = relative.auth;
+    result.hostname = relative.hostname || relative.host;
+    result.port = relative.port;
+    // to support http.request
+    if (result.pathname || result.search) {
+      var p = result.pathname || '';
+      var s = result.search || '';
+      result.path = p + s;
+    }
+    result.slashes = result.slashes || relative.slashes;
+    result.href = result.format();
+    return result;
+  }
+
+  var isSourceAbs = (result.pathname && result.pathname.charAt(0) === '/'),
+      isRelAbs = (
+          relative.host ||
+          relative.pathname && relative.pathname.charAt(0) === '/'
+      ),
+      mustEndAbs = (isRelAbs || isSourceAbs ||
+                    (result.host && relative.pathname)),
+      removeAllDots = mustEndAbs,
+      srcPath = result.pathname && result.pathname.split('/') || [],
+      relPath = relative.pathname && relative.pathname.split('/') || [],
+      psychotic = result.protocol && !slashedProtocol[result.protocol];
+
+  // if the url is a non-slashed url, then relative
+  // links like ../.. should be able
+  // to crawl up to the hostname, as well.  This is strange.
+  // result.protocol has already been set by now.
+  // Later on, put the first path part into the host field.
+  if (psychotic) {
+    result.hostname = '';
+    result.port = null;
+    if (result.host) {
+      if (srcPath[0] === '') srcPath[0] = result.host;
+      else srcPath.unshift(result.host);
+    }
+    result.host = '';
+    if (relative.protocol) {
+      relative.hostname = null;
+      relative.port = null;
+      if (relative.host) {
+        if (relPath[0] === '') relPath[0] = relative.host;
+        else relPath.unshift(relative.host);
+      }
+      relative.host = null;
+    }
+    mustEndAbs = mustEndAbs && (relPath[0] === '' || srcPath[0] === '');
+  }
+
+  if (isRelAbs) {
+    // it's absolute.
+    result.host = (relative.host || relative.host === '') ?
+                  relative.host : result.host;
+    result.hostname = (relative.hostname || relative.hostname === '') ?
+                      relative.hostname : result.hostname;
+    result.search = relative.search;
+    result.query = relative.query;
+    srcPath = relPath;
+    // fall through to the dot-handling below.
+  } else if (relPath.length) {
+    // it's relative
+    // throw away the existing file, and take the new path instead.
+    if (!srcPath) srcPath = [];
+    srcPath.pop();
+    srcPath = srcPath.concat(relPath);
+    result.search = relative.search;
+    result.query = relative.query;
+  } else if (!isNullOrUndefined(relative.search)) {
+    // just pull out the search.
+    // like href='?foo'.
+    // Put this after the other two cases because it simplifies the booleans
+    if (psychotic) {
+      result.hostname = result.host = srcPath.shift();
+      //occationaly the auth can get stuck only in host
+      //this especialy happens in cases like
+      //url.resolveObject('mailto:local1@domain1', 'local2@domain2')
+      var authInHost = result.host && result.host.indexOf('@') > 0 ?
+                       result.host.split('@') : false;
+      if (authInHost) {
+        result.auth = authInHost.shift();
+        result.host = result.hostname = authInHost.shift();
+      }
+    }
+    result.search = relative.search;
+    result.query = relative.query;
+    //to support http.request
+    if (!isNull(result.pathname) || !isNull(result.search)) {
+      result.path = (result.pathname ? result.pathname : '') +
+                    (result.search ? result.search : '');
+    }
+    result.href = result.format();
+    return result;
+  }
+
+  if (!srcPath.length) {
+    // no path at all.  easy.
+    // we've already handled the other stuff above.
+    result.pathname = null;
+    //to support http.request
+    if (result.search) {
+      result.path = '/' + result.search;
+    } else {
+      result.path = null;
+    }
+    result.href = result.format();
+    return result;
+  }
+
+  // if a url ENDs in . or .., then it must get a trailing slash.
+  // however, if it ends in anything else non-slashy,
+  // then it must NOT get a trailing slash.
+  var last = srcPath.slice(-1)[0];
+  var hasTrailingSlash = (
+      (result.host || relative.host) && (last === '.' || last === '..') ||
+      last === '');
+
+  // strip single dots, resolve double dots to parent dir
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = srcPath.length; i >= 0; i--) {
+    last = srcPath[i];
+    if (last == '.') {
+      srcPath.splice(i, 1);
+    } else if (last === '..') {
+      srcPath.splice(i, 1);
+      up++;
+    } else if (up) {
+      srcPath.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (!mustEndAbs && !removeAllDots) {
+    for (; up--; up) {
+      srcPath.unshift('..');
+    }
+  }
+
+  if (mustEndAbs && srcPath[0] !== '' &&
+      (!srcPath[0] || srcPath[0].charAt(0) !== '/')) {
+    srcPath.unshift('');
+  }
+
+  if (hasTrailingSlash && (srcPath.join('/').substr(-1) !== '/')) {
+    srcPath.push('');
+  }
+
+  var isAbsolute = srcPath[0] === '' ||
+      (srcPath[0] && srcPath[0].charAt(0) === '/');
+
+  // put the host back
+  if (psychotic) {
+    result.hostname = result.host = isAbsolute ? '' :
+                                    srcPath.length ? srcPath.shift() : '';
+    //occationaly the auth can get stuck only in host
+    //this especialy happens in cases like
+    //url.resolveObject('mailto:local1@domain1', 'local2@domain2')
+    var authInHost = result.host && result.host.indexOf('@') > 0 ?
+                     result.host.split('@') : false;
+    if (authInHost) {
+      result.auth = authInHost.shift();
+      result.host = result.hostname = authInHost.shift();
+    }
+  }
+
+  mustEndAbs = mustEndAbs || (result.host && srcPath.length);
+
+  if (mustEndAbs && !isAbsolute) {
+    srcPath.unshift('');
+  }
+
+  if (!srcPath.length) {
+    result.pathname = null;
+    result.path = null;
+  } else {
+    result.pathname = srcPath.join('/');
+  }
+
+  //to support request.http
+  if (!isNull(result.pathname) || !isNull(result.search)) {
+    result.path = (result.pathname ? result.pathname : '') +
+                  (result.search ? result.search : '');
+  }
+  result.auth = relative.auth || result.auth;
+  result.slashes = result.slashes || relative.slashes;
+  result.href = result.format();
+  return result;
+};
+
+Url.prototype.parseHost = function() {
+  var host = this.host;
+  var port = portPattern.exec(host);
+  if (port) {
+    port = port[0];
+    if (port !== ':') {
+      this.port = port.substr(1);
+    }
+    host = host.substr(0, host.length - port.length);
+  }
+  if (host) this.hostname = host;
+};
+
+function isString(arg) {
+  return typeof arg === "string";
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isNull(arg) {
+  return arg === null;
+}
+function isNullOrUndefined(arg) {
+  return  arg == null;
+}
+
+},{"punycode":158,"querystring":161}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,16,17,18,19,14]);
