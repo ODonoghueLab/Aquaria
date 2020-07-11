@@ -2,10 +2,6 @@
 node_modules
 /dist
 .htaccess
-package-lock.json
-site.json
-something1
-something2
 
 # local env files
 .env.local
