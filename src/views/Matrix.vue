@@ -5,10 +5,10 @@
           <!-- <span id="res">resized?</span>
           <span id="hd"> hDiff</span> -->
           <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
-          <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
+          <toggle-switch :options="option5" @change="updateMap($event.value)" @selected="selectedMethod()" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
     </div>
-     <iframe id="slide" src='../COVID/index.html'></iframe>
-     <div id="container">
+     <iframe id="slide" src='../COVID/index.html' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]"></iframe>
+     <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
           <a v-bind:href="[structure.count > 0 ? redirect(structure.primary_accession) : '']" :style="[structure.count > 0 ? {'cursor': 'pointer'} : {'pointer-events': 'none', 'cursor': 'none'}]" target="_blank" class='link'>
           <h3>{{structure.synonym}}</h3>
@@ -41,6 +41,7 @@ export default {
   },
   data () {
     return {
+      showSlide: 1,
       structures: null,
       organism: null,
       clicked: false,
@@ -64,13 +65,20 @@ export default {
           'border-radius': '15px'
         },
         items: {
-          preSelected: 'Grid',
-          labels: [{ name: 'Grid' }, { name: 'Genome' }]
+          preSelected: 'Genome',
+          labels: [{ name: 'Genome' }, { name: 'Grid' }]
         }
       }
     }
   },
   beforeMount () {
+    if (window.location.search === '?Grid') {
+      this.option5.items.preSelected = 'Grid'
+      this.showSlide = 0
+    } else {
+      this.option5.items.preSelected = 'Genome'
+      this.showSlide = 1
+    }
     // var numStructures = [0, 2, 2, 2, 0, 0, 0, 0, 0, 25, 357, 495, 117, 0]
     // var numStructures = [2, 0, 35, 0, 0, 0, 0, 3, 0, 0, 4, 678, 528, 134]
     var allStructures, matchingStructures
@@ -129,9 +137,11 @@ export default {
   methods: {
     updateMap: function (value) {
       if (value === 'Genome') {
+        window.history.replaceState({}, document.title, '?' + 'Genome')
         document.getElementById('container').style.display = 'none'
         document.getElementById('slide').style.display = 'block'
       } else {
+        window.history.replaceState({}, document.title, '?' + 'Grid')
         document.getElementById('container').style.display = 'grid'
         document.getElementById('slide').style.display = 'none'
       }
@@ -317,7 +327,7 @@ export default {
     }
     /* * * * * CSS grid * * * * */
     #container {
-        display: grid;
+        /* display: grid; */
         grid-gap: 6px;
         background: #c0c0c0;
         padding: 6px;
@@ -441,7 +451,7 @@ export default {
     }
 
     iframe#slide{
-      display: none;
+      /* display: block; */
       height:90%;
       width: 100%;
       border: none;
