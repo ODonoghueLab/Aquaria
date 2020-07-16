@@ -4,21 +4,11 @@
             <p id="starter"><img src="../../public/images/logo-large.png"
                    width="605"
                    height="167"
-                   alt="Aquaria 2"></p>
+                   alt="Aquaria"></p>
             <p><strong>Simplifying the generation of insight from protein structures</strong></p>
-
-            <p><span>Se&aacute;n I. O&rsquo;Donoghue<sup>1,2,3</sup>,
-            </span><span>Andrea Schafferhans<sup>4,5</sup></span>,
-            </span><span>Neblina Sikta<sup>1</sup>,
-            </span><span>Christian Stolte<sup>1</sup>,
-            </span><span>Sandeep Kaur<sup>1,3</sup>,</span>
-            <span>James Procter<sup>6</sup>,
-            </span><span>Bosco Ho<sup>1</sup>,</span>
-            <span>Stuart Anderson<sup>2</sup>,</span>
-            <span>Matt Adcock<sup>2</sup>,</span>
-            <span>Christian Dallago<sup>5</sup>,</span>
-            <span>Nicola Bordin<sup>7</sup>,</span>
-            <span>Burkhard Rost<sup>5</sup>,
+            <p><span>Se&aacute;n I. O&rsquo;Donoghue<sup>1,2,3</sup>,</span><span>Kenneth Sabir<sup>2,3</sup>,</span><span>Christian Stolte<sup>1</sup>,</span><span>Benjamin Wellmann<sup>4</sup>,</span>
+            <span>Maria Kalemanov<sup>4</sup>,</span><span>Fabian Buske<sup>2,7</sup>,</span><span>Julian Heinrich<sup>1</sup>,</span><span>Manfred Roos<sup>4</sup>,</span><span>Nelson Perdig&atilde;o<sup>5,6</sup>,</span>
+            <span>Burkhard Rost<sup>4</sup>,</span><span>Andrea Schafferhans<sup>4</sup></span>
               <br>
               <!-- <script src="/javascripts/email.js"></script><br> -->
               <br><strong>Updated: <span class="lastupdate">{{data}}</span></strong>
@@ -26,15 +16,14 @@
               <br>PDB structures released since then are not yet available in Aquaria.
               <br>The next update is planned for <span class="nextupdate">15th April 2025</span>.
             </p>
-
             <p class="affiliations">
-              <span>1. Garvan Institute of Medical Research, Sydney, Australia</span>
-              <span>2. CSIRO Data61, Sydney, Australia</span>
-              <span>3. University of NSW, Australia</span>
-              <span>4. Weihenstephan-Tr. University of Applied Sciences, Freising, Germany</span>
-              <span>5. Technische Universit&auml;t M&uuml;nchen, Germany</span>
-              <span>6. The University of Dundee, UK</span>
-              <span>7. University College London, UK.</span>
+              <span>1. CSIRO Digital Productivity, Sydney, Australia</span>
+              <span>2. Garvan Institute of Medical Research, Sydney, Australia</span>
+              <span>3. University of Sydney, Australia</span>
+              <span>4. Technische Universit&auml;t M&uuml;nchen, Germany</span>
+              <span>5. University of Lisbon, Portugal</span>
+              <span>6. Instituto de Sistemas e Rob&oacute;tica, Lisboa, Portugal</span>
+              <span>7. St. Vincent's Clinical School, UNSW, Sydney, Australia.</span>
             </p>
             <p>We gratefully acknowledge generous support from Amazon AWS in hosting the Aquaria database and server.<br>&nbsp;</p>
           </div>
