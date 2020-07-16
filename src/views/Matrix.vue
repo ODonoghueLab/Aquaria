@@ -5,7 +5,9 @@
           <!-- <span id="res">resized?</span>
           <span id="hd"> hDiff</span> -->
           <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
-          <toggle-switch :options="option5" @change="updateMap($event.value)" @selected="selectedMethod()" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
+          <img id="menu" v-bind:src="'../images/menu.png'" v-if="$mq === 'mobile'" v-on:click="showSwitch()"/>
+          <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop' || $mq === 'tablet'"/>
+          <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile'"/>
     </div>
      <iframe id="slide" src='../COVID/index.html' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]"></iframe>
      <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
@@ -142,8 +144,9 @@ export default {
         document.getElementById('slide').style.display = 'block'
       } else {
         window.history.replaceState({}, document.title, '?' + 'Grid')
-        document.getElementById('container').style.display = 'grid'
+        document.querySelector('#container').style.display = 'grid'
         document.getElementById('slide').style.display = 'none'
+        console.log('GRID')
       }
     },
     redirect: function (primaryAccession) {
@@ -175,6 +178,30 @@ export default {
         document.querySelector('div#about_overlay').style.display = 'block'
         document.querySelector('div.dimmer').addEventListener('click', function () {
           document.querySelector('div#about_overlay').style.display = 'none'
+          document.querySelector('div.dimmer').remove()
+        })
+      } else {
+        document.querySelector('div.dimmer').remove()
+      }
+    },
+    showSwitch: function () {
+      document.querySelector('#switch > ul').style.position = 'absolute'
+      document.querySelector('#switch > ul').style.top = '15px'
+      document.querySelector('#switch > ul').style.right = '20px'
+      var Position = window.innerWidth / 2 - $('#switch').width() / 2
+      Position = Position + 'px'
+      $('#switch').css({
+        left: Position
+      })
+      // dim background
+      document.querySelector('#switch').style.display = 'block'
+      if (document.getElementsByClassName('dimmer').length === 0) {
+        var elemDiv = document.createElement('div')
+        elemDiv.className = 'dimmer'
+        document.body.append(elemDiv)
+        document.querySelector('#switch').style.display = 'block'
+        document.querySelector('div.dimmer').addEventListener('click', function () {
+          document.querySelector('#switch').style.display = 'none'
           document.querySelector('div.dimmer').remove()
         })
       } else {
@@ -223,7 +250,7 @@ export default {
         // document.getElementById('header').setAttribute('style', '')
         document.getElementById('Matrix').setAttribute('style', '')
         document.getElementById('about_overlay').setAttribute('style', '')
-        document.getElementById('container').setAttribute('style', '')
+        // document.getElementById('container').setAttribute('style', '')
         // window.scrollTo(0, 9)
       }
     }
@@ -277,6 +304,17 @@ export default {
 </script>
 
 <style scoped>
+#switch{
+    display: none;
+    z-index: 11;
+}
+
+#menu{
+    height: 35px;
+    position: absolute;
+    right: -0.8vw;
+    margin-top: 13px;
+}
 .link{
   color: #2c3e50;
   font-weight:400;
@@ -309,6 +347,7 @@ export default {
         background: #bbbbbb;
     }
     #header {
+        display: inline-flex;
         padding: 2px 22px;
         height: 4em;
         min-height: calc(48px + 1.5vw);
