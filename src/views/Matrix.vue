@@ -9,7 +9,8 @@
           <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop' || $mq === 'tablet'"/>
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile'"/>
     </div>
-     <iframe id="slide" src='../COVID/index.html' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]"></iframe>
+     <iframe id="slide" src='../COVID/web/viewer.html#zoom=27.5' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]"></iframe>
+     <!-- <canvas id="slide"></canvas> -->
      <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
           <a v-bind:href="[structure.count > 0 ? redirect(structure.primary_accession) : '']" :style="[structure.count > 0 ? {'cursor': 'pointer'} : {'pointer-events': 'none', 'cursor': 'none'}]" target="_blank" class='link'>
@@ -210,6 +211,47 @@ export default {
     }
   },
   updated () {
+    // var url = '../'
+
+    // // Loaded via <script> tag, create shortcut to access PDF.js exports.
+    // var pdfjsLib = window['pdfjs-dist/build/pdf']
+
+    // // The workerSrc property shall be specified.
+    // pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js'
+
+    // // Asynchronous download of PDF
+    // var loadingTask = pdfjsLib.getDocument(url)
+    // loadingTask.promise.then(function (pdf) {
+    //   console.log('PDF loaded')
+
+    //   // Fetch the first page
+    //   var pageNumber = 1
+    //   pdf.getPage(pageNumber).then(function (page) {
+    //     console.log('Page loaded')
+
+    //     var scale = 1.5
+    //     var viewport = page.getViewport({ scale: scale })
+
+    //     // Prepare canvas using PDF page dimensions
+    //     var canvas = document.getElementById('slide')
+    //     var context = canvas.getContext('2d')
+    //     canvas.height = viewport.height
+    //     canvas.width = viewport.width
+
+    //     // Render PDF page into canvas context
+    //     var renderContext = {
+    //       canvasContext: context,
+    //       viewport: viewport
+    //     }
+    //     var renderTask = page.render(renderContext)
+    //     renderTask.promise.then(function () {
+    //       console.log('Page rendered')
+    //     })
+    //   })
+    // }, function (reason) {
+    //   // PDF loading error
+    //   console.error(reason)
+    // })
     setTimeout(function () {
       if (document.querySelector('.matrixLoading')) {
         document.querySelector('.matrixLoading').remove()
