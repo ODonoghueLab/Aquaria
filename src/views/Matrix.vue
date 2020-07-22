@@ -1,6 +1,6 @@
 <template>
   <div id="Matrix">
-    <div id="header" @click="document.getElementById('slide').focus" >
+    <div id="header">
           <div id="logo" v-on:click="showAbout()"></div>
           <!-- <span id="res">resized?</span>
           <span id="hd"> hDiff</span> -->
@@ -212,6 +212,9 @@ export default {
     }
   },
   updated () {
+    document.querySelector('div#Matrix').addEventListener('click', function () {
+      document.querySelector('iframe#slide').focus()
+    })
     setTimeout(function () {
       if (document.querySelector('.matrixLoading')) {
         document.querySelector('.matrixLoading').remove()
