@@ -8968,7 +8968,7 @@ class LinkAnnotationElement extends AnnotationElement {
     if (data.url) {
       (0, _display_utils.addLinkAttributes)(link, {
         url: data.url,
-        target: data.newWindow ? _display_utils.LinkTarget.BLANK : linkService.externalLinkTarget,
+        target: _display_utils.LinkTarget.BLANK,
         rel: linkService.externalLinkRel,
         enabled: linkService.externalLinkEnabled
       });
