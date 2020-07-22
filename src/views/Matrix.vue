@@ -1,6 +1,6 @@
 <template>
   <div id="Matrix">
-    <div id="header">
+    <div id="header" @click="document.getElementById('slide').focus" >
           <div id="logo" v-on:click="showAbout()"></div>
           <!-- <span id="res">resized?</span>
           <span id="hd"> hDiff</span> -->
@@ -9,7 +9,8 @@
           <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop' || $mq === 'tablet'"/>
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile'"/>
     </div>
-     <iframe id="slide" src='../COVID/web/viewer.html#zoom=27.5' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]"></iframe>
+     <iframe id="slide" src='../COVID/web/viewer.html#zoom=26' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'" autofocus></iframe>
+     <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe>
      <!-- <canvas id="slide"></canvas> -->
      <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
