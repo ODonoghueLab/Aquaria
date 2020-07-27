@@ -5,11 +5,13 @@
           <!-- <span id="res">resized?</span>
           <span id="hd"> hDiff</span> -->
           <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
+          <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img id="paper" class="infoLink" v-bind:src="'../images/PDF.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a>
+          <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img id="video" class="infoLink" v-bind:src="'../images/Video.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a>
           <img id="menu" v-bind:src="'../images/menu.png'" v-if="$mq === 'mobile'" v-on:click="showSwitch()"/>
           <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop' || $mq === 'tablet'"/>
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile'"/>
     </div>
-     <iframe id="slide" src='../COVID/web/viewer.html#zoom=28.8' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'" autofocus></iframe>
+     <iframe id="slide" src='../COVID/web/viewer.html#zoom=28' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'" autofocus></iframe>
      <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe>
      <!-- <canvas id="slide"></canvas> -->
      <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
@@ -149,6 +151,10 @@ export default {
         document.querySelector('#container').style.display = 'grid'
         document.getElementById('slide').style.display = 'none'
         console.log('GRID')
+      }
+      if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+        document.querySelector('#switch').style.display = 'none'
+        document.querySelector('div.dimmer').remove()
       }
     },
     redirect: function (primaryAccession) {
@@ -309,6 +315,18 @@ export default {
 </script>
 
 <style scoped>
+.infoLink{
+    position: absolute;
+    top: 10px;
+    height: 42px;
+    right: 125px;
+}
+
+#video{
+  top: 15px;
+  margin-right: 36px;
+}
+
 #switch{
     display: none;
     z-index: 11;
@@ -496,7 +514,7 @@ export default {
 
     iframe#slide{
       /* display: block; */
-      height:90%;
+      height:91.7vh;
       width: 100%;
       border: none;
     }
