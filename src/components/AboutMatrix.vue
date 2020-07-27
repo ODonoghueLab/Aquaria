@@ -3,7 +3,7 @@
         <div id="title_0" v-if="$mq === 'laptop'">
             <span id="Orgname_0">Structural models of {{ OrganismName }} proteins&nbsp;</span>
             <span id="matches_0"></span>
-            <span id="help" @mouseover="showAbout()" v-if="$mq === 'laptop'">?</span>
+            <span id="help" @mouseover="activarOver" @mousedown="showAbout" @mouseleave="resetOver" v-if="$mq === 'laptop'">?</span>
         </div>
         <div id="title_0" v-if="$mq === 'mobile' || $mq === 'tablet'" @mousedown="showAboutPhone()">
             <span id="Orgname_0">Structural models of {{ OrganismName }} proteins&nbsp;</span>
@@ -24,6 +24,11 @@
             <p>For proteins with at least one match structure, an image of the best match (based on sequence identity) is shown.</p>
             <p>Click on an image to access all matching structures for that protein, and to overlay sequence features (e.g., domains, SNPs, PTMs).</p>
             <p>Proteins with no matching structure have no detectable sequence homology to any experimentally-determined 3D structure currently published (in the <a href="https://www.wwpdb.org/">PDB</a>). However, as new structures become publicly available, they will be added to this page.</p>
+            <p>Learn more:
+              <br/>
+              <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank">Watch the introductory video</a>
+              <br/>
+              <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank">Read our bioRxiv preprint</a></p>
         </div>
     </div>
 </template>
@@ -41,7 +46,8 @@ export default {
   data () {
     return {
       synonymsString: null,
-      synonymsArray: null
+      synonymsArray: null,
+      timer: null
     }
   },
   beforeMount () {
@@ -53,6 +59,9 @@ export default {
   },
   props: ['OrganismName', 'OrgSynonyms', 'checkDevice'],
   methods: {
+    resetOver () {
+      clearTimeout(this.timer)
+    },
     hideAbout: function () {
       document.querySelector('#content').style.visibility = 'hidden'
       document.querySelector('div.dimmer').remove()
@@ -90,6 +99,24 @@ export default {
       } else {
         document.querySelector('div.dimmer').remove()
       }
+    },
+    activarOver () {
+      this.timer = setTimeout(function () {
+        document.querySelector('#content').style.visibility = 'visible'
+        if (document.getElementsByClassName('dimmer').length === 0) {
+          var elemDiv = document.createElement('div')
+          elemDiv.className = 'dimmer'
+          document.body.append(elemDiv)
+          document.querySelector('#content').style.visibility = 'visible'
+
+          document.querySelector('div.dimmer').addEventListener('mouseover', function () {
+            document.querySelector('#content').style.visibility = 'hidden'
+            document.querySelector('div.dimmer').remove()
+          })
+        } else {
+          document.querySelector('div.dimmer').remove()
+        }
+      }, 1000)
     },
     redirect: function (OrganismID) {
       var url = 'https://www.uniprot.org/taxonomy/' + OrganismID
