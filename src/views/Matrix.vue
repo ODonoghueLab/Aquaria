@@ -7,12 +7,12 @@
           <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
           <!-- <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img id="paper" class="infoLink" v-bind:src="'../images/PDF.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a>
           <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img id="video" class="infoLink" v-bind:src="'../images/Video.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a> -->
-          <img id="menu" v-bind:src="'../images/menu.png'" v-if="$mq === 'mobile'" v-on:click="showSwitch()"/>
-          <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop' || $mq === 'tablet'"/>
-          <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile'"/>
+          <img id="menu" v-bind:src="'../images/menu.png'" v-if="$mq === 'mobile' || $mq === 'tablet'" v-on:click="showSwitch()"/>
+          <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
+          <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
     </div>
-      <GraphViewer :path="`${publicPath}lib`" url="../COVID/web/Fig_1_hi-res.pdf"/>
-     <!-- <iframe id="slide" src='../COVID/web/viewer.html#zoom=28' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'" autofocus></iframe> -->
+      <!-- <GraphViewer :path="`${publicPath}lib`" url="../COVID/web/Fig_1_hi-res.pdf"/> -->
+     <iframe id="slide" src='../COVID/web/viewer.html#zoom=28' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'" autofocus></iframe>
      <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe>
      <!-- <canvas id="slide"></canvas> -->
      <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
@@ -37,7 +37,7 @@ import * as CdrComps from '../cedar.js'
 import axios from 'axios'
 import AboutAquaria from '../components/AboutAquaria'
 import AboutMatrix from '../components/AboutMatrix'
-import GraphViewer from '../components/GraphViewer'
+// import GraphViewer from '../components/GraphViewer'
 import $ from 'jquery'
 
 export default {
@@ -45,8 +45,8 @@ export default {
   components: {
     ...CdrComps,
     AboutAquaria,
-    AboutMatrix,
-    GraphViewer
+    AboutMatrix
+    // GraphViewer
   },
   data () {
     return {
@@ -150,10 +150,14 @@ export default {
         window.history.replaceState({}, document.title, '?' + 'Genome')
         document.getElementById('container').style.display = 'none'
         document.getElementById('slide').style.display = 'block'
+        document.querySelector('.dimmer').remove()
+        document.querySelector('#switch').style.display = 'none'
       } else {
         window.history.replaceState({}, document.title, '?' + 'Grid')
         document.querySelector('#container').style.display = 'grid'
         document.getElementById('slide').style.display = 'none'
+        document.querySelector('.dimmer').remove()
+        document.querySelector('#switch').style.display = 'none'
         console.log('GRID')
       }
       if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
@@ -222,6 +226,14 @@ export default {
     }
   },
   updated () {
+    // Switch styling
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.borderBottomLeftRadius = '20px'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.borderTopLeftRadius = '20px'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.borderColor = 'transparent'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.borderBottomRightRadius = '20px'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.borderTopRightRadius = '20px'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.borderColor = 'transparent'
+
     // document.querySelector('div#Matrix').addEventListener('click', function () {
     //   document.querySelector('iframe#slide').focus()
     // })
@@ -319,6 +331,14 @@ export default {
 </script>
 
 <style scoped>
+.toggle-switch li:first-child label[data-v-3cf97114] {
+    border: 1px none;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    height: 30px;
+    border-top-right-radius: 20px;
+}
 .infoLink{
     position: absolute;
     top: 10px;
@@ -364,7 +384,7 @@ export default {
 #Matrix{
   height: 99vh;
   background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) calc(8px + 0.1vh);
-  background-size: calc(30px + 1.5vw) calc(30px + 1.5vw);
+  background-size: calc(26px + 1.5vw) calc(26px + 1.5vw);
   text-align: center;
 }
 /* general layout and colors */
