@@ -5,13 +5,14 @@
           <!-- <span id="res">resized?</span>
           <span id="hd"> hDiff</span> -->
           <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
-          <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img id="paper" class="infoLink" v-bind:src="'../images/PDF.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a>
-          <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img id="video" class="infoLink" v-bind:src="'../images/Video.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a>
+          <!-- <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img id="paper" class="infoLink" v-bind:src="'../images/PDF.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a>
+          <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img id="video" class="infoLink" v-bind:src="'../images/Video.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a> -->
           <img id="menu" v-bind:src="'../images/menu.png'" v-if="$mq === 'mobile'" v-on:click="showSwitch()"/>
           <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop' || $mq === 'tablet'"/>
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile'"/>
     </div>
-     <iframe id="slide" src='../COVID/web/viewer.html#zoom=28' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'" autofocus></iframe>
+      <GraphViewer :path="`${publicPath}lib`" url="../COVID/web/Fig_1_hi-res.pdf"/>
+     <!-- <iframe id="slide" src='../COVID/web/viewer.html#zoom=28' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'" autofocus></iframe> -->
      <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe>
      <!-- <canvas id="slide"></canvas> -->
      <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
@@ -36,6 +37,7 @@ import * as CdrComps from '../cedar.js'
 import axios from 'axios'
 import AboutAquaria from '../components/AboutAquaria'
 import AboutMatrix from '../components/AboutMatrix'
+import GraphViewer from '../components/GraphViewer'
 import $ from 'jquery'
 
 export default {
@@ -43,10 +45,12 @@ export default {
   components: {
     ...CdrComps,
     AboutAquaria,
-    AboutMatrix
+    AboutMatrix,
+    GraphViewer
   },
   data () {
     return {
+      publicPath: process.env.BASE_URL,
       showSlide: 1,
       structures: null,
       organism: null,
@@ -218,9 +222,9 @@ export default {
     }
   },
   updated () {
-    document.querySelector('div#Matrix').addEventListener('click', function () {
-      document.querySelector('iframe#slide').focus()
-    })
+    // document.querySelector('div#Matrix').addEventListener('click', function () {
+    //   document.querySelector('iframe#slide').focus()
+    // })
     setTimeout(function () {
       if (document.querySelector('.matrixLoading')) {
         document.querySelector('.matrixLoading').remove()
@@ -359,8 +363,8 @@ export default {
 /* Christian's work */
 #Matrix{
   height: 99vh;
-  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) calc(6px + 0.1vh);
-  background-size: calc(40px + 1.5vw) calc(40px + 1.5vw);
+  background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) calc(8px + 0.1vh);
+  background-size: calc(30px + 1.5vw) calc(30px + 1.5vw);
   text-align: center;
 }
 /* general layout and colors */
