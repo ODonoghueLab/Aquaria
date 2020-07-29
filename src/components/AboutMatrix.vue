@@ -1,18 +1,20 @@
 <template>
     <div id="about_matrix">
-        <div id="title_0" v-if="$mq === 'laptop'">
+        <div id="title_0" v-if="$mq === 'laptop' || $mq === 'tablet'">
+            <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img class='play' v-bind:src="'/images/Play.png'"/></a>
             <span id="Orgname_0">Structural models of {{ OrganismName }} proteins&nbsp;</span>
             <span id="matches_0"></span>
+             <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img class='paper' v-bind:src="'/images/Document.png'"/></a>
             <span id="help" @mouseover="activarOver" @mousedown="showAbout" @mouseleave="resetOver" v-if="$mq === 'laptop'">?</span>
         </div>
-        <div id="title_0" v-if="$mq === 'mobile' || $mq === 'tablet'" @mousedown="showAboutPhone()">
-            <span id="Orgname_0">Structural models of {{ OrganismName }} proteins&nbsp;</span>
+        <div id="title_0" v-if="$mq === 'mobile'" @mousedown="showAboutPhone()">
+            <span id="Orgname_0">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
             <span id="matches_0"></span>
             <span id="help">?</span>
         </div>
         <div id="content">
             <div id="title">
-                <span id="Orgname">Structural models of {{ OrganismName }} proteins&nbsp;</span>
+                <span id="Orgname">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
                 <span id="matches"></span>
                 <span id="close" @click="hideAbout()">✕</span>
             </div>
@@ -58,6 +60,20 @@ export default {
     }
   },
   props: ['OrganismName', 'OrgSynonyms', 'checkDevice'],
+  mounted () {
+    document.querySelector('img.play').addEventListener('mouseover', function () {
+      document.querySelector('img.play').src = '/images/Play_Hover.png'
+    })
+    document.querySelector('img.play').addEventListener('mouseout', function () {
+      document.querySelector('img.play').src = '/images/Play.png'
+    })
+    document.querySelector('img.paper').addEventListener('mouseover', function () {
+      document.querySelector('img.paper').src = '/images/Document_Hover.png'
+    })
+    document.querySelector('img.paper').addEventListener('mouseout', function () {
+      document.querySelector('img.paper').src = '/images/Document.png'
+    })
+  },
   methods: {
     resetOver () {
       clearTimeout(this.timer)
@@ -127,7 +143,18 @@ export default {
 </script>
 
 <style scoped>
-
+img.paper{
+    height: 20px;
+    position: relative;
+    top: -3px;
+    padding-left: 3px;
+}
+img.play{
+    height: 21px;
+    position: relative;
+    top: -3px;
+    padding-right: 7px;
+}
 #about_matrix{
     margin-left: 12px;
     margin-top: 15px;
@@ -173,7 +200,7 @@ export default {
 #Orgname, #Orgname_0 {
     color: #fff;
     font-size: calc(8px + 0.8vw);
-    font-weight: 700;
+    font-weight: 500;
 }
 
 #matches, #matches_0 {
@@ -182,17 +209,19 @@ export default {
 
 #help, #close {
     border-radius: 50%;
-    background-color: #f0f8ff;
+    background-color: #808080;
     width: calc(10px + .8vw);
     height: calc(10px + .8vw);
     font-size: calc(10px + .4vw);
-    margin: 0px 0px 0px 5px;
-    line-height: calc(10px + 1vw);
+    margin: 0px 0px 0px 4px;
+    line-height: calc(11px + 1vw);
+    color: #999999;
+    font-weight: 900;
 }
 
 #close:hover, #help:hover {
-  background-color:#E9A45B;
-  color: white;
+  background-color:#bebebe;
+  color: #fe941a;
   cursor: pointer;
 }
 
@@ -200,9 +229,11 @@ export default {
 @media only screen
   and (min-width : 200px)
   and (max-height : 600px) {
-  #Orgname{
-    font-size: calc(7px + 1vw);
-  }
+  #Orgname, #Orgname_0 {
+    color: #fff;
+    font-size: calc(6px + 0.8vw);
+    font-weight: 500;
+}
   #matches {
     font-size: calc(7px + 0.5vw);
   }

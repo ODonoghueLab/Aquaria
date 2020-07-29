@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@pdftron/pdfjs-express": "^6.2.1",
     "@rei/cdr-assets": "^0.3.0",
     "@rei/cdr-grid": "^1.0.4",
     "@rei/cdr-text": "^1.0.3",
