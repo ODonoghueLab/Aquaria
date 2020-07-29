@@ -1,22 +1,27 @@
 <template>
     <div id="about_matrix">
         <div id="title_0" v-if="$mq === 'laptop' || $mq === 'tablet'">
-            <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img class='play' v-bind:src="'/images/Play.png'"/></a>
-            <span id="Orgname_0">Structural models of {{ OrganismName }} proteins&nbsp;</span>
-            <span id="matches_0"></span>
-             <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img class='paper' v-bind:src="'/images/Document.png'"/></a>
-            <span id="help" @mouseover="activarOver" @mousedown="showAbout" @mouseleave="resetOver" v-if="$mq === 'laptop'">?</span>
+            <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay" @mouseleave="resetPlay" class='icon' id='play' v-bind:src="'/images/Play.png'" v-if="$mq === 'laptop'"/></a>
+            <span id="Orgname_0" @mouseover="activateHelp" @mouseleave="resetOver">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
+            <!-- <span id="matches_0"></span> -->
+             <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper" @mouseleave="resetPaper" class='icon' id='paper' v-bind:src="'/images/Document.png'" v-if="$mq === 'laptop'"/></a>
+            <!-- <span id="help" @mouseover="activarOver" @mousedown="showAbout" @mouseleave="resetOver" v-if="$mq === 'laptop'">?</span> -->
+            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'"/>
         </div>
-        <div id="title_0" v-if="$mq === 'mobile'" @mousedown="showAboutPhone()">
+        <div id="title_0" v-if="$mq === 'mobile'" @mousedown="showAboutPhone">
             <span id="Orgname_0">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
-            <span id="matches_0"></span>
-            <span id="help">?</span>
+            <!-- <span id="matches_0"></span> -->
+            <!-- <span class='icon' id="help">?</span> -->
+            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'"/>
         </div>
         <div id="content">
             <div id="title">
+                <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay" @mouseleave="resetPlay" class='icon' id='play' v-bind:src="'/images/Play.png'" v-if="$mq === 'laptop'"/></a>
                 <span id="Orgname">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
-                <span id="matches"></span>
-                <span id="close" @click="hideAbout()">✕</span>
+                <!-- <span id="matches"></span> -->
+                <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper" @mouseleave="resetPaper" class='icon' id='paper' v-bind:src="'/images/Document.png'" v-if="$mq === 'laptop'"/></a>
+                <!-- <span id="close" @click="hideAbout()">✕</span> -->
+                <img class='icon' id='close' @mouseover="activateClose" @mouseleave="resetClose" @click="hideAbout()" v-bind:src="'/images/Close.png'"/>
             </div>
             <p>This page summarizes currently available 3D structural information for all proteins believed to comprise
               <a v-bind:href="redirect(this.synonymsArray[0])" target="_blank"> {{ OrganismName }} </a>
@@ -61,22 +66,51 @@ export default {
   },
   props: ['OrganismName', 'OrgSynonyms', 'checkDevice'],
   mounted () {
-    document.querySelector('img.play').addEventListener('mouseover', function () {
-      document.querySelector('img.play').src = '/images/Play_Hover.png'
+    document.querySelector('img#play').addEventListener('mouseover', function () {
+      document.querySelector('img#play').src = '/images/Play_Hover.png'
     })
-    document.querySelector('img.play').addEventListener('mouseout', function () {
-      document.querySelector('img.play').src = '/images/Play.png'
+    document.querySelector('img#play').addEventListener('mouseout', function () {
+      document.querySelector('img#play').src = '/images/Play.png'
     })
-    document.querySelector('img.paper').addEventListener('mouseover', function () {
-      document.querySelector('img.paper').src = '/images/Document_Hover.png'
+    document.querySelector('img#paper').addEventListener('mouseover', function () {
+      document.querySelector('img#paper').src = '/images/Document_Hover.png'
     })
-    document.querySelector('img.paper').addEventListener('mouseout', function () {
-      document.querySelector('img.paper').src = '/images/Document.png'
+    document.querySelector('img#paper').addEventListener('mouseout', function () {
+      document.querySelector('img#paper').src = '/images/Document.png'
     })
   },
   methods: {
+    activatePlay () {
+      document.querySelector('#help').src = '/images/Info.png'
+      document.querySelector('#play').src = '/images/Play_Hover.png'
+      document.querySelector('#play').style.cursor = 'pointer'
+    },
+    activatePaper () {
+      document.querySelector('#help').src = '/images/Info.png'
+      document.querySelector('#paper').src = '/images/Document_Hover.png'
+      document.querySelector('#paper').style.cursor = 'pointer'
+    },
+    resetPlay () {
+      document.querySelector('#play').src = '/images/Play.png'
+    },
+    resetPaper () {
+      document.querySelector('#paper').src = '/images/Document.png'
+    },
+    activateHelp () {
+      document.querySelector('#help').src = '/images/Info_Hover.png'
+      document.querySelector('#help').style.cursor = 'pointer'
+    },
+    activateClose () {
+      document.querySelector('#close').src = '/images/Close_Hover.png'
+      document.querySelector('#close').style.cursor = 'pointer'
+    },
+    resetClose () {
+      document.querySelector('#close').src = '/images/Close.png'
+      document.querySelector('#close').style.cursor = 'pointer'
+    },
     resetOver () {
       clearTimeout(this.timer)
+      document.querySelector('#help').src = '/images/Info.png'
     },
     hideAbout: function () {
       document.querySelector('#content').style.visibility = 'hidden'
@@ -116,7 +150,7 @@ export default {
         document.querySelector('div.dimmer').remove()
       }
     },
-    activarOver () {
+    activateOver () {
       this.timer = setTimeout(function () {
         document.querySelector('#content').style.visibility = 'visible'
         if (document.getElementsByClassName('dimmer').length === 0) {
@@ -133,6 +167,8 @@ export default {
           document.querySelector('div.dimmer').remove()
         }
       }, 1000)
+      document.querySelector('#help').src = '/images/Info_Hover.png'
+      document.querySelector('#help').style.cursor = 'pointer'
     },
     redirect: function (OrganismID) {
       var url = 'https://www.uniprot.org/taxonomy/' + OrganismID
@@ -143,21 +179,20 @@ export default {
 </script>
 
 <style scoped>
-img.paper{
-    height: 20px;
-    position: relative;
-    top: -3px;
-    padding-left: 3px;
+#help, #close, #paper{
+  padding-left: 0px;
 }
-img.play{
-    height: 21px;
-    position: relative;
-    top: -3px;
-    padding-right: 7px;
+img.icon{
+  height: calc(15px + 0.9vw);
+  position: relative;
+  top: calc(-1px + 0.001vh)
+}
+img#play{
+    padding-right: 4px;
 }
 #about_matrix{
     margin-left: 12px;
-    margin-top: 15px;
+    margin-top: calc(1px + 1.5vh);
     margin-bottom: 20px;
 }
 
@@ -170,11 +205,15 @@ img.play{
 }
 
 #title, #title_0{
-    display: inline-flex;
+    display: inline-table;
     align-items: baseline;
     border-radius: 5em;
     background: #999999;
-    padding: 5px calc(9px + 0.4vw);
+    padding: 5px calc(4px + 0.4vw)
+}
+
+#title{
+  margin-top: 7px;
 }
 
 #content {
@@ -187,7 +226,7 @@ img.play{
     left: 33%;
     right: 33%;
     padding: 8px calc(10px + 0.4vw) 20px calc(10px + 0.4vw);
-    width: 34%;
+    width: 44%;
     max-height: 90vh;
     overflow: auto;
 }
@@ -199,15 +238,16 @@ img.play{
 }
 #Orgname, #Orgname_0 {
     color: #fff;
-    font-size: calc(8px + 0.8vw);
+    font-size: calc(8px + 0.6vw);
     font-weight: 500;
+    vertical-align: middle;
 }
 
 #matches, #matches_0 {
     font-size: calc(10px + 0.4vw);
 }
 
-#help, #close {
+/* #help, #close {
     border-radius: 50%;
     background-color: #808080;
     width: calc(10px + .8vw);
@@ -217,13 +257,13 @@ img.play{
     line-height: calc(11px + 1vw);
     color: #999999;
     font-weight: 900;
-}
+} */
 
-#close:hover, #help:hover {
+/* #close:hover, #help:hover {
   background-color:#bebebe;
   color: #fe941a;
   cursor: pointer;
-}
+} */
 
 /* iPhone SE */
 @media only screen
@@ -256,10 +296,12 @@ img.play{
 /* Tall aspect ratio */
     @media (max-aspect-ratio: 3/4) {
         #content{
-            font-size: 10px;
-            left: 5%;
-            right: 5%;
-            width: 90%;
+          font-size: 10px;
+          /* left: 5%;
+          right: 5%;
+          width: 90%; */
+          left: 18%;
+          width: 65%;
         }
     }
     @media (max-aspect-ratio: 3/4) and (min-height: 1000px) {

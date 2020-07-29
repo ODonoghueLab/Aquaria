@@ -23,7 +23,6 @@
               <br><strong>Updated: <span class="lastupdate">{{data}}</span></strong>
               <br>This indicates when the Aquaria database (PSSH2) was last calculated.
               <br>PDB structures released since then are not yet available in Aquaria.
-              <br>The next update is planned for <span class="nextupdate">15th April 2025</span>.
             </p>
             <p class="affiliations">
               <span>1. Garvan Institute of Medical Research, Sydney, Australia</span>
