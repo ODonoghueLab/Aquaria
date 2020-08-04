@@ -2,7 +2,8 @@
     <div id="about_matrix">
         <div id="title_0">
             <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay(0)" @mouseleave="resetPlay(0)" class='icon' id='play' v-bind:src="'/images/Play.png'"/></a>
-            <span id="Orgname_0" @mouseover="activateHelp" @mouseleave="resetOver">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
+            <span id="Orgname_0" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'mobile'">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
+            <span id="Orgname_0" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
             <!-- <span id="matches_0"></span> -->
              <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(0)" @mouseleave="resetPaper(0)" class='icon' id='paper' v-bind:src="'/images/Document.png'"/></a>
             <!-- <span id="help" @mouseover="activarOver" @mousedown="showAbout" @mouseleave="resetOver" v-if="$mq === 'laptop'">?</span> -->
@@ -15,7 +16,8 @@
         <div id="content">
             <div id="title">
                 <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay(1)" @mouseleave="resetPlay(1)" class='icon' id='play' v-bind:src="'/images/Play.png'"/></a>
-                <span id="Orgname">{{ OrganismName }} PROTEINS STRUCTURES&nbsp;</span>
+                <span id="Orgname" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'mobile'">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
+                <span id="Orgname" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
                 <!-- <span id="matches"></span> -->
                 <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(1)" @mouseleave="resetPaper(1)" class='icon' id='paper' v-bind:src="'/images/Document.png'"/></a>
                 <!-- <span id="close" @click="hideAbout()">✕</span> -->
@@ -33,6 +35,24 @@
             Click on an image to access all matching structures for that protein, and to overlay sequence features (e.g., domains, SNPs, PTMs).
             <br/>
             Proteins with no matching structure have no detectable sequence homology to any experimentally-determined 3D structure currently published (in the <a href="https://www.wwpdb.org/">PDB</a>). However, as new structures become publicly available, they will be added to this page.
+            </p>
+            <h2>Acknowledgements</h2>
+            <p id='teams'>
+              Garvan Institute of Medical Research, Sydney, Australia
+              <br/>
+              CSIRO Data61, Sydney, Australia
+              <br/>
+              University of NSW, Australia
+              <br/>
+              Weihenstephan-Tr. University of Applied Sciences, Freising, Germany
+              <br/>
+              Technische Universität München, Germany
+              <br/>
+              The University of Dundee, UK
+              <br/>
+              University College London, UK.
+              <br/>
+              <br/>
             </p>
             </div>
         </div>
@@ -77,6 +97,9 @@ export default {
     document.querySelector('img#paper').addEventListener('mouseout', function () {
       document.querySelector('img#paper').src = '/images/Document.png'
     })
+    if (window.location.hash === '#info') {
+      this.showAbout()
+    }
   },
   methods: {
     activatePlay (n) {
@@ -112,24 +135,24 @@ export default {
       document.querySelector('#help').src = '/images/Info.png'
     },
     hideAbout: function () {
-      document.querySelector('#content').style.visibility = 'hidden'
+      document.querySelector('#content').style.display = 'none'
       document.querySelector('#title_0').style.display = 'inline-table'
       document.querySelector('div.dimmer').remove()
       setTimeout(function () { document.querySelector('#help').style.pointerEvents = 'auto' }, 1000)
       document.querySelector('#help').style.pointerEvents = 'none'
     },
     showAbout: function () {
-      document.querySelector('#content').style.visibility = 'visible'
+      document.querySelector('#content').style.display = 'block'
       document.querySelector('#title_0').style.display = 'none'
       if (document.getElementsByClassName('dimmer').length === 0) {
         var elemDiv = document.createElement('div')
         elemDiv.className = 'dimmer'
         document.body.append(elemDiv)
-        document.querySelector('#content').style.visibility = 'visible'
+        document.querySelector('#content').style.display = 'block'
         document.querySelector('#title_0').style.display = 'none'
 
-        document.querySelector('div.dimmer').addEventListener('mouseover', function () {
-          document.querySelector('#content').style.visibility = 'hidden'
+        document.querySelector('div.dimmer').addEventListener('click', function () {
+          document.querySelector('#content').style.display = 'none'
           document.querySelector('#title_0').style.display = 'inline-table'
           document.querySelector('div.dimmer').remove()
         })
@@ -138,12 +161,12 @@ export default {
       }
     },
     showAboutPhone: function () {
-      document.querySelector('#content').style.visibility = 'visible'
+      document.querySelector('#content').style.display = 'block'
       if (document.getElementsByClassName('dimmer').length === 0) {
         var elemDiv = document.createElement('div')
         elemDiv.className = 'dimmer'
         document.body.append(elemDiv)
-        document.querySelector('#content').style.visibility = 'visible'
+        document.querySelector('#content').style.display = 'block'
 
         document.querySelector('div.dimmer').addEventListener('click', function () {
           document.querySelector('#content').style.visibility = 'hidden'
@@ -155,17 +178,17 @@ export default {
     },
     activateOver () {
       this.timer = setTimeout(function () {
-        document.querySelector('#content').style.visibility = 'visible'
+        document.querySelector('#content').style.display = 'block'
         document.querySelector('#title_0').style.display = 'none'
         if (document.getElementsByClassName('dimmer').length === 0) {
           var elemDiv = document.createElement('div')
           elemDiv.className = 'dimmer'
           document.body.append(elemDiv)
-          document.querySelector('#content').style.visibility = 'visible'
+          document.querySelector('#content').style.display = 'block'
           document.querySelector('#title_0').style.display = 'none'
 
-          document.querySelector('div.dimmer').addEventListener('mouseover', function () {
-            document.querySelector('#content').style.visibility = 'hidden'
+          document.querySelector('div.dimmer').addEventListener('click', function () {
+            document.querySelector('#content').style.display = 'none'
             document.querySelector('#title_0').style.display = 'inline-table'
             document.querySelector('div.dimmer').remove()
           })
@@ -224,7 +247,7 @@ img#play{
 #content {
     position: relative;
     z-index: 4;
-    visibility: hidden;
+    display: none;
     border-radius: 2em;
     background: #DEDEDE;
     /* top: 10px;
@@ -258,6 +281,11 @@ img#play{
     font-size: calc(8px + 0.6vw);
     padding-bottom: 15px;
 }
+
+p#teams{
+  text-align: center;
+}
+
 #Orgname, #Orgname_0 {
     color: #fff;
     font-size: calc(8px + 0.6vw);
@@ -288,10 +316,10 @@ img#play{
 } */
 
 /* iPhone SE */
-@media only screen
+/* @media only screen
   and (min-width : 200px)
-  and (max-height : 600px) {
-  #Orgname, #Orgname_0 {
+  and (max-height : 600px) { */
+  /* #Orgname, #Orgname_0 {
     color: #fff;
     font-size: calc(6px + 0.8vw);
     font-weight: 500;
@@ -304,21 +332,37 @@ img#play{
   }
   #title{
     padding: 5px calc(9px + 0.4);
-  }
-  #content{
+  } */
+  /* #content{
     left: 5%;
     right: 5%;
     width: 90%;
-  }
-  #about_matrix{
+  } */
+  /* #about_matrix{
     margin-bottom: 15px;
   }
+} */
+
+@media all and (max-width: 280px) {
+  #content{
+    right: 18%;
+    width: 122%;
+  }
+  #Orgname, #Orgname_0 {
+    color: #fff;
+    font-size: calc(8px);
+    font-weight: 500;
+    vertical-align: middle;
+  }
 }
-@media all and (max-width: 535px) {
+
+@media all and (min-width: 281px) and (max-width: 535px) {
   #content{
     right: 10%;
     width: 108%;
   }
+      font-size: calc(8px + 0.6vw);
+
 }
 
 @media all and (min-width: 375px) and (max-width: 535px) {
@@ -328,41 +372,64 @@ img#play{
   }
 }
 
-@media all and (min-width: 425px) and (max-width: 535px) {
+@media all and (min-width: 425px) and (max-width: 449px) {
   #content{
     left: 8%;
     width: 78%;
   }
 }
+@media all and (min-width: 450px) and (max-width: 535px) {
+  #content{
+    left: 0%;
+    width: 92%;
+  }
+}
 
-@media all and (min-width: 535px) and (max-width: 706px) {
+@media all and (min-width: 535px) and (max-width: 550px) {
   #content{
-    left: 17%;
-    width: 63%;
+    left: 7%;
+    width: 81%;
+    /* left: 17%;
+    width: 63%; */
   }
 }
-@media all and (min-width: 706px) and (max-width: 765px) {
+@media all and (min-width: 550px) and (max-width: 706px) {
   #content{
-    left: 27%;
-    width: 46%;
+    left: 8%;
+    width: 77%;
   }
 }
-@media all and (min-width: 765px) and (max-width: 1000px) {
+
+@media all and (min-width: 706px) and (max-width: 811px) {
+  #content{
+    left: 23%;
+    width: 58%;
+  }
+}
+@media all and (min-width: 812px) and (max-width: 1000px) {
   #content{
     left: 25%;
-    width: 48%;
+    width: 53%;
   }
 }
-@media all and (min-width: 1000px) and (max-width: 3000px) {
+@media all and (min-width: 1000px) and (max-width: 1900px) {
   #content{
-    left: 31%;
-    width: 37%;
+    left: 27%;
+    width: calc(75vw - 33%)
   }
 }
+
+@media all and (min-width: 1900px) and (max-width: 3000px) {
+  #content{
+    left: 32%;
+    width: 35%;
+  }
+}
+
 @media all and (min-width: 3000px) {
   #content{
-    width: 56%;
-    left: 22%;
+    width: calc(56% - 23vw);
+    left: calc(22% + 11vw);
   }
 }
 </style>

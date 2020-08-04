@@ -1,5 +1,5 @@
 <template>
-  <div id="Matrix">
+  <div id="matrix">
     <div id="header">
           <div id="logo" v-on:click="showAbout()"></div>
           <!-- <span id="res">resized?</span>
@@ -12,7 +12,7 @@
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
     </div>
       <!-- <GraphViewer :path="`${publicPath}lib`" url="../COVID/web/Fig_1_hi-res.pdf"/> -->
-     <iframe id="slide" src='../COVID/web/viewer.html#zoom=28' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'" autofocus></iframe>
+     <iframe id="slide" src='../COVID/web/viewer.html#zoom=28' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'"></iframe>
      <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe>
      <!-- <canvas id="slide"></canvas> -->
      <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
@@ -64,26 +64,26 @@ export default {
           selectedBackgroundColor: 'orange',
           selectedColor: 'white',
           color: 'white',
-          fontFamily: 'Lucida Grande',
+          fontFamily: 'Avenir, Helvetica, Arial, sans-serif',
           fontWeightSelected: 'normal'
         },
         size: {
           height: 2,
           width: 7,
-          padding: 0.25,
-          fontSize: 0.70,
+          padding: 0.3,
+          fontSize: 1,
           'border-radius': '15px'
         },
         items: {
           preSelected: 'Genome',
-          labels: [{ name: 'Genome' }, { name: 'Grid' }]
+          labels: [{ name: 'Genome' }, { name: 'Matrix' }]
         }
       }
     }
   },
   beforeMount () {
-    if (window.location.search === '?Grid') {
-      this.option5.items.preSelected = 'Grid'
+    if (window.location.search === '?Matrix') {
+      this.option5.items.preSelected = 'Matrix'
       this.showSlide = 0
     } else {
       this.option5.items.preSelected = 'Genome'
@@ -147,18 +147,26 @@ export default {
   methods: {
     updateMap: function (value) {
       if (value === 'Genome') {
+        console.log('Genome')
         window.history.replaceState({}, document.title, '?' + 'Genome')
         document.getElementById('container').style.display = 'none'
         document.getElementById('slide').style.display = 'block'
-        document.querySelector('.dimmer').remove()
-        document.querySelector('#switch').style.display = 'none'
+        document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.zIndex = '0'
+        document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.zIndex = '1'
+        if (document.getElementsByClassName('dimmer').length === 1) {
+          document.querySelector('.dimmer').remove()
+          document.querySelector('#switch').style.display = 'none'
+        }
       } else {
-        window.history.replaceState({}, document.title, '?' + 'Grid')
+        window.history.replaceState({}, document.title, '?' + 'Matrix')
         document.querySelector('#container').style.display = 'grid'
         document.getElementById('slide').style.display = 'none'
-        document.querySelector('.dimmer').remove()
-        document.querySelector('#switch').style.display = 'none'
-        console.log('GRID')
+        document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.zIndex = '0'
+        document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.zIndex = '1'
+        if (document.getElementsByClassName('dimmer').length === 1) {
+          document.querySelector('.dimmer').remove()
+          document.querySelector('#switch').style.display = 'none'
+        }
       }
       if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
         document.querySelector('#switch').style.display = 'none'
@@ -226,13 +234,37 @@ export default {
     }
   },
   updated () {
+    if (window.location.hash === '#about') {
+      this.showAbout()
+    }
+
+    if (window.location.search === '?Matrix') {
+      document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.zIndex = '0'
+      document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.zIndex = '1'
+    } else {
+      document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.zIndex = '1'
+      document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.zIndex = '0'
+    }
+
     // Switch styling
     document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.borderBottomLeftRadius = '20px'
     document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.borderTopLeftRadius = '20px'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.borderBottomRightRadius = '20px'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.borderTopRightRadius = '20px'
     document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.borderColor = 'transparent'
+    // document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1)').style.fontSize = 'calc(8px + 0.6vw)'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1)').style.left = '25px'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1)').style.width = '50%'
+
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.borderBottomLeftRadius = '20px'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.borderTopLeftRadius = '20px'
     document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.borderBottomRightRadius = '20px'
     document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.borderTopRightRadius = '20px'
     document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.borderColor = 'transparent'
+    document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2)').style.width = '50%'
+    // document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2)').style.fontSize = 'calc(8px + 0.6vw)'
+
+    document.querySelector('#header > div:nth-child(3) > ul').style.width = '15rem'
 
     // document.querySelector('div#Matrix').addEventListener('click', function () {
     //   document.querySelector('iframe#slide').focus()
@@ -381,7 +413,7 @@ export default {
 }
 
 /* Christian's work */
-#Matrix{
+#matrix{
   height: 99vh;
   background: #c0c0c0 url(../assets/img/icon-large.png) no-repeat calc(6px + 0.4vw) calc(8px + 0.1vh);
   background-size: calc(26px + 1.5vw) calc(26px + 1.5vw);
@@ -429,7 +461,7 @@ export default {
         }
     }
     @media screen and (max-height: 420px) and (max-aspect-ratio: 15/4) and (min-aspect-ratio: 8/5) {
-      #Matrix {
+      #matrix {
         height: 88vh;
       }
     }
@@ -489,12 +521,12 @@ export default {
     }
     /* TYPOGRAPHY */
     /* responsive sizes */
-    #Matrix .cell {
+    #matrix .cell {
         /* font-family: 'Source Sans Pro', sans-serif; */
         font-size: 10px;
     }
     @media screen and (min-width: 320px) {
-        #Matrix .cell {
+        #matrix .cell {
             font-size: calc(8px + 6 * ((100vw - 320px) / 680));
         }
     }
