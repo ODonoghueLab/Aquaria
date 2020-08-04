@@ -234,6 +234,13 @@ export default {
     }
   },
   updated () {
+    setTimeout(function () {
+      if (document.querySelector('.matrixLoading')) {
+        document.querySelector('.matrixLoading').style.visibility = 'hidden'
+        document.querySelector('.matrixLoading').style.display = 'none'
+      }
+    }, 350)
+
     if (window.location.hash === '#about') {
       this.showAbout()
     }
@@ -269,11 +276,7 @@ export default {
     // document.querySelector('div#Matrix').addEventListener('click', function () {
     //   document.querySelector('iframe#slide').focus()
     // })
-    setTimeout(function () {
-      if (document.querySelector('.matrixLoading')) {
-        document.querySelector('.matrixLoading').remove()
-      }
-    }, 350)
+
     var checkPhone = function () {
       var iDevices = [
         'iPad Simulator',
