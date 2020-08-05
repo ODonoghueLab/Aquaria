@@ -1863,6 +1863,7 @@ function webViewerInitialized() {
   const queryString = document.location.search.substring(1);
   const params = (0, _ui_utils.parseQueryString)(queryString);
   file = "file" in params ? params.file : _app_options.AppOptions.get("defaultUrl");
+  //TAKE DEFAULT URL AS INPUT
   validateFileURL(file);
   const fileInput = document.createElement("input");
   fileInput.id = appConfig.openFileInputName;
@@ -3551,6 +3552,8 @@ function moveToEndOfArray(arr, condition) {
 
 "use strict";
 
+var pdf = document.location.hash.split('?')[1];
+//'Fig_1_hi-res.pdf';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -3572,7 +3575,7 @@ const defaultOptions = {
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE
   },
   defaultUrl: {
-    value: "Fig_1_hi-res.pdf",
+    value: pdf,
     kind: OptionKind.VIEWER
   },
   defaultZoomValue: {

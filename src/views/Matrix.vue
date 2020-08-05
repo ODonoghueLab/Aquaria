@@ -12,8 +12,8 @@
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
     </div>
       <!-- <GraphViewer :path="`${publicPath}lib`" url="../COVID/web/Fig_1_hi-res.pdf"/> -->
-     <iframe id="slide" src='../COVID/web/viewer.html#zoom=28' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'"></iframe>
-     <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe>
+     <iframe id="slide" src='../COVID/web/viewer.html#zoom=28?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'"></iframe>
+     <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe>
      <!-- <canvas id="slide"></canvas> -->
      <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
@@ -150,23 +150,23 @@ export default {
         console.log('Genome')
         window.history.replaceState({}, document.title, '?' + 'Genome')
         document.getElementById('container').style.display = 'none'
+        if (document.getElementsByClassName('dimmer').length === 1) {
+          document.querySelector('.dimmer').remove()
+          document.querySelector('#switch').style.display = 'none'
+        }
         document.getElementById('slide').style.display = 'block'
         document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.zIndex = '0'
         document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.zIndex = '1'
-        if (document.getElementsByClassName('dimmer').length === 1) {
-          document.querySelector('.dimmer').remove()
-          document.querySelector('#switch').style.display = 'none'
-        }
       } else {
         window.history.replaceState({}, document.title, '?' + 'Matrix')
         document.querySelector('#container').style.display = 'grid'
-        document.getElementById('slide').style.display = 'none'
-        document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.zIndex = '0'
-        document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.zIndex = '1'
         if (document.getElementsByClassName('dimmer').length === 1) {
           document.querySelector('.dimmer').remove()
           document.querySelector('#switch').style.display = 'none'
         }
+        document.getElementById('slide').style.display = 'none'
+        document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.zIndex = '0'
+        document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.zIndex = '1'
       }
       if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
         document.querySelector('#switch').style.display = 'none'
@@ -231,6 +231,25 @@ export default {
       } else {
         document.querySelector('div.dimmer').remove()
       }
+      // Switch styling
+      document.querySelector('#switch > ul > li:nth-child(1) > label').style.borderBottomLeftRadius = '20px'
+      document.querySelector('#switch > ul > li:nth-child(1) > label').style.borderTopLeftRadius = '20px'
+      document.querySelector('#switch > ul > li:nth-child(1) > label').style.borderBottomRightRadius = '20px'
+      document.querySelector('#switch > ul > li:nth-child(1) > label').style.borderTopRightRadius = '20px'
+      document.querySelector('#switch > ul > li:nth-child(1) > label').style.borderColor = 'transparent'
+      // document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1)').style.fontSize = 'calc(8px + 0.6vw)'
+      document.querySelector('#switch  > ul > li:nth-child(1)').style.left = '25px'
+      document.querySelector('#switch  > ul > li:nth-child(1)').style.width = '50%'
+
+      document.querySelector('#switch  > ul > li:nth-child(2) > label').style.borderBottomLeftRadius = '20px'
+      document.querySelector('#switch  > ul > li:nth-child(2) > label').style.borderTopLeftRadius = '20px'
+      document.querySelector('#switch  > ul > li:nth-child(2) > label').style.borderBottomRightRadius = '20px'
+      document.querySelector('#switch  > ul > li:nth-child(2) > label').style.borderTopRightRadius = '20px'
+      document.querySelector('#switch  > ul > li:nth-child(2) > label').style.borderColor = 'transparent'
+      document.querySelector('#switch  > ul > li:nth-child(2)').style.width = '50%'
+      // document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2)').style.fontSize = 'calc(8px + 0.6vw)'
+
+      document.querySelector('#switch  > ul').style.width = '15rem'
     }
   },
   updated () {
@@ -240,6 +259,16 @@ export default {
         document.querySelector('.matrixLoading').style.display = 'none'
       }
     }, 350)
+
+    // setTimeout(function () {
+    //   document.getElementById('slide').src = '../COVID/web/viewer.html#zoom=28?Fig_2_med-res.pdf'
+    //   document.getElementById('slide').contentWindow.location.reload()
+    // }, 5000)
+
+    // setTimeout(function () {
+    //   document.getElementById('slide').src = '../COVID/web/viewer.html#zoom=28?Fig_1_hi-res.pdf'
+    //   document.getElementById('slide').contentWindow.location.reload()
+    // }, 9000)
 
     if (window.location.hash === '#about') {
       this.showAbout()
