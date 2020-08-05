@@ -96,6 +96,11 @@ export default {
     })
     if (window.location.hash === '#info') {
       this.showAbout()
+      if (window.innerWidth < 750) {
+        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 80 + 'px'
+      } else {
+        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 105 + 'px'
+      }
     }
   },
   methods: {
@@ -323,13 +328,13 @@ p#teams{
   }
 }
 
-@media all and (max-width: 535px) and (min-width: 281px) and (max-height: 640px) {
+@media all and (max-width: 535px) and (min-width: 281px) and (max-height: 639px) {
   #content {
-    right: 7%;
+    right: 10%;
   }
 }
 
-@media all and (min-width: 281px) and (max-width: 535px) and (min-height: 641px) {
+@media all and (min-width: 281px) and (max-width: 535px) and (min-height: 640px) {
   #content{
     right: 7%;
     font-size: calc(8px + 0.6vw);
