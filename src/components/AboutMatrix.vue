@@ -24,9 +24,7 @@
                 <img class='icon' id='close' @mouseover="activateClose(1)" @mouseleave="resetClose(1)" @click="hideAbout()" v-bind:src="'/images/Close.png'"/>
             </div>
             <div>
-            <p>This page summarizes all available 3D structural information for all proteins comprising the
-              <a v-bind:href="redirect(this.synonymsArray[0])" target="_blank"> {{ OrganismName }} </a>
-              virus (SARS-CoV-2).
+            <p>This page summarizes all available 3D structural information for all proteins comprising the {{ OrganismName }} virus (SARS-CoV-2).
               <!-- (a.k.a. {{ this.synonymsString }} ). -->
             </p>
             <p>
@@ -48,7 +46,7 @@
               <b>The Aquaria-COVID resource </b><i>is hosted by the <a target='_blank' href="https://www.garvan.org.au/">Garvan Institute of Medical Research</a> (Sydney, Australia), and is maintained in collaboration with <a target='_blank' href="https://data61.csiro.au/">CSIRO Data61</a> (Sydney,
                Australia), the <a target='_blank' href="https://www.unsw.edu.au/"> UNSW</a> (Sydney, Australia), the <a target='_blank' href="https://www.hswt.de/en.html">
               Weihenstephan-Tr. University of Applied Sciences</a> (Freising, Germany), the <a target='_blank' href="https://www.tum.de/en/">Technical
-              University of Munich</a> (Germany), the <a target='_blank' href="https://www.dundee.ac.uk/">University of Dundee</a> (UK), and the <a target='_blank' href="https://www.ucl.ac.uk/">University College London (UK)</a>.
+              University of Munich</a> (Germany), the <a target='_blank' href="https://www.dundee.ac.uk/">University of Dundee</a> (UK), and the <a target='_blank' href="https://www.ucl.ac.uk/">University College London</a> (UK).
               </i>
             </p>
             </div>
