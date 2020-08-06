@@ -11,6 +11,9 @@
           <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
     </div>
+      <!-- <a id='graph' v-bind:href="'../COVID/web/Fig_1_hi-res.pdf'" target="_blank" :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]">
+        <img v-bind:src="'../images/Fig_2.001.jpg'"/>
+      </a> -->
       <!-- <GraphViewer :path="`${publicPath}lib`" url="../COVID/web/Fig_1_hi-res.pdf"/> -->
      <iframe id="slide" src='../COVID/web/viewer.html#zoom=28?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'"></iframe>
      <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe>
@@ -601,9 +604,12 @@ export default {
     }
 
     iframe#slide{
-      /* display: block; */
       height:91.7vh;
       width: 100%;
       border: none;
     }
+
+    /* img#graph{
+      width: 100vw;
+    } */
 </style>
