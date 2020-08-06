@@ -11,12 +11,9 @@
           <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
     </div>
-      <!-- <a id='graph' v-bind:href="'../COVID/web/Fig_1_hi-res.pdf'" target="_blank" :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]">
-        <img v-bind:src="'../images/Fig_2.001.jpg'"/>
-      </a> -->
       <!-- <GraphViewer :path="`${publicPath}lib`" url="../COVID/web/Fig_1_hi-res.pdf"/> -->
-     <iframe id="slide" src='../COVID/web/viewer.html#zoom=28?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'"></iframe>
-     <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe>
+     <!-- <iframe id="slide" src='../COVID/web/viewer.html#zoom=28?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'"></iframe>
+     <iframe id="slide" src='../COVID/web/viewer.html#zoom=16.5?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'mobile'"></iframe> -->
      <!-- <canvas id="slide"></canvas> -->
      <div id="container" :style="[this.showSlide == 0 ? {'display': 'grid'} : {'display': 'none'}]">
         <div v-for="structure in structures" :key="structure.primary_accession" class="cell"  v-on="structure.count > 0 ? { click: () => redirect(structure.primary_accession) } : {}">
@@ -31,6 +28,12 @@
           </a>
         </div>
     </div>
+     <a id='graph' title='Click to open interactive version' v-bind:href="'../COVID/web/Fig_1_hi-res.pdf'" target="_blank" :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]">
+      <v-lazy-image
+        src="../images/Fig_2_100.jpg"
+        src-placeholder="../images/Fig_2_55.jpg"
+        />
+      </a>
     <AboutAquaria />
   </div>
 </template>
@@ -42,13 +45,15 @@ import AboutAquaria from '../components/AboutAquaria'
 import AboutMatrix from '../components/AboutMatrix'
 // import GraphViewer from '../components/GraphViewer'
 import $ from 'jquery'
+import VLazyImage from 'v-lazy-image'
 
 export default {
   name: 'Matrix',
   components: {
     ...CdrComps,
     AboutAquaria,
-    AboutMatrix
+    AboutMatrix,
+    VLazyImage
     // GraphViewer
   },
   data () {
@@ -603,13 +608,22 @@ export default {
         font-size: inherit;
     }
 
-    iframe#slide{
+    /* iframe#slide{
       height:91.7vh;
       width: 100%;
       border: none;
+    } */
+
+    #graph{
+      width: 100vw;
     }
 
-    /* img#graph{
-      width: 100vw;
-    } */
+  .v-lazy-image {
+  filter: blur(10px);
+  transition: filter 0.7s;
+  }
+
+  .v-lazy-image-loaded {
+    filter: blur(0);
+  }
 </style>
