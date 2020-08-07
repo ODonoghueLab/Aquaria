@@ -7,7 +7,8 @@
             <!-- <span id="matches_0"></span> -->
              <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(0)" @mouseleave="resetPaper(0)" class='icon' id='paper' v-bind:src="'/images/Document.png'"/></a>
             <!-- <span id="help" @mouseover="activarOver" @mousedown="showAbout" @mouseleave="resetOver" v-if="$mq === 'laptop'">?</span> -->
-            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'"/>
+            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'" v-if="$mq === 'laptop'"/>
+            <img class='icon' id='help' @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
         </div>
         <!-- <div id="title_0" v-if="$mq === 'mobile'" @mousedown="showAboutPhone">
             <span id="Orgname_0">{{ OrganismName }} PROTEINS STRUCTURES&nbsp;</span>
@@ -95,9 +96,11 @@ export default {
     if (window.location.hash === '#info') {
       this.showAbout()
       if (window.innerWidth < 750) {
-        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 80 + 'px'
+        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 75 + 'px'
+      } else if (window.innerWidth < 1800 && window.innerWidth > 750) {
+        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 110 + 'px'
       } else {
-        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 105 + 'px'
+        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 130 + 'px'
       }
     }
   },
@@ -162,23 +165,23 @@ export default {
         document.querySelector('div.dimmer').remove()
       }
     },
-    showAboutPhone: function () {
-      document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 25 + 'px'
-      document.querySelector('#content').style.display = 'block'
-      if (document.getElementsByClassName('dimmer').length === 0) {
-        var elemDiv = document.createElement('div')
-        elemDiv.className = 'dimmer'
-        document.body.append(elemDiv)
-        document.querySelector('#content').style.display = 'block'
+    // showAboutPhone: function () {
+    //   document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 25 + 'px'
+    //   document.querySelector('#content').style.display = 'block'
+    //   if (document.getElementsByClassName('dimmer').length === 0) {
+    //     var elemDiv = document.createElement('div')
+    //     elemDiv.className = 'dimmer'
+    //     document.body.append(elemDiv)
+    //     document.querySelector('#content').style.display = 'block'
 
-        document.querySelector('div.dimmer').addEventListener('click', function () {
-          document.querySelector('#content').style.visibility = 'hidden'
-          document.querySelector('div.dimmer').remove()
-        })
-      } else {
-        document.querySelector('div.dimmer').remove()
-      }
-    },
+    //     document.querySelector('div.dimmer').addEventListener('click', function () {
+    //       document.querySelector('#content').style.visibility = 'hidden'
+    //       document.querySelector('div.dimmer').remove()
+    //     })
+    //   } else {
+    //     document.querySelector('div.dimmer').remove()
+    //   }
+    // },
     activateOver () {
       this.timer = setTimeout(function () {
         document.querySelector('#content').style.display = 'block'
