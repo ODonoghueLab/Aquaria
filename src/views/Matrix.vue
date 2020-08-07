@@ -10,6 +10,7 @@
           <img id="menu" v-bind:src="'../images/menu.png'" v-if="$mq === 'mobile' || $mq === 'tablet'" v-on:click="showSwitch()"/>
           <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
+          <!-- <span id='pageName' v-if="$mq === 'laptop'">Aquaria-COVID resource</span> -->
     </div>
       <!-- <GraphViewer :path="`${publicPath}lib`" url="../COVID/web/Fig_1_hi-res.pdf"/> -->
      <!-- <iframe id="slide" src='../COVID/web/viewer.html#zoom=28?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'"></iframe>
@@ -162,7 +163,7 @@ export default {
           document.querySelector('.dimmer').remove()
           document.querySelector('#switch').style.display = 'none'
         }
-        document.getElementById('slide').style.display = 'block'
+        document.getElementById('graph').style.display = 'block'
         document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.zIndex = '0'
         document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.zIndex = '1'
       } else {
@@ -172,7 +173,7 @@ export default {
           document.querySelector('.dimmer').remove()
           document.querySelector('#switch').style.display = 'none'
         }
-        document.getElementById('slide').style.display = 'none'
+        document.getElementById('graph').style.display = 'none'
         document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(1) > label').style.zIndex = '0'
         document.querySelector('#header > div:nth-child(3) > ul > li:nth-child(2) > label').style.zIndex = '1'
       }
@@ -222,9 +223,7 @@ export default {
       document.querySelector('#switch > ul').style.right = '20px'
       var Position = window.innerWidth / 2 - $('#switch').width() / 2
       Position = Position + 'px'
-      $('#switch').css({
-        left: Position
-      })
+      document.querySelector('#switch').style.left = Position
       // dim background
       document.querySelector('#switch').style.display = 'block'
       if (document.getElementsByClassName('dimmer').length === 0) {
@@ -403,6 +402,15 @@ export default {
 </script>
 
 <style scoped>
+/* span#pageName{
+  color: #747373;
+  position: absolute;
+  left: 2px;
+  top: calc(20px + 0.2vw);
+  font-size: calc(8px + 0.6vw);
+  font-weight: 600;
+  margin-left: calc(6px + 0.4vw + 26px + 1.5vw);
+} */
 .toggle-switch li:first-child label[data-v-3cf97114] {
     border: 1px none;
     border-top-left-radius: 20px;
