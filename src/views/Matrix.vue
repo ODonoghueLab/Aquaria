@@ -10,7 +10,7 @@
           <img id="menu" v-bind:src="'../images/menu.png'" v-if="$mq === 'mobile' || $mq === 'tablet'" v-on:click="showSwitch()"/>
           <toggle-switch :options="option5" @change="updateMap($event.value)" v-model="value3" style="position: absolute;top: 15px;right: 15px;" v-if="$mq === 'laptop'"/>
           <toggle-switch id="switch" :options="option5" @change="updateMap($event.value)" v-model="value3" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
-          <!-- <span id='pageName' v-if="$mq === 'laptop'">Aquaria-COVID resource</span> -->
+          <span id='pageName' v-if="$mq === 'laptop'" v-on:click="showAbout()">Aquaria-COVID resource</span>
     </div>
       <!-- <GraphViewer :path="`${publicPath}lib`" url="../COVID/web/Fig_1_hi-res.pdf"/> -->
      <!-- <iframe id="slide" src='../COVID/web/viewer.html#zoom=28?Fig_2_hi-res.pdf' :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]" v-if="$mq === 'laptop' || $mq === 'tablet'"></iframe>
@@ -402,15 +402,16 @@ export default {
 </script>
 
 <style scoped>
-/* span#pageName{
+span#pageName{
   color: #747373;
   position: absolute;
-  left: 2px;
-  top: calc(20px + 0.2vw);
+  left: 3px;
+  top: calc(8px + 1vw);
   font-size: calc(8px + 0.6vw);
   font-weight: 600;
   margin-left: calc(6px + 0.4vw + 26px + 1.5vw);
-} */
+  cursor: pointer;
+}
 .toggle-switch li:first-child label[data-v-3cf97114] {
     border: 1px none;
     border-top-left-radius: 20px;
@@ -624,6 +625,7 @@ export default {
 
     #graph{
       width: 100vw;
+      position: absolute;
     }
 
   .v-lazy-image {
