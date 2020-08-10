@@ -1,4 +1,5 @@
 var Cluster = require('../shared/cluster');
+var d3 = require('d3');
 
 var ClusterRenderer = function(cluster, rank, xScale, width, height, onTextClick, onClusterItemClick) {
 
@@ -65,10 +66,6 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 		pad = -6;
 	}
 
-	//NEBLINA's SCRIPT
-	this.w = document.getElementById("structureviewer").offsetWidth
-				- AQUARIA.margin.right - AQUARIA.margin.left;
-
 	var outerdiv = d3.select("#allclusters").append("div").attr("id", "out_" + id).attr(
 			"class", "outer_container");
 	outerdiv.append("svg").attr("width", 40).attr("height", 40).attr("viewBox",
@@ -79,13 +76,13 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 
 	// draw outline of the whole chain
 	this.nusvg = outerdiv.append("div").attr("id", "c_" + id).attr("class",
-			"container").append("svg").attr("width", this.w - 30).attr("height",
+			"container").append("svg").attr("width", this.width + 200).attr("height",
 			this.height + 30)
 			.attr("viewBox", "0 0 " + (this.width + 200) + " " + (this.height + 30)).attr(
 					"preserveAspectRatio", "none");
 
 	this.nusvg.append("g").attr("id", "structure_" + id).attr("transform",
-			"translate(" + (AQUARIA.margin.left + structStart + 100) + ",20)").on(
+			"translate(" + (AQUARIA.margin.left + structStart) + ",20)").on(
 			"mouseover", function() {
 				return d3.select(this).call(that.mouseover, that);
 			}).on("mouseout", function() {

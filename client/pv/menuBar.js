@@ -1,5 +1,5 @@
 var html = require('./menubar.html');
- 
+
 var MenuBar = function (root, callbacks) {
   this.root = root;
   $(this.root).append(html);

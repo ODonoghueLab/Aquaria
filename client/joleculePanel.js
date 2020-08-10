@@ -1,3 +1,4 @@
+
 var JoleculePanel = function(attachToDiv, chainSelected) {
   this.blankApplet();
   this.attachToDiv = attachToDiv;
@@ -67,13 +68,12 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
     if (data && data.getData) {
       alignment.selectSeq = ''
       let text = data.getData('text/plain')
-      console.log('AlignAquaria.paste', text)
+      // console.log('AlignAquaria.paste', text)
       for (let c of text.toUpperCase()) {
         alignment.selectNextChar(c)
       }
     }
   })
-
 };
 
 
@@ -95,7 +95,7 @@ buildFeatures = function(featureNames, featureDescriptions, featurePositions, fe
       features.push({
         Residue: j,
         Color: featureColours[i],
-        Name: featureNames[i],
+        Name: featureNames[i].replace(/\<[^\>\<]*\>/g, '').replace(/^.*\:/, ''),
         Description: featureDescriptions[i]
       })
     }
@@ -105,23 +105,22 @@ buildFeatures = function(featureNames, featureDescriptions, featurePositions, fe
 
 JoleculePanel.prototype.addAnnotation = function(id, annotationName, featureColours, featureNames, featureDescriptions, featurePositions, featureURLs, featureURLTexts) {
   let features = buildFeatures(featureNames, featureDescriptions, featurePositions, featureColours)
-  console.log(`JoleculePanel.addAnnotation ${id} "${annotationName}"`, features)
+  // console.log(`JoleculePanel.addAnnotation ${id} "${annotationName}"`, features)
   this.joleculeAlignment.colorFromFeatures(this.embededJolecule, features, id, annotationName)
 };
 
 JoleculePanel.prototype.removeAnnotation = function(id, annotationName) {
-  console.log('JoleculePanel.removeAnnotation', id, annotationName, this.embededJolecule)
+  // console.log('JoleculePanel.removeAnnotation', id, annotationName, this.embededJolecule)
   this.joleculeAlignment.colorFromConservation(this.embededJolecule)
 };
 
 JoleculePanel.prototype.setAlignment = function(attributes) {
-  console.log('JoleculePanel.setAlignment', attributes)
-  console.log("THIS IS ATTRIBUTE", this.embededJolecule);
+  // console.log('JoleculePanel.setAlignment', attributes)
   this.joleculeAlignment.reload(attributes, this.embededJolecule)
   var that = this;
   this.joleculeAlignment.selectNewChain = function(seqId, seqName, pdbId, chain) {
     if (seqId && !(seqId === that.seqId && chain === that.chain)) {
-      console.log('JoleculePanel.setAlignment.selectNewChain', seqId, seqName, chain)
+      // console.log('JoleculePanel.setAlignment.selectNewChain', seqId, seqName, chain)
       that.chainSelected(seqId, pdbId, chain)
       that.seqId = seqId
       that.chain = chain
@@ -129,12 +128,8 @@ JoleculePanel.prototype.setAlignment = function(attributes) {
   }
 }
 
-JoleculePanel.prototype.Mesh = function(){
-  this.embededJolecule;
-}
-
 JoleculePanel.prototype.reload = function(attributes) {
-  console.log('JoleculePanel.reload', attributes)
+  // console.log('JoleculePanel.reload', attributes)
   attributes = attributes || this.attributes;
   this.attributes = attributes;
   this.seqId = attributes.sequences[0].primary_acccession
@@ -164,12 +159,6 @@ JoleculePanel.prototype.reload = function(attributes) {
     })
 };
 
-// JoleculePanel.prototype.exportGLTF = function(){
-
-
-// // window.addEventListener('click', () => exportGLTF());
-
-// }
 
 JoleculePanel.prototype.generateAttributes = function(threeDWidth, threeDHeight, pdb_id, pdb_chain, biounit, source_primary_accession, sequences, common_names, pssh_alignment, links, transform,
   conservations) {

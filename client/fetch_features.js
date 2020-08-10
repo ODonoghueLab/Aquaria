@@ -1,5 +1,3 @@
-
-
 var axios = require('axios');
 const Ajv = require('ajv');
 
@@ -8,6 +6,11 @@ var handleSnap2 = require('./handleSnap2');
 var handleCath = require('./handleCath');
 var handleCath_covid = require('./handleCath_covid');
 
+function getRequestProtocol(){
+	let arr = window.location.href.split(/\:+/);
+	// console.log("The request protocol is " + arr[0]);
+	return (arr[0]);
+}
 
 var servers = [
 		{
@@ -118,9 +121,9 @@ var servers = [
 		];
 
 // available set of colors
-var feature_colors = [ "#253494", "#1162dc", "#7B87C2", "#8AAAD9", "#5BC48F",
-		"#00AE95", "#76B043", "#AED477", "#E4C8A7", "#FFD64F", "#E6B222",
-		"#818C43", "#D77D2A", "#F8AD7C", "#E39FC6", "#E34C94", "#993404" ];
+var feature_colors = [ "#253494", "#D77D2A",  "#7B87C2", "#8AAAD9", "#E34C94", "#5BC48F",
+		"#00AE95", "#76B043", "#AED477", "#E4C8A7", "#734a78", "#FFD64F", "#E6B222", "#1162dc",
+		"#818C43",  "#F8AD7C", "#E39FC6",  "#993404" ];
 // indicates if currently accessing remote servers
 var isFetchingData = false;
 // indicates which server is accessed
@@ -141,8 +144,11 @@ var djb2Code = function(str, bins) {
 		char = str.charCodeAt(i);
 		hash = ((hash << 5) + hash) + char; /* hash * 33 + c */
 	}
+
+	// console.log("POLICY " + hash + " bins " + (hash % bins));
 	return Math.abs(hash % bins);
 };
+
 
 function capitaliseFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -167,6 +173,18 @@ function stripScripts(s) {
   return div.innerHTML;
 }
 
+
+
+function getColorForFeat(assignedColors, feat_name, idx){
+	if (assignedColors.hasOwnProperty(feat_name)){
+		return (assignedColors[feat_name]);
+	}
+
+	assignedColors[feat_name] = feature_colors[(idx % feature_colors.length)];
+
+	return(assignedColors[feat_name]);
+}
+
 /**
  * This helper function to annotations to the json object - one at a time
  */
@@ -182,15 +200,19 @@ var add_external_annotation = function(primary_accession, json_object, ann, das_
 	var ann_track = ann["track"] || "multi_track";
 	var ann_color = ann["color"] || "single_color";
 
+	let assignedColors = {};
+
 	for ( var i = 0; i < ann.Features.length; i++) {
 		var f = ann.Features[i];
 
 		var feat_name = f.Name;
-		var feat_label = f.Name.replace(/_/g, ' ');
+		var feat_label = f.Name; // f.Name.replace(/_/g, ' ');
 		var feat_desc = stripScripts(f.Description);
 		var feat_start;
 		var feat_end;
 		var feat_color;
+
+
 
 		if (f.Color){
 			// if the JSON file specifies a color for this individual feature, then use it
@@ -199,7 +221,13 @@ var add_external_annotation = function(primary_accession, json_object, ann, das_
 			// if the JSON file specifies a feature set color, then use it for all features
 			feat_color = ann.Color;
 		} else {
-			feat_color = feature_colors[djb2Code(feat_label, feature_colors.length)];
+
+			// first check if something with same name has been assigned a colour (and use it); otherwise use 'mod' color.
+
+			feat_color = getColorForFeat(assignedColors, feat_name, i);
+
+			// feat_color = feature_colors[(i % feature_colors.length)];
+			//  feature_colors[djb2Code(feat_label, feature_colors.length)];
 		}
 
 		var setResidueRange = function(resRange){
@@ -226,13 +254,13 @@ var add_external_annotation = function(primary_accession, json_object, ann, das_
 		}
 
 		if (typeof f.Residues === "object"){
-      if(das_server === "PredictProtein"){
-        apiConvert(f.Residues)
-      }
-      else{
-        feat_start = parseInt( f.Residues[0]);
-			  feat_end = parseInt( f.Residues[1]);
-      }
+	      if(das_server === "PredictProtein"){
+	        apiConvert(f.Residues)
+	      }
+	      else{
+	        feat_start = parseInt( f.Residues[0]);
+				  feat_end = parseInt( f.Residues[1]);
+	      }
 		} else if (typeof f.Residue !== 'undefined'){
 			feat_start = parseInt( f.Residue);
 			feat_end = parseInt( f.Residue);
@@ -545,6 +573,8 @@ function clusterRegions(sequence_annotations, categories, aboutFeaturesource, hc
 
 
 					clusters[i].Tracks[0][j].label = clusters[i].Tracks[0][j].label.split(/\$\$/)[0];
+
+					// clusters[i].Tracks[0][j].name = 'Testing';
 				}
 
 
@@ -691,7 +721,15 @@ function fetch_annotations(primary_accession,
 			featureCallback);
 };
 
+function getCurrentUrl(){
+	/* console.log("CURRENT URL IS ");
+	console.log(window.location.search.substring(1));
+	console.log(window.location.href);
+	console.log(window.location.href.split(/\/+/)); */
+	let arr = window.location.href.split(/\/+/);
 
+	return (arr[0] + "//" + arr[1]);
+}
 
 function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallback){
 	let featuresFromExtServer = {};
@@ -719,13 +757,15 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
 			// console.log(response.data)
+			//console.log(getCurrentUrl());
+			//console.log(servers[3].URL_covid);
 			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
 
 
 		}
 		if (requestedFeature == 'CathCovid'){
-			console.log("!!!! The cath covid response data is ");
-			console.log(response);
+			// console.log("!!!! The cath covid response data is ");
+			// console.log(response);
 			handleCath_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
 		}
 
@@ -931,7 +971,7 @@ function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featu
 
 	if (isValid){
 		// continue
-		console.log("fetch_features.validateAquariaFeatureSet appending validated features " + 'PredictProtein')
+		// console.log("fetch_features.validateAquariaFeatureSet appending validated features " + 'PredictProtein')
 
 		parseFeatures(primary_accession, '', featureId,featureCallback, convertedFeatureSet, '', cathDataArr_hc);
 		// finishServer(convertedFeatureSet, primary_accession, featureCallback);
@@ -1125,8 +1165,8 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 	var clustered_annotations = clusterRegions(sequence_annotations, categories, description, cathDataArr_hc);
 
 
-	// console.log("The clustered annotations are: ");
-	// console.log(clustered_annotations);
+	console.log("The clustered annotations are: ");
+	console.log(clustered_annotations);
 
 	finishServer(clustered_annotations, primary_accession, featureCallback);
 
@@ -1171,10 +1211,18 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 			type: "GET",
 			dataType: "xml",
 			error: function() {
-				data = AQUARIA.remote.get_features(window.location.pathname.split('/')[1], function(orgNames) {
-				  // console.log("features.displayOrgSynonyms: " + orgNames[0].Features)
-				  parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, JSON.parse(orgNames[0].Features), url)
+				var url = window.location.origin + "/get_features/" + window.location.pathname.split('/')[1]
+				axios({
+				method: 'get',
+				url: url,
 				})
+				.then(function (response) {
+					let orgNames = response.data
+					parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, JSON.parse(orgNames[0].Features), url)
+				})
+				// data = AQUARIA.remote.get_features(window.location.pathname.split('/')[1], function(orgNames) {
+				// console.log("features.displayOrgSynonyms: " + orgNames[0].Features)
+				// })
 			  },
 			success: function(xml) {
 				data = parseUniprot(xml);
