@@ -15,7 +15,7 @@ IDRPanel.prototype.display_cluster = function(cluster, width, height) {
 		var w = width > 0 ? width : 640;
 		var h = height > 0 ? height: 480;
 
-		idrViewer = pv.Viewer(attachToDiv, 
+		idrViewer = pv.Viewer(attachToDiv,
 				{ quality : 'low', width: w, height : h,
 			antialias : true, outline : false,
 			slabMode : 'auto',
@@ -26,16 +26,16 @@ IDRPanel.prototype.display_cluster = function(cluster, width, height) {
 		idrViewer.options('fog', false);
 		this.initialised = true;
 	}
-	
+
 	idrViewer.clear();
 	structures = {};
 	cluster.members.forEach(function(member) {
 		$.ajax({ url : getPDBURL(member.pdb_id), success : function(data) {
-			console.log("[IDRPanel]: loading " + member.pdb_id);
+			// console.log("[IDRPanel]: loading " + member.pdb_id);
 			structures[member.pdb_id] = io.pdb(data);
 
 			//idrViewer.sline(member.pdb_id, structures[member.pdb_id],{ color : color.uniform('red'), showRelated : '1'});
-			idrViewer.cartoon(member.pdb_id, structures[member.pdb_id], 
+			idrViewer.cartoon(member.pdb_id, structures[member.pdb_id],
 			{ color: that.colorBySSAndHomology(structures[member.pdb_id].conservations), strength: 1.0});
 			idrViewer.autoZoom();
 			//that.initialised = true;
@@ -45,7 +45,7 @@ IDRPanel.prototype.display_cluster = function(cluster, width, height) {
 };
 
 IDRPanel.prototype.load = function (attributes) {
-	idrViewer = pv.Viewer($(this.attachToDiv)[0], 
+	idrViewer = pv.Viewer($(this.attachToDiv)[0],
 			{ quality : 'high', width: attributes.width, height : attributes.height,
 		antialias : true, outline : false,
 		slabMode : 'fixed',
@@ -53,7 +53,7 @@ IDRPanel.prototype.load = function (attributes) {
 		far: 10000,
 		background: [0.8, 0.8, 0.8]
 			});
-	//var selector =  this.PVSelector(idrViewer);	
+	//var selector =  this.PVSelector(idrViewer);
 	idrViewer.options('fog', false);
 	this.reload(attributes);
 };
@@ -64,10 +64,10 @@ IDRPanel.prototype.reload =  function(attributes) {
 	$.ajax({ url : attributes.url, success : function(data) {
 		structure = io.pdb(data);
 		idrViewer.clear();
-		idrViewer.cartoon('structure.protein', 
-				structure, 
+		idrViewer.cartoon('structure.protein',
+				structure,
 				{ color: that.colorBySSAndHomology(attributes.conservations), strength: 1.0});
-		//showRelated : '1', 
+		//showRelated : '1',
 		idrViewer.autoZoom();
 		this.blankApplet(false);
 		that.initialised = true;
@@ -85,7 +85,7 @@ if (isOn ) {
       appletMessage.text("Please wait...");
     }
     if (!$('#waitingFrame').is(":visible")) {
-      
+
       $('#waitingFrame').hide();
       $('#waitingFrame').fadeIn("fast");
     }
@@ -97,7 +97,7 @@ else {
 
 
 IDRPanel.prototype.mousePressed =  function(atom, e) {
-	console.log('obj: ' + atom.residue().num() + ', e: ' + e);
+	// console.log('obj: ' + atom.residue().num() + ', e: ' + e);
 };
 
 var interpolateColour = function (base, other, amount) {
@@ -110,8 +110,8 @@ var interpolateColour = function (base, other, amount) {
 }
 
 var assignColour = function (out, index, colorArray) {
-	out[index] = colorArray[0]; 
-	out[index+1] = colorArray[1]; 
+	out[index] = colorArray[0];
+	out[index+1] = colorArray[1];
 	out[index+2] = colorArray[2];
 }
 
@@ -122,8 +122,8 @@ IDRPanel.prototype.colorBySSAndHomology = function(conservations) {
 	this.notConserved = [60/255, 60/255, 60/255];
 	this.identicalColourMap = {
 			'C': [99/255, 153/255, 65/255], //coil
-			'H': [86/255, 138/255, 181/255],   	// helix 
-			'E': [255/255, 201/255, 0/255]   	//sheet 
+			'H': [86/255, 138/255, 181/255],   	// helix
+			'E': [255/255, 201/255, 0/255]   	//sheet
 	};
 	this.conservedColourMap = {};
 	Object.keys(this.identicalColourMap).forEach (function (key) {
@@ -139,7 +139,7 @@ IDRPanel.prototype.colorBySSAndHomology = function(conservations) {
 
 IDRPanel.prototype.getColourForResidue = function (residue) {
 	var chain = residue.chain().name();
-	var chainConservation = this.conservations[chain]; 
+	var chainConservation = this.conservations[chain];
 
 	var checkAgainst = this.identicalColourMap[residue.ss()];
 	if (chainConservation && chainConservation.nonconserved.indexOf(residue.num()) > -1) {
@@ -176,7 +176,7 @@ IDRPanel.prototype.PVSelector = function (viewer) {
 	viewer._domElement.addEventListener("atompicked", function(e) {
 		e.preventDefault();
 
-		console.log(e.detail.atom.residue().num());
+		// console.log(e.detail.atom.residue().num());
 		var newAtom = e.detail.atom;
 		var oldResidue  = null;
 		if ( this.lastSelectedAtom != null) {
@@ -216,7 +216,7 @@ IDRPanel.prototype.gestures = function () {
       var newArgs = [funcName];
       newArgs.push(Array.prototype.slice.call(arguments));
       if (funcName === 'triggerRotate') {
-        console.log('about to call TODO for webgl: ' + newArgs);
+        // console.log('about to call TODO for webgl: ' + newArgs);
       }
 //      if (document.applets[0]) {
 //        document.applets[0].molecularControlToolkit.apply(document.applets[0], newArgs);

@@ -8,9 +8,12 @@ module.exports = function (jsonObj, primary_accession, featureCallback, validate
 
 	let theKeys = Object.keys(jsonObj);
 
-	console.log(theKeys);
+	console.log(jsonObj);
 
 	Object.keys(jsonObj).forEach(function(featureSet){
+		console.log("%%%% ");
+		console.log(featureSet);
+
 		if (Object.keys(jsonObj[featureSet]).hasOwnProperty('Features')){
 
 		}

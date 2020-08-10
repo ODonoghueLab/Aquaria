@@ -32,7 +32,8 @@ module.exports = function (jsonObj, primary_accession, featureCallback, validate
 			// aquariaJsonObj[key] = jsonObj[key];
 		}
 	});
-	console.log(aquariaJsonObj)
+	//console.log("Converted PredictProtein")
+	//console.log(aquariaJsonObj)
 	validateAgainstSchema(aquariaJsonObj, primary_accession, featureCallback, 'PredictProtein')
 	// console.log(aquariaJsonObj);
 	//return (aquariaJsonObj);
@@ -108,7 +109,7 @@ function convertTheFeature(feature){
 	}
 	else{
 		convertedFeature['Residues'] = [(residue[0] + '-' + residue[1])];
-		console.log("Predict protein " + convertedFeature['Residues'])
+		// console.log("Predict protein " + convertedFeature['Residues'])
 		// console.log(residue);
 	}
 

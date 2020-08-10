@@ -1,0 +1,106 @@
+<html>
+  <head>
+    <title>Aquaria Unit Tests using Mocha</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="http://aquaria.ws:8009/stylesheets/mocha.css" />
+<style type="text/css">
+#mocha .test:hover h2:after {
+    color: #444444;
+    content: "(view source)";
+    font-family: arial;
+    font-size: 12px;
+    position: relative;
+    right: -10px;
+    top: 0;
+}
+</style>
+
+  </head>
+  <body>
+  <script>
+  function refresh() {
+          window.location.reload(true);
+  }
+
+  setTimeout(refresh, 10000);
+  </script>
+<img src="http://aquaria.ws:8009/images/aquaria-logo.png" alt="Aquaria Logo" title="Aquaria" />
+    <div id="mocha">
+
+<ul id="stats"><li class="progress"><canvas width="40" height="40"></canvas></li><li class="passes">passes: <em>4</em></li><li class="failures">failures: <em>0</em></li><li class="duration">duration: <em>1.724</em>s</li></ul>
+<ul id="report">    <li class="suite">
+      <h1>matching_structures</h1>
+      <ul>
+        <li class="suite">
+          <h1>#get_matching_structures()</h1>
+          <ul>
+            <li class="test pass">
+              <h2>should create sequence<span class="duration">770ms</span></h2>
+              <pre style="display: none;"><code>matching_structures.get_matching_structures(['P51451'], function(matches) {
+		matches.uniprot_sequence.length.should.equal(1);
+		done();
+	});</code></pre>
+            </li>
+            <li class="test pass">
+              <h2>should create sequence features<span class="duration">658ms</span></h2>
+              <pre style="display: none;"><code>matching_structures.get_matching_structures(['P51451'], function(matches) {
+		matches.uniprot_sequence_features.length.should.equal(1);
+		matches.uniprot_sequence_features[0].length.should.equal(1060);
+		done();
+	});</code></pre>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li class="suite">
+      <h1>david</h1>
+      <ul>
+        <li class="suite">
+          <h1>#get_interactions_one_uniprot_input()</h1>
+          <ul>
+            <li class="test pass">
+              <h2>should return interactions<span class="duration">280ms</span></h2>
+              <pre style="display: none;"><code>//			this.timeout(10000)
+			david.get_interactions_one_uniprot_input('P51451', function(matches) {
+				matches.data.length.should.equal(1);
+				matches.data[0]['PDB_ID'].should.equal('2x0g');
+				done();
+			});</code></pre>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li class="suite">
+      <h1>secondary_clustering</h1>
+      <ul>
+        <li class="suite">
+          <h1>#get_secondary_clusters()</h1>
+          <ul>
+            <li class="test pass">
+              <h2>should provide valid secondary clusters<span class="duration">11ms</span></h2>
+              <pre style="display: none;"><code>members = [{Repeat_domains: [1], alignment_identity_score: 82, pdb_alignment: [&quot;1-114:1-114\n&quot;], pdb_chain: [&quot;A&quot;], pdb_id: &quot;1blj&quot;, 
+					pdb_title: &quot;NMR ensemble of blk SH2 domain, 20 structures&quot;, pssh_alignment: [&quot;111-222:1-112&quot;]}];
+			secondary_clustering.get_secondary_clusters(members, &quot;P51451&quot;, function(newChildren) {
+				newChildren.length.should.equal(1);
+				newChildren[0].label.should.equal(&quot;Blk&quot;);
+				done();
+			});</code></pre>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+<ul>
+</div>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script>
+$("h2").click(function() {
+       var display = 'none' == $(this).next("pre").css('display')? 'block': 'none';
+        $(this).next("pre").css('display', display);
+});
+</script>
+</body>
+</html>
+

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--[if lt IE 9]><html class="ie"><![endif]-->
+<!--[if gte IE 9]><!--><html><!--<![endif]-->
+
+<head>
+	<!-- link tags first for fast generation of initial page  -->
+	<link rel="stylesheet" type="text/css" media="all" href="/stylesheets/jquery-ui.min.css" />
+	<link rel="stylesheet" type="text/css" media="all" href="/stylesheets/style.css" />
+	<link rel="stylesheet" type="text/css" media="all" href="/stylesheets/layout.css" />
+  <link rel="stylesheet" type="text/css" media="all" href="/stylesheets/nav.css" />
+	<link href="/stylesheets/chardinjs.mod.css" rel="stylesheet">
+	    <script src="/javascripts/jquery-1.9.1.min.js"></script>
+	
+	
+	<title>Aquaria: Integrating Sequences, Features, and 3D Structures</title>
+	<link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+	<script> var ltIE9 = false;  
+  function getUrlParameter(sParam)
+  {
+      if (window.location.search.length > 0) {
+      
+        var sPageURL = window.location.search.substring(1);  // no .toLowerCase() here (this affects the value!)
+        var sURLVariables = sPageURL.split('&');
+        sParam = sParam.toLowerCase();
+        for (var i = 0; i < sURLVariables.length; i++) 
+        {
+            var sParameterName = sURLVariables[i].split('=');
+            if (sParameterName[0].toLowerCase() == sParam) // make name case insensitive
+            {
+                return decodeURIComponent(sParameterName[1]); // the value might have been encoded
+            }
+        }
+       }
+      return null;
+  }
+  var persist = getUrlParameter("persist");
+  var viewer = getUrlParameter("viewer");
+    if ( viewer && persist) {
+        localStorage.setItem("3DViewer", viewer);
+    }
+    window.threedViewer = (viewer ||  localStorage.getItem("3DViewer") || "Applet");
+    window.threedViewer = window.threedViewer.toLowerCase();
+    
+    
+	</script>
+<!--[if lt IE 9]>
+			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+			<script>
+				ltIE9 = true;
+			</script>
+<![endif]-->
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Search for Structures, Proteins, Macromolecules, PDB, Uniprot, Features, Sequences, Genes, PSSH, HSSP"/>
+	<meta name="keywords" content="Structures, Proteins, Macromolecules, PDB, Uniprot, Features, Sequences, Genes, PSSH, HSSP"/>
+	<style>
+		body { background: #d45721 url(images/launch-1.png) repeat-x ; background-color: #d45721}
+		
+		p { font-size: 130%; }
+		
+		h1 { color: #afd9fc; line-height: 1.3em;}
+		
+		.small { color:#afd9fc; text-shadow: none; }
+		
+		.poster {
+			float: right;
+			margin: 25px 20px 0px 25px;
+			padding: 0px;
+			width: 40%;
+		}
+		h2 { color:#ffe934; }
+	</style>
+</head>
+
+<body> 
+	<div id="wrapper">
+		<div id="content">
+			<h1 style="visibility: hidden;">Aquaria launch event</h1>
+			<p><img src="/images/logo-large.png" width="605" height="167" alt="Aquaria"><img src="/images/Launch-title_03.png" alt="Launch event" style=" margin-bottom: 36px;"></p>
+			<div class="poster">               	
+        		<img src="images/Cover-img.jpg" alt="Aquaria cover artwork" style="max-width:100%; padding:8px 0;"/><br>
+            </div>
+            <p>Tuesday, 3rd February 2015, 9:00 - 10:00 am, John Shine room, Garvan Institute</p>
+            <h1>Watch this event via webcast live from this page!</h1>
+			<h2>Sydney: 9am Tuesday, February 3, 2015</h2>
+			<h2>Lisbon: 10pm Monday, February 2, 2015</h2>
+			<h2>Munich: 11pm Monday, February 2, 2015</h2>
+			<h2>New York: 5pm Monday, February 2, 2015</h2>
+			<h2>San Francisco: 2pm Monday, February 2, 2015</h2>
+
+<p>Aquaria is a new web resource for biologists that simplifies the process of gaining insight from protein structures. This event coincides with the publication of an announcement about Aquaria in Nature Methods.
+</p>
+<p>A range of speakers will introduce Aquaria, describe how it works, and highlight how it can be used by biologists to gain insight into protein function. 
+</p>
+<h2>Speakers include:</h2>
+<p>
+Dr. Se&aacute;n O&rsquo;Donoghue <span class="small">CSIRO & Garvan Institute</span><br>
+Dr. Andrea Schafferhans <span class="small">Technical University of Munich</span><br>
+Mr. Chris Hammang <span class="small">Garvan Institute</span><br>
+Mr. Neil Jackson <span class="small">Amazon</span>
+			</p>
+			
+			<iframe width="560" height="315" src="https://www.youtube.com/embed/PIs1qyV_dIQ?autoplay=1" frameborder="0" allowfullscreen autoplay="autoplay" ></iframe>
+		</div>
+		<div id="footer">			
+			
+		</div> <!-- /footer -->		
+
+	</div> <!-- /wrapper -->	
+	<!-- all script tags last for fast generation of initial page -->		
+  
+	
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-40833441-1', 'aquaria.ws');
+    ga('send', 'pageview');
+  </script>
+	
+</body>
+</html>

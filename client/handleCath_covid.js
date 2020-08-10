@@ -21,8 +21,6 @@ module.exports = function(jsonObj1, getFeatures, validateAgainstSchema, primary_
 	}
 
 	parseAndSendMultipleRequests(jsonObj1).then(function(thePromises){
-		console.log("The residues are:: : : ");
-		console.log(thePromises.residues);
 		Promise.all(thePromises.promisesGo).then(function(theData){
 			return new Promise(function(resolve, reject){
 				cathFunctions.handlePromiseData_hc(theData, dataArr_hc).then(function(){
@@ -45,13 +43,13 @@ module.exports = function(jsonObj1, getFeatures, validateAgainstSchema, primary_
 			// Superfamilies
 			return new Promise(function(resolve, reject){
 				Promise.all(thePromises.cathDomains).then(function(superFamRequests){
-
+					/*
 					console.log("The dataArrHc is - in the next then() ");
 					console.log(dataArr_hc);
 
 					console.log("The ancestor data is");
 					console.log(ancestorDataObj);
-
+					*/
 					cathFunctions.handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancestorDataObj, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet).then(function(resObj){
 						superFamFeatureSet = resObj.superFamFeatureSet;
 						convertedFeatures = resObj.convertedFeatures;
@@ -63,8 +61,8 @@ module.exports = function(jsonObj1, getFeatures, validateAgainstSchema, primary_
 		})
 		.then(function(){
 			return new Promise(function(resolve, reject){
-				console.log("$$$$$$$$ ");
-				console.log(thePromises.funfamIds);
+				// console.log("$$$$$$$$ ");
+				// console.log(thePromises.funfamIds);
 				handleData_ff(thePromises.funfamIds, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet, funFamFeatureSet, convertedFeatures).then(function(){
 					resolve()
 				});
@@ -110,8 +108,8 @@ function handleData_ff(funFamData, dataArr_hc, hcDataObj, residues_, superFamFea
 			if (i == (funFamData.length - 1)){
 				convertedFeatures[keyFunFam] = {};
 				convertedFeatures[keyFunFam]["Features"] = funFamFeatureSet;
-				console.log("@@@@@@@@@@ ");
-				console.log(funFamFeatureSet);
+				// console.log("@@@@@@@@@@ ");
+				// console.log(funFamFeatureSet);
 				resolve();
 			}
 
@@ -124,7 +122,7 @@ function parseAndSendMultipleRequests(jsonObj1){
 
 	return new Promise(function(resolve, reject){
 
-		console.log(Object.getOwnPropertyNames(jsonObj1.data));
+		// console.log(Object.getOwnPropertyNames(jsonObj1.data));
 
 		let residuesBySfFf = [];
 		let promises_superfamilyId = [];
@@ -146,8 +144,8 @@ function parseAndSendMultipleRequests(jsonObj1){
 					let sf_ff_id = {};
 					let residues = []; // list of lists.
 
-					console.log("Features ");
-					console.log(feature);
+					// console.log("Features ");
+					// console.log(feature);
 
 					if (feature.hasOwnProperty('match-id') && (feature.hasOwnProperty('resolved') )){ // || feature.hasOwnProperty('Discontiguous'))) {
 
@@ -157,8 +155,8 @@ function parseAndSendMultipleRequests(jsonObj1){
 
 						// console.log(sf_ff_id);
 						residues = extractResidues(feature['resolved']);
-						console.log("In the main function, residues");
-						console.log(residues);
+						// console.log("In the main function, residues");
+						// console.log(residues);
 
 						if (!encounteredRes_str.includes(JSON.stringify(residues))) {
 
@@ -213,7 +211,7 @@ function extractResidues(arrResidues){
 
 			if (val_i%2 == 1){
 				convertedResArr.push(resStart + "-" + resEnd);
-				console.log('here!');
+				// console.log('here!');
 			}
 		})
 	});
