@@ -3,12 +3,12 @@
         <div id="title_0">
             <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay(0)" @mouseleave="resetPlay(0)" class='icon' id='play' v-bind:src="'/images/Play.png'"/></a>
             <span id="Orgname_0" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'mobile'">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
-            <span id="Orgname_0" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
+            <span id="Orgname_0" @click="showAbout" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
             <!-- <span id="matches_0"></span> -->
              <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(0)" @mouseleave="resetPaper(0)" class='icon' id='paper' v-bind:src="'/images/Document.png'"/></a>
             <!-- <span id="help" @mouseover="activarOver" @mousedown="showAbout" @mouseleave="resetOver" v-if="$mq === 'laptop'">?</span> -->
-            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'" v-if="$mq === 'laptop'"/>
-            <img class='icon' id='help' @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'" v-if="$mq === 'mobile' || $mq === 'tablet'"/>
+            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'"/>
+            <!-- <img class='icon' id='help' @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'" v-if="$mq === 'mobile' || $mq === 'tablet'"/> -->
         </div>
         <!-- <div id="title_0" v-if="$mq === 'mobile'" @mousedown="showAboutPhone">
             <span id="Orgname_0">{{ OrganismName }} PROTEINS STRUCTURES&nbsp;</span>
@@ -183,27 +183,28 @@ export default {
     //   }
     // },
     activateOver () {
-      this.timer = setTimeout(function () {
-        document.querySelector('#content').style.display = 'block'
-        document.querySelector('#title_0').style.visibility = 'hidden'
-        if (document.getElementsByClassName('dimmer').length === 0) {
-          var elemDiv = document.createElement('div')
-          elemDiv.className = 'dimmer'
-          document.body.append(elemDiv)
-          document.querySelector('#content').style.display = 'block'
-          document.querySelector('#title_0').style.visibility = 'hidden'
+      // this.timer = setTimeout(function () {
+      //   document.querySelector('#content').style.display = 'block'
+      //   document.querySelector('#title_0').style.visibility = 'hidden'
+      //   if (document.getElementsByClassName('dimmer').length === 0) {
+      //     var elemDiv = document.createElement('div')
+      //     elemDiv.className = 'dimmer'
+      //     document.body.append(elemDiv)
+      //     document.querySelector('#content').style.display = 'block'
+      //     document.querySelector('#title_0').style.visibility = 'hidden'
 
-          document.querySelector('div.dimmer').addEventListener('click', function () {
-            document.querySelector('#content').style.display = 'none'
-            document.querySelector('#title_0').style.visibility = 'visible'
-            document.querySelector('div.dimmer').remove()
-          })
-        } else {
-          document.querySelector('div.dimmer').remove()
-        }
-      }, 1000)
+      //     document.querySelector('div.dimmer').addEventListener('click', function () {
+      //       document.querySelector('#content').style.display = 'none'
+      //       document.querySelector('#title_0').style.visibility = 'visible'
+      //       document.querySelector('div.dimmer').remove()
+      //     })
+      //   } else {
+      //     document.querySelector('div.dimmer').remove()
+      //   }
+      // }, 1000)
       document.querySelector('#help').src = '/images/Info_Hover.png'
       document.querySelector('#help').style.cursor = 'pointer'
+      document.querySelector('#Orgname_0').style.cursor = 'pointer'
     },
     redirect: function (OrganismID) {
       var url = 'https://www.uniprot.org/taxonomy/' + OrganismID

@@ -15,6 +15,7 @@
 <script>
 import axios from 'axios'
 import { screenshot } from './utils/Screenshot'
+import store from './store/index'
 
 // @TODO consider how best to expose screenshot feature in UI
 window.ss = async (resX, resY, bgColor, bgAlpha) => {
@@ -29,7 +30,8 @@ export default {
   name: 'App',
   data () {
     return {
-      primary_accession: null
+      primary_accession: null,
+      hostname: store.state.url
     }
   },
   beforeMount () {
@@ -42,11 +44,11 @@ export default {
       }
     }
     var url = ''
-    var hostname = window.location.protocol + '//' + window.location.hostname
+    // var hostname = window.location.protocol + '//' + window.location.hostname
     if (window.location.pathname.split('/')[1] === 'covid19') {
-      url = hostname + ':8010/SARS-CoV-2'
+      url = this.hostname + ':8010/SARS-CoV-2'
     } else {
-      url = hostname + ':8010' + window.location.pathname
+      url = this.hostname + ':8010' + window.location.pathname
     }
     axios({
       method: 'get',
