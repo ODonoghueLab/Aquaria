@@ -29,7 +29,7 @@
           </a>
         </div>
     </div>
-     <a id='graph' title='Click to open interactive version' v-bind:href="'../COVID/web/Fig_1_hi-res.pdf'" target="_blank" :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]">
+     <a id='graph' title='Click to open interactive version' v-bind:href="this.hostname + '/Fig_2_hi-res.pdf'" target="_blank" :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]">
       <v-lazy-image
         src="../images/Fig_2_100.jpg"
         src-placeholder="../images/Fig_2_55.jpg"
@@ -47,6 +47,7 @@ import AboutMatrix from '../components/AboutMatrix'
 // import GraphViewer from '../components/GraphViewer'
 import $ from 'jquery'
 import VLazyImage from 'v-lazy-image'
+import store from '@/store/index'
 
 export default {
   name: 'Matrix',
@@ -59,6 +60,7 @@ export default {
   },
   data () {
     return {
+      hostname: store.state.url,
       publicPath: process.env.BASE_URL,
       showSlide: 1,
       structures: null,
@@ -118,9 +120,9 @@ export default {
 
     var url = ''
     if (window.location.pathname.split('/')[1] === 'SARS-CoV-2' || window.location.pathname.split('/')[1] === 'covid19') {
-      url = window.location.protocol + '//' + window.location.hostname + ':8010/2697049'
+      url = this.hostname + ':8010/2697049'
     } else {
-      url = window.location.protocol + '//' + window.location.hostname + ':8010/' + window.location.pathname.split('/')[2]
+      url = this.hostname + ':8010/' + window.location.pathname.split('/')[2]
     }
     axios({
       method: 'get',
@@ -132,7 +134,7 @@ export default {
         for (let index = 0; index < allStructures.length; index++) {
           allStructures[index].count = 0
           if (allStructures[index].PDB_chain_hash != null) {
-            var purl = window.location.protocol + '//' + window.location.hostname + ':8010/' + allStructures[index].primary_accession + '.csv'
+            var purl = this.hostname + ':8010/' + allStructures[index].primary_accession + '.csv'
             axios({
               method: 'get',
               url: purl
@@ -184,16 +186,16 @@ export default {
     },
     redirect: function (primaryAccession) {
       // THIS GOES BACK TO AQUARIA.WS
-      let redirectionPort = ':8009/'
-      if (window.location.hostname === 'aquaria.ws') {
-        // Only on AWS production server, use the default port
-        redirectionPort = '/'
-      }
+      let redirectionPort = '/'
+      // if (window.location.hostname === 'aquaria.ws') {
+      //   // Only on AWS production server, use the default port
+      //   redirectionPort = '/'
+      // }
       if (window.location.hostname === 'localhost') {
         // Only on local dev server
-        redirectionPort = ':8080/'
+        redirectionPort = ':8009/'
       }
-      var url = window.location.protocol + '//' + window.location.hostname + redirectionPort + primaryAccession
+      var url = this.hostname + redirectionPort + primaryAccession
       return url
     },
     showAbout: function () {

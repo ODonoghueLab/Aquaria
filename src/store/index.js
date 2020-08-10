@@ -5,7 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    message: '[UPDATE DATE]'
+    message: '[UPDATE DATE]',
+    url: window.location.protocol + '//' + window.location.hostname
   },
   mutations: {
   },
