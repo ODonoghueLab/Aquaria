@@ -18,6 +18,14 @@ export default {
     Content,
     BadBrowser,
     Footer
+  },
+  mounted () {
+    setTimeout(function () {
+      if (document.querySelector('.matrixLoading')) {
+        document.querySelector('.matrixLoading').style.visibility = 'hidden'
+        document.querySelector('.matrixLoading').style.display = 'none'
+      }
+    }, 1500)
   }
   // data () {
   //   return {
