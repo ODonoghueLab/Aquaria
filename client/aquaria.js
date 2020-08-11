@@ -22,6 +22,8 @@ var d3 = require('d3');
 var axios = require('axios');
 var resize_app = require('./resize_app');
 var screenshot = require('./screenshot');
+var dnode = require('dnode');
+var shoe = require('shoe');
 
 var MAX_PROTEIN_HISTORY = 5;
 
@@ -1379,7 +1381,8 @@ var MAX_PROTEIN_HISTORY = 5;
   //
   //
 
-  var remoteSuccess = function() {
+  var remoteSuccess = function(remote) {
+    AQUARIA.remote = remote;
     if (initialised) {
       console.debug("domready.ready called again!");
       return;
@@ -1450,6 +1453,31 @@ var MAX_PROTEIN_HISTORY = 5;
 
   };
 
+  var setupDNode = function() {
+    var url = window.location.protocol + '//' + window.location.hostname + ':8010/dnode'
+    var stream = shoe(url)
+    try {
+      var dnodeConnection = dnode();
+      dnodeConnection.on('end', function(end) {
+        console.log("AQUARIA.setupDNode dnodeConnection LOST!");
+        setTimeout(setupDNode, 1000);
+      });
+      dnodeConnection.on('error', function(end) {
+        console.log("AQUARIA.setupDNode dnodeConnection ERROR! Will retry in 1 second. " + end);
+        setTimeout(setupDNode, 1000);
+      });
+      dnodeConnection
+        .on(
+          'remote', remoteSuccess
+        );
+      dnodeConnection.pipe(stream).pipe(dnodeConnection);
+    } catch (error) {
+      alert('AQUARIA.setupDNode error: setting up dnode.ready(). Will retry in 10 seconds: ' + error.message);
+      setTimeout(setupDNode, 10000);
+    }
+
+  }
+
   domready(function() {
     if (window.threedViewer === 'applet') {
       AQUARIA.panel3d = new Applet3DPanel('#threeDSpan');
@@ -1463,7 +1491,7 @@ var MAX_PROTEIN_HISTORY = 5;
       console.log('AQUARIA.domready cannot find viewer: ' + window.threedViewer);
     }
     AQUARIA.gesture = new molecularControlToolkitJS.leap(AQUARIA.panel3d.gestures());
-    remoteSuccess();
+    setupDNode();
   });
 
 })(jQuery);

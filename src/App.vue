@@ -71,14 +71,14 @@ export default {
       )
   },
   mounted () {
-    if (window.location.pathname === '/SARS-CoV-2') {
-      document.querySelector('.matrixLoading').style.visibility = 'visible'
-      var span = document.getElementById('myspan')
+    // if (window.location.pathname) {
+    document.querySelector('.matrixLoading').style.visibility = 'visible'
+    var span = document.getElementById('myspan')
 
-      setInterval(function () {
-        if ((span.innerHTML += '.').length === 5) { span.innerHTML = '' }
-      }, 500)
-    }
+    setInterval(function () {
+      if ((span.innerHTML += '.').length === 5) { span.innerHTML = '' }
+    }, 500)
+    // }
   }
 }
 </script>
@@ -90,6 +90,13 @@ export default {
   padding: 45vh 45vw;
   background: #ABABAB;
   height: 100vh;
+  width: 100vw;
+  position: fixed;
+  z-index: 9;
+}
+
+#wrapper{
+  position: absolute;
   width: 100vw;
 }
 
