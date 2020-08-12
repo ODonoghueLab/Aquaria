@@ -1,15 +1,9 @@
 <script>
 
 /**
-  * NOTE: All XR export operations are now run on-demand and do not need to be prepared ahead-of-time,
-  * so hacking into Vue reactivity as per XRButtonComponent.mounted may no longer be strictly necessary.
-  * However, all required info for XR export functions (e.g. feature server content, top feature server, current feature track,
-  * current sequence, current structure, current chain etc) should be available, ideally without hacks, globals or localstorage.
-  * Consider storing larger state info (like parsed features) in importable singletons 'let features = {}; export default features;',
-  * while properly integrating smaller state (e.g. current feature track) into Vue reactivity (fed into XRButtonComponent as properties).
-  * Server-side parsing of features (except perhaps 'Added Features') combined with HTTP (not WebSocket) delivery and appropriate
-  * caching headers should render localStorage caching unecessary, improve client performance, and simplify client code
-  **/
+ * NOTE: All XR export operations are now run on-demand and do not need to be prepared ahead-of-time,
+ * so hacking into Vue reactivity as per XRButtonComponent.mounted may no longer be strictly necessary.
+ **/
 
 import * as XR from '../utils/XRUtils'
 import QRCode from 'qrcode'
@@ -36,9 +30,6 @@ if (search.has('xr')) {
   // perform auto XR action
   XR.invokeAutoXR(uri)
 }
-
-// used to avoid hitting localstorage all the time, as this is not performant
-const COLLECTION_CACHE = {}
 
 const XRButtonComponent = {
   name: 'XRButton',
@@ -84,10 +75,7 @@ const XRButtonComponent = {
         this.featuresActive = true
         this.featureSet = featureSet
         this.featureTrack = trackNo
-        if (!COLLECTION_CACHE[featureSet.Server]) { // avoid uncessary localstorage loads
-          COLLECTION_CACHE[featureSet.Server] = XR.retrieveFeatureCollection(this.proteinId, featureSet.Server)
-        }
-        this.featureCollection = COLLECTION_CACHE[featureSet.Server]
+        this.featureCollection = XR.retrieveFeatureCollection(featureSet.Server)
       } else {
         this.featuresActive = false
         this.featureSet = null
@@ -130,7 +118,7 @@ const XRButtonComponent = {
     psvrExport: async function () {
       try {
         // default to top collection in list if no active feature
-        const collection = this.featureCollection || XR.retrieveFeatureCollection(this.proteinId, localStorage.getItem('featureOrder').split(',')[0])
+        const collection = this.featureCollection || XR.retrieveFeatureCollection(localStorage.getItem('featureOrder').split(',')[0])
         console.log(`[PSVR] Exporting Asset w/ ${this.featureCollection ? 'ACTIVE' : 'DEFAULT/FIRST'} collection [${collection.name}]`)
         const response = await XR.openInPSVR(this.proteinId, this.pdbId, collection)
         console.log(`[PSVR] Transfer successful, PSVR Response: [${response}]`)
@@ -161,12 +149,12 @@ const XRButtonComponent = {
           const skip = this.hevsUploadedCollections.includes(this.featureCollection.name)
           if (!skip) this.hevsUploadedCollections.push(this.featureCollection.name) // skip next time
 
-          console.log(`[HEVS] Updating Feature Info [${this.featureCollection.name} | Set ${featureSetIndex} | Track ${featureTrackIndex}]${(skip ? '(SKIPPING DATA UPLOAD)' : '')}`)
+          console.log(`[HEVS] Updating Feature Info [${this.featureCollection.name} | Set ${featureSetIndex} | Track ${featureTrackIndex}]${(skip ? ' (SKIPPING DATA UPLOAD)' : '')}`)
 
-          XR.updateHEVSFeature(this.hevsPlatform, this.hevsAsset, this.featureCollection, featureSetIndex, featureTrackIndex, skip)
+          await XR.updateHEVSFeature(this.hevsPlatform, this.hevsAsset, this.featureCollection, featureSetIndex, featureTrackIndex, skip)
         } else {
           console.log('[HEVS] Clearing Feature Info')
-          XR.updateHEVSFeature(this.hevsPlatform, this.hevsAsset, null, null, null)
+          await XR.updateHEVSFeature(this.hevsPlatform, this.hevsAsset, null, null, null)
         }
         console.log('[HEVS] Feature update OK')
       } catch (err) {

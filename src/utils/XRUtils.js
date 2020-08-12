@@ -22,29 +22,17 @@ const featureDetection = {
 export { featureDetection as Platform }
 
 /**
- * Retrieve feature collection (from local storage) for a given sequence and feature server combo
+ * Retrieve feature collection (from global state) for a given feature server
  * Note: 'Added Features' is a special server representing external features
  */
-export function retrieveFeatureCollection (sequence, server) {
-  let featureSets = ''
-  const features = window.AQUARIA.groupedFeatures
-  try {
-    // const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
-    // return { featureSets, name: server }
-    for (var key in features) {
-      if (features[key][0] === server) {
-        featureSets = features[key][1]
-      }
-    }
-    // const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
-    return { featureSets, name: server }
-  } catch {
-    console.warn('XR feature integration not available')
-  }
+export function retrieveFeatureCollection (server) {
+  const [, featureSets] = window.AQUARIA.groupedFeatures.find(([s]) => s === server)
+  return { featureSets, name: server }
 }
 
 export function getFeatureIndices (collection, featureSet, featureTrack) {
   // determine active feature set/track indices (can't use object equality, collection has likely been in and out of localStorage)
+  // @TODO the above comment is likely no longer true, this can probably be optimised
   let featureSetIndex = 0
   const featureTrackIndex = Math.max(featureTrack, 0)
   featureSetIndex = Math.max(collection.featureSets.findIndex(fs => {
