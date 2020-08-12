@@ -1,3 +1,6 @@
+import axios from 'axios'
+import store from '@/store/index'
+
 // instance of https://github.com/ODonoghueLab/aquariaExport
 const MODEL_SERVER = 'https://ie.csiro.au/services/aquaria-export'
 
@@ -5,6 +8,8 @@ const MODEL_SERVER = 'https://ie.csiro.au/services/aquaria-export'
 const ADVANCED_VIEWER = 'https://ie.csiro.au/apps/aquaria-export-preview'
 
 const MAX_QR_FEATURES = 45
+
+const BACKEND = `${store.state.url}:8010`
 
 /**
  * Information about platform XR support
@@ -23,13 +28,19 @@ export { featureDetection as Platform }
 export function retrieveFeatureCollection (sequence, server) {
   let featureSets = ''
   const features = window.AQUARIA.groupedFeatures
-  for (var key in features) {
-    if (features[key][0] === server) {
-      featureSets = features[key][1]
+  try {
+    // const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
+    // return { featureSets, name: server }
+    for (var key in features) {
+      if (features[key][0] === server) {
+        featureSets = features[key][1]
+      }
     }
+    // const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
+    return { featureSets, name: server }
+  } catch {
+    console.warn('XR feature integration not available')
   }
-  // const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
-  return { featureSets, name: server }
 }
 
 export function getFeatureIndices (collection, featureSet, featureTrack) {
@@ -60,40 +71,32 @@ export function openInSceneViewer (protein, pdb, featureTrackToBake) {
   openUriInSceneViewer(uri, title)
 }
 
-export function openInPSVR (protein, pdb, collection) {
-  return new Promise((resolve, reject) => {
-    const uri = getExportUri(protein, pdb, 'gltf')
-    window.AQUARIA.remote.sendToPSVR(uri, `${protein}.${pdb}`, collection, (err, response) => {
-      if (err) reject(err)
-      else resolve(response)
-    })
-  })
+export async function openInPSVR (protein, pdb, collection) {
+  const modelUri = getExportUri(protein, pdb, 'gltf')
+  const payload = { modelUri, fileName: `${protein}.${pdb}`, collection }
+  const response = await axios.post(`${BACKEND}/xr/sendToPSVR`, payload)
+  if (response.status >= 400) throw new Error(response.data)
+  else return response.data.result
 }
 
-export function openInHEVS (platform, protein, pdb) {
-  return new Promise((resolve, reject) => {
-    const uri = getExportUri(protein, pdb, 'glb')
-    window.AQUARIA.remote.sendToHEVS(platform, uri, `${protein}.${pdb}`, (err, assetId) => {
-      if (err) return reject(err)
-      else resolve(assetId)
-    })
-  })
+export async function openInHEVS (platform, protein, pdb) {
+  const modelUri = getExportUri(protein, pdb, 'glb')
+  const payload = { hevsPlatform: platform, modelUri, name: `${protein}.${pdb}` }
+  const response = await axios.post(`${BACKEND}/xr/sendToHEVS`, payload)
+  if (response.status >= 400) throw new Error(response.data)
+  else return response.data.assetId
 }
 
 export async function updateHEVSFeature (platform, asset, collection, featureSetIndex, trackIndex, skip) {
-  return new Promise((resolve, reject) => {
-    if (collection) {
-      window.AQUARIA.remote.setHEVSFeature(platform, asset, collection, featureSetIndex, trackIndex, skip, (err) => {
-        if (err) reject(err)
-        else resolve()
-      })
-    } else {
-      window.AQUARIA.remote.clearHEVSFeature(platform, asset, (err) => {
-        if (err) reject(err)
-        else resolve()
-      })
-    }
-  })
+  if (collection) {
+    const payload = { hevsPlatform: platform, assetId: asset, collection, featureSetIndex, trackName: trackIndex, skipUpload: skip }
+    const response = await axios.post(`${BACKEND}/xr/setHEVSFeature`, payload)
+    if (response.status >= 400) throw new Error(response.data)
+  } else {
+    const payload = { hevsPlatform: platform, assetId: asset }
+    const response = await axios.post(`${BACKEND}/xr/clearHEVSFeature`, payload)
+    if (response.status >= 400) throw new Error(response.data)
+  }
 }
 
 export function openInAdvancedViewer (protein, pdb) {
