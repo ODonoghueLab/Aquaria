@@ -40,13 +40,13 @@ var updateFeatureUI = function(featureList) {
 	var addedFeatures = [];
 	var orderedFeatures = [];
 	//Group by feature source
-	  var groupedFeatures = _.groupBy(featureSet, function(feature) {
+	  AQUARIA.groupedFeatures = _.groupBy(featureSet, function(feature) {
 		return feature.Server;
 	  });
 
 	//Store as an object
-	  groupedFeatures = Object.keys(groupedFeatures).map(function(key) {
-		return [String(key), groupedFeatures[key]];
+	AQUARIA.groupedFeatures = Object.keys(AQUARIA.groupedFeatures).map(function(key) {
+		return [String(key), AQUARIA.groupedFeatures[key]];
 	  });
 
 	  for ( var key in featureSet) {
@@ -54,34 +54,33 @@ var updateFeatureUI = function(featureList) {
 	  }
 
 	//Reorder grouped features
-	if((window.localStorage.getItem("featureOrder")) && (window.localStorage.getItem("featureOrder").split(",").length >= groupedFeatures.length)){
+	if((window.localStorage.getItem("featureOrder")) && (window.localStorage.getItem("featureOrder").split(",").length >= AQUARIA.groupedFeatures.length)){
 	  var featureOrder = window.localStorage.getItem("featureOrder").split(",")
 	  for ( var key in featureOrder){
-		for(var k = 0; k < groupedFeatures.length; k++){
-		  if(groupedFeatures[k][0] == featureOrder[key]){
-			orderedFeatures[key] = groupedFeatures[k]
+		for(var k = 0; k < AQUARIA.groupedFeatures.length; k++){
+		  if(AQUARIA.groupedFeatures[k][0] == featureOrder[key]){
+			orderedFeatures[key] = AQUARIA.groupedFeatures[k]
 		  }
 		}
 	  }
-	  groupedFeatures = orderedFeatures
+	  AQUARIA.groupedFeatures = orderedFeatures
 	}
-
 
 	  var featureDiv = d3.select("#featurelist").append("div").attr("id", "featureContainer").append("div").attr("id", "groupedFeatures")
 
-	  for ( var key in groupedFeatures) {
+	  for ( var key in AQUARIA.groupedFeatures) {
 	  //Feature Collection Header
-	  var featureHeader = featureDiv.append("div").attr("id", groupedFeatures[key][0]).attr("class", "featureCollection")
-	  if(groupedFeatures[key][0] == "UniProt" || groupedFeatures[key][0] == "CATH" || groupedFeatures[key][0] == "SNAP2" || groupedFeatures[key][0] == "PredictProtein"){
-		featureHeader = featureHeader.html("<div class='featureHeader'><p class='expand'>►</p><p class='featureName'>" + groupedFeatures[key][0] + "</p><div class='info'>?</div></div><span class='tooltiptext'>" + groupedFeatures[key][1][0]["About"] + "</span>")
+	  var featureHeader = featureDiv.append("div").attr("id", AQUARIA.groupedFeatures[key][0]).attr("class", "featureCollection")
+	  if(AQUARIA.groupedFeatures[key][0] == "UniProt" || AQUARIA.groupedFeatures[key][0] == "CATH" || AQUARIA.groupedFeatures[key][0] == "SNAP2" || AQUARIA.groupedFeatures[key][0] == "PredictProtein"){
+		featureHeader = featureHeader.html("<div class='featureHeader'><p class='expand'>►</p><p class='featureName'>" + AQUARIA.groupedFeatures[key][0] + "</p><div class='info'>?</div></div><span class='tooltiptext'>" + AQUARIA.groupedFeatures[key][1][0]["About"] + "</span>")
 	  }
 	  else{
-		featureHeader = featureHeader.html("<div class='featureHeader'><p class='expand'>►</p><p class='featureName'>" + groupedFeatures[key][0] + "</p><div class='info'>?</div><button id='remove' class='featureButtons'>Remove</button></div><span class='tooltiptext'>" + groupedFeatures[key][1][0]["About"] +"</span>")
+		featureHeader = featureHeader.html("<div class='featureHeader'><p class='expand'>►</p><p class='featureName'>" + AQUARIA.groupedFeatures[key][0] + "</p><div class='info'>?</div><button id='remove' class='featureButtons'>Remove</button></div><span class='tooltiptext'>" + AQUARIA.groupedFeatures[key][1][0]["About"] +"</span>")
 	  }
 		//Feature tracks
 		featureHeader.append("div").attr("class", "featureTrack")
 				.selectAll("div")
-				.data(groupedFeatures[key][1])
+				.data(AQUARIA.groupedFeatures[key][1])
 				.enter()
 				.append("div")
 				.attr("class", "track")
@@ -326,6 +325,10 @@ function drawTrack(datum, i) {
 						d3.select("svg.loaded").classed("loaded", false);
 						AQUARIA.panel3d.blankApplet(true, "Removing feature...")
 						AQUARIA.panel3d.blankApplet(false)
+						// Stu hack to detect feature changes
+						if (typeof AQUARIA.onFeatureChange === 'function') {
+							AQUARIA.onFeatureChange(null, 0);
+						  }
 						removeCurrentAnnotationFrom3DViewer();
 					}
 					else { //console.log("clicked to display feature");
@@ -416,7 +419,10 @@ function createMouseOverCallback(feature) {
 function passFeature(trk, nr, elmt) {
 
 		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
-
+		// Stu hack to detect feature changes
+		if (typeof AQUARIA.onFeatureChange === 'function') {
+			AQUARIA.onFeatureChange(trk, nr);
+		}
 		sentAnnotationTo3DViewer(trk, parseInt(nr));
 
 }

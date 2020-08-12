@@ -21,7 +21,14 @@ export { featureDetection as Platform }
  * Note: 'Added Features' is a special server representing external features
  */
 export function retrieveFeatureCollection (sequence, server) {
-  const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
+  let featureSets = ''
+  const features = window.AQUARIA.groupedFeatures
+  for (var key in features) {
+    if (features[key][0] === server) {
+      featureSets = features[key][1]
+    }
+  }
+  // const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
   return { featureSets, name: server }
 }
 
