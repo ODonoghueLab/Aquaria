@@ -21,8 +21,13 @@ export { featureDetection as Platform }
  * Note: 'Added Features' is a special server representing external features
  */
 export function retrieveFeatureCollection (sequence, server) {
-  const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
-  return { featureSets, name: server }
+  try {
+    // @TODO this needs to be rearchitected now that localStorage isn't being used
+    const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
+    return { featureSets, name: server }
+  } catch {
+    console.warn('XR feature integration not available')
+  }
 }
 
 export function getFeatureIndices (collection, featureSet, featureTrack) {
