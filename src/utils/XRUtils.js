@@ -26,9 +26,17 @@ export { featureDetection as Platform }
  * Note: 'Added Features' is a special server representing external features
  */
 export function retrieveFeatureCollection (sequence, server) {
+  let featureSets = ''
+  const features = window.AQUARIA.groupedFeatures
   try {
-    // @TODO this needs to be rearchitected now that localStorage isn't being used
-    const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
+    // const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
+    // return { featureSets, name: server }
+    for (var key in features) {
+      if (features[key][0] === server) {
+        featureSets = features[key][1]
+      }
+    }
+    // const featureSets = JSON.parse(localStorage.getItem(`${sequence}_${server}`).replace(/\[[^\]]*\]/, ''))
     return { featureSets, name: server }
   } catch {
     console.warn('XR feature integration not available')

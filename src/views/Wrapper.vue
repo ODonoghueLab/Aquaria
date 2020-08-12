@@ -26,6 +26,12 @@ export default {
         document.querySelector('.matrixLoading').style.display = 'none'
       }
     }, 1500)
+    // return new Promise((resolve, reject) => {
+    //   const script = document.createElement('script')
+    //   script.async = true
+    //   script.src = '/javascripts/aquaria.js'
+    //   document.head.appendChild(script)
+    // })
   }
   // data () {
   //   return {
