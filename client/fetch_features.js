@@ -38,7 +38,7 @@ var servers = [
 			"id": 'CATH',
 			"Server": 'CATH',
 			"URL": window.location.protocol + '//www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
-			"URL_covid": window.location.origin + "/covid19cath/",
+			"URL_covid": `${window.BACKEND}/covid19cath/`,
 			// ?content-type=application/json
 		},
 //		{
@@ -1211,7 +1211,7 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 			type: "GET",
 			dataType: "xml",
 			error: function() {
-				var url = window.location.origin + "/get_features/" + window.location.pathname.split('/')[1]
+				var url = `${window.BACKEND}/get_features/${window.location.pathname.split('/')[1]}`;
 				axios({
 				method: 'get',
 				url: url,

@@ -6,7 +6,7 @@
     <meta name="description" content="Search for Structures, Proteins, Macromolecules, PDB, Uniprot, Features, Sequences, Genes, PSSH, HSSP"/>
     <meta name="keywords" content="Structures, Proteins, Macromolecules, PDB, Uniprot, Features, Sequences, Genes, PSSH, HSSP"/>
     <link rel="icon" href="./images/favicon.ico"/>
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <title><%= process.env.VUE_APP_TITLE %></title>
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,500,700,400italic|Material+Icons">
     <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
@@ -42,7 +42,7 @@
 
   <body id="home">
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>We're sorry but <%= process.env.VUE_APP_TITLE %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="wrapper"></div>
     <script src="/javascripts/jquery-ui.1.10.3.js"></script>

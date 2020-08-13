@@ -7,7 +7,7 @@ npm install
 ----------
 ### Run in development mode
 ```
-node app.js
+npm run bundle-legacy
 npm run serve
 ```
 ----------
@@ -15,10 +15,9 @@ npm run serve
 
 Before running on production mode edit the 'app.js' file to use dist folder instead of public.
 ```
+npm run bundle-legacy
 npm run build
-node app.js
 ```
-Load page on localhost:8010
 
 ----------
 ### Lints and fixes files

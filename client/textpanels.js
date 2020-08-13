@@ -182,7 +182,7 @@ function updateText(chain, molecule_name, accession) {
 	AQUARIA.updateDocumentTitle(AQUARIA.preferred_protein_name, score, pdbId, chainId);
 };
 
-var url = window.location.origin + "/getChainInfo/" + pdbId + "/" + chainId
+var url = `${window.BACKEND}/getChainInfo/${pdbId}/${chainId}`;
 axios({
 	method: 'get',
 	url: url,
@@ -193,7 +193,7 @@ axios({
 		var chain = data;
 		if (chain.Type === 'Protein') {
 			if (chain.Source_DB === 'UniProt') {
-				var url = window.location.origin + "/getProteinSynonyms/" + chain.Accession
+				var url = `${window.BACKEND}/getProteinSynonyms/${chain.Accession}`;
 				axios({
 					method: 'get',
 					url: url,
@@ -366,7 +366,7 @@ function fetchSynonyms(proteinId) {
 console.log("textpanels.fetchSynonyms "+proteinId);
 //if (orgId == "") { orgId = null; }
 // AQUARIA.remote.getProteinSynonyms(proteinId, null, displayProtSynonyms, displayOrgSynonyms);
-var url = window.location.origin + "/getProteinSynonyms/" + proteinId
+var url = `${window.BACKEND}/getProteinSynonyms/${proteinId}`;
 axios({
 	method: 'get',
 	url: url,

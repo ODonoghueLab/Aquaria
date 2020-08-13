@@ -100,7 +100,7 @@
 				primary_accession: sequence.primary_accession,
 				cluster_nbr: cluster_nbr
 			  }
-			  var url = window.location.origin + "/get_secondary_clusters"
+			  var url = `${window.BACKEND}/get_secondary_clusters`;
 				axios({
 				  method: 'post',
 				  url: url,
@@ -611,7 +611,7 @@
     timer = window.setTimeout( showTitle, 600, longtitle, evt);
     }
     else {
-		var url = window.location.origin + "/queryPDBTitle/" + myStruct.pdb_id + "/" + myStruct.pdb_chain[0]
+		var url = `${window.BACKEND}/queryPDBTitle/${myStruct.pdb_id}/${myStruct.pdb_chain[0]}`;
         axios({
           method: 'get',
           url: url,

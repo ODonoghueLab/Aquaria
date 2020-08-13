@@ -1,15 +1,6 @@
 import axios from 'axios'
-import store from '@/store/index'
 
-// instance of https://github.com/ODonoghueLab/aquariaExport
-const MODEL_SERVER = 'https://ie.csiro.au/services/aquaria-export'
-
-// instance of https://bitbucket.csiro.au/scm/~and490/aquaria-export-preview
-const ADVANCED_VIEWER = 'https://ie.csiro.au/apps/aquaria-export-preview'
-
-const MAX_QR_FEATURES = 45
-
-const BACKEND = `${store.state.url}:8010`
+const MAX_QR_FEATURES = Number.parseInt(process.env.VUE_APP_MAX_QR_FEATURES) || 40
 
 /**
  * Information about platform XR support
@@ -62,7 +53,7 @@ export function openInSceneViewer (protein, pdb, featureTrackToBake) {
 export async function openInPSVR (protein, pdb, collection) {
   const modelUri = getExportUri(protein, pdb, 'gltf')
   const payload = { modelUri, fileName: `${protein}.${pdb}`, collection }
-  const response = await axios.post(`${BACKEND}/xr/sendToPSVR`, payload)
+  const response = await axios.post(`${process.env.VUE_APP_AQUARIA_BACKEND}/xr/sendToPSVR`, payload)
   if (response.status >= 400) throw new Error(response.data)
   else return response.data.result
 }
@@ -70,7 +61,7 @@ export async function openInPSVR (protein, pdb, collection) {
 export async function openInHEVS (platform, protein, pdb) {
   const modelUri = getExportUri(protein, pdb, 'glb')
   const payload = { hevsPlatform: platform, modelUri, name: `${protein}.${pdb}` }
-  const response = await axios.post(`${BACKEND}/xr/sendToHEVS`, payload)
+  const response = await axios.post(`${process.env.VUE_APP_AQUARIA_BACKEND}/xr/sendToHEVS`, payload)
   if (response.status >= 400) throw new Error(response.data)
   else return response.data.assetId
 }
@@ -78,24 +69,24 @@ export async function openInHEVS (platform, protein, pdb) {
 export async function updateHEVSFeature (platform, asset, collection, featureSetIndex, trackIndex, skip) {
   if (collection) {
     const payload = { hevsPlatform: platform, assetId: asset, collection, featureSetIndex, trackName: trackIndex, skipUpload: skip }
-    const response = await axios.post(`${BACKEND}/xr/setHEVSFeature`, payload)
+    const response = await axios.post(`${process.env.VUE_APP_AQUARIA_BACKEND}/xr/setHEVSFeature`, payload)
     if (response.status >= 400) throw new Error(response.data)
   } else {
     const payload = { hevsPlatform: platform, assetId: asset }
-    const response = await axios.post(`${BACKEND}/xr/clearHEVSFeature`, payload)
+    const response = await axios.post(`${process.env.VUE_APP_AQUARIA_BACKEND}/xr/clearHEVSFeature`, payload)
     if (response.status >= 400) throw new Error(response.data)
   }
 }
 
 export function openInAdvancedViewer (protein, pdb) {
   const link = document.createElement('a')
-  link.href = `${ADVANCED_VIEWER}?protein=${protein}&pdb=${pdb}`
+  link.href = `${process.env.VUE_APP_ADVANCED_VIEWER_URL}?protein=${protein}&pdb=${pdb}`
   link.target = '_'
   link.click()
 }
 
 export function getExportUri (protein, pdb, format, featureTrackToBake = null) {
-  const base = `${MODEL_SERVER}/${protein}/${pdb}.${format}`
+  const base = `${process.env.VUE_APP_AQUARIA_EXPORT_URL}/${protein}/${pdb}.${format}`
   const query = new URLSearchParams()
   if (featureTrackToBake) {
     const featureQuery = featureTrackToBake.map(feature => {

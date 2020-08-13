@@ -29,7 +29,7 @@
           </a>
         </div>
     </div>
-     <a id='graph' title='Click to open interactive version' v-bind:href="this.hostname + '/Fig_2_hi-res.pdf'" target="_blank" :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]">
+     <a id='graph' title='Click to open interactive version' v-bind:href="'/Fig_2_hi-res.pdf'" target="_blank" :style="[this.showSlide == 0 ? {'display': 'none'} : {'display': 'block'}]">
       <v-lazy-image
         src="../images/Fig_2_100.jpg"
         src-placeholder="../images/Fig_2_55.jpg"
@@ -120,9 +120,9 @@ export default {
 
     var url = ''
     if (window.location.pathname.split('/')[1] === 'SARS-CoV-2' || window.location.pathname.split('/')[1] === 'covid19') {
-      url = this.hostname + ':8010/2697049'
+      url = `${process.env.VUE_APP_AQUARIA_BACKEND}/2697049`
     } else {
-      url = this.hostname + ':8010/' + window.location.pathname.split('/')[2]
+      url = `${process.env.VUE_APP_AQUARIA_BACKEND}/${window.location.pathname.split('/')[2]}`
     }
     axios({
       method: 'get',
@@ -134,7 +134,7 @@ export default {
         for (let index = 0; index < allStructures.length; index++) {
           allStructures[index].count = 0
           if (allStructures[index].PDB_chain_hash != null) {
-            var purl = this.hostname + ':8010/' + allStructures[index].primary_accession + '.csv'
+            var purl = `${process.env.VUE_APP_AQUARIA_BACKEND}/${allStructures[index].primary_accession}.csv`
             axios({
               method: 'get',
               url: purl
@@ -185,18 +185,7 @@ export default {
       }
     },
     redirect: function (primaryAccession) {
-      // THIS GOES BACK TO AQUARIA.WS
-      let redirectionPort = '/'
-      // if (window.location.hostname === 'aquaria.ws') {
-      //   // Only on AWS production server, use the default port
-      //   redirectionPort = '/'
-      // }
-      if (window.location.hostname === 'localhost') {
-        // Only on local dev server
-        redirectionPort = ':8009/'
-      }
-      var url = this.hostname + redirectionPort + primaryAccession
-      return url
+      return `${process.env.VUE_APP_MATRIX_REDIRECT_URL || ''}/${primaryAccession}`
     },
     showAbout: function () {
       var Position = window.innerWidth / 2 - $('#about_overlay').width() / 2

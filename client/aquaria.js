@@ -206,7 +206,7 @@ var MAX_PROTEIN_HISTORY = 5;
         ///console.log('AQUARIA.display_3D_structure', AQUARIA.structures2match.Selected_PDB, pdb_id, pdb_chain[0], attributes)
 
         //ABOUT PDB PANEL
-        var url = window.location.origin + "/getPubMedForPDB/" + pdb_id + "/" + pdb_chain[0]
+        var url = `${window.BACKEND}/getPubMedForPDB/${pdb_id}/${pdb_chain[0]}`;
         axios({
           method: 'get',
           url: url,
@@ -527,7 +527,7 @@ var MAX_PROTEIN_HISTORY = 5;
         sequence: sequence,
         member: this.member
       }
-      var url = window.location.origin + "/get_3D_alignment"
+      var url = `${window.BACKEND}/get_3D_alignment`;
         axios({
           method: 'post',
           url: url,
@@ -707,7 +707,7 @@ var MAX_PROTEIN_HISTORY = 5;
       };
 
       // cache_matching_structures(primary_accession, function(primary_accession) {
-        var url = window.location.origin + "/get_matching_structures"
+        var url = `${window.BACKEND}/get_matching_structures`
           axios({
             method: 'post',
             url: url,
@@ -862,7 +862,7 @@ var MAX_PROTEIN_HISTORY = 5;
       // let params = [{
       //   "organism_id": localStorage.organism_id
       // }]
-      let url = window.location.origin + "/getOrganismSynonyms"
+      let url = `${window.BACKEND}/getOrganismSynonyms`;
         axios({
           method: 'get',
           url: url,
@@ -891,7 +891,7 @@ var MAX_PROTEIN_HISTORY = 5;
           return;
         };
 
-        var url = window.location.origin + "/getQueryOrganism/" + term
+        var url = `${window.BACKEND}/getQueryOrganism/${term}`
 				axios({
 				  method: 'get',
 				  url: url,
@@ -957,7 +957,7 @@ var MAX_PROTEIN_HISTORY = 5;
         if (ui.item.value &&
           ui.item.value.indexOf("No organisms for: ") !== 0) {
           if (ui.item.id !== localStorage.organism_id) {
-            let url = window.location.origin + "/getOrganismSynonyms"
+            let url = `${window.BACKEND}/getOrganismSynonyms`;
               axios({
                 method: 'get',
                 url: url,
@@ -1110,7 +1110,7 @@ var MAX_PROTEIN_HISTORY = 5;
             return;
           };
 
-          var url = window.location.origin + "/queryProtein/" + term + "/" + localStorage.organism_id
+          var url = `${window.BACKEND}/queryProtein/${term}/${localStorage.organism_id}`;
           axios({
             method: 'get',
             url: url,
@@ -1281,7 +1281,7 @@ var MAX_PROTEIN_HISTORY = 5;
             console.log('AQUARIA.proteinAutocomplete.select pdb', ui.item.value);
             AQUARIA.blankAll(true, "Waiting for data...");
             var chain = null;
-            var url = window.location.origin + "/getAccessionForPDB/" + ui.item.value + "/" + chain
+            var url = `${window.BACKEND}/getAccessionForPDB/${ui.item.value}/${chain}`;
             axios({
               method: 'get',
               url: url,
@@ -1305,7 +1305,7 @@ var MAX_PROTEIN_HISTORY = 5;
 
               AQUARIA.preferred_protein_name = ui.item.value;
               // AQUARIA.remote.getProteinSynonyms(AQUARIA.protein_primary_accession, //localStorage.organism_id, displayProtSynonyms, null);
-              var url = window.location.origin + "/getProteinSynonyms/" + AQUARIA.protein_primary_accession
+              var url = `${window.BACKEND}/getProteinSynonyms/${AQUARIA.protein_primary_accession};`
               axios({
                 method: 'get',
                 url: url,

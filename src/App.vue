@@ -26,6 +26,9 @@ window.ss = async (resX, resY, bgColor, bgAlpha) => {
   link.click()
 }
 
+// make env avaialble to legacy scripts (not processed by Vue)
+window.BACKEND = process.env.VUE_APP_AQUARIA_BACKEND
+
 export default {
   name: 'App',
   data () {
@@ -46,9 +49,9 @@ export default {
     var url = ''
     // var hostname = window.location.protocol + '//' + window.location.hostname
     if (window.location.pathname.split('/')[1] === 'covid19') {
-      url = this.hostname + ':8010/SARS-CoV-2'
+      url = `${process.env.VUE_APP_AQUARIA_BACKEND}/SARS-CoV-2`
     } else {
-      url = this.hostname + ':8010' + window.location.pathname
+      url = `${process.env.VUE_APP_AQUARIA_BACKEND}${window.location.pathname}`
     }
     axios({
       method: 'get',

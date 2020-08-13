@@ -39,7 +39,7 @@ var interactionPartners = []
 
 var numCluster = $("#allclusters").children().length
 for(var j = 1; j <= numCluster; j++){
-    url = window.location.origin + '/' + window.location.pathname.split('/')[1] + '/cluster' + j + ".csv"
+    url = `${process.env.BACKEND}/${window.location.pathname.split('/')[1]}/cluster${j}.csv`;
     axios({
         method: 'get',
         url: url,
@@ -48,7 +48,7 @@ for(var j = 1; j <= numCluster; j++){
         var clusters = csvJSON(response.data)
         clusters = JSON.parse(clusters)
         for (var i = 0; i < clusters.length; i++) {
-            url = window.location.origin + '/' + window.location.pathname.split('/')[1] + '/' + clusters[i]["pdb id"] + '/' + clusters[i]["pdb chain"] + '/' + clusters[i]["Cluster"] + '/interactions'
+            url = `${process.env.BACKEND}/${window.location.pathname.split('/')[1]}/${clusters[i]["pdb id"]}/${clusters[i]["pdb chain"]}/${clusters[i]["Cluster"]}/interactions`;
             axios({
                 method: 'get',
                 url: url,
