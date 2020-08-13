@@ -1,4 +1,4 @@
-var Cluster = require('../shared/cluster');
+var Cluster = require('./shared/cluster');
 var d3 = require('d3');
 
 var ClusterRenderer = function(cluster, rank, xScale, width, height, onTextClick, onClusterItemClick) {
@@ -29,7 +29,7 @@ ClusterRenderer.prototype.updateCluster = function (clusterToUpdate) {
 		.text(function() {
 		return that.clustSize;
 	});
-		
+
 	}
 
 }
@@ -40,7 +40,7 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 	var member = cluster.members[0];
 	var pdb_chain = cluster.pdb_chain[0];
 	// //var repeat_domain = data.Repeat_domains[0];
-	
+
 	if (cluster.secondary_structure.length === 0 || cluster.secondary_structure[0].length === 0) {
 		console.log('ClusterRenderer.drawClusterContainer error: cannot draw cluster as it has no secondary structure: ', cluster);
 		return;
@@ -115,20 +115,20 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 	// add thumbnail images
 	this.addThumbnails(id, structStart, structEnd, pad);
 
-	
+
 	this.nusvg.select("g#structure_" + id).append("text") // label for cluster size
 	.attr("text-anchor", "end").attr("fill", "white").attr("x",
 			(structEnd - structStart + 24 + pad)).attr("y", 13).attr("dx", -3) // padding-right
 	.attr("dy", ".35em"); // vertical-align: middle)
-	
 
-	var clickTitle = "Click to see " + that.clustSize + " structures in this cluster"; 
+
+	var clickTitle = "Click to see " + that.clustSize + " structures in this cluster";
 	this.nusvg.select("g#structure_" + id + " text, g#structure_" + id).attr("class",
 			"expandable").attr("title",
 			clickTitle);
-	
+
 //	var clickClusterEvent = new CustomEvent(
-//			"clusterExpanded", 
+//			"clusterExpanded",
 //			{
 //				detail: {
 //					message: clickTitle,
@@ -224,7 +224,7 @@ ClusterRenderer.prototype.setConservation = function(index, data) { // console.l
 		gap[1] = data.seq_start[i + 1] - 1;
 		insertions.push(gap); // console.log("insertion: " + gap.toString());
 	}
-	
+
 	var subst3 = this.nusvg.selectAll("g.residue").data(insertions).each(
 			function(d) { // console.log("d.length: "+d.length);
 				for ( var k = d[0]; k <= d[1]; k++) { // console.log("insertion at: " +

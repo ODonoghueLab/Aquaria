@@ -8,6 +8,10 @@
 </template>
 
 <script>
+
+// legacy code bundling is triggered from here
+import '../legacy/aquaria'
+
 import Content from '../components/Content'
 import Footer from '../components/Footer'
 import BadBrowser from '../components/BadBrowser'

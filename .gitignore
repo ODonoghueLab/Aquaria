@@ -2,7 +2,6 @@
 node_modules
 /dist
 .htaccess
-public/javascripts/aquaria.js
 
 # local env files
 .env.local

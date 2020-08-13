@@ -23,6 +23,8 @@ var axios = require('axios');
 var resize_app = require('./resize_app');
 var screenshot = require('./screenshot');
 
+require('./utilities');
+
 var MAX_PROTEIN_HISTORY = 5;
 
 //show_matching_structures.set(AQUARIA);
