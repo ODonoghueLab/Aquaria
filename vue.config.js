@@ -31,7 +31,8 @@ module.exports = {
       return {
         module,
         output: {
-          filename: '[name].[hash].js'
+          filename: '[name].[hash].js',
+          chunkFilename: '[id].[hash].js'
         }
       }
     }
