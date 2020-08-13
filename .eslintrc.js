@@ -15,6 +15,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
   ignorePatterns: [
-    'src/legacy/**/*.js'
+    'src/legacy/**/*.js',
+    'public/javascripts/**/*.js'
   ],
 }

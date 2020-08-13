@@ -9,7 +9,12 @@
 
 <script>
 
-// legacy code bundling is triggered from here
+// @TODO: use npm installed, imported jolecule everywhere, no global
+import * as jolecule from '../../public/javascripts/jolecule'
+
+// legacy code bundling is triggered from here (expects global jolecule)
+/* eslint-disable import/first */
+window.jolecule = jolecule
 import '../legacy/aquaria'
 
 import Content from '../components/Content'
