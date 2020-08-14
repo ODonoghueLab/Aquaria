@@ -5,9 +5,7 @@
 <script>
 export default {
   name: 'FeatureList',
-  methods () {
-
-  }
+  methods: {}
 }
 </script>
 

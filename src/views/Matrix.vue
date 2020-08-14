@@ -4,7 +4,7 @@
           <div id="logo" v-on:click="showAbout()"></div>
           <!-- <span id="res">resized?</span>
           <span id="hd"> hDiff</span> -->
-          <AboutMatrix v-bind:OrganismName="this.structures[1].name" v-bind:OrgSynonyms="this.structures[1].OrgSynonyms" id="about_matrix" />
+          <AboutMatrix v-bind:OrganismName="this.structures ? this.structures[1].name : ''" v-bind:OrgSynonyms="this.structures ? this.structures[1].OrgSynonyms : ''" id="about_matrix" />
           <!-- <a  v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img id="paper" class="infoLink" v-bind:src="'../images/PDF.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a>
           <a  v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img id="video" class="infoLink" v-bind:src="'../images/Video.png'" v-if="$mq === 'laptop' || $mq === 'tablet'"/></a> -->
           <img id="menu" v-bind:src="'../images/menu.png'" v-if="$mq === 'mobile' || $mq === 'tablet'" v-on:click="showSwitch()"/>

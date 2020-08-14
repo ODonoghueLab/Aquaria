@@ -6,18 +6,18 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/SARS-CoV-2',
-    name: 'Matrix',
-    component: Matrix
-  },
-  {
     path: '/covid19',
     name: 'Matrix',
     component: Matrix
   },
   {
+    path: '/SARS-CoV-2',
+    alias: '/covid19',
+    component: Matrix
+  },
+  {
     path: '/:id(\\d+)',
-    name: 'Matrix',
+    alias: '/covid19',
     component: Matrix
   },
   {
