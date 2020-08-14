@@ -9,12 +9,7 @@
 
 <script>
 
-// @TODO: use npm installed, imported jolecule everywhere, no global
-import * as jolecule from '../../public/javascripts/jolecule'
-
-// legacy code bundling is triggered from here (expects global jolecule)
-/* eslint-disable import/first */
-window.jolecule = jolecule
+// most legacy code bundling is triggered from here (expects global jolecule)
 import '../legacy/aquaria'
 
 import Content from '../components/Content'
@@ -35,78 +30,7 @@ export default {
         document.querySelector('.matrixLoading').style.display = 'none'
       }
     }, 1500)
-    // return new Promise((resolve, reject) => {
-    //   const script = document.createElement('script')
-    //   script.async = true
-    //   script.src = '/javascripts/aquaria.js'
-    //   document.head.appendChild(script)
-    // })
   }
-  // data () {
-  //   return {
-  //     primary_accession: null
-  //   }
-  // },
-  // beforeMount () {
-  //   axios({
-  //     method: 'get',
-  //     url: url
-  //   })
-  //     .then(function (response) {
-  //       // if (response.data.initialParams) {
-  //       //   window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
-  //       // }
-  //       if (response.data.primary_accessions) {
-  //         window.location.pathname = '/orgID/' + response.data.OrganismID
-  //       }
-  //     }
-  //     )
-  // }
-  // mounted () {
-  //   const Script1 = document.createElement('script')
-  //   Script1.setAttribute('src', '/javascripts/d3.v2.min.js')
-  //   document.body.appendChild(Script1)
-
-  //   const Script2 = document.createElement('script')
-  //   Script2.setAttribute('src', '/javascripts/browser_check.js')
-  //   document.body.appendChild(Script2)
-
-  //   const Script3 = document.createElement('script')
-  //   Script3.setAttribute('src', '/javascripts/jquery-ui.min.js')
-  //   document.body.appendChild(Script3)
-
-  //   const Script4 = document.createElement('script')
-  //   Script4.setAttribute('src', '/javascripts/jquery.expander.min.js')
-  //   document.body.appendChild(Script4)
-
-  //   const Script5 = document.createElement('script')
-  //   Script5.setAttribute('src', '/javascripts/show_expanded_clusters.js')
-  //   document.body.appendChild(Script5)
-
-  //   const Script6 = document.createElement('script')
-  //   Script6.setAttribute('src', '/javascripts/textpanels.js')
-  //   document.body.appendChild(Script6)
-
-  //   const Script7 = document.createElement('script')
-  //   Script7.setAttribute('src', '/javascripts/pv.js')
-  //   document.body.appendChild(Script7)
-
-  //   const Script8 = document.createElement('script')
-  //   Script8.setAttribute('src', '/javascripts/jolecule.js')
-  //   document.body.appendChild(Script8)
-
-  //   const Script9 = document.createElement('script')
-  //   Script9.setAttribute('src', '/javascripts/aquaria.js')
-  //   document.body.appendChild(Script9)
-
-  //   const Script10 = document.createElement('script')
-  //   Script10.setAttribute('src', '/javascripts/resize_app.js')
-  //   document.body.appendChild(Script10)
-
-  //   const Script11 = document.createElement('script')
-  //   Script11.setAttribute('src', '/javascripts/jsdas.0.1.6.min.js')
-  //   document.body.appendChild(Script11)
-  // }
 }
 </script>
 

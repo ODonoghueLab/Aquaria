@@ -1,3 +1,5 @@
+const { ProvidePlugin } = require('webpack');
+
 module.exports = {
   configureWebpack: config => {
 
@@ -23,19 +25,27 @@ module.exports = {
         ]
       },
       optimization: {
+        moduleIds: 'hashed',
         splitChunks: {
           cacheGroups: {
             legacy: { // extract legacy aquaria code into separate bundle
               chunks: 'all',
               test: /src\/legacy/
             },
-            jolecule: { // extract jolecule code into separate bundle
-              chunks: 'all',
-              test: /public\/javascripts\/jolecule.js/
-            }
           }
         }
-      }
+      },
+      plugins: [
+        new ProvidePlugin({
+          // provide jQuery globals to legacy scripts and jQuery plugins
+          $: require.resolve('jquery'),
+          jQuery: require.resolve('jquery'),
+          'window.$': require.resolve('jquery'),
+          'window.jQuery': require.resolve('jquery'),
+          // provide jolecule global to legacy scripts (@TODO npm install jolecule)
+          jolecule: require.resolve('./src/legacy/javascripts/jolecule')
+        })
+      ]
     }
 
     if (process.env.NODE_ENV === 'production') {

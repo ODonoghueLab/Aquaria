@@ -17,6 +17,8 @@
     "d3": "^2.10.3",
     "domready": "^1.0.8",
     "jquery": "^3.5.1",
+    "jquery-expander": "^2.0.1",
+    "jquery-ui-dist": "^1.12.1",
     "molecular-control-toolkit-js": "0.0.8",
     "numeric": "^1.2.6",
     "qrcode": "^1.4.4",

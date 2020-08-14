@@ -1,12 +1,23 @@
 import Vue from 'vue'
 import router from './router'
 import store from './store'
-// import Wrapper from './views/Wrapper'
 import App from './App'
 import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
-import 'vue-material/dist/vue-material.min.css'
 import VueMq from 'vue-mq'
 import ToggleSwitch from 'vuejs-toggle-switch'
+
+// import styles (would be cleaner to do this through a top-level main.css)
+import 'vue-material/dist/vue-material.min.css'
+import 'jquery-ui-dist/jquery-ui.css'
+
+// apply jquery plugins (these rely on global jquery)
+// note that anything here ends up in the main bundle (will be loaded for every route)
+import 'jquery-ui-dist/jquery-ui'
+import 'jquery-expander'
+import './legacy/javascripts/chardinjs.mod'
+
+// load other globals (some may depend on jquery/plugins above)
+import './legacy/javascripts/browser_check'
 
 Vue.use(ToggleSwitch)
 Vue.use(MdButton)
