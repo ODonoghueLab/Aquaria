@@ -32,6 +32,10 @@ module.exports = {
               chunks: 'all',
               test: /src\/legacy/
             },
+            vendor: { // extract dependencies into separate bundle
+              chunks: 'all',
+              test: /node_modules/
+            },
           }
         }
       },
@@ -42,8 +46,8 @@ module.exports = {
           jQuery: require.resolve('jquery'),
           'window.$': require.resolve('jquery'),
           'window.jQuery': require.resolve('jquery'),
-          // provide jolecule global to legacy scripts (@TODO npm install jolecule)
-          jolecule: require.resolve('./src/legacy/javascripts/jolecule')
+          // provide jolecule global to legacy scripts
+          jolecule: require.resolve('jolecule')
         })
       ]
     }
