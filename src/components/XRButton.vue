@@ -58,11 +58,20 @@ const XRButtonComponent = {
     let chainSelectionOriginal
     const chainSelectionProxy = (accession, pdb, chain) => {
       chainSelectionOriginal(accession, pdb, chain)
-      this.hevsAsset = null
+      this.dataReceived = true
+
+      // clear feature state
+      this.featuresActive = false
+      this.featureSet = null
+      this.featureTrack = -1
+      this.featureCollection = null
+
+      // clear hevs state
       this.hevsUploadedCollections = []
+
+      // update primary state
       this.proteinId = accession
       this.pdbId = pdb
-      this.dataReceived = true
     }
     if (window.AQUARIA.chainSelected !== chainSelectionProxy) {
       chainSelectionOriginal = window.AQUARIA.chainSelected
