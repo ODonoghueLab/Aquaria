@@ -134,6 +134,7 @@ const XRButtonComponent = {
         this.hevsAsset = await XR.openInHEVS(this.hevsPlatform, this.proteinId, this.pdbId)
         console.log(`[HEVS] Transfer successful, HEVS Asset ID: [${this.hevsAsset}]`)
         if (this.featuresActive) this.hevsFeatureUpdate()
+        this.hevsViewUpdate()
       } catch (err) {
         console.warn('[HEVS] Transfer error')
         console.dir(err)
@@ -159,6 +160,17 @@ const XRButtonComponent = {
         console.log('[HEVS] Feature update OK')
       } catch (err) {
         console.warn('[HEVS] Feature update error')
+        console.dir(err)
+      }
+    },
+    hevsViewUpdate: async function () {
+      try {
+        const pose = XR.getRawCameraPose()
+        const view = XR.getView()
+        console.log(`[HEVS] Updating View [${pose.position[0]}, ${pose.position[1]}, ${pose.position[2]}], ${pose.orientation[0]}, ${pose.orientation[1]}, ${pose.orientation[2]}, ${pose.orientation[3]}]`)
+        await XR.updateHEVSView(this.hevsPlatform, this.hevsAsset, pose, view)
+      } catch (err) {
+        console.warn('[HEVS] View update error')
         console.dir(err)
       }
     },

@@ -34,24 +34,24 @@ export function getFeatureIndices (collection, featureSet, featureTrack) {
 
 export function download (protein, pdb, format, featureTrackToBake) {
   const link = document.createElement('a')
-  link.href = getExportUri(protein, pdb, format, featureTrackToBake)
+  link.href = getExportUri(protein, pdb, { format, featureTrackToBake })
   link.download = `${protein}.${pdb}.${format}`
   link.click()
 }
 
 export function openInQuickLook (protein, pdb, featureTrackToBake) {
-  const uri = getExportUri(protein, pdb, 'usdz', featureTrackToBake)
+  const uri = getExportUri(protein, pdb, { format: 'usdz', featureTrackToBake })
   openUriInQuickLook(uri)
 }
 
 export function openInSceneViewer (protein, pdb, featureTrackToBake) {
-  const uri = getExportUri(protein, pdb, 'glb', featureTrackToBake)
+  const uri = getExportUri(protein, pdb, { featureTrackToBake })
   const title = `${protein}.${pdb}` // title to be displayed
   openUriInSceneViewer(uri, title)
 }
 
 export async function openInPSVR (protein, pdb, collection) {
-  const modelUri = getExportUri(protein, pdb, 'gltf')
+  const modelUri = getExportUri(protein, pdb, { format: 'gltf' })
   const payload = { modelUri, fileName: `${protein}.${pdb}`, collection }
   const response = await axios.post(`${process.env.VUE_APP_AQUARIA_BACKEND}/xr/sendToPSVR`, payload)
   if (response.status >= 400) throw new Error(response.data)
@@ -59,7 +59,7 @@ export async function openInPSVR (protein, pdb, collection) {
 }
 
 export async function openInHEVS (platform, protein, pdb) {
-  const modelUri = getExportUri(protein, pdb, 'glb')
+  const modelUri = getExportUri(protein, pdb, { rescale: false })
   const payload = { hevsPlatform: platform, modelUri, name: `${protein}.${pdb}` }
   const response = await axios.post(`${process.env.VUE_APP_AQUARIA_BACKEND}/xr/sendToHEVS`, payload)
   if (response.status >= 400) throw new Error(response.data)
@@ -78,6 +78,12 @@ export async function updateHEVSFeature (platform, asset, collection, featureSet
   }
 }
 
+export async function updateHEVSView (platform, asset, pose, view) {
+  const payload = { hevsPlatform: platform, assetId: asset, pose, view }
+  const response = await axios.post(`${process.env.VUE_APP_AQUARIA_BACKEND}/xr/setHEVSView`, payload)
+  if (response.status >= 400) throw new Error(response.data)
+}
+
 export function openInAdvancedViewer (protein, pdb) {
   const link = document.createElement('a')
   link.href = `${process.env.VUE_APP_ADVANCED_VIEWER_URL}?protein=${protein}&pdb=${pdb}`
@@ -85,11 +91,22 @@ export function openInAdvancedViewer (protein, pdb) {
   link.click()
 }
 
-export function getExportUri (protein, pdb, format, featureTrackToBake = null) {
-  const base = `${process.env.VUE_APP_AQUARIA_EXPORT_URL}/${protein}/${pdb}.${format}`
+/**
+ * @param {String} protein Accession
+ * @param {String} pdb PDB ID
+ * @param {Object} options
+ * @param {String} options.format 'glb', 'gltf', or 'usdz' (default 'glb')
+ * @param {Object} options.featureTrackToBake feature track (default none)
+ * @param {Boolean} options.rescale resize model for XR (default true)
+ */
+export function getExportUri (protein, pdb, options = {}) {
+  const defaults = { format: 'glb', featureTrackToBake: null, rescale: true }
+  const opts = Object.assign(defaults, options)
+  const base = `${process.env.VUE_APP_AQUARIA_EXPORT_URL}/${protein}/${pdb}.${opts.format}`
   const query = new URLSearchParams()
-  if (featureTrackToBake) {
-    const featureQuery = featureTrackToBake.map(feature => {
+  if (options.rescale === false) query.append('rescale', 'false')
+  if (options.featureTrackToBake) {
+    const featureQuery = options.featureTrackToBake.map(feature => {
       let encodedFeature = `${feature.color.replace('#', '')}-${feature.start}`
       if (feature.start !== feature.end) encodedFeature = `${encodedFeature}-${feature.end}`
       return encodedFeature
@@ -112,7 +129,7 @@ export function prepareAutoXR (protein, pdb, featureTrackToBake = null) {
     ? featureTrackToBake.slice(0, MAX_QR_FEATURES)
     : featureTrackToBake
 
-  const uri = getExportUri(protein, pdb, '$FORMAT', features)
+  const uri = getExportUri(protein, pdb, { format: '$FORMAT', featureTrackToBake: features })
   return uri
 }
 
@@ -128,6 +145,32 @@ export function invokeAutoXR (data) {
     // @TODO: better title required here
     openUriInSceneViewer(data.replace('$FORMAT', 'glb'), 'Aquaria Auto-XR')
   }
+}
+
+/**
+ * Grab the current raw camera pose with optional handedness conversion
+ * @param {Boolean} convertToLHS
+ * @returns {{ position: Number[], orientation: Number[] }}
+ */
+export function getRawCameraPose (convertToLHS = true) {
+  const position = window.AQUARIA.panel3d.embededJolecule.soupWidget.camera.position.clone()
+  const orientation = window.AQUARIA.panel3d.embededJolecule.soupWidget.camera.quaternion.clone()
+  if (convertToLHS) {
+    position.x = -position.x
+    orientation.set(orientation.z, orientation.w, orientation.x, orientation.y)
+  }
+  return {
+    position: [position.x, position.y, position.z],
+    orientation: [orientation.x, orientation.y, orientation.z, orientation.w]
+  }
+}
+
+/**
+ * Grab high level view data
+ */
+export function getView () {
+  // @TODO implement
+  return {}
 }
 
 function openUriInSceneViewer (uri, title) {
