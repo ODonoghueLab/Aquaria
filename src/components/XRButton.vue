@@ -1,13 +1,10 @@
 <script>
 
-/**
- * NOTE: All XR export operations are now run on-demand and do not need to be prepared ahead-of-time,
- * so hacking into Vue reactivity as per XRButtonComponent.mounted may no longer be strictly necessary.
- **/
-
 import * as XR from '../utils/XRUtils'
 import QRCode from 'qrcode'
+import debounce from 'lodash.debounce'
 
+const HEVS_UPDATE_INTERVAL = Number.parseInt(process.env.VUE_APP_HEVS_VIEW_UPDATE_INTERVAL) || 1000
 const search = new URLSearchParams(location.search)
 
 /** automatic XR (QR redirect)
@@ -46,6 +43,8 @@ const XRButtonComponent = {
       featureTrack: -1,
       featureCollection: null,
       isOpen: false,
+      view: null,
+      pose: null,
       hevsPlatform: search.get('HEVS'),
       hevsAsset: null,
       hevsUploadedCollections: [],
@@ -54,6 +53,8 @@ const XRButtonComponent = {
     }
   },
   mounted: function () {
+    this.hevsViewUpdateDebounced = debounce(() => this.hevsViewUpdate(), HEVS_UPDATE_INTERVAL, { leading: true, maxWait: HEVS_UPDATE_INTERVAL })
+
     // shim the chainSelected function to detect changes
     let chainSelectionOriginal
     const chainSelectionProxy = (accession, pdb, chain) => {
@@ -95,10 +96,38 @@ const XRButtonComponent = {
       // update HEVS if connected
       if (this.hevsPlatform && this.hevsAsset) this.hevsFeatureUpdate()
     }
+
+    // view change detection (@TODO drive this from Jolecule, this is expensive)
+    (() => {
+      const update = () => {
+        requestAnimationFrame(() => update())
+        try {
+          const latestView = XR.getView()
+          const latestPose = XR.getRawCameraPose()
+          if (!this.pose) {
+            this.pose = latestPose
+            this.view = latestView
+          }
+          let viewChanged = false
+          for (let i = 0; i < 3; i++) if (latestPose.position[i] !== this.pose.position[i]) { viewChanged = true; break }
+          for (let i = 0; i < 4; i++) if (latestPose.orientation[i] !== this.pose.orientation[i]) { viewChanged = true; break }
+          if (viewChanged) {
+            this.pose = latestPose
+            this.view = latestView
+          }
+        } catch {}
+      }
+      update()
+    })()
   },
   computed: {
     currentFeatureTrack: function () {
       return this.featuresActive ? this.featureSet.Tracks[this.featureTrack] : null
+    }
+  },
+  watch: {
+    pose: function (pose) {
+      if (this.hevsAsset) this.hevsViewUpdateDebounced()
     }
   },
   methods: {
@@ -174,10 +203,8 @@ const XRButtonComponent = {
     },
     hevsViewUpdate: async function () {
       try {
-        const pose = XR.getRawCameraPose()
-        const view = XR.getView()
-        console.log(`[HEVS] Updating View [${pose.position[0]}, ${pose.position[1]}, ${pose.position[2]}], ${pose.orientation[0]}, ${pose.orientation[1]}, ${pose.orientation[2]}, ${pose.orientation[3]}]`)
-        await XR.updateHEVSView(this.hevsPlatform, this.hevsAsset, pose, view)
+        console.log(`[HEVS] Updating View [${this.pose.position[0]}, ${this.pose.position[1]}, ${this.pose.position[2]}], ${this.pose.orientation[0]}, ${this.pose.orientation[1]}, ${this.pose.orientation[2]}, ${this.pose.orientation[3]}]`)
+        await XR.updateHEVSView(this.hevsPlatform, this.hevsAsset, this.pose, this.view)
       } catch (err) {
         console.warn('[HEVS] View update error')
         console.dir(err)

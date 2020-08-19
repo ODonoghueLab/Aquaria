@@ -20,6 +20,7 @@
     "jquery": "^3.5.1",
     "jquery-expander": "^2.0.1",
     "jquery-ui-dist": "^1.12.1",
+    "lodash.debounce": "^4.0.8",
     "molecular-control-toolkit-js": "0.0.8",
     "numeric": "^1.2.6",
     "qrcode": "^1.4.4",
