@@ -50,7 +50,12 @@ module.exports = {
           // @TODO switch back to npm jolecule at some point
           jolecule: require.resolve('./src/legacy/javascripts/jolecule.js')
         })
-      ]
+      ],
+      devServer: {
+        historyApiFallback: {
+          disableDotRule: false
+        }
+      }
     }
 
     if (process.env.NODE_ENV === 'production') {
