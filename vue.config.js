@@ -1,9 +1,12 @@
 const { ProvidePlugin } = require('webpack');
 
-module.exports = {
-  configureWebpack: config => {
+console.log(`Aquaria Backend: ${process.env.VUE_APP_AQUARIA_BACKEND}`);
+console.log(`Export Backend: ${process.env.VUE_APP_AQUARIA_EXPORT_URL}`);
+console.log(`Static SPA Mode Enabled: ${!!process.env.VUE_APP_STATIC_SPA_MODE}`);
 
-    const c = {
+module.exports = {
+  configureWebpack: baseConfig => {
+    const config = {
       module: {
         rules: [
           {
@@ -63,12 +66,23 @@ module.exports = {
     }
     else {
       // bust cache during development (Vue's default ETag implementation doesn't work well with Safari in particular)
-      c.output = {
+      config.output = {
         filename: '[name].[hash].js',
         chunkFilename: '[id].[hash].js'
       }
     }
 
-    return c;
+    return config;
+  },
+  chainWebpack: config => {
+    // ignore 404.html unless static SPA mode configured
+    if (!process.env.VUE_APP_STATIC_SPA_MODE) {
+      config.plugin('copy').tap(args => {
+        args[0][0].ignore.push('404.html');
+        return args;
+      });
+    }
+    return config;
   }
+
 }
