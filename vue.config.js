@@ -13,7 +13,7 @@ module.exports = {
       module: {
         rules: [
           {
-            test: /node_modules\/d3\//,  // fix old d3/jsdom compile errors by excluding jsdom
+            test: /node_modules[\/\\]d3[\/\\]/,  // fix old d3/jsdom compile errors by excluding jsdom
             loader: 'string-replace-loader',
             options: {
               multiple: [
@@ -36,7 +36,7 @@ module.exports = {
           cacheGroups: {
             legacy: { // extract legacy aquaria code into separate bundle
               chunks: 'all',
-              test: /src\/legacy/
+              test: /src[\/\\]legacy/
             },
             vendor: { // extract dependencies into separate bundle
               chunks: 'all',
