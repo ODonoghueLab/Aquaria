@@ -3,6 +3,9 @@ const { ProvidePlugin } = require('webpack');
 console.log(`Aquaria Backend: ${process.env.VUE_APP_AQUARIA_BACKEND}`);
 console.log(`Export Backend: ${process.env.VUE_APP_AQUARIA_EXPORT_URL}`);
 console.log(`Static SPA Mode Enabled: ${!!process.env.VUE_APP_STATIC_SPA_MODE}`);
+if (process.env.AQUARIA_CLIENT_EMIT_CNAME) {
+  console.log(`Emit CNAME: ${process.env.AQUARIA_CLIENT_EMIT_CNAME}`);
+}
 
 module.exports = {
   configureWebpack: baseConfig => {
@@ -52,7 +55,19 @@ module.exports = {
           // provide jolecule global to legacy scripts
           // @TODO switch back to npm jolecule at some point
           jolecule: require.resolve('./src/legacy/javascripts/jolecule.js')
-        })
+        }),
+        {
+          apply: (compiler) => {
+            compiler.hooks.emit.tap('AquariaAssetEmitWebpackPlugin', (compilation) => {
+              if (process.env.AQUARIA_CLIENT_EMIT_CNAME) {
+                compilation.assets.CNAME = {
+                  source: () => process.env.AQUARIA_CLIENT_EMIT_CNAME,
+                  size: () => process.env.AQUARIA_CLIENT_EMIT_CNAME
+                };
+              }
+            });
+          }
+        }
       ],
       devServer: {
         historyApiFallback: {

@@ -1,0 +1,72 @@
+name: Deploy Production Client to Github Pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_OUTPUT_PATH: dist
+      PUBLISH_REPO_PATH: publish
+      PUBLISH_REPO: aqclient/aqclient.github.io
+      PUBLISH_BRANCH: gh-pages
+      VUE_APP_AQUARIA_BACKEND: https://aquaria.ws:8010
+      VUE_APP_STATIC_SPA_MODE: true
+      AQUARIA_CLIENT_EMIT_CNAME: aquaria.app
+
+    steps:
+    - name: Checkout source Repo
+      uses: actions/checkout@v2
+
+    - name: Checkout publish repo
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ env.PUBLISH_REPO }}
+        ref: ${{ env.PUBLISH_BRANCH }}
+        path: '${{ env.PUBLISH_REPO_PATH }}'
+        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
+
+    - name: Clean publish repo
+      working-directory: ${{ env.PUBLISH_REPO_PATH }}
+      run: |
+        git rm -rf .
+        git clean -fxd
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build client
+      run: npm run build
+
+    - name: Copy build
+      run: 'cp -r ${{ env.BUILD_OUTPUT_PATH }}/* ${{ env.PUBLISH_REPO_PATH }}'
+
+    - name: Update publish repo (deploy)
+      working-directory: ${{ env.PUBLISH_REPO_PATH }}
+      run: |
+        git status
+        git add .
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "Deploy $GITHUB_SHA"
+
+    - name: Deploy to Pages
+      uses: ad-m/github-push-action@v0.6.0
+      with:
+        # directory: repo
+        # repository: aqclient/deploytest
+        # branch: master
+        directory: ${{ env.PUBLISH_REPO_PATH }}
+        repository: ${{ env.PUBLISH_REPO }}
+        branch: ${{ env.PUBLISH_BRANCH }}
+        github_token: ${{ secrets.PUBLISH_ACCESS_TOKEN }}
+        # force: true
