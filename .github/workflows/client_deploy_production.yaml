@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - README.md
+      - .editorconfig
+      - .gitignore
+      - .eslintrc.js
 
 jobs:
   build-and-deploy:
@@ -41,6 +46,18 @@ jobs:
       with:
         node-version: '12.x'
 
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
     - name: Install dependencies
       run: npm install
 
@@ -50,7 +67,15 @@ jobs:
     - name: Copy build
       run: 'cp -r ${{ env.BUILD_OUTPUT_PATH }}/* ${{ env.PUBLISH_REPO_PATH }}'
 
-    - name: Update publish repo (deploy)
+    - name: Check for changes
+      working-directory: ${{ env.PUBLISH_REPO_PATH }}
+      run: |
+        git status
+        [[ -z $(git status --porcelain) ]] || echo "::set-output name=changed::true"
+      id: check_changes
+
+    - name: Update publish repo
+      if: steps.check_changes.outputs.changed
       working-directory: ${{ env.PUBLISH_REPO_PATH }}
       run: |
         git status
@@ -60,13 +85,10 @@ jobs:
         git commit -m "Deploy $GITHUB_SHA"
 
     - name: Deploy to Pages
+      if: steps.check_changes.outputs.changed
       uses: ad-m/github-push-action@v0.6.0
       with:
-        # directory: repo
-        # repository: aqclient/deploytest
-        # branch: master
         directory: ${{ env.PUBLISH_REPO_PATH }}
         repository: ${{ env.PUBLISH_REPO }}
         branch: ${{ env.PUBLISH_BRANCH }}
         github_token: ${{ secrets.PUBLISH_ACCESS_TOKEN }}
-        # force: true
