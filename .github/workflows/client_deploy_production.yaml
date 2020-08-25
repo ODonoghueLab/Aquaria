@@ -23,7 +23,7 @@ jobs:
       AQUARIA_CLIENT_EMIT_CNAME: aquaria.app
 
     steps:
-    - name: Checkout source Repo
+    - name: Checkout source repo
       uses: actions/checkout@v2
 
     - name: Checkout publish repo
@@ -70,6 +70,7 @@ jobs:
     - name: Check for changes
       working-directory: ${{ env.PUBLISH_REPO_PATH }}
       run: |
+        git add .
         git status
         [[ -z $(git status --porcelain) ]] || echo "::set-output name=changed::true"
       id: check_changes
@@ -78,8 +79,6 @@ jobs:
       if: steps.check_changes.outputs.changed
       working-directory: ${{ env.PUBLISH_REPO_PATH }}
       run: |
-        git status
-        git add .
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git commit -m "Deploy $GITHUB_SHA"
