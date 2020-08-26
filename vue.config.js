@@ -53,8 +53,7 @@ module.exports = {
           'window.$': require.resolve('jquery'),
           'window.jQuery': require.resolve('jquery'),
           // provide jolecule global to legacy scripts
-          // @TODO switch back to npm jolecule at some point
-          jolecule: require.resolve('./src/legacy/javascripts/jolecule.js')
+          jolecule: require.resolve('jolecule')
         }),
         {
           apply: (compiler) => {

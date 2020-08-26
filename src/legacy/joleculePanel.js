@@ -27,6 +27,8 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
     isTextOverlay: false,
     isMouseWheel: false
   });
+  // apply Neblina's scripts to alter jolecule appearance
+  require('./jolecule-mods');
   var alignment = new jolecule.AquariaAlignment()
   this.joleculeAlignment = alignment
   var controller = this.embededJolecule.controller
