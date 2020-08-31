@@ -4,8 +4,12 @@ import * as XR from '../utils/XRUtils'
 import QRCode from 'qrcode'
 import debounce from 'lodash.debounce'
 
-const HEVS_UPDATE_INTERVAL = Number.parseInt(process.env.VUE_APP_HEVS_VIEW_UPDATE_INTERVAL) || 1000
 const search = new URLSearchParams(location.search)
+const HEVS_UPDATE_INTERVAL = Number.parseInt(
+  search.has('HEVS_UPDATE_INTERVAL')
+    ? search.get('HEVS_UPDATE_INTERVAL')
+    : process.env.VUE_APP_HEVS_VIEW_UPDATE_INTERVAL
+) || 1000
 
 /** automatic XR (QR redirect)
  * @TODO a more robust solution would be to flag xr=true and use rest of existing params to reconstruct export URL
