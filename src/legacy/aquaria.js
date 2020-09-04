@@ -282,7 +282,7 @@ var MAX_PROTEIN_HISTORY = 5;
 
           var interactive = attributes['interactive'] ? '/' +
             attributes['interactive'] : '';
-          var urlParams = window.location.search;
+          var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length);
           history.pushState(null, sequences[0].primary_accession,
             window.location.protocol + '//' + window.location.host +
             "/" + sequences[0].primary_accession + "/" +
@@ -677,7 +677,7 @@ var MAX_PROTEIN_HISTORY = 5;
       ///console.log('AQUARIA.loadAccession load', primary_accession)
 
       pdbParam = autoSelectPDB ? "/" + autoSelectPDB : "";
-      var urlParams = window.location.search;
+      var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length);
       history.pushState(primary_accession, document.title, '/' +
         primary_accession + pdbParam + urlParams);
 
@@ -1398,7 +1398,7 @@ var MAX_PROTEIN_HISTORY = 5;
     var uniprot_accession;
     // when 'now' socket is ready, fetch structures if URL specifies
     // a Primary_Accession
-    var pathname = document.URL.split('?')[0];
+    var pathname = document.location.origin + document.location.pathname; // document.URL.split('?')[0];
     if (typeof window.initialParams !== 'undefined') {
       AQUARIA.initialisePanels(true);
       uniprot_accession = [];

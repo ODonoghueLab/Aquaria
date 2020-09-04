@@ -169,8 +169,7 @@ export function getRawCameraPose (convertToLHS = true) {
  * Grab high level view data
  */
 export function getView () {
-  // @TODO implement
-  return {}
+  return window.AQUARIA.panel3d.embededJolecule.soupView
 }
 
 function openUriInSceneViewer (uri, title) {
