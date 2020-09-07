@@ -18,7 +18,7 @@ jobs:
       PUBLISH_REPO_PATH: publish
       PUBLISH_REPO: aqclient/aqclient.github.io
       PUBLISH_BRANCH: gh-pages
-      VUE_APP_AQUARIA_BACKEND: https://aquaria.ws:8010
+      VUE_APP_AQUARIA_BACKEND: https://aquaria.ws:8012
       VUE_APP_STATIC_SPA_MODE: true
       AQUARIA_CLIENT_EMIT_CNAME: aquaria.app
 
