@@ -177,10 +177,26 @@ const XRButtonComponent = {
 
       for (const chain in selected) {
         if (resString.length > 1) {
-          resString += ','
+          resString += RES_SEPERATE_CHAR
         }
         resString += chain
-        resString += selected[chain].join(RES_SEPERATE_CHAR)
+        const sorted = selected[chain].sort()
+        let start = 0
+        while (start < sorted.length) {
+          if (start > 0) {
+            resString += RES_SEPERATE_CHAR
+          }
+          resString += sorted[start]
+          let i = 1
+          while (start + i < sorted.length && sorted[start + i] - sorted[start] === i) {
+            i++
+          }
+          if (i > 1) {
+            resString += '-' + sorted[start + i - 1]
+          }
+          start += i
+        }
+        // resString += selected[chain].join(RES_SEPERATE_CHAR)
       }
 
       const forward = view.currentView.cameraParams.position.clone().sub(view.currentView.cameraParams.focus).normalize()
