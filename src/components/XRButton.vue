@@ -170,7 +170,7 @@ const XRButtonComponent = {
 
       // const urlParams = new URLSearchParams(window.location.search)
 
-      let resString = ''
+      let resString = '#'
       if (Object.keys(selected).length > 0) {
         resString = '#'
       }
@@ -221,7 +221,7 @@ const XRButtonComponent = {
       }
 
       const urlEnding = `${resString}?(${THREE.MathUtils.radToDeg(e.y).toFixed(DECIMAL_PRECISION)},${THREE.MathUtils.radToDeg(e.x).toFixed(DECIMAL_PRECISION)},${THREE.MathUtils.radToDeg(e.z).toFixed(DECIMAL_PRECISION)})&${sign}${zoom.toFixed(DECIMAL_PRECISION)}`
-      window.history.replaceState(null, null, window.location.origin + window.location.pathname + urlEnding)
+      window.history.replaceState(null, null, window.location.origin + window.location.pathname + window.location.search + urlEnding)
 
       // urlParams.set('res', resString)
       // urlParams.set('p', THREE.MathUtils.radToDeg(e.x).toFixed(DECIMAL_PRECISION))
@@ -234,7 +234,7 @@ const XRButtonComponent = {
 
     // eslint-disable-next-line no-unused-vars
     function parseURL () {
-      const post = decodeURIComponent(window.location.href.substr(window.location.origin.length + window.location.pathname.length))
+      const post = decodeURIComponent(window.location.href.substr(window.location.origin.length + window.location.pathname.length + window.location.search.length))
       if (post.length === 0) {
         return null
       }
@@ -249,7 +249,7 @@ const XRButtonComponent = {
       if (post[0] === '#') {
         let i = 0
         const selectedResidueString = post.substring(1, q)
-        {
+        if (selectedResidueString.length > 0) {
           const elements = selectedResidueString.split(',')
           for (i = 0; i < elements.length; i++) {
             const split = elements[i].split('-')
