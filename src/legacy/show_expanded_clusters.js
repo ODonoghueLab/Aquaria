@@ -333,7 +333,8 @@
 					var imgNm = " ";
 					if (d.pdb_id && typeof d._children === 'undefined') { imgNm = d.pdb_id.toUpperCase(); }
 					if (d._children && d._children[0].pdb_id) { imgNm = d._children[0].pdb_id.toUpperCase(); }
-					return (imgNm === " ") ? " " : "https://www.rcsb.org/pdb/images/"+imgNm+"_bio_r_65.jpg";
+					return (imgNm === " ") ? " " : "https://www.ebi.ac.uk/pdbe/static/entry/"+ imgNm.toLowerCase() + "_assembly_1_chain_front_image-200x200.png"
+					// return (imgNm === " ") ? " " : "https://www.rcsb.org/pdb/images/"+imgNm+"_bio_r_65.jpg";
 					});
 	
 	  nodeEnter.append("text")
