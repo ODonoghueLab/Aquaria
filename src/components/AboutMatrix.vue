@@ -1,28 +1,19 @@
 <template>
     <div id="about_matrix">
         <div id="title_0">
-            <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay(0)" @mouseleave="resetPlay(0)" class='icon' id='play' v-bind:src="'/images/Play.png'"/></a>
+            <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay(0)" @mouseleave="resetPlay(0)" class='icon' id='play' v-bind:src="play"/></a>
             <span id="Orgname_0" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'mobile'">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
             <span id="Orgname_0" @click="showAbout" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
-            <!-- <span id="matches_0"></span> -->
-             <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(0)" @mouseleave="resetPaper(0)" class='icon' id='paper' v-bind:src="'/images/Document.png'"/></a>
-            <!-- <span id="help" @mouseover="activarOver" @mousedown="showAbout" @mouseleave="resetOver" v-if="$mq === 'laptop'">?</span> -->
-            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'"/>
-            <!-- <img class='icon' id='help' @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'" v-if="$mq === 'mobile' || $mq === 'tablet'"/> -->
+             <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(0)" @mouseleave="resetPaper(0)" class='icon' id='paper' v-bind:src="document"/></a>
+            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="info"/>
         </div>
-        <!-- <div id="title_0" v-if="$mq === 'mobile'" @mousedown="showAboutPhone">
-            <span id="Orgname_0">{{ OrganismName }} PROTEINS STRUCTURES&nbsp;</span>
-            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="'/images/Info.png'"/>
-        </div> -->
         <div id="content">
             <div id="title">
-                <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay(1)" @mouseleave="resetPlay(1)" class='icon' id='play' v-bind:src="'/images/Play.png'"/></a>
+                <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay(1)" @mouseleave="resetPlay(1)" class='icon' id='play' v-bind:src="play"/></a>
                 <span id="Orgname" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'mobile'">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
                 <span id="Orgname" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
-                <!-- <span id="matches"></span> -->
-                <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(1)" @mouseleave="resetPaper(1)" class='icon' id='paper' v-bind:src="'/images/Document.png'"/></a>
-                <!-- <span id="close" @click="hideAbout()">✕</span> -->
-                <img class='icon' id='close' @mouseover="activateClose(1)" @mouseleave="resetClose(1)" @click="hideAbout()" v-bind:src="'/images/Close.png'"/>
+                <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(1)" @mouseleave="resetPaper(1)" class='icon' id='paper' v-bind:src="document"/></a>
+                <img class='icon' id='close' @mouseover="activateClose(1)" @mouseleave="resetClose(1)" @click="hideAbout()" v-bind:src="close"/>
             </div>
             <div>
             <p>This page summarizes all available 3D structural information for all proteins comprising the {{ OrganismName }} virus (SARS-CoV-2).
@@ -69,16 +60,20 @@ export default {
     return {
       synonymsString: null,
       synonymsArray: null,
-      timer: null
+      timer: null,
+      play: require('../assets/img/Play.png'),
+      info: require('../assets/img/Info.png'),
+      document: require('../assets/img/Document.png'),
+      close: require('../assets/img/Close.png')
     }
   },
-  beforeMount () {
-    this.synonymsArray = this.OrgSynonyms.split(',')
-    this.synonymsString = this.synonymsArray[1]
-    for (var i = 2; i < this.synonymsArray.length; i++) {
-      this.synonymsString = this.synonymsString + ', ' + this.synonymsArray[i]
-    }
-  },
+  // beforeMount () {
+  //   // this.synonymsArray = this.OrgSynonyms.split(',')
+  //   this.synonymsString = this.synonymsArray[1]
+  //   for (var i = 2; i < this.synonymsArray.length; i++) {
+  //     this.synonymsString = this.synonymsString + ', ' + this.synonymsArray[i]
+  //   }
+  // },
   props: ['OrganismName', 'OrgSynonyms', 'checkDevice'],
   mounted () {
     document.querySelector('img#play').addEventListener('mouseover', function () {
@@ -93,16 +88,6 @@ export default {
     document.querySelector('img#paper').addEventListener('mouseout', function () {
       document.querySelector('img#paper').src = '/images/Document.png'
     })
-    if (window.location.hash === '#info') {
-      this.showAbout()
-      if (window.innerWidth < 750) {
-        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 75 + 'px'
-      } else if (window.innerWidth < 1800 && window.innerWidth > 750) {
-        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 110 + 'px'
-      } else {
-        document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 130 + 'px'
-      }
-    }
   },
   methods: {
     activatePlay (n) {
@@ -138,6 +123,11 @@ export default {
       document.querySelector('#help').src = '/images/Info.png'
     },
     hideAbout: function () {
+      if (document.querySelector('#graph').style.display === 'block') {
+        window.history.replaceState({}, document.title, '#Map')
+      } else {
+        window.history.replaceState({}, document.title, '#Matrix')
+      }
       document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 25 + 'px'
       document.querySelector('#content').style.display = 'none'
       document.querySelector('#title_0').style.visibility = 'visible'
@@ -146,7 +136,9 @@ export default {
       document.querySelector('#help').style.pointerEvents = 'none'
     },
     showAbout: function () {
-      document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 25 + 'px'
+      window.history.replaceState({}, document.title, '#info')
+      var titleWidth = document.querySelector('#Orgname_0').offsetWidth + 80 + 'px'
+      document.querySelector('#content').style.width = 'calc(' + titleWidth + ' + 3vw)'
       document.querySelector('#content').style.display = 'block'
       document.querySelector('#title_0').style.visibility = 'hidden'
       if (document.getElementsByClassName('dimmer').length === 0) {
@@ -157,6 +149,11 @@ export default {
         document.querySelector('#title_0').style.visibility = 'hidden'
 
         document.querySelector('div.dimmer').addEventListener('click', function () {
+          if (document.querySelector('#graph').style.display === 'block') {
+            window.history.replaceState({}, document.title, '#Map')
+          } else {
+            window.history.replaceState({}, document.title, '#Matrix')
+          }
           document.querySelector('#content').style.display = 'none'
           document.querySelector('#title_0').style.visibility = 'visible'
           document.querySelector('div.dimmer').remove()
@@ -165,43 +162,7 @@ export default {
         document.querySelector('div.dimmer').remove()
       }
     },
-    // showAboutPhone: function () {
-    //   document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 25 + 'px'
-    //   document.querySelector('#content').style.display = 'block'
-    //   if (document.getElementsByClassName('dimmer').length === 0) {
-    //     var elemDiv = document.createElement('div')
-    //     elemDiv.className = 'dimmer'
-    //     document.body.append(elemDiv)
-    //     document.querySelector('#content').style.display = 'block'
-
-    //     document.querySelector('div.dimmer').addEventListener('click', function () {
-    //       document.querySelector('#content').style.visibility = 'hidden'
-    //       document.querySelector('div.dimmer').remove()
-    //     })
-    //   } else {
-    //     document.querySelector('div.dimmer').remove()
-    //   }
-    // },
     activateOver () {
-      // this.timer = setTimeout(function () {
-      //   document.querySelector('#content').style.display = 'block'
-      //   document.querySelector('#title_0').style.visibility = 'hidden'
-      //   if (document.getElementsByClassName('dimmer').length === 0) {
-      //     var elemDiv = document.createElement('div')
-      //     elemDiv.className = 'dimmer'
-      //     document.body.append(elemDiv)
-      //     document.querySelector('#content').style.display = 'block'
-      //     document.querySelector('#title_0').style.visibility = 'hidden'
-
-      //     document.querySelector('div.dimmer').addEventListener('click', function () {
-      //       document.querySelector('#content').style.display = 'none'
-      //       document.querySelector('#title_0').style.visibility = 'visible'
-      //       document.querySelector('div.dimmer').remove()
-      //     })
-      //   } else {
-      //     document.querySelector('div.dimmer').remove()
-      //   }
-      // }, 1000)
       document.querySelector('#help').src = '/images/Info_Hover.png'
       document.querySelector('#help').style.cursor = 'pointer'
       document.querySelector('#Orgname_0').style.cursor = 'pointer'
@@ -212,6 +173,9 @@ export default {
     }
   },
   updated () {
+    if (window.location.hash.toLowerCase() === '#info') {
+      this.showAbout()
+    }
     window.addEventListener('resize', function (event) {
       document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 25 + 'px'
     })
@@ -233,7 +197,7 @@ img#play{
 }
 #about_matrix{
     margin-left: 12px;
-    margin-top: calc(1px + 1.5vh);
+    margin-top: calc(7px + 0.55vh);
     margin-bottom: 20px;
 }
 
@@ -258,7 +222,7 @@ img#play{
 }
 #content {
     position: relative;
-    z-index: 4;
+    z-index: 15;
     display: none;
     border-radius: 2em;
     background: #DEDEDE;

@@ -8,10 +8,8 @@
 </template>
 
 <script>
-
 // most legacy code bundling is triggered from here (expects global jolecule)
 import '../legacy/aquaria'
-
 import Content from '../components/Content'
 import Footer from '../components/Footer'
 import BadBrowser from '../components/BadBrowser'
@@ -23,7 +21,49 @@ export default {
     BadBrowser,
     Footer
   },
+  // beforeMount () {
+  //   const Script1 = document.createElement('script')
+  //   Script1.setAttribute('src', '/javascripts/jquery-1.9.1.min.js')
+  //   document.body.appendChild(Script1)
+
+  //   const Script2 = document.createElement('script')
+  //   Script2.setAttribute('src', '/javascripts/chardinjs.mod.js')
+  //   document.body.appendChild(Script2)
+  // },
+  // created () {
+  //   var libs = [
+  //     '/javascripts/jquery-ui.1.10.3.js',
+  //     '/javascripts/jquery.expander.min.js',
+  //     '/javascripts/browser_check.js'
+  //   ]
+
+  //   var injectLibFromStack = function () {
+  //     if (libs.length > 0) {
+  //       // grab the next item on the stack
+  //       var nextLib = libs.shift()
+  //       var headTag = document.getElementsByTagName('head')[0]
+
+  //       // create a script tag with this library
+  //       var scriptTag = document.createElement('script')
+  //       scriptTag.src = nextLib
+
+  //       // when successful, inject the next script
+  //       scriptTag.onload = function (e) {
+  //         console.log('---> loaded: ' + e.target.src)
+  //         injectLibFromStack()
+  //       }
+
+  //       // append the script tag to the <head></head>
+  //       headTag.appendChild(scriptTag)
+  //       console.log('injecting: ' + nextLib)
+  //     }
+  //   }
+
+  //   // start script injection
+  //   injectLibFromStack()
+  // },
   mounted () {
+    document.querySelector('#header').remove()
     setTimeout(function () {
       if (document.querySelector('.matrixLoading')) {
         document.querySelector('.matrixLoading').style.visibility = 'hidden'
@@ -35,6 +75,8 @@ export default {
 </script>
 
 <style>
+  /* @import "https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"; */
+
 #wrapper{
   font: 12px/18px "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
 }

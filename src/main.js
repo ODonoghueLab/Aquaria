@@ -19,6 +19,11 @@ import './legacy/javascripts/chardinjs.mod'
 // load other globals (some may depend on jquery/plugins above)
 import './legacy/javascripts/browser_check'
 
+// Import all styles
+require('../src/assets/css/layout.css')
+require('../src/assets/css/normalize.css')
+require('../src/assets/css/main.css')
+
 Vue.use(ToggleSwitch)
 Vue.use(MdButton)
 Vue.use(MdContent)

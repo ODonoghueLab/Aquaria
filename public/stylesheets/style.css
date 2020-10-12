@@ -670,18 +670,6 @@ div.expansion svg > g {
     z-index: 90;
   }
 
-  div.dimmer {
-    background: black;
-    height: 100%;
-    position: fixed;
-    left: 0;
-    top: 0;
-    opacity: 0.68;
-    -moz-opacity: 0.68;
-    width: 100%;
-    z-index: 99;
-  }
-
   div.panel span.help {
     display: inline-block;
     width: 17px;

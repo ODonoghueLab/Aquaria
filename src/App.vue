@@ -37,7 +37,7 @@ export default {
       hostname: store.state.url
     }
   },
-  beforeMount () {
+  beforeCreate () {
     // var regex = /(^\d+\/*$)/
     if (window.location.pathname === '/') {
       if (sessionStorage.getItem('link') == null) {
@@ -46,42 +46,62 @@ export default {
         window.location.pathname = sessionStorage.getItem('link')
       }
     }
-    var url = ''
-    // var hostname = window.location.protocol + '//' + window.location.hostname
-    if (window.location.pathname.split('/')[1] === 'covid19') {
-      url = `${process.env.VUE_APP_AQUARIA_BACKEND}/SARS-CoV-2`
-    } else {
-      url = `${process.env.VUE_APP_AQUARIA_BACKEND}${window.location.pathname}`
-    }
-    axios({
-      method: 'get',
-      url: url
-    })
-      .then(function (response) {
-        if (response.data.initialParams) {
-          window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
-        }
-        if (response.data.primary_accessions) {
-          window.localStorage.setItem('OrgID', response.data.OrganismID)
-          if (response.data.OrganismID === '2697049') {
-            window.location.pathname = 'SARS-CoV-2'
-          } else {
-            window.location.pathname = '/orgID/' + response.data.OrganismID
-          }
-          this.primary_accession = response
-        }
-      }
-      )
   },
+  // beforeMount () {
+  //   // var regex = /(^\d+\/*$)/
+  //   if (window.location.pathname === '/') {
+  //     if (sessionStorage.getItem('link') == null) {
+  //       window.location.pathname = '/O15350/2xwc/A'
+  //     } else {
+  //       window.location.pathname = sessionStorage.getItem('link')
+  //     }
+  //   }
+  //   var url = ''
+  //   // var hostname = window.location.protocol + '//' + window.location.hostname
+  //   if (window.location.pathname.split('/')[1] === 'covid19') {
+  //     url = `${process.env.VUE_APP_AQUARIA_BACKEND}/SARS-CoV-2`
+  //   } else {
+  //     url = `${process.env.VUE_APP_AQUARIA_BACKEND}${window.location.pathname}`
+  //   }
+  //   axios({
+  //     method: 'get',
+  //     url: url
+  //   })
+  //     .then(function (response) {
+  //       if (response.data.initialParams) {
+  //         window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
+  //       }
+  //       if (response.data.primary_accessions) {
+  //         window.localStorage.setItem('OrgID', response.data.OrganismID)
+  //         if (response.data.OrganismID === '2697049') {
+  //           window.location.pathname = 'SARS-CoV-2'
+  //         } else {
+  //           window.location.pathname = '/orgID/' + response.data.OrganismID
+  //         }
+  //         this.primary_accession = response
+  //       }
+  //     }
+  //     )
+  // },
   mounted () {
-    // if (window.location.pathname) {
-    document.querySelector('.matrixLoading').style.visibility = 'visible'
-    var span = document.getElementById('myspan')
+    setTimeout(function () {
+      const pdf = window.location.protocol + '//' + window.location.hostname + '/COVID-Structural-Coverage-Map.pdf'
+      const js1 = window.location.protocol + '//' + window.location.hostname + '/javascripts/aquaria.js'
+      const js2 = window.location.protocol + '//' + window.location.hostname + '/javascripts/jolecule.js'
+      axios({
+        method: 'get',
+        url: pdf
+      })
+      axios({
+        method: 'get',
+        url: js1
+      })
 
-    setInterval(function () {
-      if ((span.innerHTML += '.').length === 5) { span.innerHTML = '' }
-    }, 500)
-    // }
+      axios({
+        method: 'get',
+        url: js2
+      })
+    }, 15000)
   }
 }
 </script>
@@ -180,4 +200,16 @@ html{
 #nav a.router-link-exact-active {
   color: #42b983;
 }
+
+div.dimmer {
+    background: black;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    opacity: 0.68;
+    -moz-opacity: 0.68;
+    width: 100%;
+    z-index: 1;
+  }
 </style>
