@@ -525,15 +525,18 @@ var MAX_PROTEIN_HISTORY = 5;
       AQUARIA.blankPanel("#aboutPDB", true);
       //AQUARIA.blankPanel("#uniProtDesc", true);
       // member["sequence"] = sequence["sequence"];
-      var params = {
-        sequence: sequence,
-        member: this.member
-      }
+      
+      var loadRequest = {
+        selector: [sequence.primary_accession],
+        selectPDB: this.member.pdb_id,
+        selectChain: this.member.pdb_chain[0]
+      };
+
       var url = `${window.BACKEND}/get_3D_alignment`;
         axios({
-          method: 'post',
+          method: 'get',
           url: url,
-          data: params
+          params: loadRequest
         })
         .then(function (response) {
           let newData = response.data
@@ -711,9 +714,9 @@ var MAX_PROTEIN_HISTORY = 5;
       // cache_matching_structures(primary_accession, function(primary_accession) {
         var url = `${window.BACKEND}/get_matching_structures`
           axios({
-            method: 'post',
+            method: 'get',
             url: url,
-            data: loadRequest
+            params: loadRequest
           })
           .then(function (response) {
             let matches = response.data
@@ -1464,8 +1467,8 @@ var MAX_PROTEIN_HISTORY = 5;
     } else {
       console.log('AQUARIA.domready cannot find viewer: ' + window.threedViewer);
     }
-    remoteSuccess();
     AQUARIA.gesture = new molecularControlToolkitJS.leap(AQUARIA.panel3d.gestures());
+    remoteSuccess();
   });
 
 })(jQuery);

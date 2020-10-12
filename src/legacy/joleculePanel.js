@@ -1,5 +1,6 @@
 
 var JoleculePanel = function(attachToDiv, chainSelected) {
+
   this.blankApplet();
   this.attachToDiv = attachToDiv;
   var n = attachToDiv.length
@@ -9,7 +10,7 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
   var newDivId = divId + '-inner'
   var newAttachToDiv = '#' + newDivId
   newDiv.setAttribute('id', newDivId)
-  newDiv.setAttribute('style', 'padding-bottom: 10px; box-sizing: border-box; width: 100%; height: 100%')
+  newDiv.setAttribute('style', 'padding-bottom: 2px; box-sizing: border-box; width: 100%; height: 95%')
   currentDiv.appendChild(newDiv);
   this.chainSelected = chainSelected;
   this.embededJolecule = jolecule.initEmbedJolecule({
@@ -17,15 +18,15 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
     isLoop: false,
     isGrid: true,
     isLegend: true,
-    backgroundColor: "#cccccc",
+    backgroundColor: "#CCC",
     isEditable: true,
     isResidueSelector: false,
     isExtraEditable: true,
     isMenu: true,
-    isToolbarOnTop: true,
+    isToolbarOnTop: false,
     isToolbarOn: true,
     isTextOverlay: false,
-    isMouseWheel: false
+    isMouseWheel: true
   });
   // apply Neblina's scripts to alter jolecule appearance
   require('./jolecule-mods');
@@ -161,7 +162,7 @@ JoleculePanel.prototype.reload = function(attributes) {
     })
 };
 
-
+//for generating attributes use location+pdb_id
 JoleculePanel.prototype.generateAttributes = function(threeDWidth, threeDHeight, pdb_id, pdb_chain, biounit, source_primary_accession, sequences, common_names, pssh_alignment, links, transform,
   conservations) {
   var instanceId = sequences[0].primary_accession + '-' + pdb_id + '-' + pdb_chain[0];

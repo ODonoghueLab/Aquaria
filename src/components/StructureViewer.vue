@@ -13,6 +13,7 @@
         <span class="threedcontent resizable" id="threeD">
               <span id="threeDSpan">
               </span>
+              <Tabs />
                 <iframe src="/html/waiting.html" frameBorder="0" name="waitingFrame" id="waitingFrame" scrolling="no" allowtransparency="true">
                 <p>Your browser does not support iframes.</p>
               </iframe>
@@ -25,12 +26,14 @@
 
 <script>
 import XRButton from '../components/XRButton'
+import Tabs from '../components/Tabs'
 import $ from 'jquery'
 
 export default {
   name: 'StructureViewer',
   components: {
-    XRButton
+    XRButton,
+    Tabs
   },
   mounted () {
     function checkPhone () {
