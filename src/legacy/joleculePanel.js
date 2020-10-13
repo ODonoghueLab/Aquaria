@@ -144,14 +144,28 @@ JoleculePanel.prototype.reload = function(attributes) {
   this.joleculeAlignment.selectNewChain = () => {}
 
   let that = this
+  var DataServer = require('./data-server');
+
+  let PDB_URI = ''
+  if (attributes.biounit == 0) {
+    // 0, null or undefined
+    // url = 'https://files.rcsb.org/download/' + pdbId + '.pdb';
+    PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb`;
+  } else {
+    // url = 'https://files.rcsb.org/download/' + pdbId + '.pdb' + biounit;
+    PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb${attributes.biounit}`;
+  }
+  console.log(PDB_URI)
+  const dataServer = new DataServer.DataServer(PDB_URI, attributes.pdb_id);
   this.embededJolecule.asyncAddDataServer(
-      jolecule.makeDataServer(
-        attributes.pdb_id,
-        "",
-        false,
-        false,
-        false,
-        attributes.biounit)
+    dataServer
+      // jolecule.makeDataServer(
+      //   attributes.pdb_id,
+      //   "",
+      //   false,
+      //   false,
+      //   false,
+      //   attributes.biounit)
     )
     .then(function() {
       that.setAlignment(attributes)
