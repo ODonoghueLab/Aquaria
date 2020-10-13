@@ -95,17 +95,14 @@
 //				//console.log("The % complete = " + (val * 100));
 //			};
 			console.log('show_expanded_cluster.expand_cluster remote fetch secondary clusters', cluster.members, sequence.primary_accession, cluster_nbr)
-			var params = {
-				members: cluster.members,
-				primary_accession: sequence.primary_accession,
-				cluster_nbr: cluster_nbr
-			  }
+			
 			  var url = `${window.BACKEND}/get_secondary_clusters`;
-				axios({
-				  method: 'post',
-				  url: url,
-				  data: params
-				})
+			  url = url +  sequence.primary_accession + "/" + pdbid + "/" + chainParam.split('/')[1]+ "/" + cluster_nbr
+
+			  axios({
+				method: 'get',
+				url: url
+			  })
 				.then(function (response) {
 				  let newData = response.data
 				  secondaryClustersCallback(newData)
