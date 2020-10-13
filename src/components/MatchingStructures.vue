@@ -9,12 +9,15 @@ export default {
 </script>
 
 <style>
- #vis {
+ /* #vis {
     min-height: 200px;
     padding: 2px;
     position: relative;
+  } */
+  #vis{
+    max-height: 40vh;
+    overflow: scroll;
   }
-
   .outer_container{
     display: inline-flex;
   }
