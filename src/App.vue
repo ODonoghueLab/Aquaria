@@ -119,7 +119,6 @@ export default {
 }
 
 #wrapper{
-  position: absolute;
   width: 100vw;
 }
 

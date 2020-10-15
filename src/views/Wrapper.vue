@@ -63,7 +63,9 @@ export default {
   //   injectLibFromStack()
   // },
   mounted () {
-    document.querySelector('#header').remove()
+    if (document.querySelector('#header')) {
+      document.querySelector('#header').remove()
+    }
     setTimeout(function () {
       if (document.querySelector('.matrixLoading')) {
         document.querySelector('.matrixLoading').style.visibility = 'hidden'
