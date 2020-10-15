@@ -19,8 +19,16 @@ export default {
 </script>
 
 <style>
-#center{
-  display: inline-flex;
+/* #center{
+  display: grid;
   width: 100%;
+  z-index: 1;
+} */
+#center{
+  margin: auto;
+  display: flex;
+  flex-flow: column nowrap;
+  align-content: stretch;
+  height: 98vh;
 }
 </style>

@@ -79,6 +79,9 @@ export default {
 
 #wrapper{
   font: 12px/18px "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+
 }
 
 a, p#psyns a, p#osyns a, .simulatelink {

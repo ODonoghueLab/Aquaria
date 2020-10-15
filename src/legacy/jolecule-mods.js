@@ -3,18 +3,18 @@
 $("#export-button").removeAttr("style")
   .attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
 
-$("#toggle-toolbar-button").removeAttr("style")
-  .attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
+// $("#toggle-toolbar-button").removeAttr("style")
+//   .attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
 
-$("#toggle-toolbar-button2").click(function () {
-  $("#toggle-toolbar-button").removeAttr("style")
-    .attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
-})
+// $("#toggle-toolbar-button2").click(function () {
+//   $("#toggle-toolbar-button").removeAttr("style")
+//     .attr("style", "position: absolute; z-index: 2; top: 3px; right: 0px; margin: 5px; transform: rotate(180deg)")
+// })
 
-$(window).on('resize', function () {
-  $("#toggle-toolbar-button").removeAttr('style')
-    .attr("style", "position: absolute; z-index: 2; top: 0px; right: 3px; margin: 5px; transform: rotate(180deg)")
-});
+// $(window).on('resize', function () {
+//   $("#toggle-toolbar-button").removeAttr('style')
+//     .attr("style", "position: absolute; z-index: 2; top: 0px; right: 3px; margin: 5px; transform: rotate(180deg)")
+// });
 
 $('.jolecule-embed-header').attr("style", "display: none; flex-flow: row-reverse;")
 

@@ -17,6 +17,7 @@ export default {
   #vis{
     max-height: 40vh;
     overflow: scroll;
+    margin-bottom: -54px;
   }
   .outer_container{
     display: inline-flex;

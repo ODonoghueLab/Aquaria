@@ -4,6 +4,7 @@
     --_333: #333333;
     --text: #fcfcfc;
     --background: #c0c0c0;
+    --transparent: #ffffff00;
     --bg-highlite: #dedede;
     --coil-conserved: #5d724f;
     --coil-match: #6f9e52;
@@ -36,14 +37,14 @@ main {
     height: 98vh;
 }  
 
-/* #header {
+#header {
   display: flex;
-  flex-flow: row nowrap; */
+  flex-flow: row nowrap;
   /* Then we define how to distribute the remaining space */
-  /* justify-content: space-between; 
-  margin-top: 0.5rem; */
+  justify-content: space-between; 
+  margin-top: 0.5rem;
   /* order: 2; */
-/* } */
+}
 .item {
     flex-grow: 0;
     flex-basis: 3rem;
@@ -81,9 +82,9 @@ main {
 strong {
     font-weight: 600;
 }
-/* #title:hover {
+#title:hover {
     padding-left: 3rem;
-} */
+}
 #structureImage {
     width: 100%;
     height: 100%;
@@ -113,10 +114,11 @@ strong {
 }
 .tab#Features {
     order: 2;
+    flex-basis: calc(9rem + 1vw);
 }
 span.icon {
     display: inline-block;
-    background-color: var(--background);
+    background-color: var(--transparent);
     width: calc(1.25rem + 1vh);
     height: calc(1.25rem + 1vh);
     border-radius: 50%;
@@ -151,7 +153,7 @@ span.icon {
 }
 
 .tab a {
-    color: var(--background);
+    color: var(--transparent);
     text-decoration: none;
     transition: All 0.5s ease;
 }

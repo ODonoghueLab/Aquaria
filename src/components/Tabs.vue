@@ -25,19 +25,52 @@ export default {
       MS: require('../assets/img/MS-01.svg'),
       FT: require('../assets/img/FT-01.svg')
     }
+  },
+  mounted () {
+    document.querySelector('.icon').addEventListener('click', function () {
+    //   document.querySelector('.tabs').style.position = 'sticky'
+      if (document.getElementsByClassName('dimmer').length === 0) {
+        var elemDiv = document.createElement('div')
+        elemDiv.className = 'dimmer'
+        document.body.append(elemDiv)
+        document.querySelector('.tabs > .panel').style.display = 'block'
+        // document.querySelector('#switch').style.display = 'block'
+        document.querySelector('div.dimmer').style.height = '100%'
+        document.querySelector('div.dimmer').style.zIndex = '0'
+        document.querySelector('div.dimmer').addEventListener('click', function () {
+          document.querySelector('.tabs > .panel').style.display = 'none'
+          document.querySelector('div.dimmer').remove()
+        })
+      } else {
+        document.querySelector('div.dimmer').remove()
+        // document.querySelector('#vis').style.display = 'none'
+        // document.querySelector('.tabs').style.position = 'relative'
+      }
+    })
   }
-//   mounted () {
-//     document.querySelector('.icon').addEventListener('click', function () {
-//       document.querySelector('#structureviewer').style.height = document.querySelector('#structureviewer').style.height - document.querySelector('.tabs').offsetHeight
-//     })
-//   }
 }
 </script>
 
-<style scoped>
-.tabs {
+<style>
+/* .tabs {
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
+    position: fixed;
+    z-index: 2;
+    bottom: 4px;
+    background: #f0f8ff00;
+} */
+.tabs{
+    position: fixed;
+    z-index: 1;
+    display: flex;
+    bottom: 1px;
+}
+#Structures{
+    float: left;
+}
+#Features{
+    float: right;
 }
 </style>
