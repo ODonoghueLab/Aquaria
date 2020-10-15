@@ -1,23 +1,36 @@
 <template>
 <div>
+    <XRButton />
+    <div id="menu-btn" class="item"><a href="#Menu"><img :src="menu" /></a></div>
+    <Menu />
     <StructureViewer id="structureviewer"/>
-    <Structures class="panel" id="structurematches" data-intro=" " data-position="top" />
+    <!-- <Structures class="panel" id="structurematches" data-intro=" " data-position="top" /> -->
     <AboutAquaria />
+    <Tabs />
 </div>
 </template>
 
 <script>
 import StructureViewer from './StructureViewer'
-import Structures from './Structures'
 import AboutAquaria from './AboutAquaria'
+import Tabs from '../components/Tabs'
 import $ from 'jquery'
+import XRButton from './XRButton'
+import Menu from './Menu'
 
 export default {
   name: 'Center',
   components: {
     StructureViewer,
-    Structures,
-    AboutAquaria
+    AboutAquaria,
+    Tabs,
+    XRButton,
+    Menu
+  },
+  data () {
+    return {
+      menu: require('../assets/img/aquaria-menu.svg')
+    }
   },
   mounted () {
     var width = window.innerWidth - 75
@@ -32,6 +45,12 @@ export default {
 </script>
 
 <style scoped>
+#menu-btn{
+  z-index: 1;
+  position: absolute;
+  right: 6px;
+  top: 18px;
+}
 #structurematches{
   position: fixed;
   top: 4vh;
