@@ -18,6 +18,7 @@ export default {
     max-height: 40vh;
     overflow: scroll;
     margin-bottom: -54px;
+    width: 100vw;
   }
   .outer_container{
     display: inline-flex;

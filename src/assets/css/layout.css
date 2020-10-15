@@ -107,15 +107,18 @@ strong {
     height: 2rem;
     padding-left: 0.5rem;
     transition: All 0.5s ease;
-    min-width: 8rem;
+    min-width: 6rem;
 }
 .tab#Structures {
     order: 1;
+    float: left;
 }
 .tab#Features {
     order: 2;
     flex-basis: calc(9rem + 1vw);
+    float: left;
 }
+
 span.icon {
     display: inline-block;
     background-color: var(--transparent);
@@ -141,6 +144,24 @@ span.icon {
     height: 0;
     transition: All 0.8s ease;
 }
+#vis {
+    background: var(--bg-highlite);
+    padding: 0.2rem 0.5rem;
+    flex-basis: 98%;
+    display: none;
+    opacity: 0;
+    height: 0;
+    transition: All 0.8s ease;
+}
+#featurelist {
+    background: var(--bg-highlite);
+    padding: 0.2rem 0.5rem;
+    flex-basis: 98%;
+    display: none;
+    opacity: 0;
+    height: 0;
+    transition: All 0.8s ease;
+}
 :target + .panel, .panel:target {
     background-color: var(--primary-tab);
     opacity: 1;
@@ -151,7 +172,26 @@ span.icon {
     width: 100%;
     transition: All 0.8s ease;
 }
-
+:target + #featurelist, #featurelist:target {
+    background-color: var(--primary-tab);
+    opacity: 1;
+    height: auto;
+    order: 3;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    transition: All 0.8s ease;
+}
+:target + #vis, #vis:target {
+    background-color: var(--primary-tab);
+    opacity: 1;
+    height: auto;
+    order: 3;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    transition: All 0.8s ease;
+}
 .tab a {
     color: var(--transparent);
     text-decoration: none;

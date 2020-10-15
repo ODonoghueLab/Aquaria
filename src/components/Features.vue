@@ -1,5 +1,5 @@
 <template>
-    <div class="toggled" id="featurelist"></div>
+    <div id="featurelist"></div>
 </template>
 
 <script>
@@ -10,12 +10,11 @@ export default {
 </script>
 
 <style>
-/* #featurelist{
+#featurelist{
   overflow: scroll;
-  height: 83vh;
-  padding: 8px;
-} */
-
+  margin-bottom: -10px;
+  width: 100vw;
+}
 #groupedFeatures{
     margin-left: 6px;
   }

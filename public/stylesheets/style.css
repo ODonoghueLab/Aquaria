@@ -315,7 +315,7 @@
     z-index: 10;
   }
 
-  #waitingFrame {
+  /* #waitingFrame {
     overflow: hidden;
     position: absolute;
     z-index: 101;
@@ -324,8 +324,9 @@
     padding: 0px;
     margin: 0px;
     width: 100%;
-    height: 100%;
-  }
+    height: 102vh;
+    bottom: 106vh;
+  } */
 
   #selectionText {
     overflow: hidden;

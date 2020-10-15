@@ -335,9 +335,11 @@ const XRButtonComponent = {
 
       // const proxies = resNums.map((res) => window.AQUARIA.panel3d.embededJolecule.soup.findFirstResidue(chain, res)) // window.AQUARIA.panel3d.embededJolecule.soup.findResidueIndices(structure, chain, resNums)
       soupController.clearSelectedResidues()
-      proxies.forEach((proxy) => {
-        soupController.selectResidue(proxy.iRes, true)
-      })
+      if (proxies[0]) {
+        proxies.forEach((proxy) => {
+          soupController.selectResidue(proxy.iRes, true)
+        })
+      }
       const currentView = soupView.getZoomedOutViewOfSelection()
       if (zoom) {
         zoom *= 10

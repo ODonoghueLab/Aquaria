@@ -21,7 +21,7 @@ export default {
 <style scoped>
 #controls{
   padding-left: 10px;
-  position: absolute;
+  /* position: absolute; */
   width: 0;
   display: flex;
 }

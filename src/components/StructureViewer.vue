@@ -79,9 +79,9 @@ export default {
 
 <style scoped>
 #structureviewer{
-  height: 112vh;
-  position: absolute;
-  margin-top: -11px;
+  height: 111vh;
+  /* position: absolute; */
+  /* margin-top: -90px; */
 }
 
 #updateJava3D {
@@ -126,8 +126,8 @@ export default {
     padding: 0px;
     margin: 0px;
     width: 100%;
-    height: 100vh;
-    top: -101vh;
+    height: 107vh;
+    bottom: 106vh;
 }
 
 /* div.panel span#threeD {

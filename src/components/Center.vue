@@ -47,7 +47,7 @@ export default {
 <style scoped>
 #menu-btn{
   z-index: 1;
-  position: absolute;
+  position: fixed;
   right: 6px;
   top: 18px;
 }
