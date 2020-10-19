@@ -201,7 +201,7 @@ html{
 }
 
 div.dimmer {
-    background: black;
+    background: #5E5E5E;
     height: 100%;
     position: fixed;
     left: 0;
@@ -209,6 +209,6 @@ div.dimmer {
     opacity: 0.68;
     -moz-opacity: 0.68;
     width: 100%;
-    z-index: 1;
-  }
+    z-index: 0;
+}
 </style>

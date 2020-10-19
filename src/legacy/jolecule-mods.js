@@ -56,90 +56,90 @@ var select_residue = new MutationObserver(function () {
   $("#threeDSpan-inner-sequence-widget-inner>canvas").show()
 });
 
-var on_load = new MutationObserver(function (m) {
-  m.forEach(function (mutation) {
-    if (mutation.attributeName !== 'style') return;
-    var currentValue = mutation.target.style.display;
-    if (currentValue == "none") {
-      if (document.getElementById("loading-message").innerHTML == "Preparing views...") {
-        $(".jolecule-button").hide()
-        // $("#toggle-toolbar-button").hide()
-        $("#export-button").hide()
-        $("#intro").hide()
-        $('#structurematches').hide()
-        $('div.dimmer').remove()
-        $('#gene_name').show()
-        $("#title3D").css("display", "none")
-        $("#searchByName").css("display", "none")
+// var on_load = new MutationObserver(function (m) {
+//   m.forEach(function (mutation) {
+//     if (mutation.attributeName !== 'style') return;
+//     var currentValue = mutation.target.style.display;
+//     if (currentValue == "none") {
+//       if (document.getElementById("loading-message").innerHTML == "Preparing views...") {
+//         $(".jolecule-button").hide()
+//         // $("#toggle-toolbar-button").hide()
+//         $("#export-button").hide()
+//         $("#intro").hide()
+//         $('#structurematches').hide()
+//         $('div.dimmer').remove()
+//         $('#gene_name').show()
+//         $("#title3D").css("display", "none")
+//         $("#searchByName").css("display", "none")
 
-        sessionStorage.setItem("link", $(location).attr('pathname'))
+//         sessionStorage.setItem("link", $(location).attr('pathname'))
 
-        select_residue.observe(document.getElementById("threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection"), {
-          childlist: true,
-          attributes: true,
-          attributeFilter: ['style']
-        });
+//         select_residue.observe(document.getElementById("threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection"), {
+//           childlist: true,
+//           attributes: true,
+//           attributeFilter: ['style']
+//         });
 
-        if ($("#first_match").length > 0) {
-          $("#first_match").remove()
-        }
-        //THE COVERAGE MAP
-        $("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
-        if ($("#first_match").length < 1) {
-          var a = $("div.container.loaded").html()
-          var b = $('<div id="first_match">').append(a)
-          $("#threeDSpan-inner-sequence-widget-inner").append(b)
-        }
+//         if ($("#first_match").length > 0) {
+//           $("#first_match").remove()
+//         }
+//         //THE COVERAGE MAP
+//         $("#threeDSpan-inner-sequence-widget-inner>canvas").hide()
+//         if ($("#first_match").length < 1) {
+//           var a = $("div.container.loaded").html()
+//           var b = $('<div id="first_match">').append(a)
+//           $("#threeDSpan-inner-sequence-widget-inner").append(b)
+//         }
 
-        var windowWidth = window.innerWidth
-        $("#first_match>svg>g").find('.thumbnail').remove()
-        document.querySelector("#first_match>svg>g>g>line").setAttribute("x1", -windowWidth);
-        document.querySelector("#first_match>svg>g>g>line").setAttribute("x2", windowWidth + 100);
-        $("#first_match>svg").css({ "width": "100%" })
-        var g_left = parseInt($("#first_match>svg>g").css('transform').split(', ')[4])
-        $("#first_match>svg>g").attr("transform", "translate(" + g_left + ",2)")
-        $("#first_match").css({
+//         var windowWidth = window.innerWidth
+//         $("#first_match>svg>g").find('.thumbnail').remove()
+//         document.querySelector("#first_match>svg>g>g>line").setAttribute("x1", -windowWidth);
+//         document.querySelector("#first_match>svg>g>g>line").setAttribute("x2", windowWidth + 100);
+//         $("#first_match>svg").css({ "width": "100%" })
+//         var g_left = parseInt($("#first_match>svg>g").css('transform').split(', ')[4])
+//         $("#first_match>svg>g").attr("transform", "translate(" + g_left + ",2)")
+//         $("#first_match").css({
 
-        })
-        $("#first_match").on("mouseenter", function () {
-          $("#first_match").css({
-            transform: "scale(1.04)"
-          })
-        });
-        $("#first_match").on("mouseleave", function () {
-          $("#first_match").css({
-            transform: "scale(1)"
-          })
-        });
-        //   var svg_width = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[2]
-        //   var svg_height = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[3]
-        //   document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + svg_width + " " + svg_height- 20 )
+//         })
+//         $("#first_match").on("mouseenter", function () {
+//           $("#first_match").css({
+//             transform: "scale(1.04)"
+//           })
+//         });
+//         $("#first_match").on("mouseleave", function () {
+//           $("#first_match").css({
+//             transform: "scale(1)"
+//           })
+//         });
+//         //   var svg_width = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[2]
+//         //   var svg_height = document.querySelector("#first_match > svg").getAttribute("viewBox").split(' ')[3]
+//         //   document.querySelector("#first_match > svg").setAttribute("viewBox","0 0 " + svg_width + " " + svg_height- 20 )
 
-        //REMOVE FOOTER BORDER
+//         //REMOVE FOOTER BORDER
 
-        $(".jolecule-embed-footer").css({ "border-top": "none" })
+//         $(".jolecule-embed-footer").css({ "border-top": "none" })
 
-        $('#first_match').on('click', function () {
-          if (document.getElementsByClassName('dimmer').length === 0) {
-            $('body').append('<div class="dimmer"></div>')
-            $('#gene_name').hide()
-            $('div.dimmer').on('click', function () {
-              $('#structurematches').hide()
-              $('div.dimmer').remove()
-              $('#gene_name').show()
-            })
-          } else {
-            $('div.dimmer').remove()
-          }
-          $('#structurematches').slideToggle('slow')
-        })
+//         $('#first_match').on('click', function () {
+//           if (document.getElementsByClassName('dimmer').length === 0) {
+//             $('body').append('<div class="dimmer"></div>')
+//             $('#gene_name').hide()
+//             $('div.dimmer').on('click', function () {
+//               $('#structurematches').hide()
+//               $('div.dimmer').remove()
+//               $('#gene_name').show()
+//             })
+//           } else {
+//             $('div.dimmer').remove()
+//           }
+//           $('#structurematches').slideToggle('slow')
+//         })
 
-      }
-    }
-  })
-});
+//       }
+//     }
+//   })
+// });
 
-on_load.observe(document.getElementById("waitingFrame"), {
-  attributes: true,
-  attributeFilter: ["style"]
-})
+// on_load.observe(document.getElementById("waitingFrame"), {
+//   attributes: true,
+//   attributeFilter: ["style"]
+// })

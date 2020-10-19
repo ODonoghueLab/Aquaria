@@ -34,11 +34,11 @@ export default {
     showPanels: function () {
     // dim background
       if (document.getElementsByClassName('dimmer').length === 0) {
-        $('body').append('<div class="dimmer"></div>')
+        window.AQUARIA.overlay()
         $('#gene_name').hide()
-        $('div.dimmer').on('click', function () {
+        document.querySelector('div.dimmer').addEventListener('click', function () {
           $('#searchByName, #title3D,#uniprot, #gallery').hide()
-          $('div.dimmer').remove()
+          document.querySelector('div.dimmer').remove()
           $('#gene_name').show()
         })
       } else {

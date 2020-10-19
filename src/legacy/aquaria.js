@@ -36,6 +36,12 @@ var MAX_PROTEIN_HISTORY = 5;
     proteinSubmitListeners.push(listener);
   };
 
+  AQUARIA.overlay = function(){
+    var elemDiv = document.createElement('div')
+    elemDiv.className = 'dimmer'
+    document.body.append(elemDiv)
+  }
+
   AQUARIA.fireProteinSubmitListeners = function(proteinName, primary_accession, pdb_id) {
     proteinSubmitListeners.forEach(function(listener) {
       listener.submitFired(proteinName, primary_accession, pdb_id);
@@ -454,10 +460,12 @@ var MAX_PROTEIN_HISTORY = 5;
 
 
     function showBubble(msgHtml) {
-
-      $('body').append('<div class="dimmer" style="opacity: 0.08; -moz-opacity: 0.08;"></div>');
+      if (document.getElementsByClassName('dimmer').length === 0){
+        AQUARIA.overlay()
+      }
+      // $('body').append('<div class="dimmer" style="opacity: 0.08; -moz-opacity: 0.08;"></div>');
       $("span#help3D.roundButton").css("background-position", "0 -21px");
-      $("div.dimmer").on("click", function() {
+      document.querySelector("div.dimmer").addEventListener("click", function() {
         $("div.popup, div.dimmer").fadeOut().remove();
         $("span#help3D.roundButton").css("background-position", "0 0");
       });
