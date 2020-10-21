@@ -23,7 +23,7 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
     isResidueSelector: false,
     isExtraEditable: true,
     isMenu: true,
-    isToolbarOnTop: false,
+    isToolbarOnTop: true,
     isToolbarOn: true,
     isTextOverlay: false,
     isMouseWheel: true
@@ -211,7 +211,6 @@ JoleculePanel.prototype.blankApplet = function(isOn, message) {
       appletMessage.text("Please wait...");
     }
     if (!$('#waitingFrame').is(":visible")) {
-
       $('#waitingFrame').hide();
       $('#waitingFrame').fadeIn("fast");
     }

@@ -97,17 +97,14 @@ a, p#psyns a, p#osyns a, .simulatelink {
 } */
 
 span.content p, p.expandable, p.hidden {
-    color: #666;
+    color: white;
 }
 
 span.content p:last-child {
     margin-bottom: 0.75em;
 }
-span.content p, p.expandable, p.hidden {
-    color: #666;
-}
 
-.panel h3, #gallery h3, #controls h3, .balloon h3, #about_overlay h3, #help_overlay h3 {
+.panel h3, #gallery h3, .balloon h3, #about_overlay h3, #help_overlay h3 {
     background-color: #999;
     border-radius: 10px;
     color: white;

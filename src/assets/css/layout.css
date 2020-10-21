@@ -67,8 +67,7 @@ main {
 #logo {
     margin-left: 0.5vw;
 }
-.title {
-    /* flex-grow: 1; */
+/* .title {
     flex-basis: auto; 
     background-color: var(--primary-label);
     color: white;
@@ -78,13 +77,11 @@ main {
     border-radius: 1.5rem;
     margin: auto;
     transition: all 0.7s ease;
-}
+} */
 strong {
     font-weight: 600;
 }
-#title:hover {
-    padding-left: 3rem;
-}
+
 #structureImage {
     width: 100%;
     height: 100%;

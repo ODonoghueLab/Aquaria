@@ -12,10 +12,10 @@
 	module.exports.expand_cluster = function expand_cluster(d,  cluster, sequence) {
 		console.log('show_expanded_cluster.expand_cluster')
 		// dim background
-		$('body').append('<div class="dimmer"></div>');
+		// $('body').append('<div class="dimmer2"></div>');
 		
 		//hide applet temporarily for Windows
-		if(browser.indexOf("Windows") != -1) { $("#threeD").css("visibility", "hidden"); }
+		// if(browser.indexOf("Windows") != -1) { $("#threeD").css("visibility", "hidden"); }
 		
 		var cluster_nbr = parseInt(d.attr("id").substr(15));
 				//console.log("expanding cluster "+ cluster_nbr);
@@ -96,8 +96,8 @@
 //			};
 			console.log('show_expanded_cluster.expand_cluster remote fetch secondary clusters', cluster.members, sequence.primary_accession, cluster_nbr)
 			
-			  var url = `${window.BACKEND}/get_secondary_clusters`;
-			  url = url +  sequence.primary_accession + "/" + pdbid + "/" + chainParam.split('/')[1]+ "/" + cluster_nbr
+			  var url = `${window.BACKEND}/get_secondary_clusters/`;
+			  url = url +  sequence.primary_accession + "/" + pdbid + "/" + AQUARIA.currentChain + "/" + cluster_nbr
 
 			  axios({
 				method: 'get',
@@ -231,7 +231,7 @@
 	update(root);
 	}
 		//remove tree when background is clicked
-	$('div.dimmer').one('click', function() { //console.log("clicked background");
+	$('div.dimmer2').one('click', function() { //console.log("clicked background");
     nodeClick(root);
 //	  if (root.children && root.children[0]) {
 //	    if (root.children[0].children) {
@@ -243,7 +243,7 @@
 //	    }
 //	  }
 //    root.children = root._originalChildren;
-		$('div.expansion, div.dimmer, div#wait4tree').remove();
+		$('div.expansion, div.dimmer2, div#wait4tree').remove();
 		 // un-hide applet
 		$("#threeD").css("visibility", "visible");
 	});
@@ -568,7 +568,7 @@
 			$("#threeD").css("visibility", "visible");
 			  
 			window.setTimeout(function() {
-				$('div.expansion, div.dimmer').remove(); 
+				$('div.expansion, div.dimmer2').remove(); 
 			  }, 600); 
 	  	} 
 	  	else {
@@ -579,7 +579,7 @@
 	  
 	  //remove layers once a leaf node was clicked
 	  window.setTimeout(function() {
-		$('div.expansion, div.dimmer').remove(); 
+		$('div.expansion, div.dimmer2').remove(); 
 	 	 }, 600); 
 		}		  
 	}
@@ -654,7 +654,7 @@ $(document).keyup(function(e) {
 	 // e.stopPropagation();
 	 // if( e.isDefaultPrevented() ) { console.log("Esc pressed and default prevented: "+ e.isDefaultPrevented());}
 	 // if( e.isPropagationStopped() ) { console.log("Esc pressed and bubbling up prevented: "+ e.isPropagationStopped());}
-	  $('div.expansion, div.dimmer, div#wait4tree').remove();
+	  $('div.expansion, div.dimmer2, div#wait4tree').remove();
 	  //un-hide applet
 	  $("#threeD").css("visibility", "visible");
   }   

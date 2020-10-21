@@ -1,5 +1,23 @@
-//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
+var selectRes = new MutationObserver(function () {
+  if(document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display == 'none'){
+    document.querySelector('.jolecule-embed-footer').style.display = 'none'
+    document.querySelector('.icons').style.bottom = '11px'
+  }
+  else{
+    document.querySelector('.jolecule-embed-footer').style.display = 'flex'
+    document.querySelector('.icons').style.bottom = '85px'
+  }
+})
 
+selectRes.observe(document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection'), {
+  childlist: true,
+  attributes: true,
+  attributeFilter: ['style'],
+  characterDataOldValue: true
+})
+document.querySelector("div#color-legend.jolecule-button").style.display = 'none'
+
+//NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
 $("#export-button").removeAttr("style")
   .attr("style", "position: absolute; z-index: 2; top: 6px; right: 33px; margin: 5px; width:35px;")
 
@@ -26,30 +44,31 @@ $(".jolecule-embed-view").removeAttr('style').css({
   "top": "2px"
 })
 
-if ((($("#threeDSpan-inner-clipping-plane").length > 0) && $("#export-button").length <= 0)) {
-  $(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
-}
+
+// if ((($("#threeDSpan-inner-clipping-plane").length > 0) && $("#export-button").length <= 0)) {
+//   $(".jolecule-embed-header").append("<span class='jolecule-button' id='export-button'>Export USDZ</span>")
+// }
 
 //Align feature description text
 $("#threeDSpan-inner-jolecule-soup-display").css({ 'text-align': 'left' })
 
 // TOGGLE COLOR LEGEND
-var toggle_legend = new MutationObserver(function () {
-  console.log("THIS IS COLOR LEGEND")
-  $("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
+// var toggle_legend = new MutationObserver(function () {
+//   console.log("THIS IS COLOR LEGEND")
+//   $("#color-legend-buttons").removeAttr("id").attr("id", "color_legend_buttons")
 
-  $("#color-legend").click(function () {
-    $('[id^="color-legend-"]').toggle();
-  })
+//   $("#color-legend").click(function () {
+//     $('[id^="color-legend-"]').toggle();
+//   })
 
-  $('[id^="color-legend-"]').hide()
-});
+//   $('[id^="color-legend-"]').hide()
+// });
 
-toggle_legend.observe(document.getElementById("color-legend"), {
-  childlist: true,
-  attributes: true,
-  attributeFilter: ['style']
-});
+// toggle_legend.observe(document.getElementById("color-legend"), {
+//   childlist: true,
+//   attributes: true,
+//   attributeFilter: ['style']
+// });
 
 var select_residue = new MutationObserver(function () {
   $("#first_match").hide()
