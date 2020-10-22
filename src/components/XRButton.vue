@@ -133,7 +133,9 @@ const XRButtonComponent = {
       if (window.location.search !== '' || window.location.hash !== '') {
         console.log('loading view')
         const results = parseURL()
-        setView(results.selected, results.pitch, results.yaw, results.roll, results.zoom)
+        if (results) {
+          setView(results.selected, results.pitch, results.yaw, results.roll, results.zoom)
+        }
         // const urlParams = new URLSearchParams(window.location.search)
         // const resString = urlParams.get('res')
         // const selected = {}
