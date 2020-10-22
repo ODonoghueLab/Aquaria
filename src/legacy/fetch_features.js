@@ -1214,6 +1214,7 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 		var features = searchParam.split('&')
 		features.forEach(function(feature){
 			residue = feature.replace(/[A-Za-z$-]/g, "")
+			residue = parseInt(residue)
 			data[feature] = {}
 			data[feature].Description
 			data[feature].Features = []
@@ -1221,7 +1222,12 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 			data[feature].Features[0].Color = "#F73C3C"
 			data[feature].Features[0].Description = feature
 			data[feature].Features[0].Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
-			data[feature].Features[0].Residue = residue
+			if(feature.split(residue)[1].toLowerCase() == 'ter'){
+				data[feature].Features[0].Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
+			}
+			else{
+				data[feature].Features[0].Residue = residue
+			}
 			data[feature].URL = feature
 		})
 		parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, searchParam)
