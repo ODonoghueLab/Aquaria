@@ -36,6 +36,12 @@ var MAX_PROTEIN_HISTORY = 5;
     proteinSubmitListeners.push(listener);
   };
 
+  AQUARIA.overlay = function(){
+    var elemDiv = document.createElement('div')
+    elemDiv.className = 'dimmer'
+    document.body.append(elemDiv)
+  }
+
   AQUARIA.fireProteinSubmitListeners = function(proteinName, primary_accession, pdb_id) {
     proteinSubmitListeners.forEach(function(listener) {
       listener.submitFired(proteinName, primary_accession, pdb_id);
@@ -369,40 +375,6 @@ var MAX_PROTEIN_HISTORY = 5;
     //updates the 3D viewer title
     // this is a hack and requires the function to be called once before the proper HTML code is being generated.
     //TODO move html code to home_page.ejs?
-    AQUARIA.update3DTitle = function(accession, pdbId, chainId, molecule_name, score) {
-
-      if (chainId && molecule_name) {
-
-        var short_name = molecule_name;
-        if (short_name.indexOf("(") != -1) {
-          short_name = molecule_name.substring(0, molecule_name.indexOf("(")).trim();
-        }
-
-        AQUARIA.short_molecule_name = short_name;
-
-        if (accession && pdbId && score) {
-          $("#structureviewerexplanation").html("<a id='accession_link' href='https://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name +
-            "</a> sequence aligned onto <a href='/" + accession + "' title='View the structure for " + short_name + " in Aquaria'>" + short_name +
-            "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" + chainId + "</a> (" + score +
-            "% sequence identity)&nbsp;&nbsp;<a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a>");
-
-          var evalue = AQUARIA.currentMember.E_value; // e-value from pssh2
-          $("#help3D").show().parent().attr("onmouseenter", "AQUARIA.explainTitle('" + accession + "','" + AQUARIA.preferred_protein_name + "','" + short_name + "','" + pdbId + "','" + chainId +
-            "','" + score + "','" + evalue + "');");
-        } else { // DNA or RNA (no accession)
-          $("#structureviewerexplanation").html(short_name + "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" +
-            chainId + "</a> (" + score + "% sequence identity)");
-        }
-
-      } else {
-
-        $("#accession_link").text(AQUARIA.preferred_protein_name);
-        //$("#help3D").hide();
-
-      }
-
-
-    };
 
     AQUARIA.explainTitle = function(accession, uniprotName, pdbName, pdbId, chainId, score, evalue) {
       var precisiontxt, quality, qualClass, Log10E, evalueString;
@@ -454,10 +426,12 @@ var MAX_PROTEIN_HISTORY = 5;
 
 
     function showBubble(msgHtml) {
-
-      $('body').append('<div class="dimmer" style="opacity: 0.08; -moz-opacity: 0.08;"></div>');
+      if (document.getElementsByClassName('dimmer').length === 0){
+        AQUARIA.overlay()
+      }
+      // $('body').append('<div class="dimmer" style="opacity: 0.08; -moz-opacity: 0.08;"></div>');
       $("span#help3D.roundButton").css("background-position", "0 -21px");
-      $("div.dimmer").on("click", function() {
+      document.querySelector("div.dimmer").addEventListener("click", function() {
         $("div.popup, div.dimmer").fadeOut().remove();
         $("span#help3D.roundButton").css("background-position", "0 0");
       });

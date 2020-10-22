@@ -240,7 +240,9 @@ var updateFeatureUI = function(featureList) {
 	var document_observer = new MutationObserver( function (mutations) {
 		// `mutations` is an array of mutations that occurred
 		// `me` is the MutationObserver instance
-		if($(location).attr('href').includes("json")){
+		var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+$/)
+		var searchParam = window.location.search.split('?')[1]
+		if($(location).attr('href').includes("json") || featureRegex.test(searchParam)){
 		  mutations.forEach(function(mutation) {
 			if (mutation.attributeName !== 'style') {
 			  return none;

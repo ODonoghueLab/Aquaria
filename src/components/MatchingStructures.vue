@@ -314,7 +314,7 @@ export default {
     z-index: 90;
   }
 
-  div.dimmer {
+  /* div.dimmer {
     background: #5E5E5E ;
     height: 100%;
     position: fixed;
@@ -324,7 +324,7 @@ export default {
     -moz-opacity: 0.68;
     width: 100%;
     z-index: 3;
-  }
+  } */
 
   div.panel span.help {
     display: inline-block;

@@ -1,63 +1,202 @@
 <template>
-  <h3 id="titleBar3Dview" data-intro="3D view: initially shows PDB structure estimated to be most relevant for the specified protein. Hue is used to indicate secondary structure: yellow = strand, blue = helix, and green = coil. Lightness is used to indicate amino acid substitutions between the specified protein and PDB structure: slightly dark = conserved, very dark = non-conserved, white = insertions, and semi-transparent = other chains. <br><p>&nbsp;</p>
-<div class='bg_helpdoc'>
-<table id='helptable'><tr><td>
-<h2>Videos</h2>
-<p><a target='_blank' href='http://youtu.be/FAQ3yVGYSzY'>Quick introduction (6:16)</a></p>
-<p><a target='_blank' href='http://youtu.be/PIs1qyV_dIQ'>General overview (44:25)</a></p>
-<p><a target='_blank' href='http://youtu.be/XU_6TWM9ke8'>Leap Motion controller (2:18)</a></p>
-<h2>Installation</h2>
-<p><a target='_blank' href='https://docs.google.com/document/d/1waNOvw442Bwncx_FlMJAATH35aJxXpxu0iRcrZt8hrQ/pub'>On Mac OS</a></p>
-<p><a target='_blank' href='https://docs.google.com/document/d/1wZo-76MEPyoDj-9uAxHyz4y2f4_6ZR89uJcPBQvVUQc/pub'>On Windows</a></p>
-<h2>Documentation</h2>
-<p><a target='_blank' href='/help/Aquaria3D_QR_v1.pdf'>Mouse & keyboard controls</a></p>
-<p><a target='_blank' href='https://docs.google.com/document/d/1566Ub_-WAXMcuOA8gmb2-X9JmYfWuZarrgneNVaBQd8/pub'>Aquaria API</a></p>
-</td><td>
-<h2>Publication</h2>
-<p><a target='_blank' href='http://nature.com/articles/nmeth.3258'>O&rsquo;Donoghue et al., Nature Methods (2015)</a></p>
-<h2>Forum</h2>
-<p><a target='_blank' href='https://www.biostars.org/t/aquaria'>View forum</a></p>
-<p><a target='_blank' href='https://www.biostars.org/p/new/post/?tag_val=aquaria'>Ask a question</a></p>
-<h2>Bugs</h2>
-<p><a target='_blank' href='https://github.com/ODonoghueLab/Aquaria/issues'>View known bugs</a></p>
-<p><a target='_blank' href='https://github.com/ODonoghueLab/Aquaria/issues/new' >Report new bug</a></p>
-</td></tr></table>
-</div>
-" data-position="bottom">3D structure
-<span id="structureviewerexplanation" class="explanation"></span>
-<div class="rightHeaderBar">
+  <div>
+    <h3 id="structureviewerexplanation" class="explanation"></h3>
+    <div id='conentPanel'>
+      <h3 id="structureviewerexplanation_1" class="explanation"></h3>
+      <SearchPanel id="searchByName"/>
+      <AboutUniprot id="uniprot"/>
+      <Gallery id="gallery"/>
+    </div>
+    <!-- <div class="rightHeaderBar">
         <a href="javascript:;" title="Toggle full window view" data-intro="Full window" data-position="bottom">
-        <span id="expander" class="roundButton" style="display: inline-block;">&nbsp;</span>
-</a>
-<a class="launchApplicationLink" href="#" target="_blank" title="Launch stand-alone Java application" data-intro="Standalone application" data-position="top">
-            <span class="applauncher roundButton"
-                style="display: inline-block;">&nbsp;</span>
-</a>
+          <span id="expander" class="roundButton" style="display: inline-block;">&nbsp;</span>
+        </a>
+        <a class="launchApplicationLink" href="#" target="_blank" title="Launch stand-alone Java application" data-intro="Standalone application" data-position="top">
+            <span class="applauncher roundButton" style="display: inline-block;">&nbsp;</span>
+        </a>
+  </div> -->
 </div>
-</h3>
 </template>
 
 <script>
+import SearchPanel from './SearchPanel'
+import AboutUniprot from './AboutUniprot'
+import Gallery from './Gallery'
+import $ from 'jquery'
+
 export default {
-  name: 'Title3D'
+  name: 'Title3D',
+  components: {
+    Gallery,
+    SearchPanel,
+    AboutUniprot
+  },
+  beforeMount () {
+    const _this = this
+
+    window.AQUARIA.update3DTitle = function (accession, pdbId, chainId, moleculeName, score) {
+      if (chainId && moleculeName) {
+        var shortName = moleculeName
+        if (shortName.indexOf('(') !== -1) {
+          shortName = moleculeName.substring(0, moleculeName.indexOf('(')).trim()
+        }
+
+        window.AQUARIA.short_moleculeName = shortName
+
+        if (accession && pdbId && score) {
+          $('[id^="structureviewerexplanation"]').html('<span id="uniprotpanel" class="titlepanel">' + window.AQUARIA.pdb_data.Organism[window.AQUARIA.protein_primary_accession] + ' ' + window.AQUARIA.preferred_protein_name +
+            "</span><span id='threeDexplanation' class='titlepanel'>aligned onto</span><span id='pdbpanel' class='titlepanel'>" + pdbId + '-' + chainId + "</a></span><a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a>")
+
+          var evalue = window.AQUARIA.currentMember.E_value // e-value from pssh2
+          $('#help3D').show().parent().attr('onmouseenter', "AQUARIA.explainTitle('" + accession + "','" + window.AQUARIA.preferred_protein_name + "','" + shortName + "','" + pdbId + "','" + chainId +
+            "','" + score + "','" + evalue + "');")
+        } else { // DNA or RNA (no accession)
+          $('[id^="structureviewerexplanation"]').html(shortName + "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + '-' +
+            chainId + '</a>')
+        }
+      } else {
+        $('#accession_link').text(window.AQUARIA.preferred_protein_name)
+        // $("#help3D").hide();
+      }
+      document.querySelectorAll('.titlepanel').forEach(el => {
+        el.style.display = 'flex'
+        el.style.background = '#5d5d5d'
+      })
+      document.querySelector('#uniprotpanel').addEventListener('click', function () {
+        document.querySelectorAll('.titlepanel').forEach(el => {
+          el.style.display = 'flex'
+          el.style.background = '#5d5d5d'
+        })
+        document.querySelector('#structureviewerexplanation_1 > #uniprotpanel').style.background = 'orange'
+        _this.showPanels()
+      })
+      document.querySelector('#pdbpanel').addEventListener('click', function () {
+        document.querySelectorAll('.titlepanel').forEach(el => {
+          el.style.display = 'flex'
+          el.style.background = '#5d5d5d'
+        })
+        document.querySelector('#structureviewerexplanation_1 > #pdbpanel').style.background = 'orange'
+        _this.showPanels()
+      })
+    }
+    // var searchLeft = $('#affordance_mode').width() / 2 - $('#searchByName').width() / 2
+    // searchLeft = searchLeft + 'px'
+    // $('#searchByName').css({
+    //   'margin-left': searchLeft
+    // })
+  },
+  methods: {
+    showPanels: function () {
+    // dim background
+      document.querySelector('#conentPanel').style.display = 'block'
+      document.querySelector('#structureviewerexplanation').style.display = 'none'
+      if (document.getElementsByClassName('dimmer').length === 0) {
+        window.AQUARIA.overlay()
+        // $('#gene_name').hide()
+        document.querySelector('div.dimmer').addEventListener('click', function () {
+          document.querySelector('#conentPanel').style.display = 'none'
+          document.querySelector('#structureviewerexplanation').style.display = '-webkit-box'
+          document.querySelector('div.dimmer').remove()
+          // $('#gene_name').show()
+        })
+      } else {
+        $('div.dimmer').remove()
+      }
+
+      $('#searchByName, #title3D').slideToggle('slow')
+    }
+  }
 }
 </script>
 
-<style scoped>
-h3{
-  position: absolute;
-  z-index: 10;
-  top: 40px;
-  font-size: 10px;
-  margin: 4vh;
-  background-color: #999999;
+<style>
+#gallery{
+    top: 20vh;
+    margin: 10px 0px;
+    position: absolute;
+    width: 100%;
+    height: fit-content;
+    padding: 10px;
+    z-index: 20;
 }
 
+#uniprotpanel{
+    padding-left: 12px;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+    line-height: 31px;
+}
+#threeDexplanation{
+    padding-left: 7px;
+    line-height: 31px;
+}
+#pdbpanel{
+    padding-left: 7px;
+    padding-right: 12px;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+    line-height: 31px;
+}
+/* .titlepanel{
+  display: flex;
+  background: '#5d5d5d';
+} */
 .roundButton {
     color: #999;
     height: 17px;
     width: 17px;
     padding: 0 4px;
     /*margin-left: 4px;*/
-  }
+}
+#structureviewerexplanation,#structureviewerexplanation_1{
+  width: max-content;
+  display: -webkit-box;
+  background-color: var(--transparent);
+}
+#searchByName{
+    display: block;
+    overflow: auto;
+    width: fit-content;
+    /* top: 40vh; */
+    position: relative;
+    background-color: #d1d1d1;
+    padding: 5px;
+    border-radius: 10px;
+    z-index: 200;
+}
+#uniprot{
+    display: block;
+    margin: 10px 0px;
+    position: relative;
+    width: 100%;
+    height: fit-content;
+    padding: 10px;
+    z-index: 20;
+}
+#conentPanel{
+  display: none;
+  z-index: 1;
+  position: relative;
+  top: 2vh;
+  flex-basis: auto;
+  background-color: #d2d2d2;
+  color: white;
+  text-align: center;
+  line-height: 2.5;
+  padding: 0.5rem 1.5rem;
+  border-radius: 1.5rem;
+  margin: auto;
+  transition: all 0.7s ease;
+}
+#structureviewerexplanation_1 > #uniprotpanel {
+  padding-right: 5px;
+}
+#structureviewerexplanation_1 > #threeDexplanation {
+  padding-right: 5px;
+  border-right: 1px solid white;
+  border-left: 1px solid white;
+}
+#structureviewerexplanation_1 > #pdbpanel {
+  padding-left: 8px;
+}
 </style>

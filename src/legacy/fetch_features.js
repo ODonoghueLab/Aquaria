@@ -149,6 +149,20 @@ var djb2Code = function(str, bins) {
 	return Math.abs(hash % bins);
 };
 
+AQUARIA.getUrlParameter = function(sParam) {
+	if (window.location.search.length > 0) {
+	  var sPageURL = window.location.search.substring(1) // no .toLowerCase() here (this affects the value!)
+	  var sURLVariables = sPageURL.split('&')
+	  sParam = sParam.toLowerCase()
+	  for (var i = 0; i < sURLVariables.length; i++) {
+		var sParameterName = sURLVariables[i].split('=')
+		if (sParameterName[0].toLowerCase() === sParam) {
+		  return decodeURIComponent(sParameterName[1]) // the value might have been encoded
+		}
+	  }
+	}
+	return null
+  }
 
 function capitaliseFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -677,24 +691,24 @@ function getAllFeatureNamesRequested(primary_accession){
 	let features = []
 
 	// URL
-	if(getUrlParameter("features") != ''){
+	if(AQUARIA.getUrlParameter("features") != ''){
 		features.push("features");
 	};
 
 
 	// Uniprot
-	if(getUrlParameter("UniprotFeatures") != ''){
+	if(AQUARIA.getUrlParameter("UniprotFeatures") != ''){
 		features.push("UniprotFeatures");
 	};
 
 
 	// PredictProtein
-	if(getUrlParameter("PredictProtein") != ''){
+	if(AQUARIA.getUrlParameter("PredictProtein") != ''){
 		features.push("PredictProtein");
 	};
 
 	// Snap2
-	if(getUrlParameter("SNAP2") != ''){
+	if(AQUARIA.getUrlParameter("SNAP2") != ''){
 		features.push("SNAP2");
 	};
 
@@ -1173,7 +1187,9 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 }
 
 function checkURLForFeatures(primary_accession, server, featureCallback){
-	var url = getUrlParameter("features");
+	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+$/)
+	var searchParam = window.location.search.split('?')[1]
+	var url = AQUARIA.getUrlParameter("features");
 	if (url){
 		axios({
 			method: 'get',
@@ -1191,7 +1207,32 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 		//$.getJSON( url, function (responseJSON) { //After load, parse data returned by xhr.responseText
 		// parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, responseJSON, url);
 		// });
-	} else {
+	} 
+	else if (featureRegex.test(searchParam)) {
+		var data = {}
+		var residue;
+		var features = searchParam.split('&')
+		features.forEach(function(feature){
+			residue = feature.replace(/[A-Za-z$-]/g, "")
+			residue = parseInt(residue)
+			data[feature] = {}
+			data[feature].Description
+			data[feature].Features = []
+			data[feature].Features[0] = {}
+			data[feature].Features[0].Color = "#F73C3C"
+			data[feature].Features[0].Description = feature
+			data[feature].Features[0].Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
+			if(feature.split(residue)[1].toLowerCase() == 'ter'){
+				data[feature].Features[0].Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
+			}
+			else{
+				data[feature].Features[0].Residue = residue
+			}
+			data[feature].URL = feature
+		})
+		parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, searchParam)
+	}
+	else {
 		// finishServer(new Array(), primary_accession,
 		// 	featureCallback);
 		processNextServer(primary_accession,

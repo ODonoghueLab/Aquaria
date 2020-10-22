@@ -141,7 +141,7 @@ export default {
       document.querySelector('#content').style.width = 'calc(' + titleWidth + ' + 3vw)'
       document.querySelector('#content').style.display = 'block'
       document.querySelector('#title_0').style.visibility = 'hidden'
-      if (document.getElementsByClassName('dimmer').length === 0) {
+      if (document.querySelector('div.dimmer').length === 0) {
         var elemDiv = document.createElement('div')
         elemDiv.className = 'dimmer'
         document.body.append(elemDiv)
