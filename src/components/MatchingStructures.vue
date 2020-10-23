@@ -17,7 +17,8 @@ export default {
   #vis{
     max-height: 40vh;
     overflow: scroll;
-    margin-bottom: -54px;
+    /* margin-bottom: -54px; */
+    margin-bottom: -20px;
     width: 100vw;
   }
   .outer_container{

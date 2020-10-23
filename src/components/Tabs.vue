@@ -55,6 +55,8 @@ export default {
     },
     showMatches: function () {
       const _this = this
+      const soupController = window.AQUARIA.panel3d.embededJolecule.controller
+      soupController.clearSelectedResidues()
       _this.showPanel('vis', 'Structures')
       _this.hidePanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {
@@ -67,6 +69,8 @@ export default {
     },
     showFeatures: function () {
       const _this = this
+      const soupController = window.AQUARIA.panel3d.embededJolecule.controller
+      soupController.clearSelectedResidues()
       _this.hidePanel('vis', 'Structures')
       _this.showPanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {

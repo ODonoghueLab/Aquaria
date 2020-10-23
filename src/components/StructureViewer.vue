@@ -127,7 +127,7 @@ export default {
     margin: 0px;
     width: 100%;
     height: 107vh;
-    bottom: 106vh;
+    bottom: 112vh;
 }
 
 /* div.panel span#threeD {
