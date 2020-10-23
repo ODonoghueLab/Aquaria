@@ -379,7 +379,8 @@ axios({
 
 var displayOrgSynonyms = function(orgNames) {
 console.log("textpanels.displayOrgSynonyms: " + orgNames.synonyms[0]);
-AQUARIA.organismName = orgNames.synonyms[1];
+let entries = orgNames.synonyms.length
+AQUARIA.organismName = orgNames.synonyms[entries-1];
 var onames = "<a href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="+orgNames.synonyms[0]+"' title='Go to NCBI' target='_blank' >" + orgNames.synonyms[1] + "</a>";
 for (var n=2; n < orgNames.synonyms.length; n++) { //omit first name (numeric ID)
 	onames += ", " + orgNames.synonyms[n];
