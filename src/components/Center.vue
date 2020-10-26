@@ -44,7 +44,10 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+#XRbutton{
+  display: none;
+}
 #menu-btn{
   z-index: 1;
   position: fixed;

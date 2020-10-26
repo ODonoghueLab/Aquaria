@@ -17,6 +17,10 @@ selectRes.observe(document.querySelector('#threeDSpan-inner-jolecule-soup-displa
   attributeFilter: ['style'],
   characterDataOldValue: true
 })
+document.querySelector("#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar").style.display = 'none'
+document.querySelector("#toggle-toolbar-button").style.display = 'none'
+// window.AQUARIA.panel3d.embededJolecule.soupWidget.div[0].childNodes[8].remove()
+
 
 //NEBLINA'S SCRIPT TO MOVE JOLECULE BUTTON TO THE RIGHT
 $("#export-button").removeAttr("style")

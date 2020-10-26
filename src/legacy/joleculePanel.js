@@ -1,6 +1,6 @@
 
 var JoleculePanel = function(attachToDiv, chainSelected) {
-
+  
   this.blankApplet();
   this.attachToDiv = attachToDiv;
   var n = attachToDiv.length
@@ -81,6 +81,8 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
 
 
 JoleculePanel.prototype.load = function(attributes) {
+  document.querySelector("#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar").style.display = 'none'
+  document.querySelector("#toggle-toolbar-button").style.display = 'none'
   this.reload(attributes);
 }
 

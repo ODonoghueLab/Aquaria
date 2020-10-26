@@ -2,29 +2,61 @@
     <div id="Menu" class="panel floating">
       <a href="#" class="close"></a>
       <div>
-        <!-- <a class="lnk" href="#">XR Mode</a> -->
+        <a class="lnk" id='xr' href="#">XR Mode</a>
         <a class="lnk" id='print' href="#">Print</a>
       </div>
       <div>
-        <a class="lnk" href="#Menu">Sidechains</a>
-        <a class="lnk" href="#Menu">Neighbors</a>
-        <a class="lnk" href="#Menu">Ligands</a>
-        <a class="lnk" href="#Menu">Water</a>
+        <a class="lnk" id='Sidechains' href="#Menu">Sidechains</a>
+        <a class="lnk" id='Neighbors' href="#Menu">Neighbors</a>
+        <a class="lnk" id='Ligands' href="#Menu">Ligands</a>
+        <a class="lnk" id='Water' href="#Menu">Water</a>
       </div>
-      <select>
-        <option selected>Ribbon</option>
-        <option >Sphere</option>
-        <option >Backbone</option>
+      <select v-model="selected" @change="onChange($event)">
+        <option id='ribbon' selected>Ribbon</option>
+        <option id='sphere'>Sphere</option>
+        <option id='backbone'>Backbone</option>
       </select>
+      <!-- <span>SElected: {{selected}} </span> -->
     </div>
 </template>
 <script>
 export default {
   name: 'Menu',
+  data () {
+    return {
+      selected: 'Ribbon'
+    }
+  },
+  methods: {
+    onChange (event) {
+      const id = event.target.value.toLowerCase()
+      document.querySelector('#threeDSpan-inner-menu-' + id).click()
+    }
+  },
   mounted () {
     document.querySelector('#print').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
       window.AQUARIA.screenshot() // invoke screenshot feature
+    })
+    document.querySelector('#xr').addEventListener('click', function (ev) {
+      ev.preventDefault() // prevent default navigation
+      document.querySelector('.xr-menu-button').click()
+    })
+    document.querySelector('#Sidechains').addEventListener('click', function (ev) {
+      ev.preventDefault() // prevent default navigation
+      document.querySelector('#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar > span:nth-child(6)').click()
+    })
+    document.querySelector('#Neighbors').addEventListener('click', function (ev) {
+      ev.preventDefault() // prevent default navigation
+      document.querySelector('#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar > span:nth-child(7)').click()
+    })
+    document.querySelector('#Ligands').addEventListener('click', function (ev) {
+      ev.preventDefault() // prevent default navigation
+      document.querySelector('#threeDSpan-inner-menu-ligand').click()
+    })
+    document.querySelector('#Water').addEventListener('click', function (ev) {
+      ev.preventDefault() // prevent default navigation
+      document.querySelector('#threeDSpan-inner-menu-water').click()
     })
   }
 }
