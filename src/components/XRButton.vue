@@ -470,7 +470,8 @@ export default XRButtonComponent
 
 <template>
 <div>
-  <img v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" src="/images/ar-button.png">
+  <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'>XR Mode</a>
+  <!-- <img v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" src="/images/ar-button.png"> -->
   <div class="column xr-modal" v-if="isOpen">
     <div class="column inner-modal">
       <div class="row modal-header">

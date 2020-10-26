@@ -128,7 +128,6 @@ var MAX_PROTEIN_HISTORY = 5;
   try {
     // Display 3D structure
     window.aquariaReady = function() {};
-
     var switcherText = '';
     if (window.threedViewer === 'applet') {
       switcherText = 'simple';
