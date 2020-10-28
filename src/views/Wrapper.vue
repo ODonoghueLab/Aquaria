@@ -97,7 +97,7 @@ a, p#psyns a, p#osyns a, .simulatelink {
 } */
 
 span.content p, p.expandable, p.hidden {
-    color: white;
+    color: #5d5d5d;
 }
 
 span.content p:last-child {

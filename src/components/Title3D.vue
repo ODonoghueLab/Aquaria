@@ -276,6 +276,7 @@ export default {
 .contents{
   padding: 59px 69px;
   text-align: left;
+  color: #5d5d5d;
 }
 #uniprot{
     display: block;
