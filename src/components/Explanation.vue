@@ -1,5 +1,15 @@
 <template>
-    <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a>
+    <div>
+    <!-- <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a> -->
+    <p>What you see in the 3D viewer is the experimentally-determined structure of {{pdbName}} from
+        <a href='http://www.rcsb.org/pdb/explore.do?structureId={{}}' target='_blank'> PDB entry {{pdbId}}</a>chain {{chainId}}.
+    </p>
+    <p>The full-length sequence of the protein you specified ({{uniprotName}}) has been aligned onto the sequence used to determine this PDB structure.</p>
+    <p>Overall, the two sequences align with {{score}}% identity; any amino acid substitutions are indicated using dark coloring (see legend).</p>
+    <p class='quality'>This alignment has an HHblits E-value of {{evalueString}}, which is considered to be {{quality}}.
+        Based on cross-validation, the likelihood that your specified protein ({{uniprotName}}) adopts a structure similar to that shown is estimated to be {{precisiontxt}}%.</p>
+        <p>Note that the structure shown is taken directly from the PDB; it has not been derived by ab-initio or comparative modeling.</p>
+    </div>
 </template>
 
 <script>
@@ -8,38 +18,56 @@ import d3 from 'd3'
 
 export default {
   name: 'Explanation',
+  data () {
+    return {
+      pdbName: null,
+      pdbId: null,
+      chainId: null,
+      score: null,
+      qualClass: null,
+      evalueString: null,
+      quality: null,
+      uniprotName: null,
+      precisiontxt: null
+    }
+  },
   beforeMount () {
     const _this = this
     // updates the 3D viewer title
     // this is a hack and requires the function to be called once before the proper HTML code is being generated.
     // TODO move html code to home_page.ejs?
     window.AQUARIA.explainTitle = function (accession, uniprotName, pdbName, pdbId, chainId, score, evalue) {
-      var precisiontxt, quality, qualClass, Log10E, evalueString
+      _this.pdbName = pdbName
+      _this.pdbId = pdbId
+      _this.chainId = chainId
+      _this.score = score
+      _this.uniprotName = uniprotName
+      var Log10E
       Log10E = -Math.log(evalue) / Math.LN10
       var precision = (_this.BioScience_PlantDisease_Weibull_model(Log10E) * 100)
       precision = Math.round(precision)
       /// console.log("AQUARIA.explainTitle -Log10e: " + Log10E + " precision: " + precision);
-      evalueString = evalue.replace(/e(.*)$/, ' &times <nobr>10<sup>$1</sup></nobr>')
+      _this.evalueString = evalue.replace(/e(.*)$/, ' &times <nobr>10<sup>$1</sup></nobr>')
       if (evalue === 0 && precision === 1) {
-        precisiontxt = 'close to 100'
+        _this.precisiontxt = 'close to 100'
       } else {
-        precisiontxt = '&#8805; ' + precision
+        _this.precisiontxt = '&#8805; ' + precision
       }
       if (evalue > 10E-72) {
-        quality = 'in the twilight zone'
-        qualClass = 'twilight'
+        _this.quality = 'in the twilight zone'
+        _this.qualClass = 'twilight'
       } else {
-        quality = 'high quality'
-        qualClass = 'high'
+        _this.quality = 'high quality'
+        _this.qualClass = 'high'
       }
-      var msgTxt = '<p>What you see in the 3D viewer is the experimentally-determined structure of ' + pdbName + " from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId +
-        "' target='_blank'>PDB entry " + pdbId + '</a>, chain ' + chainId + '.</p>'
-      msgTxt += '<p>The full-length sequence of the protein you specified (' + uniprotName + ') has been aligned onto the sequence used to determine this PDB structure.</p>'
-      msgTxt += 'Overall, the two sequences align with ' + score + '% identity; any amino acid substitutions are indicated using dark coloring (see legend).</p>'
-      msgTxt += "<p class='quality " + qualClass + "'>This alignment has an HHblits E-value of " + evalueString + ', which is considered to be ' + quality +
-        '. Based on cross-validation, the likelihood that your specified protein (' + uniprotName + ') adopts a structure similar to that shown is estimated to be ' + precisiontxt + '%.</p>'
-      msgTxt += '<p>Note that the structure shown is taken directly from the PDB; it has not been derived by ab-initio or comparative modeling.</p>'
-      _this.showBubble(msgTxt)
+    //   var msgTxt = '<p>What you see in the 3D viewer is the experimentally-determined structure of ' + pdbName + " from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId +
+    //         "' target='_blank'>PDB entry " + pdbId + '</a>, chain ' + chainId + '.</p>'
+    //   msgTxt += '<p>The full-length sequence of the protein you specified (' + uniprotName + ') has been aligned onto the sequence used to determine this PDB structure.</p>'
+    //   msgTxt += 'Overall, the two sequences align with ' + score + '% identity; any amino acid substitutions are indicated using dark coloring (see legend).</p>'
+    //   msgTxt += "<p class='quality'>This alignment has an HHblits E-value of " + evalueString + ', which is considered to be ' + quality +
+    //         '. Based on cross-validation, the likelihood that your specified protein (' + uniprotName + ') adopts a structure similar to that shown is estimated to be ' + precisiontxt + '%.</p>'
+    //   msgTxt += '<p>Note that the structure shown is taken directly from the PDB; it has not been derived by ab-initio or comparative modeling.</p>'
+    //   _this.showBubble(msgTxt)
     }
   },
   methods: {
