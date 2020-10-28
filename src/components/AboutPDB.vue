@@ -1,7 +1,7 @@
 <template>
     <div id="gallery">
       <div id="description" data-intro="PDB summary for the shown structure." data-position="bottom">
-        <h3>About <span class="explanation"> PDB</span></h3>
+        <!-- <h3>About <span class="explanation"> PDB</span></h3> -->
         <span class="content" id="description" data-intro="PDB summary for the shown structure." data-position="bottom">
             <span id="biounitDisplay" style="display: none;">
                 <span id="biounitLeft" style="display: inline-block;" title="Navigate to other assemblies">&lt;</span>
@@ -34,7 +34,7 @@
 
 <script>
 export default {
-  name: 'Gallery'
+  name: 'AboutPDB'
 }
 </script>
 

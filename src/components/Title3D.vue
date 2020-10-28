@@ -11,18 +11,21 @@
       <!-- </span> -->
       <!-- <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a> -->
     </h3>
-    <div id='conentPanel'>
+    <div id='contentPanel'>
       <h3 id="structureviewerexplanation_1" class="explanation">
         <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel">
-          <img v-bind:src="search" id='search'/>{{organism_name}} {{primary_accession}}
+          <!-- <img v-bind:src="search" id='search'/> -->
+          {{organism_name}} {{primary_accession}}
         </span>
         <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">{{text}} </span>
         <span id="pdbpanel" class='titlepanel' @click="showPdbPanel">{{pdb}}</span>
       </h3>
-      <SearchPanel id="searchByName" class='contents'/>
-      <AboutUniprot id="uniprot" class='contents'/>
-      <Gallery id="gallery" class='contents'/>
-      <Explanation id="explanation"/>
+      <div id='panel1' class='contents'>
+        <SearchPanel id="searchByName"/>
+        <AboutUniprot id="uniprot"/>
+      </div>
+      <AboutPDB id="gallery" class='contents'/>
+      <Explanation id="explanation" class='contents'/>
     </div>
     <!-- <div class="rightHeaderBar">
         <a href="javascript:;" title="Toggle full window view" data-intro="Full window" data-position="bottom">
@@ -38,14 +41,14 @@
 <script>
 import SearchPanel from './SearchPanel'
 import AboutUniprot from './AboutUniprot'
-import Gallery from './Gallery'
+import AboutPDB from './AboutPDB'
 import Explanation from './Explanation'
 import $ from 'jquery'
 
 export default {
   name: 'Title3D',
   components: {
-    Gallery,
+    AboutPDB,
     SearchPanel,
     AboutUniprot,
     Explanation
@@ -79,8 +82,9 @@ export default {
 
           // '[id^="structureviewerexplanation"]'
           var evalue = window.AQUARIA.currentMember.E_value // e-value from pssh2
-          $('#help3D').show().parent().attr('onmouseenter', "AQUARIA.explainTitle('" + accession + "','" + window.AQUARIA.preferred_protein_name + "','" + shortName + "','" + pdbId + "','" + chainId +
-            "','" + score + "','" + evalue + "');")
+          window.AQUARIA.explainTitle(accession, window.AQUARIA.preferred_protein_name, shortName, pdbId, chainId, score, evalue)
+          // $('#help3D').show().parent().attr('onmouseenter', "AQUARIA.explainTitle('" + accession + "','" + window.AQUARIA.preferred_protein_name + "','" + shortName + "','" + pdbId + "','" + chainId +
+          //   "','" + score + "','" + evalue + "');")
         } else { // DNA or RNA (no accession)
           _this.organism_name = window.AQUARIA.organismName
           _this.primary_accession = shortName
@@ -91,14 +95,12 @@ export default {
         $('#accession_link').text(window.AQUARIA.preferred_protein_name)
         // $("#help3D").hide();
       }
-      _this.resetSelection()
     }
-
-    var searchLeft = $('#affordance_mode').width() / 2 - $('#searchByName').width() / 2
-    searchLeft = searchLeft + 'px'
-    $('#searchByName').css({
-      'margin-left': searchLeft
-    })
+    // var searchLeft = $('#affordance_mode').width() / 2 - $('#searchByName').width() / 2
+    // searchLeft = searchLeft + 'px'
+    // $('#searchByName').css({
+    //   'margin-left': searchLeft
+    // })
   },
   methods: {
     select: function () {
@@ -113,19 +115,13 @@ export default {
       event.currentTarget.style.background = '#5d5d5d'
     },
     showSearch: function () {
-      // document.querySelector('#uniprotpanel').style.paddingLeft = '12.1px'
       document.querySelector('#search').style.display = 'block'
       document.querySelector('#threeDexplanation').style.borderLeft = '1px solid white'
       document.querySelector('#threeDexplanation').style.borderRight = '1px solid white'
-      // document.querySelector('#threeDexplanation').style.paddingRight = '5px'
-      // document.querySelector('#uniprotpanel').style.paddingRight = '5px'
     },
     hideSearch: function () {
-      // document.querySelector('#uniprotpanel').style.paddingLeft = '12px'
       document.querySelector('#search').style.display = 'none'
       document.querySelector('#threeDexplanation').style.border = 'none'
-      // document.querySelector('#threeDexplanation').style.paddingRight = '0px'
-      // document.querySelector('#uniprotpanel').style.paddingRight = '0px'
     },
     resetSelection: function () {
       document.querySelectorAll('.titlepanel').forEach(el => {
@@ -133,9 +129,7 @@ export default {
         el.style.background = '#5d5d5d'
         // el.style.transition = 'all 0.7s ease 0s'
       })
-      document.querySelectorAll('#search').forEach(el => {
-        el.style.background = '#5d5d5d'
-      })
+      document.querySelector('#search').style.background = '#5d5d5d'
       document.querySelectorAll('.contents').forEach(el => {
         el.style.display = 'none'
       })
@@ -145,16 +139,16 @@ export default {
         window.AQUARIA.overlay()
       }
       this.resetSelection()
-      document.querySelector('#conentPanel').style.display = 'block'
+      document.querySelector('#contentPanel').style.display = 'block'
       document.querySelector('#structureviewerexplanation').style.display = 'none'
+      document.querySelector('#panel1').style.display = 'block'
       document.querySelector('#uniprot').style.display = 'block'
       document.querySelector('#searchByName').style.display = 'block'
       document.querySelector('#structureviewerexplanation_1 > #uniprotpanel').style.background = 'orange'
-      document.querySelector('#structureviewerexplanation_1 > #uniprotpanel > #search').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelector('#uniprot').style.display = 'none'
-        document.querySelector('#conentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = '-webkit-box'
+        document.querySelector('#contentPanel').style.display = 'none'
+        document.querySelector('#structureviewerexplanation').style.display = 'flex'
         document.querySelector('div.dimmer').remove()
         // $('#gene_name').show()
       })
@@ -165,12 +159,12 @@ export default {
       }
       this.resetSelection()
       document.querySelector('#gallery').style.display = 'block'
-      document.querySelector('#conentPanel').style.display = 'block'
+      document.querySelector('#contentPanel').style.display = 'block'
       document.querySelector('#structureviewerexplanation').style.display = 'none'
       document.querySelector('#structureviewerexplanation_1 > #pdbpanel').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelector('#conentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = '-webkit-box'
+        document.querySelector('#contentPanel').style.display = 'none'
+        document.querySelector('#structureviewerexplanation').style.display = 'flex'
         document.querySelector('div.dimmer').remove()
         // $('#gene_name').show()
       })
@@ -179,27 +173,29 @@ export default {
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
-      document.querySelector('#explanation').style.display = 'block'
-      document.querySelector('#conentPanel').style.display = 'block'
-      document.querySelector('#structureviewerexplanation').style.display = 'none'
       this.resetSelection()
+      document.querySelector('#explanation').style.display = 'block'
+      document.querySelector('#contentPanel').style.display = 'block'
+      document.querySelector('#structureviewerexplanation').style.display = 'none'
       document.querySelector('#structureviewerexplanation_1 > #threeDexplanation').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelector('#conentPanel').style.display = 'none'
+        document.querySelector('#contentPanel').style.display = 'none'
         document.querySelector('#structureviewerexplanation').style.display = '-webkit-box'
         document.querySelector('div.dimmer').remove()
-        // $('#gene_name').show()
       })
     }
   },
-  updated () {
-    var titleLeft = document.querySelector('#affordance_mode').offsetWidth / 2 - document.querySelector('#structureviewerexplanation').offsetWidth / 2
-    // var searchLeft = titleLeft + 5
-    titleLeft = titleLeft + 'px'
-    document.querySelector('#structureviewerexplanation').style.marginLeft = titleLeft
-    // document.querySelector('#search').style.left = searchLeft + 'px'
-    document.querySelector('#contentPanel').style.marginLeft = titleLeft
+  mounted () {
+    this.resetSelection()
   }
+  // updated () {
+  //   var titleLeft = document.querySelector('#affordance_mode').offsetWidth / 2 - document.querySelector('#structureviewerexplanation').offsetWidth / 2
+  //   // var searchLeft = titleLeft + 5
+  //   titleLeft = titleLeft + 'px'
+  //   document.querySelector('#structureviewerexplanation').style.marginLeft = titleLeft
+  //   // document.querySelector('#search').style.left = searchLeft + 'px'
+  //   document.querySelector('#contentPanel').style.marginLeft = titleLeft
+  // }
 }
 </script>
 
@@ -224,10 +220,8 @@ export default {
     margin: 10px 0px;
     width: 100%;
     height: fit-content;
-    padding: 10px;
     z-index: 20;
 }
-
 #uniprotpanel{
     padding-left: 12px;
     border-top-left-radius: 14px;
@@ -258,43 +252,60 @@ export default {
 }
 #structureviewerexplanation,#structureviewerexplanation_1{
   width: max-content;
-  display: -webkit-box;
+  display: flex;
   background-color: var(--transparent);
+  position: fixed;
+  left: 52%;
+  top: 28px;
+  transform: translate(-50%, -50%);
+  align-items: baseline;
+  border-radius: 5em;
+  padding: 5px calc(4px + 0.4vw)
 }
 #searchByName{
     display: block;
     overflow: auto;
     width: fit-content;
     /* top: 40vh; */
-    position: relative;
+    /* position: absolute; */
     background-color: #d1d1d1;
     padding: 5px;
     border-radius: 10px;
     z-index: 200;
 }
+.contents{
+  padding: 59px 69px;
+  text-align: left;
+}
 #uniprot{
     display: block;
     margin: 10px 0px;
-    position: relative;
+    /* position: absolute; */
     width: 100%;
     height: fit-content;
     padding: 10px;
     z-index: 20;
 }
-#conentPanel{
-  display: none;
-  z-index: 1;
+#contentPanel{
   position: relative;
+  z-index: 1;
+  display: none;
+  border-radius: 2em;
+  background: rgb(222, 222, 222);
+  bottom: 35px;
+  max-height: 80vh;
+  /*
+  position: absolute;
   top: 2vh;
   flex-basis: auto;
   background-color: #d2d2d2;
   color: white;
   text-align: center;
   line-height: 2.5;
-  padding: 0.5rem 1.5rem;
+  padding: 1.5rem 1.5rem;
   border-radius: 1.5rem;
-  margin: auto;
-  transition: all 0.7s ease;
+  margin-left: -19px;
+  transition: all 0.7s ease; */
 }
 #structureviewerexplanation_1 > #uniprotpanel {
   padding-right: 5px;
