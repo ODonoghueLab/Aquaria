@@ -41,7 +41,7 @@ export default {
     // var regex = /(^\d+\/*$)/
     if (window.location.pathname === '/') {
       if (sessionStorage.getItem('link') == null) {
-        window.location.pathname = '/O15350/2xwc/A'
+        window.location.pathname = '/P04637/3kmd'
       } else {
         window.location.pathname = sessionStorage.getItem('link')
       }
@@ -85,9 +85,9 @@ export default {
   // },
   mounted () {
     setTimeout(function () {
-      const pdf = window.location.protocol + '//' + window.location.hostname + '/COVID-Structural-Coverage-Map.pdf'
-      const js1 = window.location.protocol + '//' + window.location.hostname + '/javascripts/aquaria.js'
-      const js2 = window.location.protocol + '//' + window.location.hostname + '/javascripts/jolecule.js'
+      const pdf = window.BACKEND + '/COVID-Structural-Coverage-Map.pdf'
+      const js1 = window.BACKEND + '/javascripts/aquaria.js'
+      const js2 = window.BACKEND + '/javascripts/jolecule.js'
       axios({
         method: 'get',
         url: pdf
@@ -102,6 +102,9 @@ export default {
         url: js2
       })
     }, 15000)
+  },
+  updated () {
+    sessionStorage.setItem('link', window.location.pathname)
   }
 }
 </script>

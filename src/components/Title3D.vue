@@ -1,21 +1,28 @@
 <template>
   <div>
-    <h3 id="structureviewerexplanation" class="explanation">
-      <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel">{{organism_name}} {{primary_accession}} </span>
-      <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">{{text}} </span>
-      <span id="pdbpanel" class='titlepanel' @click="showPdbPanel">{{pdb}}</span>
-      <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a>
+    <h3 id="structureviewerexplanation" class="explanation" @mouseover="showSearch" @mouseout="hideSearch" >
+      <!-- <span id='titlebar'> -->
+        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" @mouseover="select" @mouseout="diselect">
+          <img v-bind:src="search" id='search'/>
+          {{organism_name}} {{primary_accession}}
+        </span>
+        <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation" @mouseover="select" @mouseout="diselect">{{text}} </span>
+        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" @mouseover="select" @mouseout="diselect">{{pdb}}</span>
+      <!-- </span> -->
+      <!-- <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a> -->
     </h3>
     <div id='conentPanel'>
       <h3 id="structureviewerexplanation_1" class="explanation">
-        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel">{{organism_name}} {{primary_accession}} </span>
+        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel">
+          <img v-bind:src="search" id='search'/>{{organism_name}} {{primary_accession}}
+        </span>
         <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">{{text}} </span>
         <span id="pdbpanel" class='titlepanel' @click="showPdbPanel">{{pdb}}</span>
-        <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a>
       </h3>
       <SearchPanel id="searchByName" class='contents'/>
       <AboutUniprot id="uniprot" class='contents'/>
       <Gallery id="gallery" class='contents'/>
+      <Explanation id="explanation"/>
     </div>
     <!-- <div class="rightHeaderBar">
         <a href="javascript:;" title="Toggle full window view" data-intro="Full window" data-position="bottom">
@@ -32,6 +39,7 @@
 import SearchPanel from './SearchPanel'
 import AboutUniprot from './AboutUniprot'
 import Gallery from './Gallery'
+import Explanation from './Explanation'
 import $ from 'jquery'
 
 export default {
@@ -39,14 +47,16 @@ export default {
   components: {
     Gallery,
     SearchPanel,
-    AboutUniprot
+    AboutUniprot,
+    Explanation
   },
   data () {
     return {
       organism_name: null,
       primary_accession: null,
       text: null,
-      pdb: null
+      pdb: null,
+      search: require('../assets/img/search.png')
     }
   },
   beforeMount () {
@@ -83,6 +93,7 @@ export default {
       }
       _this.resetSelection()
     }
+
     var searchLeft = $('#affordance_mode').width() / 2 - $('#searchByName').width() / 2
     searchLeft = searchLeft + 'px'
     $('#searchByName').css({
@@ -90,9 +101,39 @@ export default {
     })
   },
   methods: {
+    select: function () {
+      event.currentTarget.style.background = 'orange'
+      if (event.currentTarget.children[0]) {
+        document.querySelector('#search').style.background = 'orange'
+      } else {
+        document.querySelector('#search').style.background = '#5d5d5d'
+      }
+    },
+    diselect: function () {
+      event.currentTarget.style.background = '#5d5d5d'
+    },
+    showSearch: function () {
+      // document.querySelector('#uniprotpanel').style.paddingLeft = '12.1px'
+      document.querySelector('#search').style.display = 'block'
+      document.querySelector('#threeDexplanation').style.borderLeft = '1px solid white'
+      document.querySelector('#threeDexplanation').style.borderRight = '1px solid white'
+      // document.querySelector('#threeDexplanation').style.paddingRight = '5px'
+      // document.querySelector('#uniprotpanel').style.paddingRight = '5px'
+    },
+    hideSearch: function () {
+      // document.querySelector('#uniprotpanel').style.paddingLeft = '12px'
+      document.querySelector('#search').style.display = 'none'
+      document.querySelector('#threeDexplanation').style.border = 'none'
+      // document.querySelector('#threeDexplanation').style.paddingRight = '0px'
+      // document.querySelector('#uniprotpanel').style.paddingRight = '0px'
+    },
     resetSelection: function () {
       document.querySelectorAll('.titlepanel').forEach(el => {
         el.style.display = 'flex'
+        el.style.background = '#5d5d5d'
+        // el.style.transition = 'all 0.7s ease 0s'
+      })
+      document.querySelectorAll('#search').forEach(el => {
         el.style.background = '#5d5d5d'
       })
       document.querySelectorAll('.contents').forEach(el => {
@@ -109,6 +150,7 @@ export default {
       document.querySelector('#uniprot').style.display = 'block'
       document.querySelector('#searchByName').style.display = 'block'
       document.querySelector('#structureviewerexplanation_1 > #uniprotpanel').style.background = 'orange'
+      document.querySelector('#structureviewerexplanation_1 > #uniprotpanel > #search').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelector('#uniprot').style.display = 'none'
         document.querySelector('#conentPanel').style.display = 'none'
@@ -137,6 +179,7 @@ export default {
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
+      document.querySelector('#explanation').style.display = 'block'
       document.querySelector('#conentPanel').style.display = 'block'
       document.querySelector('#structureviewerexplanation').style.display = 'none'
       this.resetSelection()
@@ -148,11 +191,34 @@ export default {
         // $('#gene_name').show()
       })
     }
+  },
+  updated () {
+    var titleLeft = document.querySelector('#affordance_mode').offsetWidth / 2 - document.querySelector('#structureviewerexplanation').offsetWidth / 2
+    // var searchLeft = titleLeft + 5
+    titleLeft = titleLeft + 'px'
+    document.querySelector('#structureviewerexplanation').style.marginLeft = titleLeft
+    // document.querySelector('#search').style.left = searchLeft + 'px'
+    document.querySelector('#contentPanel').style.marginLeft = titleLeft
   }
 }
 </script>
 
 <style>
+#titlebar{
+  display: contents;
+}
+#search{
+    display: none;
+    height: calc(1.2rem + 0.2vh);
+    width: 31px;
+    height: 31px;
+    position: absolute;
+    padding: 6px 2px 3px 6px;
+    background: #5d5d5d;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+    margin-left: -31px;
+}
 #gallery{
     top: 20vh;
     margin: 10px 0px;
@@ -167,9 +233,10 @@ export default {
     border-top-left-radius: 14px;
     border-bottom-left-radius: 14px;
     line-height: 31px;
+    transition: all 0s ease 0s
 }
 #threeDexplanation{
-    padding-left: 7px;
+    padding-left: 8px;
     line-height: 31px;
 }
 #pdbpanel{
@@ -231,6 +298,9 @@ export default {
 }
 #structureviewerexplanation_1 > #uniprotpanel {
   padding-right: 5px;
+}
+#structureviewerexplanation_1 > #uniprotpanel > img{
+  display: block;
 }
 #structureviewerexplanation_1 > #threeDexplanation {
   padding-right: 5px;
