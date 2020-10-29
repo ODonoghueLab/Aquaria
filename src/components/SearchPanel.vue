@@ -1,10 +1,19 @@
 <template>
     <div id="searchByName">
-            <h3>Specify a Protein</h3>
+            <p>Search proteins</p>
               <form id="myform"
                     name="myform"
                     ACTION="#"
                     method="post">
+                <img v-bind:src="search"/>
+                <p id="input2"><input class="search"
+                                      type="text"
+                                      id="organism_syn_input"
+                                      name="organism_syn_input"
+                                      placeholder="Organism"
+                                      autocomplete="on"
+                                      data-intro="Enter an organism name (human is default)."
+                                      data-position="right" /></p>
                 <p id="input1"><input class="search"
                                       type="text"
                                       id="protein_syn_input"
@@ -14,14 +23,6 @@
                                       data-intro="START HERE - specify a protein name (or UniProt identifier, or PDB ID), then press 'Enter'."
                                       data-position="right" /></p>
                                      <p>&nbsp;</p>
-                <p id="input2"><input class="search"
-                                      type="text"
-                                      id="organism_syn_input"
-                                      name="organism_syn_input"
-                                      placeholder="Organism"
-                                      autocomplete="on"
-                                      data-intro="Enter an organism name (human is default)."
-                                      data-position="right" /></p>
                 <!--<input type="hidden" id="organismid" name="organismid" value="9606"/>-->
               </form>
       <!-- </span> -->
@@ -33,6 +34,11 @@
 
 export default {
   name: 'SearchPanel',
+  data () {
+    return {
+      search: require('../assets/img/search_dark.png')
+    }
+  },
   methods: {
     fillin: function (term) {
       document.getElementById('protein_syn_input').value = term
@@ -45,8 +51,14 @@ export default {
 </script>
 
 <style>
+#searchByName img{
+    height: calc(0.25rem + 2vh);
+    margin-top: 8px;
+    padding-left: 4px;
+}
 #myform{
   display: inline-flex;
+  background: white;
 }
 
 #input1, #input2{
@@ -92,6 +104,8 @@ input[type=search].ui-autocomplete-loading {
 
   input {
     z-index: 40;
+    border: none;
+    font-size: 16px;
   }
 
   .ui-autocomplete ul {

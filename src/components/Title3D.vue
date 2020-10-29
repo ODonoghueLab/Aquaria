@@ -187,6 +187,15 @@ export default {
   },
   mounted () {
     this.resetSelection()
+  },
+  updated () {
+    var input
+    input = document.querySelector('#organism_syn_input')
+    input.placeholder = window.AQUARIA.organismName
+    input.setAttribute('size', input.getAttribute('placeholder').length)
+    input = document.querySelector('#protein_syn_input')
+    input.placeholder = window.AQUARIA.preferred_protein_name
+    input.setAttribute('size', input.getAttribute('placeholder').length)
   }
   // updated () {
   //   var titleLeft = document.querySelector('#affordance_mode').offsetWidth / 2 - document.querySelector('#structureviewerexplanation').offsetWidth / 2
@@ -255,7 +264,7 @@ export default {
   display: flex;
   background-color: var(--transparent);
   position: fixed;
-  left: 52%;
+  left: 50%;
   top: 28px;
   transform: translate(-50%, -50%);
   align-items: baseline;
@@ -268,7 +277,7 @@ export default {
     width: fit-content;
     /* top: 40vh; */
     /* position: absolute; */
-    background-color: #d1d1d1;
+    /* background-color: #d1d1d1; */
     padding: 5px;
     border-radius: 10px;
     z-index: 200;
