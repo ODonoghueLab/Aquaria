@@ -12,7 +12,6 @@
 	module.exports.expand_cluster = function expand_cluster(d,  cluster, sequence) {
 		console.log('show_expanded_cluster.expand_cluster')
 		// dim background
-		// $('body').append('<div class="dimmer2"></div>');
 		
 		//hide applet temporarily for Windows
 		// if(browser.indexOf("Windows") != -1) { $("#threeD").css("visibility", "hidden"); }
@@ -68,6 +67,7 @@
 		
 		// append <div>
 		d3.select("div#c_"+pdbid+"_"+cluster_nbr).append("div").attr("class","expansion");
+		d3.select("div#c_"+pdbid+"_"+cluster_nbr).append('div').attr('class', 'dimmer2')
 		
 		
 		if (cluster._children) { //console.log(matching_structures.clusters[cluster_nbr]._children.length +" hidden c.");
