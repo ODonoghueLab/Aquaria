@@ -51,7 +51,7 @@ main {
     display: flex;
 }
 .item a { 
-    display: flex;
+    display: contents;
 }
 .item  img {
     height: calc(2.25rem + 2vh);

@@ -286,7 +286,7 @@ export default {
 
   div.expansion {
     position: absolute;
-    width: 400px;
+    width: 0px;
     z-index: 102;
   }
 
