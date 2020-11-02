@@ -36,6 +36,9 @@ export default {
     if (window.location.hash.includes('Features')) {
       this.showFeatures()
     }
+    // var iconLeft = document.querySelector('#affordance_mode').offsetWidth - document.querySelector('.tabs').offsetWidth
+    // iconLeft = iconLeft + 'px'
+    // document.querySelector('.tabs').style.marginLeft = iconLeft
   },
   methods: {
     showPanel: function (elem1, elem2) {
@@ -55,8 +58,8 @@ export default {
     },
     showMatches: function () {
       const _this = this
-      const soupController = window.AQUARIA.panel3d.embededJolecule.controller
-      soupController.clearSelectedResidues()
+      // const soupController = window.AQUARIA.panel3d.embededJolecule.controller
+      // soupController.clearSelectedResidues()
       _this.showPanel('vis', 'Structures')
       _this.hidePanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {
@@ -69,8 +72,10 @@ export default {
     },
     showFeatures: function () {
       const _this = this
-      const soupController = window.AQUARIA.panel3d.embededJolecule.controller
-      soupController.clearSelectedResidues()
+      if (window.AQUARIA.panel3d) {
+        const soupController = window.AQUARIA.panel3d.embededJolecule.controller
+        soupController.clearSelectedResidues()
+      }
       _this.hidePanel('vis', 'Structures')
       _this.showPanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {
@@ -82,6 +87,11 @@ export default {
       })
     }
   }
+  // updated () {
+  //   var iconLeft = document.querySelector('#affordance_mode').offsetWidth - document.querySelector('.tabs').offsetWidth
+  //   iconLeft = iconLeft + 'px'
+  //   document.querySelector('.tabs').style.marginLeft = iconLeft
+  // }
 }
 </script>
 
@@ -108,7 +118,29 @@ export default {
 
 .tabs{
     z-index: 1;
-    display: block;
+    padding-left: 12px;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+    line-height: 31px;
+    transition: all 0s ease 0s;
+    width: -webkit-max-content;
+    width: -moz-max-content;
+    width: max-content;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: inline-block;
+    background-color: var(--transparent);
+    position: fixed;
+    left: 45%;
+    /* top: 28px; */
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -87%);
+    -webkit-box-align: baseline;
+    -ms-flex-align: baseline;
+    align-items: baseline;
+    border-radius: 5em;
+    padding: 5px calc(4px + 0.4vw);
+    font-size: calc(8px + .6vw);
 }
 
 #vis, #featurelist{

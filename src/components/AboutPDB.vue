@@ -39,10 +39,10 @@ export default {
 </script>
 
 <style scoped>
-#gallery{
+/* #gallery{
     width: 100%;
     min-height: 100px;
-}
+} */
 div.panel{
     border: 1px solid rgb(153, 153, 153);
     font-size: 89%;
@@ -52,12 +52,12 @@ div.panel{
     height: 350px;
     overflow: scroll;
 }
-#gallery div {
+/* #gallery div {
     margin: 2px 0;
-}
+} */
 
 #description span.content {
-    height: 32vh;
+    height: fit-content;
     overflow: hidden;
     display: block;
 }

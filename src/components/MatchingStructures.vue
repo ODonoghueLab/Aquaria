@@ -1,5 +1,7 @@
 <template>
-  <span class="content toggled" id="vis"></span>
+  <span class="content toggled" id="vis">
+    <div id='allclusters' data-intro='Visual summary of all structures in PDB matching the specified protein, grouped by region of match.' data-position='left'></div>
+  </span>
 </template>
 
 <script>
