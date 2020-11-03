@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3 id="structureviewerexplanation" class="explanation">
+    <div id="structureviewerexplanation" class="explanation">
       <span id='titlebar' @mouseover="showSearch" @mouseout="hideSearch" >
         <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" @mouseover="select" @mouseout="diselect">
           <img v-bind:src="search" id='search'/>
@@ -10,10 +10,10 @@
         <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" @mouseover="select" @mouseout="diselect">{{pdb}}</span>
       </span>
       <!-- <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a> -->
-    </h3>
+    </div>
     <div id='contentPanel'>
-      <h3 id="structureviewerexplanation_1" class="explanation">
-        <span id='titlebar'>
+      <!-- <h3 id="structureviewerexplanation_1" > -->
+        <span id='titlebar' class="explanation">
           <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel">
             <!-- <img v-bind:src="search" id='search'/> -->
             {{organism_name}} {{primary_accession}}
@@ -21,7 +21,7 @@
           <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">{{text}} </span>
           <span id="pdbpanel" class='titlepanel' @click="showPdbPanel">{{pdb}}</span>
         </span>
-      </h3>
+      <!-- </h3> -->
       <div id='panel1' class='contents'>
         <SearchPanel id="searchByName"/>
         <AboutUniprot id="uniprot"/>
@@ -127,9 +127,7 @@ export default {
     },
     resetSelection: function () {
       document.querySelectorAll('.titlepanel').forEach(el => {
-        // el.style.padding = '8px'
         el.style.background = '#5d5d5d'
-        // el.style.transition = 'all 0.7s ease 0s'
       })
       document.querySelector('#search').style.background = '#5d5d5d'
       document.querySelectorAll('.contents').forEach(el => {
@@ -146,11 +144,11 @@ export default {
       document.querySelector('#panel1').style.display = 'block'
       document.querySelector('#uniprot').style.display = 'block'
       document.querySelector('#searchByName').style.display = 'block'
-      document.querySelector('#structureviewerexplanation_1 > #titlebar > #uniprotpanel').style.background = 'orange'
+      document.querySelector('#contentPanel > #titlebar > #uniprotpanel').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelector('#uniprot').style.display = 'none'
         document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = '-webkit-box'
+        document.querySelector('#structureviewerexplanation').style.display = 'grid'
         document.querySelector('div.dimmer').remove()
         // $('#gene_name').show()
       })
@@ -163,10 +161,10 @@ export default {
       document.querySelector('#gallery').style.display = 'block'
       document.querySelector('#contentPanel').style.display = 'block'
       document.querySelector('#structureviewerexplanation').style.display = 'none'
-      document.querySelector('#structureviewerexplanation_1 > #titlebar > #pdbpanel').style.background = 'orange'
+      document.querySelector('#contentPanel > #titlebar > #pdbpanel').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = '-webkit-box'
+        document.querySelector('#structureviewerexplanation').style.display = 'grid'
         document.querySelector('div.dimmer').remove()
         // $('#gene_name').show()
       })
@@ -179,10 +177,10 @@ export default {
       document.querySelector('#explanation').style.display = 'block'
       document.querySelector('#contentPanel').style.display = 'block'
       document.querySelector('#structureviewerexplanation').style.display = 'none'
-      document.querySelector('#structureviewerexplanation_1 > #titlebar > #threeDexplanation').style.background = 'orange'
+      document.querySelector('#contentPanel >  #titlebar > #threeDexplanation').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = '-webkit-box'
+        document.querySelector('#structureviewerexplanation').style.display = 'grid'
         document.querySelector('div.dimmer').remove()
       })
     }
@@ -223,13 +221,12 @@ export default {
     border-radius: 5em;
     background: #9990;
     padding: 5px calc(4px + .4vw);
-    min-width: 100vw;
+    min-width: 260px;
 }
 #panel1{
   margin-top: 100px;
 }
 #search{
-    margin-top: 1px;
     display: none;
     height: calc(1.2rem + 0.2vh);
     width: 32px;
@@ -297,7 +294,7 @@ export default {
 } */
 
 #structureviewerexplanation,#structureviewerexplanation_1{
-    display: -webkit-box;
+    display: grid;
     background-color: var(--transparent);
     position: fixed;
     left: 50%;
@@ -311,7 +308,7 @@ export default {
     z-index: 2;
 }
 
-.contents{
+/* .contents{
   padding: 70px 20px 22px 20px;
   min-width: 50vw;
   text-align: left;
@@ -327,13 +324,11 @@ export default {
   transform: translate(-50%, -50%);
   -webkit-box-align: baseline;
   -ms-flex-align: baseline;
-  /* align-items: baseline; */
   border-radius: 5em;
-  /* padding: 5px calc(4px + 0.4vw); */
   font-size: calc(8px + .6vw);
   background: #dedede;
   z-index: 1;
-}
+} */
 
 #searchByName{
     display: block;
