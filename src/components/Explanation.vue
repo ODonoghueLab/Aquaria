@@ -4,9 +4,9 @@
     <p>What you see in the 3D viewer is the experimentally-determined structure of {{pdbName}} from
         <a href='http://www.rcsb.org/pdb/explore.do?structureId={{}}' target='_blank'> PDB entry {{pdbId}}</a>chain {{chainId}}.
     </p>
-    <p>The full-length sequence of the protein you specified ({{uniprotName}}) has been aligned onto the sequence used to determine this PDB structure.</p>
-    <p>Overall, the two sequences align with {{score}}% identity; any amino acid substitutions are indicated using dark coloring (see legend).</p>
-    <p class='quality'>This alignment has an HHblits E-value of {{evalueString}}, which is considered to be {{quality}}.
+    <p> The full-length sequence of the protein you specified ({{uniprotName}}) has been aligned onto the sequence used to determine this PDB structure.</p>
+    <p> Overall, the two sequences align with {{score}}% identity; any amino acid substitutions are indicated using dark coloring (see legend).</p>
+    <p class='quality'> This alignment has an HHblits E-value of {{evalueString}} &times; <nobr>10<sup>{{power}}</sup></nobr>, which is considered to be {{quality}}.
         Based on cross-validation, the likelihood that your specified protein ({{uniprotName}}) adopts a structure similar to that shown is estimated to be {{precisiontxt}}%.</p>
         <p>Note that the structure shown is taken directly from the PDB; it has not been derived by ab-initio or comparative modeling.</p>
     </div>
@@ -28,7 +28,8 @@ export default {
       evalueString: null,
       quality: null,
       uniprotName: null,
-      precisiontxt: null
+      precisiontxt: null,
+      power: null
     }
   },
   beforeMount () {
@@ -47,11 +48,13 @@ export default {
       var precision = (_this.BioScience_PlantDisease_Weibull_model(Log10E) * 100)
       precision = Math.round(precision)
       /// console.log("AQUARIA.explainTitle -Log10e: " + Log10E + " precision: " + precision);
-      _this.evalueString = evalue.replace(/e(.*)$/, ' &times <nobr>10<sup>$1</sup></nobr>')
+      _this.evalueString = evalue.toString().split('e')[0]
+      _this.power = evalue.toString().split('e')[1]
+      //  evalue.toString().replace(/e(.*)$/, ' &times <nobr>10 $1<sup></sup></nobr>')
       if (evalue === 0 && precision === 1) {
         _this.precisiontxt = 'close to 100'
       } else {
-        _this.precisiontxt = '&#8805; ' + precision
+        _this.precisiontxt = '≥ ' + precision
       }
       if (evalue > 10E-72) {
         _this.quality = 'in the twilight zone'

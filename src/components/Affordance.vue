@@ -41,20 +41,6 @@ export default {
   border-color: black;
 }
 
-.title{
-  z-index: 1;
-  position: relative;
-  top: 2vh;
-  flex-basis: auto;
-  color: white;
-  text-align: center;
-  line-height: 2.5;
-  padding: 0.5rem 1.5rem;
-  border-radius: 1.5rem;
-  margin: auto;
-  transition: all 0.7s ease;
-}
-
 /* #title:hover {
     padding-left: 3rem;
 } */

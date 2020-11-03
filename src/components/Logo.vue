@@ -46,7 +46,7 @@ export default {
     showExplanations: function () {
       $('div.dimmer').remove()
       $('div#about_overlay, div#help_overlay').hide()
-      $('body, #gallery').css('margin-top', '5em')
+      // $('body, #gallery').css('margin-top', '5em')
       $('div.container').first().hide()
       $('div.outer_container').first().append("<div id='tree_helper' class='chardinjs-helper-layer chardinjs-relative-position'></div>")
       $('#tree_helper').html('<img src="/images/tree-overlay.png" />')

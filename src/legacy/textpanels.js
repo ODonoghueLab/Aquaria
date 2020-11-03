@@ -489,10 +489,6 @@ if (data.synonyms == "none") {
 	$('#gene_name').css({
 		'margin-left': geneLeft
 	})
-
-	var iconLeft = document.querySelector('#affordance_mode').offsetWidth - document.querySelector('#Structures').offsetWidth
-    iconLeft = iconLeft + 'px'
-    document.querySelector('.tabs').style.marginLeft = iconLeft
 	
 	//update ABOUT title
 	$("#about h3 span.explanation").html("<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>");

@@ -10,7 +10,7 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
   var newDivId = divId + '-inner'
   var newAttachToDiv = '#' + newDivId
   newDiv.setAttribute('id', newDivId)
-  newDiv.setAttribute('style', 'padding-bottom: 2px; box-sizing: border-box; width: 100%; height: 95%')
+  newDiv.setAttribute('style', 'padding-bottom: 2px; box-sizing: border-box; width: 100%; height: 98.6%%')
   currentDiv.appendChild(newDiv);
   this.chainSelected = chainSelected;
   this.embededJolecule = jolecule.initEmbedJolecule({
