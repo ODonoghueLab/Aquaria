@@ -193,7 +193,8 @@ axios({
 		var chain = data;
 		if (chain.Type === 'Protein') {
 			if (chain.Source_DB === 'UniProt') {
-				var url = `${window.BACKEND}/getProteinSynonyms/${chain.Accession}`;
+				var url = `${window.BACKEND}/getProteinSynonyms/${AQUARIA.protein_primary_accession}`;
+				// var url = `${window.BACKEND}/getProteinSynonyms/${chain.Accession}`;
 				axios({
 					method: 'get',
 					url: url,
