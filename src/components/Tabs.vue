@@ -128,7 +128,7 @@ export default {
     width: max-content;
     display: -webkit-box;
     display: -ms-flexbox;
-    display: inline-block;
+    display: inline-table;
     background-color: var(--transparent);
     position: fixed;
     left: 45%;

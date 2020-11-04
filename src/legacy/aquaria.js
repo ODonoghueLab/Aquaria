@@ -187,14 +187,16 @@ var MAX_PROTEIN_HISTORY = 5;
       var sequences = data.sequences;
       var transform = assert_orientation(data.transforms[0]);
       var common_names = data.common_names;
-      var biounits = data.biounits;
       var source_primary_accession = data.source_primary_accession;
       var conservations = data.conservations;
-      if (! biounits || biounits < 1) {
+      ///console.log("(biounits, currentBiounit) = (" + biounits + ", " + currentBiounit + ")");
+      if (! data.biounits || data.biounits < 1) {
         // if the database PDB table has biounit = 0 or undefined
         currentBiounit = 0
       }
-      ///console.log("(biounits, currentBiounit) = (" + biounits + ", " + currentBiounit + ")");
+      else{
+        currentBiounit = data.biounits
+      }
 
       if (pdb_id.match(/^\d\w\w\w$/)) {
         var threeDWidth = $("#threeD").width();
@@ -206,10 +208,6 @@ var MAX_PROTEIN_HISTORY = 5;
         // $("#threeD").html('');
         ///console.log('display_3D_structure: currentBiounit =' + currentBiounit + "\n" + 'And biounits =' + biounits)
 
-        var attributes = AQUARIA.panel3d.generateAttributes(threeDWidth, threeDHeight,
-          pdb_id, pdb_chain, currentBiounit, source_primary_accession,
-          sequences, common_names, alignment, '', transform, conservations, AQUARIA.structures2match.version_string);
-
         ///console.log('AQUARIA.display_3D_structure', AQUARIA.structures2match.Selected_PDB, pdb_id, pdb_chain[0], attributes)
 
         //ABOUT PDB PANEL
@@ -219,8 +217,20 @@ var MAX_PROTEIN_HISTORY = 5;
           url: url,
         })
         .then(function (response) {
+
           var pdbData = response.data[0]
-          if (biounits > 0 && typeof pdbData.Experimental_Method !== 'undefined' && pdbData.Experimental_Method !== null && pdbData.Experimental_Method.toLowerCase().indexOf('x-ray') > -1) {
+          var biounits = pdbData.Biounits;
+          if (! biounits || biounits < 1) {
+            // if the database PDB table has biounit = 0 or undefined
+            currentBiounit = 0
+            pdbData.Biounits = 0;
+          }
+
+          if (biounits > 0 && typeof pdbData.experimental_method !== 'undefined' && pdbData.experimental_method !== null && pdbData.experimental_method.toLowerCase().indexOf('x-ray') > -1) {
+            if(member){
+              currentBiounit = 1
+              textpanel.updatePDBPanel(pdbData, common_names[0], member.alignment_identity_score);
+            }
             if (currentBiounit > biounits) {
               currentBiounit = 0;
             } else if (currentBiounit < 0) {
@@ -230,8 +240,9 @@ var MAX_PROTEIN_HISTORY = 5;
               $('#biounitType').text('Asymmetric Unit');
               $('#biounitCount').hide();
             } else {
-              $('#biounitType').text('Biological Assembly');
+              $('#biounitType').text('Biological Assembly ');
               if (biounits > 1) {
+                $('#biounitCount').show();
               } else {
                 $('#biounitCount').hide();
               }
@@ -251,20 +262,25 @@ var MAX_PROTEIN_HISTORY = 5;
               $('#biounitLeft').hide();
             }
           } else {
+            if(pdbData){
+              textpanel.updatePDBPanel(pdbData, common_names[0], member.alignment_identity_score);
+            }
             $("#biounitDisplay").hide();
             currentBiounit = 0;
           }
           AQUARIA.pdb_data = pdbData;
-          if(pdbData){
-            textpanel.updatePDBPanel(pdbData, common_names[0], member.alignment_identity_score);
-          }
-          else { console.log("textpanels.updatePDBPanel error: PDBData not available"); }
+          // if(pdbData){
+          //   textpanel.updatePDBPanel(pdbData, common_names[0], member.alignment_identity_score);
+          // }
+          // else { console.log("textpanels.updatePDBPanel error: PDBData not available"); }
 
           //deselect feature tracks that may still be active
           d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
           d3.selectAll("svg.loaded").classed("loaded", false);
-        });
-
+        
+        var attributes = AQUARIA.panel3d.generateAttributes(threeDWidth, threeDHeight,
+          pdb_id, pdb_chain, currentBiounit, source_primary_accession,
+          sequences, common_names, alignment, '', transform, conservations, AQUARIA.structures2match.version_string);
         $("#jnlp_app_attributes").val(JSON.stringify(attributes));
 
         // $("#launchJalviewLink").click(function () {
@@ -287,7 +303,7 @@ var MAX_PROTEIN_HISTORY = 5;
 
           var interactive = attributes['interactive'] ? '/' +
             attributes['interactive'] : '';
-          var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length);
+          var urlParams = window.location.search;
           history.pushState(null, sequences[0].primary_accession,
             window.location.protocol + '//' + window.location.host +
             "/" + sequences[0].primary_accession + "/" +
@@ -313,11 +329,10 @@ var MAX_PROTEIN_HISTORY = 5;
           //					});
           //					delete attributes['interactive'];
         }
-
+      });
       } else {
         console.log("AQUARIA.display_3D_structure Error: Invalid PDB identifier");
       }
-
     };
 
     AQUARIA.display_features = function(sequences) {
@@ -370,6 +385,7 @@ var MAX_PROTEIN_HISTORY = 5;
         "% Sequence Identity to PDB " + pdbid + ", chain " + chain;
       featurelist.updateFeatureTabTitle(protein_name);
     };
+
 
     AQUARIA.refresh = function() {
       if (typeof AQUARIA.showMatchingStructures !== 'undefined') {

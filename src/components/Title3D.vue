@@ -223,9 +223,6 @@ export default {
     padding: 5px calc(4px + .4vw);
     min-width: 260px;
 }
-#panel1{
-  margin-top: 100px;
-}
 #search{
     display: none;
     height: calc(1.2rem + 0.2vh);
@@ -247,21 +244,23 @@ export default {
 } */
 #uniprotpanel{
     /* padding-left: 14px; */
-    padding: 8px 2px 8px 14px;
+    padding: 8px 0px 8px 14px;
     border-top-left-radius: 14px;
     border-bottom-left-radius: 14px;
     line-height: 31px;
     transition: all 0s ease 0s
 }
 #threeDexplanation{
-    padding: 8px 2px 8px 6px;
+    padding: 8px 1px 8px 1px;
     line-height: 31px;
+    margin: 0px -1px;
 }
 #pdbpanel{
-    padding: 8px 14px 8px 6px;
+    padding: 8px 14px 8px 2px;
     border-top-right-radius: 14px;
     border-bottom-right-radius: 14px;
     line-height: 31px;
+    margin-left: -1px;
 }
 .titlepanel{
   cursor: pointer;
@@ -287,11 +286,12 @@ export default {
   font-size: calc(8px + .6vw)
 } */
 
-/* .contents{
-  padding: 59px 69px;
+.contents{
+  padding: 0px 40px;
   text-align: left;
   color: #5d5d5d;
-} */
+  overflow: scroll;
+}
 
 #structureviewerexplanation,#structureviewerexplanation_1{
     display: grid;
@@ -352,12 +352,11 @@ export default {
     z-index: 20;
 }
 #contentPanel{
-  position: relative;
+  position: fixed;
   z-index: 1;
   display: none;
   border-radius: 2em;
   background: rgb(222, 222, 222);
-  bottom: 35px;
   max-height: 80vh;
   /*
   position: absolute;
