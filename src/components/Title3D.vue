@@ -1,14 +1,14 @@
 <template>
   <div>
     <div id="structureviewerexplanation" class="explanation">
-      <span id='titlebar' @mouseover="showSearch" @mouseout="hideSearch" >
+      <div id='titlebar' @mouseover="showSearch" @mouseout="hideSearch" >
         <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" @mouseover="select" @mouseout="diselect">
           <img v-bind:src="search" id='search'/>
           {{organism_name}} {{primary_accession}}
         </span>
         <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation" @mouseover="select" @mouseout="diselect">{{text}} </span>
         <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" @mouseover="select" @mouseout="diselect">{{pdb}}</span>
-      </span>
+      </div>
       <!-- <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a> -->
     </div>
     <div id='contentPanel'>
@@ -211,21 +211,22 @@ export default {
 <style>
 #titlebar{
     display: -webkit-box;
-    margin-left: 12px;
-    margin-top: calc(5px + 1.5vh);
-    margin-bottom: 20px;
+    /* margin-left: 12px;
+    margin-top: calc(12px + 1.5vh);
+    margin-bottom: 20px; */
+    margin: auto;
     display: inline-table;
-    -webkit-box-align: baseline;
+    /* -webkit-box-align: baseline;
     -ms-flex-align: baseline;
-    align-items: baseline;
+    align-items: baseline; */
     border-radius: 5em;
-    background: #9990;
+    /* background-color: var(--primary-label); */
     padding: 5px calc(4px + .4vw);
     min-width: 260px;
 }
-#panel1{
-  margin-top: 100px;
-}
+/* #panel1{
+   margin-top: 100px;
+ } */
 #search{
     display: none;
     height: calc(1.2rem + 0.2vh);
@@ -375,7 +376,7 @@ export default {
 #structureviewerexplanation_1 > #titlebar >  #uniprotpanel {
   padding-right: 5px;
 }
-#structureviewerexplanation_1 > #titlebar >  #uniprotpanel > img{
+#structureviewerexplanation_1 > #titlebar >  #uniprotpanel > img {
   display: block;
 }
 #structureviewerexplanation_1 > #titlebar >  #threeDexplanation {

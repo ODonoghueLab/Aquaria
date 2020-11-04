@@ -21,16 +21,17 @@ export default {
 
 <style scoped>
 #controls{
-  padding-left: 10px;
-  /* position: absolute; */
-  width: 0;
+  /* padding-left: 10px; */
+  width: 66%;
+  min-width: 300px;
   display: flex;
+  margin: auto;
 }
 
 .title{
   z-index: 1;
   position: relative;
-  top: 2vh;
+  top: 4vh;
   flex-basis: auto;
   color: white;
   text-align: center;
