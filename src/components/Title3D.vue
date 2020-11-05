@@ -1,14 +1,14 @@
 <template>
   <div>
     <div id="structureviewerexplanation" class="explanation">
-      <span id='titlebar' @mouseover="showSearch" @mouseout="hideSearch" >
+      <div id='titlebar' @mouseover="showSearch" @mouseout="hideSearch" >
         <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" @mouseover="select" @mouseout="diselect">
           <img v-bind:src="search" id='search'/>
           {{organism_name}} {{primary_accession}}
         </span>
         <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation" @mouseover="select" @mouseout="diselect">{{text}} </span>
         <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" @mouseover="select" @mouseout="diselect">{{pdb}}</span>
-      </span>
+      </div>
       <!-- <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a> -->
     </div>
     <div id='contentPanel'>
@@ -209,21 +209,22 @@ export default {
 </script>
 
 <style>
-#titlebar{
+#titlebar {
     display: -webkit-box;
-    margin-left: 12px;
-    margin-top: calc(5px + 1.5vh);
-    margin-bottom: 20px;
+    /* margin-left: 12px;
+    margin-top: calc(12px + 1.5vh);
+    margin-bottom: 20px; */
+    margin: auto;
     display: inline-table;
-    -webkit-box-align: baseline;
+    /* -webkit-box-align: baseline;
     -ms-flex-align: baseline;
-    align-items: baseline;
+    align-items: baseline; */
     border-radius: 5em;
-    background: #9990;
+    /* background-color: var(--primary-label); */
     padding: 5px calc(4px + .4vw);
     min-width: 260px;
 }
-#search{
+#search {
     display: none;
     height: calc(1.2rem + 0.2vh);
     width: 32px;
@@ -242,7 +243,7 @@ export default {
     height: fit-content;
     z-index: 20;
 } */
-#uniprotpanel{
+#uniprotpanel {
     /* padding-left: 14px; */
     padding: 8px 0px 8px 14px;
     border-top-left-radius: 14px;
@@ -250,7 +251,7 @@ export default {
     line-height: 31px;
     transition: all 0s ease 0s
 }
-#threeDexplanation{
+#threeDexplanation {
     padding: 8px 1px 8px 1px;
     line-height: 31px;
     margin: 0px -1px;
@@ -262,7 +263,7 @@ export default {
     line-height: 31px;
     margin-left: -1px;
 }
-.titlepanel{
+.titlepanel {
   cursor: pointer;
 }
 .roundButton {
@@ -270,7 +271,6 @@ export default {
     height: 17px;
     width: 17px;
     padding: 0 4px;
-    /*margin-left: 4px;*/
 }
 /* #structureviewerexplanation,#structureviewerexplanation_1{
   width: max-content;
@@ -286,14 +286,14 @@ export default {
   font-size: calc(8px + .6vw)
 } */
 
-.contents{
+.contents {
   padding: 0px 40px;
   text-align: left;
   color: #5d5d5d;
   overflow: scroll;
 }
 
-#structureviewerexplanation,#structureviewerexplanation_1{
+#structureviewerexplanation,#structureviewerexplanation_1 {
     display: grid;
     background-color: var(--transparent);
     position: fixed;
@@ -330,7 +330,7 @@ export default {
   z-index: 1;
 } */
 
-#searchByName{
+#searchByName {
     display: block;
     overflow: auto;
     width: fit-content;
@@ -342,7 +342,7 @@ export default {
     z-index: 200;
 }
 
-#uniprot{
+#uniprot {
     display: block;
     margin: 10px 0px;
     /* position: absolute; */
@@ -351,7 +351,7 @@ export default {
     padding: 10px;
     z-index: 20;
 }
-#contentPanel{
+#contentPanel {
   position: fixed;
   z-index: 1;
   display: none;
@@ -374,7 +374,7 @@ export default {
 #structureviewerexplanation_1 > #titlebar >  #uniprotpanel {
   padding-right: 5px;
 }
-#structureviewerexplanation_1 > #titlebar >  #uniprotpanel > img{
+#structureviewerexplanation_1 > #titlebar >  #uniprotpanel > img {
   display: block;
 }
 #structureviewerexplanation_1 > #titlebar >  #threeDexplanation {
