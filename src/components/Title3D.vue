@@ -352,7 +352,6 @@ export default {
     z-index: 20;
 }
 #contentPanel {
-  position: fixed;
   z-index: 1;
   display: none;
   border-radius: 2em;
