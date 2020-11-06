@@ -47,6 +47,7 @@ const XRButtonComponent = {
       proteinId: 'none',
       quickLook: XR.Platform.supportsQuickLook,
       sceneViewer: XR.Platform.supportsSceneViewer,
+      windowsMr: XR.Platform.supportsMixedReality,
       featuresActive: false,
       featureSet: null,
       featureTrack: -1,
@@ -402,6 +403,9 @@ const XRButtonComponent = {
     openInSceneViewer: function () {
       XR.openInSceneViewer(this.proteinId, this.pdbId, this.currentFeatureTrack)
     },
+    openInWindowsMR: function () {
+      XR.openInWindowsMixedReality(this.proteinId, this.pdbId, this.currentFeatureTrack)
+    },
     psvrExport: async function () {
       try {
         // default to top collection in list if no active feature
@@ -492,6 +496,10 @@ export default XRButtonComponent
 
         <!-- AR Quick Look (iOS) -->
         <button v-if="quickLook" class="xr-item default-button" @click="close(); openInQuickLook()">Open in AR Quick Look</button>
+
+        <!-- Windows MR -->
+        <!-- @TODO check poly count. Windows MR has strict limits -->
+        <button v-if="windowsMr" class="xr-item default-button" @click="close(); openInWindowsMR()">Open in Mixed Reality</button>
 
         <!-- Send to PlayStation -->
         <button v-if="psvrEnabled" class="xr-item default-button" @click="close(); psvrExport()">Send to PSVR</button>

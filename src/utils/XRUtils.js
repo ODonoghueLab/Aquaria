@@ -50,6 +50,11 @@ export function openInSceneViewer (protein, pdb, featureTrackToBake) {
   openUriInSceneViewer(uri, title)
 }
 
+export function openInWindowsMixedReality (protein, pdb, featureTrackToBake) {
+  const uri = getExportUri(protein, pdb, { featureTrackToBake, merge: true })
+  openUriInWindowsMixedReality(uri)
+}
+
 export async function openInPSVR (protein, pdb, collection) {
   const modelUri = getExportUri(protein, pdb, { format: 'gltf' })
   const payload = { modelUri, fileName: `${protein}.${pdb}`, collection }
@@ -98,6 +103,7 @@ export function openInAdvancedViewer (protein, pdb) {
  * @param {String} options.format 'glb', 'gltf', or 'usdz' (default 'glb')
  * @param {Object} options.featureTrackToBake feature track (default none)
  * @param {Boolean} options.rescale resize model for XR (default true)
+ * @param {Boolean} options.merge merge model nodes to minimise node count at the cost of losing metadata (default false)
  */
 export function getExportUri (protein, pdb, options = {}) {
   const defaults = { format: 'glb', featureTrackToBake: null, rescale: true }
@@ -105,6 +111,7 @@ export function getExportUri (protein, pdb, options = {}) {
   const base = `${process.env.VUE_APP_AQUARIA_EXPORT_URL}/${protein}/${pdb}.${opts.format}`
   const query = new URLSearchParams()
   if (options.rescale === false) query.append('rescale', 'false')
+  if (options.merge === true) query.append('merge', 'true')
   if (options.featureTrackToBake) {
     const featureQuery = options.featureTrackToBake.map(feature => {
       let encodedFeature = `${feature.color.replace('#', '')}-${feature.start}`
@@ -191,5 +198,11 @@ function openUriInQuickLook (uri) {
   link.href = uri
   link.rel = 'ar'
   link.appendChild(document.createElement('img')) // this is required
+  link.click()
+}
+
+function openUriInWindowsMixedReality (uri) {
+  const link = document.createElement('a')
+  link.href = `ms-mixedreality:addModel?uri=${uri}`
   link.click()
 }
