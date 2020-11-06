@@ -8,7 +8,7 @@
       <div>
         <a class="lnk" id='Sidechains' href="#Menu">Sidechains</a>
         <a class="lnk" id='Neighbors' href="#Menu">Neighbors</a>
-        <a class="lnk" id='Ligands' href="#Menu">Ligands</a>
+        <a class="lnk active" id='Ligands' href="#Menu">Ligands</a>
         <a class="lnk" id='Water' href="#Menu">Water</a>
       </div>
       <select v-model="selected" @change="onChange($event)">
@@ -34,6 +34,13 @@ export default {
     }
   },
   mounted () {
+    const toggleActive = function (ev) {
+      if (ev.target.className === 'lnk active') {
+        ev.target.className = 'lnk'
+      } else {
+        ev.target.className = 'lnk active'
+      }
+    }
     document.querySelector('#print').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
       window.AQUARIA.screenshot() // invoke screenshot feature
@@ -44,18 +51,22 @@ export default {
     })
     document.querySelector('#Sidechains').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
+      toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar > span:nth-child(6)').click()
     })
     document.querySelector('#Neighbors').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
+      toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar > span:nth-child(7)').click()
     })
     document.querySelector('#Ligands').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
+      toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner-menu-ligand').click()
     })
     document.querySelector('#Water').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
+      toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner-menu-water').click()
     })
   }
@@ -79,6 +90,9 @@ export default {
         padding: 0.2em 0.6em;
         margin: 2px 0;
         text-decoration: none;
+    }
+    #Menu a.lnk.active {
+      background-color: var(--primary-highlight);
     }
     #Menu a.lnk:hover {
         background-color: var(--primary-link)

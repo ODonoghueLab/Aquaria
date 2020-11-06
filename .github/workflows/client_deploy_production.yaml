@@ -25,7 +25,7 @@ jobs:
       PUBLISH_REPO_PROD: aqclient/aqclient.github.io
       # test specific settings
       AQUARIA_CLIENT_EMIT_CNAME_TEST: test.aquaria.app
-      VUE_APP_AQUARIA_BACKEND_TEST: http://test.aquaria.ws:8010
+      VUE_APP_AQUARIA_BACKEND_TEST: https://odonoghuelab.org:8011
       PUBLISH_REPO_TEST: aqclient/test.aqclient.github.io
 
     steps:
