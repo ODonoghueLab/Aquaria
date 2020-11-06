@@ -1219,15 +1219,14 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 			if(featureRegex.test(feature)){
 				var featureAttributes = {}
 				var description = feature.split('=')[1]
-				if(description.includes('"')){
-					description = description.split('"')[1]
-
-				}
 				feature = feature.split('=')[0]
 				residue = feature.replace(/[A-Za-z$-]/g, "")
 				residue = parseInt(residue)
 				featureAttributes.Color = "#F73C3C"
 				if(description){
+					if(description.includes('"')){
+						description = description.split('"')[1]
+					}
 					featureAttributes.Description = description.replace(/%22/g, "")
 				}
 				else{
