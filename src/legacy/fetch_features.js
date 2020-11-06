@@ -1188,7 +1188,7 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 
 function checkURLForFeatures(primary_accession, server, featureCallback){
 	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
-	var searchParam = window.location.search.split('?')[1]
+	var searchParam = decodeURI(window.location.search.split('?')[1])
 	// searchParam = searchParam.split('=')[0]
 	var url = AQUARIA.getUrlParameter("features");
 	if (url){
