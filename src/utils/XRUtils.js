@@ -179,6 +179,21 @@ export function getView () {
   return window.AQUARIA.panel3d.embededJolecule.soupView
 }
 
+export function countPolygons (object) {
+  let count = 0
+  object.traverse(obj => {
+    if (obj.geometry) {
+      const index = obj.geometry.getIndex()
+      if (index) {
+        count += index.count / 3
+      } else {
+        count += obj.geometry.getAttribute('position').count / 3
+      }
+    }
+  })
+  return count
+}
+
 function openUriInSceneViewer (uri, title) {
   // https://developers.google.com/ar/develop/java/scene-viewer
   // @TODO: give thought to what the appropriate fallback URI is

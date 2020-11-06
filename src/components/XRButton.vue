@@ -42,6 +42,7 @@ const XRButtonComponent = {
   components: {},
   data: () => {
     return {
+      polycount: Infinity,
       dataReceived: false,
       pdbId: 'none',
       proteinId: 'none',
@@ -83,6 +84,13 @@ const XRButtonComponent = {
       // update primary state
       this.proteinId = accession
       this.pdbId = pdb
+
+      // count polys
+      this.polycount =
+      XR.countPolygons(window.AQUARIA.panel3d.embededJolecule.soupWidget.representations.transparentRibbon.displayObj)
+      XR.countPolygons(window.AQUARIA.panel3d.embededJolecule.soupWidget.representations.ligand.displayObj)
+      console.log(`Polycount is: ${this.polycount}`)
+
       loadView()
     }
     if (window.AQUARIA.chainSelected !== chainSelectionProxy) {
@@ -499,7 +507,7 @@ export default XRButtonComponent
 
         <!-- Windows MR -->
         <!-- @TODO check poly count. Windows MR has strict limits -->
-        <button v-if="windowsMr" class="xr-item default-button" @click="close(); openInWindowsMR()">Open in Mixed Reality</button>
+        <button v-if="windowsMr && polycount <= 10000" class="xr-item default-button" @click="close(); openInWindowsMR()">Open in Mixed Reality</button>
 
         <!-- Send to PlayStation -->
         <button v-if="psvrEnabled" class="xr-item default-button" @click="close(); psvrExport()">Send to PSVR</button>
