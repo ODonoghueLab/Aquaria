@@ -41,6 +41,12 @@ var servers = [
 			"URL_covid": `${window.BACKEND}/covid19cath/`,
 			// ?content-type=application/json
 		},
+		{
+			"id": 'myVariant',
+			"Server": 'myVariant.info',
+			"URL_variantList": 'https:', // POST request
+			"URL_variants": 'https:', // GET request
+		},
 //		{
 //			"Server" : 'InterPro',
 //			"URL" : 'http://www.ebi.ac.uk/das-srv/interpro/das/InterPro-matches-overview/',
@@ -829,6 +835,7 @@ var processNextServer = function(primary_accession,
 				console.error(error);
 			}
 			finally {
+				console.log("In the added features (does it always come here...?)");
 				processNextServer(primary_accession,
 					featureCallback);
 			}
@@ -1190,6 +1197,8 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
 	var searchParam = decodeURI(window.location.search.split('?')[1])
 	// searchParam = searchParam.split('=')[0]
+
+	console.log("The search param is " + searchParam);
 	var url = AQUARIA.getUrlParameter("features");
 	if (url){
 		axios({
@@ -1208,8 +1217,9 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 		//$.getJSON( url, function (responseJSON) { //After load, parse data returned by xhr.responseText
 		// parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, responseJSON, url);
 		// });
-	} 
+	}
 	else if (featureRegex.test(searchParam)) {
+		console.log("over here!");
 		var data = {}
 		var residue;
 		var features = searchParam.split('&')
@@ -1219,7 +1229,8 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 			if(featureRegex.test(feature)){
 				var featureAttributes = {}
 				var description = feature.split('=')[1]
-				if(description.includes('"')){
+				console.log("description is " + description);
+				if(description && description.includes('"')){
 					description = description.split('"')[1]
 
 				}
@@ -1227,12 +1238,17 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				residue = feature.replace(/[A-Za-z$-]/g, "")
 				residue = parseInt(residue)
 				featureAttributes.Color = "#F73C3C"
+
 				if(description){
 					featureAttributes.Description = description.replace(/%22/g, "")
 				}
 				else{
 					featureAttributes.Description = feature
+					console.log("No default feature description");
 				}
+
+				console.log("Feature description is " + featureAttributes.Description);
+
 				featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
 				if(feature.split(residue)[1].toLowerCase() == 'ter'){
 					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
