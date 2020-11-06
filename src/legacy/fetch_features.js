@@ -1187,8 +1187,9 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 }
 
 function checkURLForFeatures(primary_accession, server, featureCallback){
-	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+$/)
+	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
 	var searchParam = window.location.search.split('?')[1]
+	// searchParam = searchParam.split('=')[0]
 	var url = AQUARIA.getUrlParameter("features");
 	if (url){
 		axios({
@@ -1212,23 +1213,32 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 		var data = {}
 		var residue;
 		var features = searchParam.split('&')
+		data['AddedFeatures'] = {}
+		data['AddedFeatures'].Features = []
 		features.forEach(function(feature){
-			residue = feature.replace(/[A-Za-z$-]/g, "")
-			residue = parseInt(residue)
-			data[feature] = {}
-			data[feature].Description
-			data[feature].Features = []
-			data[feature].Features[0] = {}
-			data[feature].Features[0].Color = "#F73C3C"
-			data[feature].Features[0].Description = feature
-			data[feature].Features[0].Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
-			if(feature.split(residue)[1].toLowerCase() == 'ter'){
-				data[feature].Features[0].Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
+			if(featureRegex.test(feature)){
+				var featureAttributes = {}
+				var description = feature.split('=')[1]
+				feature = feature.split('=')[0]
+				residue = feature.replace(/[A-Za-z$-]/g, "")
+				residue = parseInt(residue)
+				featureAttributes.Color = "#F73C3C"
+				if(description){
+					featureAttributes.Description = description.replace(/%22/g, "")
+				}
+				else{
+					featureAttributes.Description = feature
+				}
+				featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
+				if(feature.split(residue)[1].toLowerCase() == 'ter'){
+					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
+				}
+				else{
+					featureAttributes.Residue = residue
+				}
+				data['AddedFeatures'].Features.push(featureAttributes)
+				// data[feature].URL = feature
 			}
-			else{
-				data[feature].Features[0].Residue = residue
-			}
-			data[feature].URL = feature
 		})
 		parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, searchParam)
 	}

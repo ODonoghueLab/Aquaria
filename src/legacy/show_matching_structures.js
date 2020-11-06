@@ -68,7 +68,7 @@ ShowMatchingStructures.prototype.initialise = function(sequence) {
 		this.drawAxisRuler("vis");
 		
 		// append div for clusters
-		$("#vis").append("<div id='allclusters' data-intro='Visual summary of all structures in PDB matching the specified protein, grouped by region of match.' data-position='left'></div>");
+		// $("#vis").append("<div id='allclusters' data-intro='Visual summary of all structures in PDB matching the specified protein, grouped by region of match.' data-position='left'></div>");
 
 };
 
