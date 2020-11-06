@@ -490,6 +490,7 @@ var MAX_PROTEIN_HISTORY = 5;
         ///console.log('AQUARIA.sequenceCallback update Uniprot')
         textpanel.updateUniprotInfo(sequences[0]);
         ///console.log('AQUARIA.sequenceCallback display features')
+        AQUARIA.addedFeature = false;
         AQUARIA.display_features(sequences);
       } else {
         ///console.log('AQUARIA.sequenceCallback error: received old data for sequence callback: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
