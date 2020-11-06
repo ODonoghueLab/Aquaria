@@ -1431,7 +1431,7 @@ AQUARIA.screenshot = function() {
   // construct a temporary anchor element with a download attribute and click it
   // alternatively this could be wired up to a declared html element
   var a = document.createElement('a');
-  screenshot(3840, 2160, 0, 0).then(function (href) {
+  screenshot(7680, 4320, 0, 0).then(function (href) {
     a.href = href; // href is always a string. whether blob uri (Object URL) or data uri depends on browser support
     a.download = 'aquaria-screenshot.png'; // @TODO consider a more meaningful filename here. maybe use protein name w/ a timestamp
     a.click();
