@@ -303,7 +303,7 @@ var MAX_PROTEIN_HISTORY = 5;
 
           var interactive = attributes['interactive'] ? '/' +
             attributes['interactive'] : '';
-          var urlParams = window.location.search;
+          var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length);
           history.pushState(null, sequences[0].primary_accession,
             window.location.protocol + '//' + window.location.host +
             "/" + sequences[0].primary_accession + "/" +
