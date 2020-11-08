@@ -371,6 +371,11 @@ const XRButtonComponent = {
   },
   computed: {
     currentFeatureTrack: function () {
+      if (window.AQUARIA.addedFeature) {
+        this.featuresActive = true
+        this.featureSet = window.AQUARIA.customfeatureSet
+        this.featureTrack = window.AQUARIA.customfeatureSetioid
+      }
       return this.featuresActive ? this.featureSet.Tracks[this.featureTrack] : null
     }
   },

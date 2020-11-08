@@ -235,6 +235,8 @@ var updateFeatureUI = function(featureList) {
 		if(custom_feature.length > 0){
 			custom_feature.attr("class", "loaded");
 			var oid = custom_feature.attr("id").split("_")[2];
+			AQUARIA.customfeatureSet = addedFeatures[0]
+			AQUARIA.customfeatureSetioid = oid
 			passFeature(addedFeatures[0], oid);
 			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 			d3.select("svg.loaded").classed("loaded", false);
@@ -294,7 +296,14 @@ function drawTrack(datum, i) {
 						var oid = d3.select(this).attr("id").split("_")[2];
 						AQUARIA.panel3d.blankApplet(true, "Loading feature...")
 						AQUARIA.panel3d.blankApplet(false)
+						if(datum.Server != "Added Features"){
+							AQUARIA.addedFeature = false
+						}
 						passFeature(datum, oid, this);
+						// Stu hack to detect feature changes
+						if (typeof AQUARIA.onFeatureChange === 'function') {
+							AQUARIA.onFeatureChange(datum, oid);
+						}
 						//console.log("Datum");
 						//console.log(datum);
 						// console.log(oid);
@@ -376,15 +385,11 @@ function createMouseOverCallback(feature) {
 }
 
 function passFeature(trk, nr, elmt) {
-
-		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
-		// Stu hack to detect feature changes
 		if (typeof AQUARIA.onFeatureChange === 'function') {
 			AQUARIA.onFeatureChange(trk, nr);
 		}
-
+		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
 		sentAnnotationTo3DViewer(trk, parseInt(nr));
-
 }
 
 var t, s;
