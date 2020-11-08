@@ -217,83 +217,39 @@ var updateFeatureUI = function(featureList) {
 	  childList: true
 	  });
 
-	// d3.selectAll("#share").on("click", function() {
-	// 	var dummy = document.createElement('input'),
-	//   text = window.location.href;
-	//   document.body.appendChild(dummy);
-	//   dummy.value = text;
-	//   dummy.select();
-	//   document.execCommand('copy');
-	//   document.body.removeChild(dummy);
-	// })
 
-  //On external features scripts show features
-// 	if($("svg#s_0_0").parent().parent().parent().attr("id") === "Added Features"){
-//       	var custom_feature = $("svg#s_0_0")
-// 		var oid = custom_feature.attr("id").split("_")[2];
-// 		passFeature(clusters[0], oid);
-// 		d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-// 		d3.select("svg.loaded").classed("loaded", false);
-// 		custom_feature.attr("class", "loaded");
-//   }
 
-	var document_observer = new MutationObserver( function (mutations) {
-		// `mutations` is an array of mutations that occurred
-		// `me` is the MutationObserver instance
-		var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
-		var searchParam = window.location.search.split('?')[1]
-		// searchParam = window.location.search.split('=')[0]
-		if($(location).attr('href').includes("json") || featureRegex.test(searchParam)){
-		  mutations.forEach(function(mutation) {
-			if (mutation.attributeName !== 'style') {
-			  return none;
+	function waitForElement(){
+	AQUARIA.addedFeature = true;
+    if(document.getElementById("waitingFrame").style.display != 'none'){
+		setTimeout(waitForElement, 250);
+		console.log("REPEATING")
+    }
+    else{
+		clusters.forEach(function(c){
+			if(c.Server == "Added Features"){
+				addedFeatures.push(c)
 			}
-			else{
-			  var currentValue = mutation.target.style.display;
-			  if (currentValue == "none") {
-				pdb_chain_observer.observe(document.getElementById("waitingFrame"), {
-				  attributes:    true,
-				  attributeFilter: ["style"]
-				})
-			  }
-			}
-			})
-		  }
 		})
+		var custom_feature = $('[id="Added Features"]').children().eq(2).children().eq(0).find("svg")
+		if(custom_feature.length > 0){
+			custom_feature.attr("class", "loaded");
+			var oid = custom_feature.attr("id").split("_")[2];
+			AQUARIA.customfeatureSet = addedFeatures[0]
+			AQUARIA.customfeatureSetioid = oid
+			passFeature(addedFeatures[0], oid);
+			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+			d3.select("svg.loaded").classed("loaded", false);
+		}
+    }
+	}
 
-	  var pdb_chain_observer = new MutationObserver(function (m, me) {
-		m.forEach( function(mut) {
-		  if (mut.attributeName !== 'style') return;
-		  var currentValue = mut.target.style.display;
-		  if (currentValue == "none") {
-			clusters.forEach(function(c){
-				if(c.Server == "Added Features"){
-					addedFeatures.push(c)
-				}
-			})
-			var custom_feature = $('[id="Added Features"]').children().eq(2).children().eq(0).find("svg")
-			if(custom_feature.length > 0){
-				custom_feature.attr("class", "loaded");
-				var oid = custom_feature.attr("id").split("_")[2];
-				// AQUARIA.panel3d.blankApplet(true, "Loading feature...")
-				// AQUARIA.panel3d.blankApplet(false)
-				passFeature(addedFeatures[0], oid);
-				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-				d3.select("svg.loaded").classed("loaded", false);
-
-				me.disconnect();     // stop observing
-			}
-		  }
-		})
-	  })
-
-
-  //   start observing structure change
-	document_observer.observe(document.getElementById("loading-message"), {
-	  attributes:    true,
-	  attributeFilter: ["style"],
-	  characterDataOldValue: true
-	});
+	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
+	var searchParam = window.location.search.split('?')[1]
+	// searchParam = window.location.search.split('=')[0]
+	if(($(location).attr('href').includes("json") || featureRegex.test(searchParam)) && !AQUARIA.addedFeature){
+		waitForElement()
+	}
 };
 
 
@@ -340,7 +296,14 @@ function drawTrack(datum, i) {
 						var oid = d3.select(this).attr("id").split("_")[2];
 						AQUARIA.panel3d.blankApplet(true, "Loading feature...")
 						AQUARIA.panel3d.blankApplet(false)
+						if(datum.Server != "Added Features"){
+							AQUARIA.addedFeature = false
+						}
 						passFeature(datum, oid, this);
+						// Stu hack to detect feature changes
+						if (typeof AQUARIA.onFeatureChange === 'function') {
+							AQUARIA.onFeatureChange(datum, oid);
+						}
 						//console.log("Datum");
 						//console.log(datum);
 						// console.log(oid);
@@ -422,16 +385,11 @@ function createMouseOverCallback(feature) {
 }
 
 function passFeature(trk, nr, elmt) {
-
-		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
-
-		// Stu hack to detect feature changes
 		if (typeof AQUARIA.onFeatureChange === 'function') {
 			AQUARIA.onFeatureChange(trk, nr);
 		}
-
+		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
 		sentAnnotationTo3DViewer(trk, parseInt(nr));
-
 }
 
 var t, s;
