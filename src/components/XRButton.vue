@@ -42,11 +42,13 @@ const XRButtonComponent = {
   components: {},
   data: () => {
     return {
+      polycount: Infinity,
       dataReceived: false,
       pdbId: 'none',
       proteinId: 'none',
       quickLook: XR.Platform.supportsQuickLook,
       sceneViewer: XR.Platform.supportsSceneViewer,
+      windowsMr: XR.Platform.supportsMixedReality,
       featuresActive: false,
       featureSet: null,
       featureTrack: -1,
@@ -82,6 +84,13 @@ const XRButtonComponent = {
       // update primary state
       this.proteinId = accession
       this.pdbId = pdb
+
+      // count polys
+      this.polycount =
+      XR.countPolygons(window.AQUARIA.panel3d.embededJolecule.soupWidget.representations.transparentRibbon.displayObj)
+      XR.countPolygons(window.AQUARIA.panel3d.embededJolecule.soupWidget.representations.ligand.displayObj)
+      console.log(`Polycount is: ${this.polycount}`)
+
       loadView()
     }
     if (window.AQUARIA.chainSelected !== chainSelectionProxy) {
@@ -407,6 +416,9 @@ const XRButtonComponent = {
     openInSceneViewer: function () {
       XR.openInSceneViewer(this.proteinId, this.pdbId, this.currentFeatureTrack)
     },
+    openInWindowsMR: function () {
+      XR.openInWindowsMixedReality(this.proteinId, this.pdbId, this.currentFeatureTrack)
+    },
     psvrExport: async function () {
       try {
         // default to top collection in list if no active feature
@@ -481,8 +493,8 @@ export default XRButtonComponent
     <div class="column inner-modal">
       <div class="row modal-header">
         <div></div>
-        <h1>XR Options</h1>
-        <button @click="close()">X</button>
+        <h2>XR Options</h2>
+        <button @click="close()">×</button>
       </div>
       <div class="column modal-content">
 
@@ -497,6 +509,10 @@ export default XRButtonComponent
 
         <!-- AR Quick Look (iOS) -->
         <button v-if="quickLook" class="xr-item default-button" @click="close(); openInQuickLook()">Open in AR Quick Look</button>
+
+        <!-- Windows MR -->
+        <!-- @TODO check poly count. Windows MR has strict limits -->
+        <button v-if="windowsMr && polycount <= 10000" class="xr-item default-button" @click="close(); openInWindowsMR()">Open in Mixed Reality</button>
 
         <!-- Send to PlayStation -->
         <button v-if="psvrEnabled" class="xr-item default-button" @click="close(); psvrExport()">Send to PSVR</button>
@@ -520,16 +536,15 @@ export default XRButtonComponent
 
   .xr-modal {
     position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    top: 1vh;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    width: 90vw;
+    max-width: 30rem;
     z-index: 9999;
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
     background-color: rgba(0, 0, 0, 0.75);
+    padding: 1rem;
   }
 
   .default-button {
@@ -537,13 +552,13 @@ export default XRButtonComponent
     color: black;
     background-color: white;
     border-radius: 5px;
-    font-size: 1.5em;
+    font-size: 1.15em;
     box-shadow: none;
     border: 2px solid black;
     padding: 3px;
     line-height: 100%;
     cursor: pointer;
-    min-width: 250px;
+    min-width: 180px;
     padding: 10px;
   }
 
@@ -565,6 +580,7 @@ export default XRButtonComponent
   .column {
     display: flex;
     flex-direction: column;
+    height: auto;
   }
 
   .row {
@@ -586,7 +602,7 @@ export default XRButtonComponent
     width: 100%;
   }
 
-  .modal-header h1 {
+  .modal-header h2 {
     flex-grow: 1;
     color: white;
   }
@@ -605,7 +621,7 @@ export default XRButtonComponent
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5em;
+    font-size: 2em;
   }
 
   .modal-content {
