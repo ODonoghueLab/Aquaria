@@ -148,7 +148,7 @@ var updateFeatureUI = function(featureList) {
 		content.slideToggle('slow')
 
 		if(content.is(":visible")){
-		  $(this).addClass("active")
+		  $(this).addClass("actived")
 		}
 		if ($(this).children().eq(0).text() == '►') {
 			$(this).children().eq(0).text("▼")
@@ -158,12 +158,12 @@ var updateFeatureUI = function(featureList) {
 			$(this).children("button").css({"visibility": "hidden"})
 		}
 
-		var notThis = $('div[class*="active"]').not(this)
+		var notThis = $('div[class*="actived"]').not(this)
 
 		notThis.children().eq(0).text("►")
 		notThis.parent().children().eq(2).slideUp("slow");
 		notThis.children("button").css({"visibility": "hidden"})
-		notThis.removeClass("active")
+		notThis.removeClass("actived")
 
 		});
 	var timer;
