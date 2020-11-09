@@ -1195,7 +1195,7 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 
 function checkURLForFeatures(primary_accession, server, featureCallback){
 	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
-	var searchParam = decodeURI(window.location.search.split('?')[1])
+	var searchParam = decodeURIComponent(window.location.search.split('?')[1])
 	// searchParam = searchParam.split('=')[0]
 
 	console.log("The search param is " + searchParam);

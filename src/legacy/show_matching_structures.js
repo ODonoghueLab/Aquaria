@@ -132,8 +132,21 @@ ShowMatchingStructures.prototype.getClusterId = function (d) {
 	return parseInt(d.attr("id").substr(15));
 };
 
+function waitForElement(){
+	AQUARIA.addedFeature = true;
+	if(document.getElementById("waitingFrame").style.display != 'none'){
+		setTimeout(waitForElement, 5);
+	}
+	else{
+		AQUARIA.passFeature(AQUARIA.customfeatureSet, AQUARIA.customfeatureSetioid)
+		d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+		d3.select("svg.loaded").classed("loaded", false);
+	}
+}
+
 ShowMatchingStructures.prototype.clusterItemClick = function(d) {
-	
+	history.pushState("", document.title, window.location.pathname + window.location.search);
+
 	var shortId = d.attr("id").substr(10, 4);
 	var cluster_nbr = that.getClusterId(d);
 
@@ -157,7 +170,12 @@ ShowMatchingStructures.prototype.clusterItemClick = function(d) {
 		var member = that.clusters[cluster_nbr].members[0];
 		AQUARIA.display_member(member);
 	}
-	
+	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
+	var searchParam = window.location.search.split('?')[1]
+	// searchParam = window.location.search.split('=')[0]
+	if(($(location).attr('href').includes("json") || featureRegex.test(searchParam))){
+		waitForElement()
+	}
 };
 
 ShowMatchingStructures.prototype.drawAxisRuler = function(layerId) { // console.log("Ruler

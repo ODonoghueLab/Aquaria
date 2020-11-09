@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 import { screenshot } from './utils/Screenshot'
 import store from './store/index'
 
@@ -83,26 +83,26 @@ export default {
   //     }
   //     )
   // },
-  mounted () {
-    setTimeout(function () {
-      const pdf = window.BACKEND + '/COVID-Structural-Coverage-Map.pdf'
-      const js1 = window.BACKEND + '/javascripts/aquaria.js'
-      const js2 = window.BACKEND + '/javascripts/jolecule.js'
-      axios({
-        method: 'get',
-        url: pdf
-      })
-      axios({
-        method: 'get',
-        url: js1
-      })
+  // mounted () {
+  //   setTimeout(function () {
+  //     const pdf = window.BACKEND + '/COVID-Structural-Coverage-Map.pdf'
+  //     const js1 = window.BACKEND + '/javascripts/aquaria.js'
+  //     const js2 = window.BACKEND + '/javascripts/jolecule.js'
+  //     axios({
+  //       method: 'get',
+  //       url: pdf
+  //     })
+  //     axios({
+  //       method: 'get',
+  //       url: js1
+  //     })
 
-      axios({
-        method: 'get',
-        url: js2
-      })
-    }, 15000)
-  },
+  //     axios({
+  //       method: 'get',
+  //       url: js2
+  //     })
+  //   }, 15000)
+  // },
   updated () {
     sessionStorage.setItem('link', window.location.pathname)
   }

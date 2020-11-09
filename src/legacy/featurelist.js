@@ -237,7 +237,7 @@ var updateFeatureUI = function(featureList) {
 			var oid = custom_feature.attr("id").split("_")[2];
 			AQUARIA.customfeatureSet = addedFeatures[0]
 			AQUARIA.customfeatureSetioid = oid
-			passFeature(addedFeatures[0], oid);
+			AQUARIA.passFeature(addedFeatures[0], oid);
 			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 			d3.select("svg.loaded").classed("loaded", false);
 		}
@@ -299,7 +299,7 @@ function drawTrack(datum, i) {
 						if(datum.Server != "Added Features"){
 							AQUARIA.addedFeature = false
 						}
-						passFeature(datum, oid, this);
+						AQUARIA.passFeature(datum, oid, this);
 						// Stu hack to detect feature changes
 						if (typeof AQUARIA.onFeatureChange === 'function') {
 							AQUARIA.onFeatureChange(datum, oid);
@@ -384,7 +384,7 @@ function createMouseOverCallback(feature) {
 	};
 }
 
-function passFeature(trk, nr, elmt) {
+AQUARIA.passFeature = function(trk, nr, elmt) {
 		if (typeof AQUARIA.onFeatureChange === 'function') {
 			AQUARIA.onFeatureChange(trk, nr);
 		}
