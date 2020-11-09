@@ -43,13 +43,15 @@ export default {
   methods: {
     showPanel: function (elem1, elem2) {
       document.querySelector('#' + elem1).style.display = 'flex'
-      document.querySelector('#' + elem2 + ' > a').style.color = 'white'
-      document.querySelector('#' + elem2 + ' > a > span').style.backgroundColor = 'white'
+      document.querySelector('#' + elem2).className = 'tab active'
+      // document.querySelector('#' + elem2 + ' > a').style.color = 'white'
+      // document.querySelector('#' + elem2 + ' > a > span').style.backgroundColor = 'white'
     },
     hidePanel: function (elem1, elem2) {
       document.querySelector('#' + elem1).style.display = 'none'
-      document.querySelector('#' + elem2 + ' > a').style.color = '#ffffff00'
-      document.querySelector('#' + elem2 + ' > a > span').style.backgroundColor = '#ffffff00'
+      document.querySelector('#' + elem2).className = 'tab'
+      // document.querySelector('#' + elem2 + ' > a').style.color = '#ffffff00'
+      // document.querySelector('#' + elem2 + ' > a > span').style.backgroundColor = '#ffffff00'
     },
     hidePanels: function () {
       document.querySelectorAll('div.dimmer').forEach(el => el.remove())
@@ -128,7 +130,7 @@ export default {
     width: max-content;
     display: -webkit-box;
     display: -ms-flexbox;
-    display: inline-table;
+    display: flex;
     background-color: var(--transparent);
     position: fixed;
     left: 45%;
@@ -142,7 +144,55 @@ export default {
     padding: 5px calc(4px + 0.4vw);
     font-size: calc(8px + .6vw);
 }
-
+.tab {
+    flex: 0 3 auto;
+    height: 2rem;
+    padding: 0.2rem 0.5rem;
+    transition: All 0.5s ease;
+    min-width: 6rem;
+}
+.tab.active a, .tab.active a:hover {
+    color: var(--dark-text);
+}
+.tab.active, .tab.active:hover {
+    background-color: var(--bg-highlite);
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+.tab:hover {
+    background-color: rgba(150, 150, 150, 0.7);
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+span.icon {
+    display: inline-block;
+    background-color: rgb(207, 207, 207);
+    width: calc(1.25rem + 1vh);
+    height: calc(1.25rem + 1vh);
+    border-radius: 50%;
+    transition: All 0.5s ease;
+}
+.tab a:hover span.icon {
+    background-color: #eee;
+    transition: All 0.5s ease;
+}
+.tab.active a span.icon {
+    background-color: transparent;
+}
+.tab a {
+    color: var(--transparent);
+    text-decoration: none;
+    transition: All 0.5s ease;
+}
+.tab a:hover {
+    color: #FFF;
+    text-decoration: none;
+    transition: All 0.5s ease;
+}
+.icon img {
+    height:  calc(1rem + 1vh);
+    margin-top: -0.175rem;
+}
 #vis, #featurelist{
     background-color: var(--primary-tab);
     opacity: 1;
