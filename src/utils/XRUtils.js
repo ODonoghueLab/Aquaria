@@ -101,44 +101,42 @@ export function openInAdvancedViewer (protein, pdb) {
  * @param {String} pdb PDB ID
  * @param {Object} options
  * @param {String} options.format 'glb', 'gltf', or 'usdz' (default 'glb')
+ * @param {String} options.encodedFeatureTrack pre-encoded feature track (default none)
  * @param {Object} options.featureTrackToBake feature track (default none)
  * @param {Boolean} options.rescale resize model for XR (default true)
  * @param {Boolean} options.merge merge model nodes to minimise node count at the cost of losing metadata (default false)
+ * @param {Boolean} options.detail ribbon detail level (default server decides - typically 4)
  */
 export function getExportUri (protein, pdb, options = {}) {
-  const defaults = { format: 'glb', featureTrackToBake: null, rescale: true, detail: null }
+  const defaults = { format: 'glb', encodedFeatureTrack: null, featureTrackToBake: null, rescale: true, detail: null }
   const opts = Object.assign(defaults, options)
   const base = `${process.env.VUE_APP_AQUARIA_EXPORT_URL}/model/${protein}/${pdb}.${opts.format}`
   const query = new URLSearchParams()
   if (options.rescale === false) query.append('rescale', 'false')
   if (options.merge === true) query.append('merge', 'true')
   if (options.detail) query.append('detail', options.detail)
-  if (options.featureTrackToBake) {
-    const featureQuery = options.featureTrackToBake.map(feature => {
-      let encodedFeature = `${feature.color.replace('#', '')}-${feature.start}`
-      if (feature.start !== feature.end) encodedFeature = `${encodedFeature}-${feature.end}`
-      return encodedFeature
-    })
-    query.append('f', featureQuery.join(','))
-  }
+  if (options.encodedFeatureTrack) query.append('f', options.encodedFeatureTrack)
+  else if (options.featureTrackToBake) query.append('f', encodeFeatureTrack(options.featureTrackToBake))
   const queryString = query.toString()
   if (queryString) return `${base}?${query}`
   return base
 }
 
 /**
- * Prepare the data required to invoke auto-xr later
+ * Prepare the data payload required to invoke auto-xr later
  * @returns {string}
  */
 export function prepareAutoXR (protein, pdb, featureTrackToBake = null) {
-  // data is currently just a URI with a special token to be replaced by the appropriate format
-  // NOTE: too many features will break the QR code. Truncate to avoid
+  // payload is currently: PROTEIN|PDB|ENCODEDFEATURES (ENCODEDFEATURES can be empty string if no active features)
+  // enough info to reconstruct the export URL immediately without waiting for the whole page to initialise
+  // @TODO could protein/pdb just be grabbed out of the URL pathname?
+  // @NOTE: too many features will break the QR code. Truncate to avoid
   const features = (featureTrackToBake && featureTrackToBake.length > MAX_QR_FEATURES)
     ? featureTrackToBake.slice(0, MAX_QR_FEATURES)
     : featureTrackToBake
 
-  const uri = getExportUri(protein, pdb, { format: '$FORMAT', featureTrackToBake: features })
-  return uri
+  const payload = `${protein}|${pdb}|${features ? encodeFeatureTrack(features) : ''}`
+  return payload
 }
 
 /**
@@ -147,11 +145,17 @@ export function prepareAutoXR (protein, pdb, featureTrackToBake = null) {
  */
 export function invokeAutoXR (data) {
   // data is currently just a URI with a special token to be replaced by the appropriate format
+  console.info(`Auto-XR invoked with payload: ${data}`)
+  const [protein, pdb, encodedFeatureTrack] = data.split('|')
   if (featureDetection.supportsQuickLook) {
-    openUriInQuickLook(data.replace('$FORMAT', 'usdz'))
+    const uri = getExportUri(protein, pdb, { format: 'usdz', detail: 1, merge: true, encodedFeatureTrack })
+    openUriInQuickLook(uri)
   } else if (featureDetection.supportsSceneViewer) {
-    // @TODO: better title required here
-    openUriInSceneViewer(data.replace('$FORMAT', 'glb'), 'Aquaria Auto-XR')
+    const uri = getExportUri(protein, pdb, { format: 'glb', detail: 1, merge: true, encodedFeatureTrack })
+    openUriInSceneViewer(uri, 'Aquaria Auto-XR') // @TODO: better title required here
+  } else if (featureDetection.supportsMixedReality) {
+    const uri = getExportUri(protein, pdb, { format: 'glb', detail: 1, merge: true, encodedFeatureTrack })
+    openUriInWindowsMixedReality(uri)
   }
 }
 
@@ -195,6 +199,18 @@ export function countPolygons (object) {
   return count
 }
 
+/**
+ * Encode a feature track for use with Aquaria Export service
+ * @param {*} featureTrack
+ */
+function encodeFeatureTrack (featureTrack) {
+  return featureTrack.map(feature => {
+    let encodedFeature = `${feature.color.replace('#', '')}-${feature.start}`
+    if (feature.start !== feature.end) encodedFeature = `${encodedFeature}-${feature.end}`
+    return encodedFeature
+  }).join(',')
+}
+
 function openUriInSceneViewer (uri, title) {
   // https://developers.google.com/ar/develop/java/scene-viewer
   // @TODO: give thought to what the appropriate fallback URI is
@@ -219,6 +235,6 @@ function openUriInQuickLook (uri) {
 
 function openUriInWindowsMixedReality (uri) {
   const link = document.createElement('a')
-  link.href = `ms-mixedreality:addModel?uri=${uri}`
+  link.href = `ms-mixedreality:addModel?uri=${encodeURIComponent(uri)}`
   link.click()
 }
