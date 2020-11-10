@@ -83,8 +83,8 @@ export async function updateHEVSFeature (platform, asset, collection, featureSet
   }
 }
 
-export async function updateHEVSView (platform, asset, pose, view) {
-  const payload = { hevsPlatform: platform, assetId: asset, pose, view }
+export async function updateHEVSView (platform, asset, pose) {
+  const payload = { hevsPlatform: platform, assetId: asset, pose }
   const response = await axios.post(`${process.env.VUE_APP_AQUARIA_BACKEND}/xr/setHEVSView`, payload)
   if (response.status >= 400) throw new Error(response.data)
 }
