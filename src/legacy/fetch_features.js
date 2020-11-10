@@ -1252,7 +1252,8 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 
 				console.log("Feature description is " + featureAttributes.Description);
 
-				featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
+				// featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
+				featureAttributes.Name = feature
 				if(feature.split(residue)[1].toLowerCase() == 'ter'){
 					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
 				}
