@@ -7,7 +7,7 @@
             <img id="gif" src="../assets/img/aquaria-spin.gif" alt="Loading" title="Loading data...">
         </div>
     </div>
-    <p id="intro" v-if="$mq === 'laptop'">
+    <!-- <p id="intro" v-if="$mq === 'laptop'"> -->
         <!-- <span class="small">
             <a href="#" v-on:click="showAbout()" >Updated:
                 <span class="lastupdate">{{data}}</span>
@@ -18,7 +18,7 @@
         <a target="_blank" style="color:#DDD;" href="https://www.biostars.org/t/aquaria">Forum</a> |
         <a href="#" v-on:click="showExplanations()" style="color:#DDD;">Help</a>
         <br> -->
-    </p>
+    <!-- </p> -->
     </div>
 </template>
 
