@@ -40,18 +40,18 @@ export function download (protein, pdb, format, featureTrackToBake) {
 }
 
 export function openInQuickLook (protein, pdb, featureTrackToBake) {
-  const uri = getExportUri(protein, pdb, { format: 'usdz', featureTrackToBake })
+  const uri = getExportUri(protein, pdb, { format: 'usdz', featureTrackToBake, merge: true, detail: 1 })
   openUriInQuickLook(uri)
 }
 
 export function openInSceneViewer (protein, pdb, featureTrackToBake) {
-  const uri = getExportUri(protein, pdb, { featureTrackToBake })
+  const uri = getExportUri(protein, pdb, { featureTrackToBake, merge: true, detail: 1 })
   const title = `${protein}.${pdb}` // title to be displayed
   openUriInSceneViewer(uri, title)
 }
 
 export function openInWindowsMixedReality (protein, pdb, featureTrackToBake) {
-  const uri = getExportUri(protein, pdb, { featureTrackToBake, merge: true })
+  const uri = getExportUri(protein, pdb, { featureTrackToBake, merge: true, detail: 1 })
   openUriInWindowsMixedReality(uri)
 }
 
@@ -106,12 +106,13 @@ export function openInAdvancedViewer (protein, pdb) {
  * @param {Boolean} options.merge merge model nodes to minimise node count at the cost of losing metadata (default false)
  */
 export function getExportUri (protein, pdb, options = {}) {
-  const defaults = { format: 'glb', featureTrackToBake: null, rescale: true }
+  const defaults = { format: 'glb', featureTrackToBake: null, rescale: true, detail: null }
   const opts = Object.assign(defaults, options)
-  const base = `${process.env.VUE_APP_AQUARIA_EXPORT_URL}/${protein}/${pdb}.${opts.format}`
+  const base = `${process.env.VUE_APP_AQUARIA_EXPORT_URL}/model/${protein}/${pdb}.${opts.format}`
   const query = new URLSearchParams()
   if (options.rescale === false) query.append('rescale', 'false')
   if (options.merge === true) query.append('merge', 'true')
+  if (options.detail) query.append('detail', options.detail)
   if (options.featureTrackToBake) {
     const featureQuery = options.featureTrackToBake.map(feature => {
       let encodedFeature = `${feature.color.replace('#', '')}-${feature.start}`
