@@ -129,6 +129,9 @@ export default {
     margin-bottom: -20px;
     width: 100vw;
   }
+  div.ruler {
+    margin-left: 40px;
+  }
   .outer_container{
     display: inline-flex;
   }

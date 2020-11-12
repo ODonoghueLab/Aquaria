@@ -50,8 +50,9 @@ ShowMatchingStructures.prototype.initialise = function(sequence) {
 		seqLength = this.sequence.length;
 //		AQUARIA.structures2match = matching_structures;
 
-		this.width = document.getElementById("structureviewer").offsetWidth
-				- AQUARIA.margin.right - AQUARIA.margin.left;
+		// this.width = document.getElementById("structureviewer").offsetWidth
+		this.width = document.getElementById("structureviewer").offsetWidth/1.2 - AQUARIA.margin.right - AQUARIA.margin.left;
+		console.log('this.width: ' + this.width);
 		this.height = 40 - AQUARIA.margin.top - AQUARIA.margin.bottom + 35; // height
 																																		// for one
 																																		// structure

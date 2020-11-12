@@ -84,6 +84,7 @@ export default {
     right: 1rem;
     }
     #Menu a.lnk {
+        color: var(--text);
         display: block;
         background-color: var(--secondary-label);
         border-radius: 0.25em;

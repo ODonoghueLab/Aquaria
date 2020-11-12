@@ -221,7 +221,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .v-lazy-image{
   width: 100vw;
 }
@@ -354,7 +354,7 @@ export default {
     }
     /* Alignment */
     body {
-        text-align: center;
+        /* text-align: center; */
     }
     h1, h3, p {
         margin: 0;

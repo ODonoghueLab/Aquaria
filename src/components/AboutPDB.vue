@@ -83,7 +83,7 @@ div.panel span#biounitDisplay {
 }
 
 #biounitLeft {
-    background: transparent url('/../public/javascripts/images/ar-le.png') no-repeat center;
+    background: transparent url('/images/ar-le.png') no-repeat center;
 }
 #biounitLeft, #biounitRight {
     cursor: pointer;
