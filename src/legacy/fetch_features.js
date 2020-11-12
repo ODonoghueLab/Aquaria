@@ -845,25 +845,24 @@ var processNextServer = function(primary_accession,
 
 			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
 			featureCallback(aggregatedAnnotations);
-
+			processNextServer(primary_accession,
+				featureCallback);
 		}
 		else if (servers[currentServer]['id'] == 'PredictProtein'){
 
 
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
 			featureCallback(aggregatedAnnotations);
-
-
-
+			processNextServer(primary_accession,
+				featureCallback);
 		}
 		else if (servers[currentServer]['id'] == 'SNAP2'){
 
 
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
 			featureCallback(aggregatedAnnotations);
-
-
-
+			processNextServer(primary_accession,
+				featureCallback);
 		}
 		else if (servers[currentServer]['id'] == 'CATH'){
 			console.log('############################ Requesting Cath features')
@@ -877,6 +876,8 @@ var processNextServer = function(primary_accession,
 				// console.log('^^ Failed to fetch item: err=', err);
 				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet)
 				featureCallback(aggregatedAnnotations);
+				processNextServer(primary_accession,
+					featureCallback);
 			}
 
 
