@@ -29,7 +29,7 @@ var servers = [
 			"Server": 'PredictProtein',
 			"URL": 'https://api.predictprotein.org/v1/results/molart/',
 		},
-		{
+		/* {
 			"id": 'SNAP2',
 			"Server": 'SNAP2',
 			"URL": 'https://rostlab.org/services/aquaria/snap4aquaria/json.php?uniprotAcc=',
@@ -46,7 +46,7 @@ var servers = [
 			"Server": 'myVariant.info',
 			"URL_variantList": 'https:', // POST request
 			"URL_variants": 'https:', // GET request
-		},
+		},*/
 //		{
 //			"Server" : 'InterPro',
 //			"URL" : 'http://www.ebi.ac.uk/das-srv/interpro/das/InterPro-matches-overview/',
@@ -138,6 +138,7 @@ var isFetchingFromServer = "";
 var currentServer = -1;
 // contains current records of all annotations
 var aggregatedAnnotations;
+var variantResidues = {};
 
 // color handling
 /**
@@ -768,7 +769,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 
 		if (requestedFeature == 'PredictProtein'){
 			// convert feature first
-			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet)
+			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature)
 		}
 		if (requestedFeature == 'SNAP2'){
 			console.log(response);
@@ -835,13 +836,14 @@ var processNextServer = function(primary_accession,
 				console.error(error);
 			}
 			finally {
-				console.log("In the added features (does it always come here...?)");
 				processNextServer(primary_accession,
 					featureCallback);
 			}
 		}
 		else if (servers[currentServer]['Server'] == "UniProt"){
 
+			console.log("The aggregatedAnnotations are: ");
+			console.log(aggregatedAnnotations);
 
 			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
 			featureCallback(aggregatedAnnotations);
@@ -1229,7 +1231,7 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 			if(featureRegex.test(feature)){
 				var featureAttributes = {}
 				var description = feature.split('=')[1]
-				console.log("description is " + description);
+
 				if(description && description.includes('"')){
 					description = description.split('"')[1]
 
@@ -1247,7 +1249,6 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				}
 				else{
 					featureAttributes.Description = feature
-					console.log("No default feature description");
 				}
 
 				console.log("Feature description is " + featureAttributes.Description);
@@ -1255,14 +1256,20 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
 				if(feature.split(residue)[1].toLowerCase() == 'ter'){
 					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
+
+					// variantResidues[featureAttributes.Residues[0] + '-' + featureAttributes.Residues[0]] = "";
 				}
 				else{
 					featureAttributes.Residue = residue
+					variantResidues[featureAttributes.Residue] = {};
 				}
 				data['AddedFeatures'].Features.push(featureAttributes)
+
 				// data[feature].URL = feature
 			}
 		})
+
+
 		parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, searchParam)
 	}
 	else {
@@ -1300,10 +1307,18 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 			  },
 			success: function(xml) {
 				data = parseUniprot(xml);
+				console.log("The uniprot data are: ");
+				console.log(data);
+
+				// Step 1. Get list of variants
+				// Step 2.
+				// extractVariantInfo(aggregatedAnnotations, data);
 				parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url)
 			}
 	});
 
 };
+
+
 
 module.exports = fetch_annotations;
