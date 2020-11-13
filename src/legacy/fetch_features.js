@@ -137,7 +137,7 @@ var isFetchingFromServer = "";
 // current server index
 var currentServer = -1;
 // contains current records of all annotations
-var aggregatedAnnotations;
+var aggregatedAnnotations = [];
 var variantResidues = {};
 
 // color handling
@@ -769,11 +769,11 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 
 		if (requestedFeature == 'PredictProtein'){
 			// convert feature first
-			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature)
+			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
 		}
 		if (requestedFeature == 'SNAP2'){
 			console.log(response);
-			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet)
+			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature); 
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
@@ -853,6 +853,7 @@ var processNextServer = function(primary_accession,
 
 
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
+
 			featureCallback(aggregatedAnnotations);
 
 
@@ -890,10 +891,55 @@ var processNextServer = function(primary_accession,
 	}
 	else {
 		console.log("fetch_features.processNextServer finish DAS");
-
+		toDescAndAddToAdedFeat();
 		featureCallback(aggregatedAnnotations);
 	}
 };
+
+
+function toDescAndAddToAdedFeat(){
+	// return new Promise(function(resolve, reject) {
+		console.log("Convert the variant features to description, and update added feature's description");
+	// });
+
+
+
+	//Variant residues
+	for (let residue in variantResidues){
+		console.log("Variant residues " + residue);
+
+		let description = "<table>";
+		for (let serverName in variantResidues[residue]){
+			description = description + "<tr>";
+			description = "<td> <b>" + serverName + "</b> </td><td> " + variantResidues[residue][serverName] + "</td>";
+			description = description + "</tr>";
+		}
+		description = description + "</table>"
+
+		// Aggregated Annotations
+		for (let i =0; i < aggregatedAnnotations.length; i++){
+
+			if (aggregatedAnnotations[i].hasOwnProperty('Server')  && aggregatedAnnotations[i].Server == 'Added Features'){
+
+				if (aggregatedAnnotations[i].hasOwnProperty('Tracks') ){
+					console.log("An aggregat annotation of interest is ");
+					console.log(aggregatedAnnotations[i].Tracks);
+
+					for (j = 0; j < aggregatedAnnotations[i].Tracks.length; j++){
+						for (k = 0; k < aggregatedAnnotations[i].Tracks[j].length; k++){
+							console.log(aggregatedAnnotations[i].Tracks[j][k]);
+
+							if (parseInt(residue) >= parseInt(aggregatedAnnotations[i].Tracks[j][k].start) &&  parseInt(residue) <= parseInt(aggregatedAnnotations[i].Tracks[j][k].end)){
+								aggregatedAnnotations[i].Tracks[j][k].desc = description;
+							}
+						}
+					}
+				}
+			}
+		}
+
+	}
+}
 
 var finishServer = function(clustered_annotations, primary_accession,
 		  featureCallback) {
@@ -1005,6 +1051,8 @@ function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featu
 		finishServer(new Array(), primary_accession,
 			featureCallback);
 	}
+
+
 
 	// ajv.addMetaSchema(require());
 	// console.log(ajv.validate(schema, convertedFeatureSet).errors)
