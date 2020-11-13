@@ -1,7 +1,7 @@
 const url = require('url');
 
 var variants_featTypesOfInt = ['CONSERVATION_(CONSEQ)'];
-
+var checkIfValInSnpResAndAdd = require('./variantResiduesDesc');
 
 module.exports = function (jsonObj, primary_accession, featureCallback, validateAgainstSchema, variantResidues, requestedFeature){
 
@@ -123,7 +123,7 @@ function convertTheFeature(feature, variantResidues, requestedFeature){
 
 	});
 
-	checkIfValInSnpResAndAdd(residue[0], residue[1], variantResidues, featureKey, convertedFeature['Description'], requestedFeature);
+	checkIfValInSnpResAndAdd(residue[0], residue[1], variantResidues, featureKey, convertedFeature['Description'], requestedFeature, variants_featTypesOfInt);
 
 
 

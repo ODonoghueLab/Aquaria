@@ -29,12 +29,12 @@ var servers = [
 			"Server": 'PredictProtein',
 			"URL": 'https://api.predictprotein.org/v1/results/molart/',
 		},
-		/* {
+		{
 			"id": 'SNAP2',
 			"Server": 'SNAP2',
 			"URL": 'https://rostlab.org/services/aquaria/snap4aquaria/json.php?uniprotAcc=',
 		},
-		{
+		/* {
 			"id": 'CATH',
 			"Server": 'CATH',
 			"URL": window.location.protocol + '//www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
@@ -773,7 +773,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 		if (requestedFeature == 'SNAP2'){
 			console.log(response);
-			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature); 
+			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
@@ -863,7 +863,7 @@ var processNextServer = function(primary_accession,
 
 
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
-			featureCallback(aggregatedAnnotations);
+			// featureCallback(aggregatedAnnotations);
 
 
 
@@ -878,7 +878,7 @@ var processNextServer = function(primary_accession,
 	 		}
 			else {
 				// console.log('^^ Failed to fetch item: err=', err);
-				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet)
+				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet);
 				featureCallback(aggregatedAnnotations);
 			}
 
@@ -897,40 +897,52 @@ var processNextServer = function(primary_accession,
 };
 
 
-function toDescAndAddToAdedFeat(){
+function toDescAndAddToAdedFeat(){ // convert to description and add to added feature's description
 	// return new Promise(function(resolve, reject) {
-		console.log("Convert the variant features to description, and update added feature's description");
+	console.log("Convert the variant features to description, and update added feature's description");
 	// });
+
+	console.log(variantResidues);
 
 
 
 	//Variant residues
 	for (let residue in variantResidues){
 		console.log("Variant residues " + residue);
+		let description = "";
 
-		let description = "<table>";
 		for (let serverName in variantResidues[residue]){
-			description = description + "<tr>";
-			description = "<td> <b>" + serverName + "</b> </td><td> " + variantResidues[residue][serverName] + "</td>";
-			description = description + "</tr>";
-		}
-		description = description + "</table>"
 
+			console.log('Server name is ' + serverName);
+			if (serverName != 'newResidue'){
+				variantResidues[residue][serverName].forEach(function(anDesc, anDesc_i){
+					description = description + "<br><b>" + serverName + "</b>" + anDesc;
+				});				
+			}
+
+
+			// description = description + "<tr>";
+
+			// description = description + "</tr>";
+		}
 		// Aggregated Annotations
 		for (let i =0; i < aggregatedAnnotations.length; i++){
+
 
 			if (aggregatedAnnotations[i].hasOwnProperty('Server')  && aggregatedAnnotations[i].Server == 'Added Features'){
 
 				if (aggregatedAnnotations[i].hasOwnProperty('Tracks') ){
-					console.log("An aggregat annotation of interest is ");
-					console.log(aggregatedAnnotations[i].Tracks);
+					// console.log("An aggregate annotation of interest is ");
+					// console.log(aggregatedAnnotations[i].Tracks);
 
 					for (j = 0; j < aggregatedAnnotations[i].Tracks.length; j++){
 						for (k = 0; k < aggregatedAnnotations[i].Tracks[j].length; k++){
 							console.log(aggregatedAnnotations[i].Tracks[j][k]);
 
 							if (parseInt(residue) >= parseInt(aggregatedAnnotations[i].Tracks[j][k].start) &&  parseInt(residue) <= parseInt(aggregatedAnnotations[i].Tracks[j][k].end)){
-								aggregatedAnnotations[i].Tracks[j][k].desc = description;
+								aggregatedAnnotations[i].Tracks[j][k].desc =  aggregatedAnnotations[i].Tracks[j][k].desc  + description;
+
+								// console.log("The complete description is: " + aggregatedAnnotations[i].Tracks[j][k].desc );
 							}
 						}
 					}
@@ -1269,7 +1281,7 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 		// });
 	}
 	else if (featureRegex.test(searchParam)) {
-		console.log("over here!");
+		// console.log("over here!");
 		var data = {}
 		var residue;
 		var features = searchParam.split('&')
@@ -1299,17 +1311,21 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 					featureAttributes.Description = feature
 				}
 
-				console.log("Feature description is " + featureAttributes.Description);
 
-				featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
+				featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0];
+
+
+
+				// console.log(feature.split(residue)[1][0]);
 				if(feature.split(residue)[1].toLowerCase() == 'ter'){
 					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
 
 					// variantResidues[featureAttributes.Residues[0] + '-' + featureAttributes.Residues[0]] = "";
 				}
 				else{
-					featureAttributes.Residue = residue
+					featureAttributes.Residue = residue;
 					variantResidues[featureAttributes.Residue] = {};
+					variantResidues[featureAttributes.Residue] = {'newResidue': feature.split(residue)[1][0]};
 				}
 				data['AddedFeatures'].Features.push(featureAttributes)
 
