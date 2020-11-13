@@ -917,7 +917,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 			if (serverName != 'newResidue'){
 				variantResidues[residue][serverName].forEach(function(anDesc, anDesc_i){
 					description = description + "<br><b>" + serverName + "</b>" + anDesc;
-				});				
+				});
 			}
 
 
@@ -1099,76 +1099,79 @@ function createCORSRequest(method, url) {
  * https://docs.google.com/document/d/1wFJjdyl1OASnsBNkUzUx4ME8YhVybhIWCTr3Z1fBEWQ/pub
  */
 function parseUniprot(xml) {
+	return new Promise(function(resolve, reject) {
+		let data = {};
 
-	var data = {};
-	$(xml).find("feature").each(function() {
-		var type = capitaliseFirstLetter($(this).attr("type"));
-		var feature = {};
+		$(xml).find("feature").each(function() {
+			var type = capitaliseFirstLetter($(this).attr("type"));
+			var feature = {};
 
-		switch(type) {
-		case "Helix":
-//			feature.Color = "#568AB5";
-//			type = "Secondary Structure";
-//			break;
-		case "Strand":
-//			feature.Color = "#FFC900";
-//			type = "Secondary Structure";
-//			break;
-		case "Turn":
-//			feature.Color = "#639941";
-//			type = "Secondary Structure";
-			return;
-			break;
+			switch(type) {
+			case "Helix":
+	//			feature.Color = "#568AB5";
+	//			type = "Secondary Structure";
+	//			break;
+			case "Strand":
+	//			feature.Color = "#FFC900";
+	//			type = "Secondary Structure";
+	//			break;
+			case "Turn":
+	//			feature.Color = "#639941";
+	//			type = "Secondary Structure";
+				return;
+				break;
 
-		}
-
-		if (!hasOwnProperty(data, type)) {
-			data[type] = {"Source" : "UniProt", "URL" : "https://www.uniprot.org", "Features" : []};
-			if (type == "Sequence variant" ||
-					type == "Mutagenesis site" ||
-					type == "Modified residue" ||
-					type == "Site") {
-				data[type]["Color"] = feature_colors[djb2Code(type.replace(/_/g, ' '), feature_colors.length)];
 			}
-		}
 
-		// feature description (optional)
-		var description = $(this).attr("description") || "";
-
-		// feature name (optional)
-		var name = undefined;
-		var original = $(this).find("original");
-		if (original.length) {
-			name = original.first().text();
-			var variation = $(this).find("variation");
-			if (variation.length) {
-				name += " > " + variation.first().text();
+			if (!hasOwnProperty(data, type)) {
+				data[type] = {"Source" : "UniProt", "URL" : "https://www.uniprot.org", "Features" : []};
+				if (type == "Sequence variant" ||
+						type == "Mutagenesis site" ||
+						type == "Modified residue" ||
+						type == "Site") {
+					data[type]["Color"] = feature_colors[djb2Code(type.replace(/_/g, ' '), feature_colors.length)];
+				}
 			}
-		};
 
-		var residues = [];
-		var loc = $(this).find("location");
-		loc.each(function() {	// each location can be either a single position or a range
-			// this returns an array of positions
-			var pos = $(this).children().map(function() {
-				return $(this).attr("position");
-			}).get();
+			// feature description (optional)
+			var description = $(this).attr("description") || "";
 
-			residues = residues.concat(pos);
+			// feature name (optional)
+			var name = undefined;
+			var original = $(this).find("original");
+			if (original.length) {
+				name = original.first().text();
+				var variation = $(this).find("variation");
+				if (variation.length) {
+					name += " > " + variation.first().text();
+				}
+			};
+
+			var residues = [];
+			var loc = $(this).find("location");
+			loc.each(function() {	// each location can be either a single position or a range
+				// this returns an array of positions
+				var pos = $(this).children().map(function() {
+					return $(this).attr("position");
+				}).get();
+
+				residues = residues.concat(pos);
+			});
+			if (residues.length == 1) {
+				feature["Residue"] = residues;
+			} else {
+				feature["Residues"] = residues;
+			}
+
+			feature["Name"] = name || description;
+			feature["Description"] = name ? description : "";
+
+			data[type]["Features"].push(feature);
 		});
-		if (residues.length == 1) {
-			feature["Residue"] = residues;
-		} else {
-			feature["Residues"] = residues;
-		}
 
-		feature["Name"] = name || description;
-		feature["Description"] = name ? description : "";
-
-		data[type]["Features"].push(feature);
+		resolve(data);
 	});
 
-	return data;
 
 }
 
@@ -1370,19 +1373,42 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 				// })
 			  },
 			success: function(xml) {
-				data = parseUniprot(xml);
-				console.log("The uniprot data are: ");
-				console.log(data);
+				parseUniprot(xml).then(function(data){
+					console.log("The uniprot data are: ");
+					console.log(data);
 
-				// Step 1. Get list of variants
-				// Step 2.
-				// extractVariantInfo(aggregatedAnnotations, data);
-				parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url)
+					// Step 1. Get list of variants
+					// Step 2.
+					// extractVariantInfo(aggregatedAnnotations, data);
+
+					extractVariantInfoFromUniprot(data);
+					parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url)
+				});
+
 			}
 	});
 
 };
 
+
+var checkIfValInSnpResAndAdd = require('./variantResiduesDesc');
+
+function extractVariantInfoFromUniprot(uniprotData){
+	console.log("extractVariantInfoFromUniprot");
+	let variants_featTypesOfInt = ['Modified residue', 'Mutagenesis site', 'Sequence conflict', 'Sequence variant'];
+
+	for (let featureType in uniprotData){
+		console.log("Uniprot: Feature type " + featureType);
+		if (uniprotData[featureType].hasOwnProperty('Features')){
+			for (let i =0; i< uniprotData[featureType]['Features'].length; i++){
+				if (uniprotData[featureType]['Features'][i].hasOwnProperty('Residue')){
+					checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
+				}
+			}
+		}
+	}
+
+}
 
 
 module.exports = fetch_annotations;
