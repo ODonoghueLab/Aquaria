@@ -570,10 +570,11 @@ var MAX_PROTEIN_HISTORY = 5;
       ///console.log('AQUARIA.loadAccession load', primary_accession)
 
       pdbParam = autoSelectPDB ? "/" + autoSelectPDB : "";
+      chainParam = autoSelectChain ? "/" + autoSelectChain : "";
       var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length);
       if(AQUARIA.orgName){
         history.pushState(primary_accession, document.title, '/' +
-        AQUARIA.orgName + '/' + AQUARIA.gene + pdbParam + urlParams);
+        AQUARIA.orgName + '/' + AQUARIA.gene + pdbParam + chainParam + urlParams);
       }
       else{
         history.pushState(primary_accession, document.title, '/' +
