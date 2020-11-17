@@ -47,7 +47,7 @@ jobs:
     - name: Checkout publish repo
       uses: actions/checkout@v2
       with:
-        repository: ${{ env.PUBLISH_REPO_TEST }}
+        repository: ${{ env.PUBLISH_REPO }}
         ref: ${{ env.PUBLISH_BRANCH }}
         path: '${{ env.PUBLISH_REPO_PATH }}'
         persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
