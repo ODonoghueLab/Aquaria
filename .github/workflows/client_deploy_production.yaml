@@ -32,16 +32,16 @@ jobs:
     - name: Configure environment (production)
       if: github.ref == 'refs/heads/test'
       run: |
-        echo "::set-env name=AQUARIA_CLIENT_EMIT_CNAME::$AQUARIA_CLIENT_EMIT_CNAME_PROD"
-        echo "::set-env name=VUE_APP_AQUARIA_BACKEND::$VUE_APP_AQUARIA_BACKEND_PROD"
-        echo "::set-env name=PUBLISH_REPO::$PUBLISH_REPO_PROD"
+        echo "AQUARIA_CLIENT_EMIT_CNAME" >> $AQUARIA_CLIENT_EMIT_CNAME_PROD
+        echo "VUE_APP_AQUARIA_BACKEND" >> $VUE_APP_AQUARIA_BACKEND_PROD
+        echo "PUBLISH_REPO" >> $PUBLISH_REPO_PROD
 
     - name: Configure environment (test)
       if: github.ref == 'refs/heads/test'
       run: |
         echo "AQUARIA_CLIENT_EMIT_CNAME" >> $AQUARIA_CLIENT_EMIT_CNAME_TEST
-        echo "::set-env name=VUE_APP_AQUARIA_BACKEND::$VUE_APP_AQUARIA_BACKEND_TEST"
-        echo "::set-env name=PUBLISH_REPO::$PUBLISH_REPO_TEST"
+        echo "VUE_APP_AQUARIA_BACKEND" >> $VUE_APP_AQUARIA_BACKEND_TEST
+        echo "PUBLISH_REPO" >> $PUBLISH_REPO_TEST
 
     - name: Checkout source repo
       uses: actions/checkout@v2
