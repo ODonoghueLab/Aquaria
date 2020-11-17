@@ -39,7 +39,7 @@ jobs:
     - name: Configure environment (test)
       if: github.ref == 'refs/heads/test'
       run: |
-        echo "::set-env name=AQUARIA_CLIENT_EMIT_CNAME::$AQUARIA_CLIENT_EMIT_CNAME_TEST"
+        echo "AQUARIA_CLIENT_EMIT_CNAME" >> $AQUARIA_CLIENT_EMIT_CNAME_TEST
         echo "::set-env name=VUE_APP_AQUARIA_BACKEND::$VUE_APP_AQUARIA_BACKEND_TEST"
         echo "::set-env name=PUBLISH_REPO::$PUBLISH_REPO_TEST"
 
