@@ -1,6 +1,6 @@
 <template>
 <div id="wrapper">
-    <!-- <div>{{data}}</div> -->
+  <!-- <div>{{data}}</div> -->
     <Content/>
     <Footer />
     <BadBrowser />
