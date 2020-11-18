@@ -511,6 +511,7 @@ var MAX_PROTEIN_HISTORY = 5;
       } else {
         ///console.log('AQUARIA.clusterCallback error: received old data for cluster callback: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
       }
+      // AQUARIA.showMatchingStructures.showMap(newClusters[0])
     };
 
 
@@ -650,7 +651,6 @@ var MAX_PROTEIN_HISTORY = 5;
               var cluster = AQUARIA.structures2match.clusters[clusterNumber];
               AQUARIA.showMatchingStructures.selectCluster(cluster,
                 clusterNumber);
-
               if (!skip3DView) {
                 if (window.threedView === 'IDR') {
                   var threeDWidth = $("#threeD").width();
@@ -663,7 +663,7 @@ var MAX_PROTEIN_HISTORY = 5;
                 }
                 AQUARIA.display_member();
               }
-
+              AQUARIA.showMatchingStructures.showMap(cluster)
             }
           } else {
             ///console.log('AQUARIA.loadAccession error: received old data for Best PDB: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
