@@ -93,14 +93,6 @@ CoverageMapRenderer.prototype.drawClusterContainer = function (cluster, s, eleme
       (structEnd - structStart + 24 + pad)).attr('y', 13).attr('dx', -3) // padding-right
     .attr('dy', '.35em') // vertical-align: middle)
 
-  // var clickTitle = 'Click to see ' + that.clustSize + ' structures in this cluster'
-  // this.nusvg.select('g#structure_' + id + ' text, g#structure_' + id).attr('class', 'expandable').attr('title', clickTitle)
-
-  // this.nusvg.select('g#structure_' + id + ' text').on(
-  //   'click', function () {
-  //     that.onTextClick(d3.select(this.parentNode), that.cluster)
-  //   })
-
   return outerdiv
 }
 
@@ -165,11 +157,6 @@ CoverageMapRenderer.prototype.drawResidues = function (cluster, rank, el) {
   }
 }
 CoverageMapRenderer.prototype.setConservation = function (index, data) { // console.log("setting conservation
-  // for cluster "+index);
-
-  // TO DO: account for gaps=insertions ( .clusters[n].seq_end[m]+1 ,
-  // .clusters[n].seq_start[m+1]-1 )
-  // draw rect height=2
   var insertions = []
   for (var i = 0; i < data.seq_end.length - 1; i++) {
     var gap = []
@@ -177,16 +164,6 @@ CoverageMapRenderer.prototype.setConservation = function (index, data) { // cons
     gap[1] = data.seq_start[i + 1] - 1
     insertions.push(gap) // console.log("insertion: " + gap.toString());
   }
-
-  // var subst3 = this.nusvg.selectAll('g.residue').data(insertions).each(
-  //   function (d) { // console.log("d.length: "+d.length);
-  //     for (var k = d[0]; k <= d[1]; k++) { // console.log("insertion at: " +
-  //       // k);
-  //       that.nusvg.select('g.residue#r_' + index + '_' + k + ' rect').attr(
-  //         'height', 1).attr('transform', 'translate(0,5)').attr('class',
-  //         'insertion')
-  //     }
-  //   })
 }
 
 module.exports = CoverageMapRenderer

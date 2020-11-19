@@ -1,6 +1,7 @@
 <template>
   <span id="map">
     <div id='selectedCluster'></div>
+    <div id='selectedFeature'></div>
   </span>
 </template>
 
@@ -12,7 +13,11 @@ export default {
 
 <style scoped>
 #selectedCluster{
-    position: absolute;
-    bottom: 24px;
+  position: absolute;
+  bottom: 24px;
+}
+#selectedFeature{
+  position: absolute;
+  bottom: 4px;
 }
 </style>

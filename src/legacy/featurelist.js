@@ -5,6 +5,7 @@ var featureCount;
 var groupCount;
 var Highcharts = require('./highstocks.js');
 var d3 = require('d3');
+var featureMap = require('../utils/featureMap')
 
 function createFeatureUI() {
 	width = document.getElementById("structureviewer").offsetWidth
@@ -289,10 +290,13 @@ function drawTrack(datum, i) {
 						if (typeof AQUARIA.onFeatureChange === 'function') {
 							AQUARIA.onFeatureChange(null, 0);
 						  }
-
 						removeCurrentAnnotationFrom3DViewer();
+						document.querySelector('#outerFeatureMap').remove()
 					}
 					else { //console.log("clicked to display feature");
+						if(document.querySelector('#outerFeatureMap')) {
+							document.querySelector('#outerFeatureMap').remove()
+						}
 						var oid = d3.select(this).attr("id").split("_")[2];
 						AQUARIA.panel3d.blankApplet(true, "Loading feature...")
 						AQUARIA.panel3d.blankApplet(false)
@@ -310,6 +314,10 @@ function drawTrack(datum, i) {
 						d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 						d3.select("svg.loaded").classed("loaded", false);
 						d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
+						drawfeatureMap = featureMap.createFeatureMap(datum)
+						// document.querySelectorAll("#selectedCluster [id*='r_'] rect").forEach(function (part){
+						// 	part.style.fill = '#a5a5a5'
+						// })
 						}
 					})
 				.on("mouseover", function() {
@@ -376,20 +384,20 @@ function drawTrack(datum, i) {
 	groupCount++;
 }
 
+AQUARIA.passFeature = function(trk, nr, elmt) {
+	if (typeof AQUARIA.onFeatureChange === 'function') {
+		AQUARIA.onFeatureChange(trk, nr);
+	}
+	//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
+	sentAnnotationTo3DViewer(trk, parseInt(nr));
+}
+
 function createMouseOverCallback(feature) {
 	return function() {
 		// console.log(">>>>>>>>>> over here ....???");
 		var ID = d3.select(this).attr("id");
 		d3.select(this).call(mouseoverFeature, feature, ID);
 	};
-}
-
-AQUARIA.passFeature = function(trk, nr, elmt) {
-		if (typeof AQUARIA.onFeatureChange === 'function') {
-			AQUARIA.onFeatureChange(trk, nr);
-		}
-		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
-		sentAnnotationTo3DViewer(trk, parseInt(nr));
 }
 
 var t, s;
