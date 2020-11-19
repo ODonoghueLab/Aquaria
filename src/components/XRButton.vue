@@ -16,25 +16,19 @@ const HEVS_UPDATE_INTERVAL = Number.parseInt(
     : process.env.VUE_APP_HEVS_VIEW_UPDATE_INTERVAL
 ) || 1000
 
-/** automatic XR (QR redirect)
- * @TODO a more robust solution would be to flag xr=true and use rest of existing params to reconstruct export URL
- * benefits include:
- *   - ability to easily redirect to auto-XR from non-Aquaria sources (won't need to know the implementation detail of constructing export URLs)
- *   - likely shorter URLs (aka simpler QR code, no limit on number of features)
- * challenges include:
- *   - not enough state contained in the regular URL yet (e.g. active feature/track)
- *   - are all required params available near instantly for full export URI construction? Don't want to keep a user waiting on a load screen pre-XR
- **/
+// Auto-XR (QR redirect to platform-native XR experience)
+// @TODO browser has to load a fair chunk to get here, can this be optimised for faster XR response on devices?
 if (search.has('xr')) {
-  // parse auto XR details
-  const uri = search.get('xr')
-
-  // remove the auto XR tag from search params, one time operation
+  // extract auto XR payload
+  const payload = search.get('xr')
+  // remove the auto XR payload param from URL, this is a one time operation
   search.delete('xr')
-  history.replaceState(null, '', `${location.pathname}?${search.toString()}`)
-
+  // strip extra equals after non-key value pairs (e.g. features) and ignore question mark when not
+  const searchString = `${[...search.keys()].length > 0 ? '?' : ''}${search.toString().replace('=&', '&').replace(/=$/, '')}`
+  // @TODO this now seems to be quickly overriden, maybe some of the new URL work interferes? Hopefully it doesn't cause recursive AR mode
+  history.replaceState(null, '', `${location.pathname}${searchString}${location.hash}`)
   // perform auto XR action
-  XR.invokeAutoXR(uri)
+  XR.invokeAutoXR(payload)
 }
 
 const XRButtonComponent = {
@@ -380,6 +374,11 @@ const XRButtonComponent = {
   },
   computed: {
     currentFeatureTrack: function () {
+      if (window.AQUARIA.addedFeature) {
+        this.featuresActive = true
+        this.featureSet = window.AQUARIA.customfeatureSet
+        this.featureTrack = window.AQUARIA.customfeatureSetioid
+      }
       return this.featuresActive ? this.featureSet.Tracks[this.featureTrack] : null
     }
   },
@@ -391,10 +390,20 @@ const XRButtonComponent = {
   methods: {
     open: function () {
       this.isOpen = true
-      const autoXRData = XR.prepareAutoXR(this.proteinId, this.pdbId, this.currentFeatureTrack)
-      const url = location.search ? `${location.href}&xr=${autoXRData}` : `${location.href}?xr=${autoXRData}`
-      // need to wait for canvas to render (its behind a v-if)
-      this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url))
+
+      // prepare auto XR payload
+      const autoXrPayload = XR.prepareAutoXR(this.proteinId, this.pdbId, this.currentFeatureTrack)
+
+      // inject auto xr param into query
+      const search = new URLSearchParams(location.search)
+      search.append('xr', autoXrPayload)
+      // strip extra equals after non-key value pairs (e.g. features) and ignore question mark when not
+      const searchString = `${[...search.keys()].length > 0 ? '?' : ''}${search.toString().replace('=&', '&').replace(/=$/, '')}`
+
+      // reconstruct URL for QR code
+      const url = `${location.protocol}//${location.host}${location.pathname}${searchString}${location.hash}`
+      console.info(`Auto-XR (QR) URI: ${url}`)
+      this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url)) // need to wait for canvas to render (its behind a v-if)
     },
     close: function () {
       this.isOpen = false
@@ -488,8 +497,8 @@ export default XRButtonComponent
     <div class="column inner-modal">
       <div class="row modal-header">
         <div></div>
-        <h1>XR Options</h1>
-        <button @click="close()">X</button>
+        <h2>XR Options</h2>
+        <button @click="close()">×</button>
       </div>
       <div class="column modal-content">
 
@@ -531,16 +540,15 @@ export default XRButtonComponent
 
   .xr-modal {
     position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    top: 1vh;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    width: 90vw;
+    max-width: 30rem;
     z-index: 9999;
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
     background-color: rgba(0, 0, 0, 0.75);
+    padding: 1rem;
   }
 
   .default-button {
@@ -548,13 +556,13 @@ export default XRButtonComponent
     color: black;
     background-color: white;
     border-radius: 5px;
-    font-size: 1.5em;
+    font-size: 1.15em;
     box-shadow: none;
     border: 2px solid black;
     padding: 3px;
     line-height: 100%;
     cursor: pointer;
-    min-width: 250px;
+    min-width: 180px;
     padding: 10px;
   }
 
@@ -576,6 +584,7 @@ export default XRButtonComponent
   .column {
     display: flex;
     flex-direction: column;
+    height: auto;
   }
 
   .row {
@@ -597,7 +606,7 @@ export default XRButtonComponent
     width: 100%;
   }
 
-  .modal-header h1 {
+  .modal-header h2 {
     flex-grow: 1;
     color: white;
   }
@@ -616,7 +625,7 @@ export default XRButtonComponent
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5em;
+    font-size: 2em;
   }
 
   .modal-content {

@@ -99,6 +99,7 @@ strong {
     justify-content: center;
     /* order: 4; */
 }
+/* 
 .tab {
     flex: 0 3 auto;
     height: 2rem;
@@ -114,8 +115,8 @@ strong {
     order: 2;
     flex-basis: calc(9rem + 1vw);
     float: left;
-}
-
+} */ 
+/* 
 span.icon {
     display: inline-block;
     background-color: var(--transparent);
@@ -131,7 +132,7 @@ span.icon {
 .icon img {
     height:  calc(1rem + 1vh);
     margin: .15rem;
-}
+} */
 .panel {
     background: var(--bg-highlite);
     padding: 0.2rem 0.5rem;
@@ -189,15 +190,7 @@ span.icon {
     width: 100%;
     transition: All 0.8s ease;
 }
-.tab a {
-    color: var(--transparent);
-    text-decoration: none;
-    transition: All 0.5s ease;
-}
-.tab a:hover, :target a {
-    color: #FFF;
-    transition: All 0.5s ease;
-}
+
 a.to-right {
     float: right;
     margin-right: 0.5rem;

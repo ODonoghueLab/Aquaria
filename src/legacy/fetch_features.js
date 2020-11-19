@@ -847,7 +847,8 @@ var processNextServer = function(primary_accession,
 
 			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
 			featureCallback(aggregatedAnnotations);
-
+			processNextServer(primary_accession,
+				featureCallback);
 		}
 		else if (servers[currentServer]['id'] == 'PredictProtein'){
 
@@ -855,18 +856,23 @@ var processNextServer = function(primary_accession,
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
 
 			featureCallback(aggregatedAnnotations);
-
-
-
+			processNextServer(primary_accession,
+				featureCallback);
 		}
 		else if (servers[currentServer]['id'] == 'SNAP2'){
 
 
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
+<<<<<<< HEAD
 			// featureCallback(aggregatedAnnotations);
 
 
 
+=======
+			featureCallback(aggregatedAnnotations);
+			processNextServer(primary_accession,
+				featureCallback);
+>>>>>>> test
 		}
 		else if (servers[currentServer]['id'] == 'CATH'){
 			console.log('############################ Requesting Cath features')
@@ -880,6 +886,8 @@ var processNextServer = function(primary_accession,
 				// console.log('^^ Failed to fetch item: err=', err);
 				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet);
 				featureCallback(aggregatedAnnotations);
+				processNextServer(primary_accession,
+					featureCallback);
 			}
 
 
@@ -1260,7 +1268,7 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 
 function checkURLForFeatures(primary_accession, server, featureCallback){
 	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
-	var searchParam = decodeURI(window.location.search.split('?')[1])
+	var searchParam = decodeURIComponent(window.location.search.split('?')[1])
 	// searchParam = searchParam.split('=')[0]
 
 	console.log("The search param is " + searchParam);
@@ -1315,11 +1323,16 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				}
 
 
+<<<<<<< HEAD
 				featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0];
 
 
 
 				// console.log(feature.split(residue)[1][0]);
+=======
+				// featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
+				featureAttributes.Name = feature
+>>>>>>> test
 				if(feature.split(residue)[1].toLowerCase() == 'ter'){
 					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
 

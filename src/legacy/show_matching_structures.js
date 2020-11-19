@@ -1,4 +1,5 @@
 var ClusterRenderer = require('./clusterRenderer');
+var CoverageMapRenderer = require('../utils/coverageMap')
 var d3 = require('d3');
 
 // Render 2D structures in SVG.
@@ -29,7 +30,7 @@ ShowMatchingStructures.prototype.selectCluster = function(cluster, clusterNumber
 	}
 	else {
 	  	this.bestClusterNumber = (typeof clusterNumber === 'undefined') ? this.bestClusterNumber : clusterNumber;
-	  	var loadPDBStructure = this.selectedCluster.pdb_id;
+		var loadPDBStructure = this.selectedCluster.pdb_id;
 	  	this.mark_loaded_structure(loadPDBStructure, this.bestClusterNumber);
 	  	// update title bar for 3D structure view
 	  	var identity_score = this.selectedCluster.members[0].alignment_identity_score;
@@ -50,12 +51,9 @@ ShowMatchingStructures.prototype.initialise = function(sequence) {
 		seqLength = this.sequence.length;
 //		AQUARIA.structures2match = matching_structures;
 
-		this.width = document.getElementById("structureviewer").offsetWidth
-				- AQUARIA.margin.right - AQUARIA.margin.left;
+		// this.width = document.getElementById("structureviewer").offsetWidth
+		this.width = document.getElementById("structureviewer").offsetWidth/1.2 - AQUARIA.margin.right - AQUARIA.margin.left;
 		this.height = 40 - AQUARIA.margin.top - AQUARIA.margin.bottom + 35; // height
-																																		// for one
-																																		// structure
-
 		this.xScale = d3.scale.linear().domain([ 1, seqLength ]).range([ 1, this.width ]); // .range([1, width]);
 
 		// set single residue width
@@ -98,6 +96,11 @@ ShowMatchingStructures.prototype.refresh = function() {
 	this.selectCluster();
 };
 
+ShowMatchingStructures.prototype.showMap = function(cluster) {
+	CoverageMapRenderer.RenderMap(cluster, this.rank);
+	AQUARIA.showMatchingStructures.cluster = cluster;
+};
+
 ShowMatchingStructures.prototype.addCluster = function(cluster) {
 	this.clusters.push(cluster);
 	var clusterRenderer = new ClusterRenderer(cluster, this.rank, this.xScale, this.width,
@@ -105,7 +108,7 @@ ShowMatchingStructures.prototype.addCluster = function(cluster) {
 				console.log('ShowMatchingStructures.addCluster.onclick', clusterSelected)
 				var cluster_nbr = that.getClusterId(d);
 				that.onTextClick(d, clusterSelected);
-			}, this.clusterItemClick);
+			}, this.clusterItemClick, "#allclusters");
 	this.clusterRenderers.push(clusterRenderer);
 	this.rank++;
 };
@@ -132,8 +135,21 @@ ShowMatchingStructures.prototype.getClusterId = function (d) {
 	return parseInt(d.attr("id").substr(15));
 };
 
+function waitForElement(){
+	AQUARIA.addedFeature = true;
+	if(document.getElementById("waitingFrame").style.display != 'none'){
+		setTimeout(waitForElement, 5);
+	}
+	else{
+		AQUARIA.passFeature(AQUARIA.customfeatureSet, AQUARIA.customfeatureSetioid)
+		d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+		d3.select("svg.loaded").classed("loaded", false);
+	}
+}
+
 ShowMatchingStructures.prototype.clusterItemClick = function(d) {
-	
+	history.pushState("", document.title, window.location.pathname + window.location.search);
+
 	var shortId = d.attr("id").substr(10, 4);
 	var cluster_nbr = that.getClusterId(d);
 
@@ -157,7 +173,14 @@ ShowMatchingStructures.prototype.clusterItemClick = function(d) {
 		var member = that.clusters[cluster_nbr].members[0];
 		AQUARIA.display_member(member);
 	}
-	
+	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
+	var searchParam = window.location.search.split('?')[1]
+	// searchParam = window.location.search.split('=')[0]
+	if(($(location).attr('href').includes("json") || featureRegex.test(searchParam))){
+		waitForElement()
+	}
+	document.querySelector('#selectedCluster').children[0].remove()
+	that.showMap(that.clusters[cluster_nbr])
 };
 
 ShowMatchingStructures.prototype.drawAxisRuler = function(layerId) { // console.log("Ruler
@@ -219,12 +242,12 @@ ShowMatchingStructures.prototype.drawAxisRuler = function(layerId) { // console.
 
 
 ShowMatchingStructures.prototype.mark_loaded_structure = function(id, nbr) { // console.log("highlight
-																																							// id:
-																																							// "+id+",
-																																							// cluster:
-																																							// "+nbr);
-	$("div.container.loaded").removeClass("loaded");
-	d3.select("g.loaded").classed("loaded", false);
+	// id:
+	// "+id+",
+	// cluster:
+	// "+nbr);
+	$("g.loaded").removeClass("loaded");
+	d3.select("div.container.loaded").classed("loaded", false);
 	d3.select("g#structure_" + id + "_" + nbr).classed("loaded", true);
 	d3.select("div#c_" + id + "_" + nbr).classed("loaded", true);
 	// AQUARIA.currentData.cluster_number = nbr;

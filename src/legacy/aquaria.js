@@ -303,7 +303,7 @@ var MAX_PROTEIN_HISTORY = 5;
 
           var interactive = attributes['interactive'] ? '/' +
             attributes['interactive'] : '';
-          var urlParams = window.location.search;
+          var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length);
           history.pushState(null, sequences[0].primary_accession,
             window.location.protocol + '//' + window.location.host +
             "/" + sequences[0].primary_accession + "/" +
@@ -490,6 +490,7 @@ var MAX_PROTEIN_HISTORY = 5;
         ///console.log('AQUARIA.sequenceCallback update Uniprot')
         textpanel.updateUniprotInfo(sequences[0]);
         ///console.log('AQUARIA.sequenceCallback display features')
+        AQUARIA.addedFeature = false;
         AQUARIA.display_features(sequences);
       } else {
         ///console.log('AQUARIA.sequenceCallback error: received old data for sequence callback: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
@@ -510,6 +511,7 @@ var MAX_PROTEIN_HISTORY = 5;
       } else {
         ///console.log('AQUARIA.clusterCallback error: received old data for cluster callback: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
       }
+      // AQUARIA.showMatchingStructures.showMap(newClusters[0])
     };
 
 
@@ -569,10 +571,16 @@ var MAX_PROTEIN_HISTORY = 5;
       ///console.log('AQUARIA.loadAccession load', primary_accession)
 
       pdbParam = autoSelectPDB ? "/" + autoSelectPDB : "";
+      chainParam = autoSelectChain ? "/" + autoSelectChain : "";
       var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length);
-      history.pushState(primary_accession, document.title, '/' +
+      if(AQUARIA.orgName){
+        history.pushState(primary_accession, document.title, '/' +
+        AQUARIA.orgName + '/' + AQUARIA.gene + pdbParam + chainParam + urlParams);
+      }
+      else{
+        history.pushState(primary_accession, document.title, '/' +
         primary_accession + pdbParam + urlParams);
-
+      }
 
       AQUARIA.blankPanel("#vis", true);
       AQUARIA.blankPanel("#uniProtDesc", true);
@@ -643,7 +651,6 @@ var MAX_PROTEIN_HISTORY = 5;
               var cluster = AQUARIA.structures2match.clusters[clusterNumber];
               AQUARIA.showMatchingStructures.selectCluster(cluster,
                 clusterNumber);
-
               if (!skip3DView) {
                 if (window.threedView === 'IDR') {
                   var threeDWidth = $("#threeD").width();
@@ -656,7 +663,7 @@ var MAX_PROTEIN_HISTORY = 5;
                 }
                 AQUARIA.display_member();
               }
-
+              AQUARIA.showMatchingStructures.showMap(cluster)
             }
           } else {
             ///console.log('AQUARIA.loadAccession error: received old data for Best PDB: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
@@ -1328,9 +1335,47 @@ var MAX_PROTEIN_HISTORY = 5;
       ///console.log('AQUARIA.remoteSuccess inside chain selection');
       AQUARIA.initialisePanels(true);
       AQUARIA.blankAll(true, "Waiting for data...")
-      AQUARIA
-        .loadAccession(uniprot_accession, pdb, chain);
-    } else if (pathname.match(/\/([A-Za-z]+)/)) {
+      AQUARIA.loadAccession(uniprot_accession, pdb, chain);
+    }else if (window.location.pathname) {
+      var accession = [];
+      var orgID;
+      let attr = window.location.pathname.split('/')
+      organism_gene = attr[1] + '/' + attr[2]
+      var url =`${window.BACKEND}/getAccessionbyOrgNameandGene/${attr[1]}/${attr[2]}`
+      axios({
+        method: 'get',
+        url: url,
+      })
+      .then(function (response) {
+        AQUARIA.orgName = attr[1]
+        AQUARIA.gene = attr[2]
+        orgID = response.data[0].orgID
+        accession.push(response.data[0].Primary_Accession)
+        if(attr.length > 4){
+          if(attr[3].match(/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])/)){
+            pdb = attr[3]
+          }
+          if(attr[4].match(/([a-zA-Z,0-9])?$/)){
+            chain = attr[4]
+          }
+          AQUARIA.initialisePanels(true);
+          AQUARIA.loadAccession(accession, pdb, chain);
+        }
+        else if(attr.length > 3){
+          if(attr[3].match(/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])/)){
+            pdb = attr[3]
+          }
+          AQUARIA.initialisePanels(true);
+          AQUARIA.loadAccession(accession, pdb);
+  
+        }
+        else{
+          AQUARIA.initialisePanels(true);
+          AQUARIA.loadAccession(accession);
+        }
+      })
+    } 
+    else if (pathname.match(/\/([A-Za-z]+)/)) {
       //uniprot_accession = RegExp.$1;
       // History:
       // [JH] matches the URL and tries to load it as accession

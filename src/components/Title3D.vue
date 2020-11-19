@@ -1,26 +1,25 @@
 <template>
   <div>
     <div id="structureviewerexplanation" class="explanation">
-      <div id='titlebar' @mouseover="showSearch" @mouseout="hideSearch" >
-        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" @mouseover="select" @mouseout="diselect">
-          <img v-bind:src="search" id='search'/>
-          {{organism_name}} {{primary_accession}}
+      <div id='titlebar'>
+        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel">
+          {{organism_name}} <strong>{{primary_accession}}</strong>
         </span>
-        <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation" @mouseover="select" @mouseout="diselect">{{text}} </span>
-        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" @mouseover="select" @mouseout="diselect">{{pdb}}</span>
+        <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">{{text}} </span>
+        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel">{{pdb}}</span>
       </div>
       <!-- <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a> -->
     </div>
     <div id='contentPanel'>
       <!-- <h3 id="structureviewerexplanation_1" > -->
-        <span id='titlebar' class="explanation">
+        <!-- <span id='titlebar' class="explanation">
           <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel">
-            <!-- <img v-bind:src="search" id='search'/> -->
-            {{organism_name}} {{primary_accession}}
+            <! -- <img v-bind:src="search" id='search'/> -->
+            <!-- {{organism_name}} {{primary_accession}}
           </span>
           <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">{{text}} </span>
           <span id="pdbpanel" class='titlepanel' @click="showPdbPanel">{{pdb}}</span>
-        </span>
+        </span> -->
       <!-- </h3> -->
       <div id='panel1' class='contents'>
         <SearchPanel id="searchByName"/>
@@ -105,47 +104,49 @@ export default {
     // })
   },
   methods: {
-    select: function () {
-      event.currentTarget.style.background = 'orange'
-      if (event.currentTarget.children[0]) {
-        document.querySelector('#search').style.background = 'orange'
-      } else {
-        document.querySelector('#search').style.background = '#5d5d5d'
-      }
-    },
-    diselect: function () {
-      event.currentTarget.style.background = '#5d5d5d'
-    },
-    showSearch: function () {
-      document.querySelector('#search').style.display = 'inline'
-      document.querySelector('#threeDexplanation').style.borderLeft = '1px solid white'
-      document.querySelector('#threeDexplanation').style.borderRight = '1px solid white'
-    },
-    hideSearch: function () {
-      document.querySelector('#search').style.display = 'none'
-      document.querySelector('#threeDexplanation').style.border = 'none'
-    },
+    // select: function () {
+    //   event.currentTarget.style.background = 'orange'
+    //   if (event.currentTarget.children[0]) {
+    //     document.querySelector('#search').style.background = 'orange'
+    //   } else {
+    //     document.querySelector('#search').style.background = '#5d5d5d'
+    //   }
+    // },
+    // diselect: function () {
+    //   event.currentTarget.style.background = '#5d5d5d'
+    // },
+    // showSearch: function (ev) {
+    //   document.querySelector('#search').style.display = 'inline'
+    // document.querySelector('#threeDexplanation').style.borderLeft = '1px solid white'
+    // document.querySelector('#threeDexplanation').style.borderRight = '1px solid white'
+    // },
+    // hideSearch: function () {
+    //   document.querySelector('#search').style.display = 'none'
+    // document.querySelector('#threeDexplanation').style.border = 'none'
+    // },
     resetSelection: function () {
-      document.querySelectorAll('.titlepanel').forEach(el => {
-        el.style.background = '#5d5d5d'
+      document.querySelectorAll('#titlebar span').forEach(el => {
+        el.className = 'titlepanel'
       })
-      document.querySelector('#search').style.background = '#5d5d5d'
+      // document.querySelector('#search').style.background = '#5d5d5d'
       document.querySelectorAll('.contents').forEach(el => {
         el.style.display = 'none'
       })
     },
-    showUniprotPanel: function () {
+    showUniprotPanel: function (ev) {
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
       this.resetSelection()
+      ev.target.className = 'titlepanel active'
       document.querySelector('#contentPanel').style.display = 'block'
-      document.querySelector('#structureviewerexplanation').style.display = 'none'
+      // document.querySelector('#structureviewerexplanation').style.display = 'none'
       document.querySelector('#panel1').style.display = 'block'
       document.querySelector('#uniprot').style.display = 'block'
       document.querySelector('#searchByName').style.display = 'block'
-      document.querySelector('#contentPanel > #titlebar > #uniprotpanel').style.background = 'orange'
+      // document.querySelector('#contentPanel > #titlebar > #uniprotpanel').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
+        document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#uniprot').style.display = 'none'
         document.querySelector('#contentPanel').style.display = 'none'
         document.querySelector('#structureviewerexplanation').style.display = 'grid'
@@ -153,34 +154,38 @@ export default {
         // $('#gene_name').show()
       })
     },
-    showPdbPanel: function () {
+    showPdbPanel: function (ev) {
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
       this.resetSelection()
+      ev.target.className = 'titlepanel active'
       document.querySelector('#gallery').style.display = 'block'
       document.querySelector('#contentPanel').style.display = 'block'
-      document.querySelector('#structureviewerexplanation').style.display = 'none'
-      document.querySelector('#contentPanel > #titlebar > #pdbpanel').style.background = 'orange'
+      // document.querySelector('#structureviewerexplanation').style.display = 'none'
+      // document.querySelector('#contentPanel > #titlebar > #pdbpanel').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
+        document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = 'grid'
+        // document.querySelector('#structureviewerexplanation').style.display = 'grid'
         document.querySelector('div.dimmer').remove()
         // $('#gene_name').show()
       })
     },
-    showthreeDexplanation: function () {
+    showthreeDexplanation: function (ev) {
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
       this.resetSelection()
+      ev.target.className = 'titlepanel active'
       document.querySelector('#explanation').style.display = 'block'
       document.querySelector('#contentPanel').style.display = 'block'
-      document.querySelector('#structureviewerexplanation').style.display = 'none'
-      document.querySelector('#contentPanel >  #titlebar > #threeDexplanation').style.background = 'orange'
+      // document.querySelector('#structureviewerexplanation').style.display = 'none'
+      // document.querySelector('#contentPanel >  #titlebar > #threeDexplanation').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
+        document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = 'grid'
+        // document.querySelector('#structureviewerexplanation').style.display = 'grid'
         document.querySelector('div.dimmer').remove()
       })
     }
@@ -209,22 +214,75 @@ export default {
 </script>
 
 <style>
+/* Christian */
+#titlebar {
+    flex-basis: auto;
+    text-align: center;
+    line-height: 1.25;
+    padding: 0;
+    border-radius: 1.5rem;
+    margin: auto;
+    position: relative;
+    z-index: 6;
+}
+#titlebar span {
+  display: inline-block;
+  background-color: var(--primary-label);
+  background-position: 1rem 50%;
+  background-size: 0;
+  padding: calc(0.4rem + 3 * ((100vw - 320px) / 680)) 0.2rem;
+  transition: all 0.5s ease;
+  color: var(--text);
+  text-decoration: none;
+}
+#titlebar span:hover {
+  background-color: var(--primary-link);
+}
+#titlebar span.titlepanel.active {
+  background-color: var(--primary-highlight);
+}
+
+#title:hover span#threeDexplanation {
+  border-right: 1px dotted var(--background);
+  border-left: 1px dotted var(--background);
+}
+span#uniprotpanel {
+  padding-left: 1rem;
+  border-top-left-radius: 1.5rem;
+  border-bottom-left-radius: 1.5rem;
+  background-position: 0.5rem 50%;
+  background-size: 0;
+  transition: all 0.7s ease;
+}
+span#uniprotpanel:hover, #title:hover span#uniprotpanel {
+    padding-left: 2rem;
+    background-image: url("../assets/img/search_24.png");
+    background-repeat: no-repeat;
+    background-size: 1rem;
+}
+span#pdbpanel {
+  padding-right: 1rem;
+  font-weight: 600;
+  border-top-right-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
+}
+
+/* Neblina */
 #titlebar {
     display: -webkit-box;
     /* margin-left: 12px;
     margin-top: calc(12px + 1.5vh);
     margin-bottom: 20px; */
     margin: auto;
-    display: inline-table;
+    /* display: inline-table; */
     /* -webkit-box-align: baseline;
     -ms-flex-align: baseline;
     align-items: baseline; */
     border-radius: 5em;
-    /* background-color: var(--primary-label); */
-    padding: 5px calc(4px + .4vw);
+    background-color: var(--primary-label);
     min-width: 260px;
 }
-#search {
+/* #search {
     display: none;
     height: calc(1.2rem + 0.2vh);
     width: 32px;
@@ -235,7 +293,7 @@ export default {
     border-top-left-radius: 14px;
     border-bottom-left-radius: 14px;
     margin-left: -31px;
-}
+} */
 /* #gallery{
     top: 20vh;
     margin: 10px 0px;
@@ -243,20 +301,20 @@ export default {
     height: fit-content;
     z-index: 20;
 } */
-#uniprotpanel {
+/* #uniprotpanel { */
     /* padding-left: 14px; */
-    padding: 8px 0px 8px 14px;
+    /* padding: 8px 0px 8px 14px;
     border-top-left-radius: 14px;
     border-bottom-left-radius: 14px;
     line-height: 31px;
-    transition: all 0s ease 0s
-}
-#threeDexplanation {
-    padding: 8px 1px 8px 1px;
+    transition: all 0s ease 0s */
+/* } */
+/* #threeDexplanation { */
+    /* padding: 8px 1px 8px 1px;
     line-height: 31px;
-    margin: 0px -1px;
-}
-#pdbpanel{
+    margin: 0px -1px; */
+/* } */
+/* #pdbpanel{
     padding: 8px 14px 8px 2px;
     border-top-right-radius: 14px;
     border-bottom-right-radius: 14px;
@@ -265,34 +323,19 @@ export default {
 }
 .titlepanel {
   cursor: pointer;
-}
+} */
 .roundButton {
     color: #999;
     height: 17px;
     width: 17px;
     padding: 0 4px;
 }
-/* #structureviewerexplanation,#structureviewerexplanation_1{
-  width: max-content;
-  display: flex;
-  background-color: var(--transparent);
-  position: fixed;
-  left: 47vw;
-  top: 28px;
-  transform: translate(-50%, -50%);
-  align-items: baseline;
-  border-radius: 5em;
-  padding: 5px calc(4px + 0.4vw);
-  font-size: calc(8px + .6vw)
-} */
-
 .contents {
   padding: 0px 40px;
   text-align: left;
   color: #5d5d5d;
-  overflow: scroll;
+  overflow: auto;
 }
-
 #structureviewerexplanation,#structureviewerexplanation_1 {
     display: grid;
     background-color: var(--transparent);
@@ -307,29 +350,6 @@ export default {
     font-size: calc(8px + .6vw);
     z-index: 2;
 }
-
-/* .contents{
-  padding: 70px 20px 22px 20px;
-  min-width: 50vw;
-  text-align: left;
-  color: #5d5d5d;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  background-color: var(--transparent);
-  position: fixed;
-  margin-left: 45vw;
-  top: 249px;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  -webkit-box-align: baseline;
-  -ms-flex-align: baseline;
-  border-radius: 5em;
-  font-size: calc(8px + .6vw);
-  background: #dedede;
-  z-index: 1;
-} */
-
 #searchByName {
     display: block;
     overflow: auto;
@@ -357,18 +377,9 @@ export default {
   border-radius: 2em;
   background: rgb(222, 222, 222);
   max-height: 80vh;
-  /*
-  position: absolute;
-  top: 2vh;
-  flex-basis: auto;
-  background-color: #d2d2d2;
-  color: white;
-  text-align: center;
-  line-height: 2.5;
-  padding: 1.5rem 1.5rem;
-  border-radius: 1.5rem;
-  margin-left: -19px;
-  transition: all 0.7s ease; */
+  top: -40px;
+  position: relative;
+  padding-top: 40px;
 }
 #structureviewerexplanation_1 > #titlebar >  #uniprotpanel {
   padding-right: 5px;
