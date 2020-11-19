@@ -126,7 +126,7 @@ export default {
     max-height: 40vh;
     overflow: scroll;
     /* margin-bottom: -54px; */
-    margin-bottom: -20px;
+    margin-bottom: -200px;
     width: 100vw;
   }
   div.ruler {
