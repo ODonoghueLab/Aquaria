@@ -542,6 +542,15 @@
 		return nukids;	
 	}
 
+	function waitForElement(){
+		AQUARIA.addedFeature = true;
+		if(document.getElementById("waitingFrame").style.display != 'none'){
+			setTimeout(waitForElement, 5);
+		}
+		else{
+			AQUARIA.passFeature(AQUARIA.customfeatureSet, AQUARIA.customfeatureSetioid)
+		}
+	}
 	
 	function load_structure(matching_structures, d, really) {	//console.log(really + " load "+d.id+" MS.c: "+matching_structures.clusters.length);
 		console.log('show_expanded_cluster.load_structure')
@@ -570,6 +579,13 @@
 			window.setTimeout(function() {
 				$('div.expansion, div.dimmer2').remove(); 
 			  }, 600); 
+
+			var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
+			var searchParam = window.location.search.split('?')[1]
+			// searchParam = window.location.search.split('=')[0]
+			if(($(location).attr('href').includes("json") || featureRegex.test(searchParam))){
+				waitForElement()
+			}
 	  	} 
 	  	else {
 	  update(d);

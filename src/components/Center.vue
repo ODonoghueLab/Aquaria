@@ -7,10 +7,12 @@
     <!-- <Structures class="panel" id="structurematches" data-intro=" " data-position="top" /> -->
     <AboutAquaria />
     <Tabs />
+    <CoverageMap />
 </div>
 </template>
 
 <script>
+import CoverageMap from './CoverageMap'
 import StructureViewer from './StructureViewer'
 import AboutAquaria from './AboutAquaria'
 import Tabs from '../components/Tabs'
@@ -25,7 +27,8 @@ export default {
     AboutAquaria,
     Tabs,
     XRButton,
-    Menu
+    Menu,
+    CoverageMap
   },
   data () {
     return {
