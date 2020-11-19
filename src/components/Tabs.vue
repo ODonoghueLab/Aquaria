@@ -17,6 +17,7 @@
 <script>
 import MatchingStructures from './MatchingStructures'
 import FeatureList from './Features'
+import * as Panels from '../utils/matches_features_panels'
 export default {
   name: 'Tabs',
   components: {
@@ -48,31 +49,18 @@ export default {
       // document.querySelector('#' + elem2 + ' > a').style.color = 'white'
       // document.querySelector('#' + elem2 + ' > a > span').style.backgroundColor = 'white'
     },
-    hidePanel: function (elem1, elem2) {
-      document.querySelector('#' + elem1).style.display = 'none'
-      document.querySelector('#' + elem2).className = 'tab inactive'
-      // document.querySelector('#' + elem2 + ' > a').style.color = '#ffffff00'
-      // document.querySelector('#' + elem2 + ' > a > span').style.backgroundColor = '#ffffff00'
-    },
-    hidePanels: function () {
-      document.querySelectorAll('div.dimmer').forEach(el => el.remove())
-      this.hidePanel('vis', 'Structures')
-      this.hidePanel('featurelist', 'Features')
-      document.querySelector('#Structures').className = 'tab'
-      document.querySelector('#Features').className = 'tab'
-    },
     showMatches: function () {
       const _this = this
       // const soupController = window.AQUARIA.panel3d.embededJolecule.controller
       // soupController.clearSelectedResidues()
       _this.showPanel('vis', 'Structures')
-      _this.hidePanel('featurelist', 'Features')
+      Panels.hidePanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
       document.querySelector('div.dimmer').style.zIndex = '0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        _this.hidePanels()
+        Panels.hidePanels()
       })
     },
     showFeatures: function () {
@@ -81,14 +69,14 @@ export default {
         const soupController = window.AQUARIA.panel3d.embededJolecule.controller
         soupController.clearSelectedResidues()
       }
-      _this.hidePanel('vis', 'Structures')
+      Panels.hidePanel('vis', 'Structures')
       _this.showPanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
       document.querySelector('div.dimmer').style.zIndex = '0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        _this.hidePanels()
+        Panels.hidePanels()
       })
     }
   }

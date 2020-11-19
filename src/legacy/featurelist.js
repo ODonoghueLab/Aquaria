@@ -6,6 +6,7 @@ var groupCount;
 var Highcharts = require('./highstocks.js');
 var d3 = require('d3');
 var featureMap = require('../utils/featureMap')
+var Panels = require('../utils/matches_features_panels')
 
 function createFeatureUI() {
 	width = document.getElementById("structureviewer").offsetWidth
@@ -281,12 +282,12 @@ function drawTrack(datum, i) {
 						"Click to load feature into 3D view; hover over features to see detailed info.")
 
 				.on("click", function() {
-					if(d3.select(this).attr("class") == "loaded") { // deselect feature (it's already displayed)
+					if(d3.select(this).attr("class") == "loaded") {// deselect feature (it's already displayed)
+						document.querySelector(".featureHeader.actived").click()
 						d3.select("svg.loaded").classed("loaded", false);
 						AQUARIA.panel3d.blankApplet(true, "Removing feature...")
 						AQUARIA.panel3d.blankApplet(false)
-
-            // Stu hack to detect feature changes
+            			// Stu hack to detect feature changes
 						if (typeof AQUARIA.onFeatureChange === 'function') {
 							AQUARIA.onFeatureChange(null, 0);
 						  }
@@ -294,8 +295,10 @@ function drawTrack(datum, i) {
 						document.querySelector('#outerFeatureMap').remove()
 						AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
 						document.querySelector('#selectedCluster > .outer_container').remove()
+						Panels.hidePanels()
 					}
 					else { //console.log("clicked to display feature");
+						document.querySelector(".featureHeader.actived").click()
 						if(document.querySelector('#outerFeatureMap')) {
 							document.querySelector('#outerFeatureMap').remove()
 						}
@@ -317,9 +320,7 @@ function drawTrack(datum, i) {
 						d3.select("svg.loaded").classed("loaded", false);
 						d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
 						drawfeatureMap = featureMap.createFeatureMap(datum)
-						// document.querySelectorAll("#selectedCluster [id*='r_'] rect").forEach(function (part){
-						// 	part.style.fill = '#a5a5a5'
-						// })
+						Panels.hidePanels()
 						}
 					})
 				.on("mouseover", function() {
