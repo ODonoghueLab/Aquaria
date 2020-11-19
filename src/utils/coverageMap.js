@@ -1,6 +1,6 @@
-var d3 = require('d3')
+import d3 from 'd3'
 
-var CoverageMapRenderer = function (cluster, rank) {
+export function RenderMap (cluster, rank) {
   this.width = document.getElementById('structureviewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left
   this.height = 40 - window.AQUARIA.margin.top - window.AQUARIA.margin.bottom + 35 // height
   var seqLength = window.AQUARIA.showMatchingStructures.sequence.length
@@ -16,7 +16,7 @@ var CoverageMapRenderer = function (cluster, rank) {
   }
 }
 
-CoverageMapRenderer.prototype.updateCluster = function (clusterToUpdate) {
+export function updateCluster (clusterToUpdate) {
   var that = this
   this.cluster = clusterToUpdate
   this.clustSize = clusterToUpdate.cluster_size
@@ -29,7 +29,7 @@ CoverageMapRenderer.prototype.updateCluster = function (clusterToUpdate) {
   }
 }
 
-CoverageMapRenderer.prototype.drawClusterContainer = function (cluster, s, element) {
+export function drawClusterContainer (cluster, s, element) {
   // scale start and end coordinates
   // //var repeat_domain = data.Repeat_domains[0];
 
@@ -96,7 +96,7 @@ CoverageMapRenderer.prototype.drawClusterContainer = function (cluster, s, eleme
   return outerdiv
 }
 
-CoverageMapRenderer.prototype.drawCluster = function (cluster, rank) {
+export function drawCluster (cluster, rank) {
   var that = this
   cluster.secondary_structure[0].forEach(function (d, index) {
     // convert strings to numbers
@@ -107,10 +107,10 @@ CoverageMapRenderer.prototype.drawCluster = function (cluster, rank) {
     // draw the secondary structure, etc.
     that.drawResidues(cluster, rank, d)
   })
-  this.setConservation(rank, cluster)
+  this.setConservation(cluster)
 }
 
-CoverageMapRenderer.prototype.drawResidues = function (cluster, rank, el) {
+export function drawResidues (cluster, rank, el) {
   // for each residue, draw one rectangle with a unique position id, so we can
   // assign a class/status later
   var offset = cluster.secondary_structure[0][0].start
@@ -156,7 +156,8 @@ CoverageMapRenderer.prototype.drawResidues = function (cluster, rank, el) {
     thickness = 0
   }
 }
-CoverageMapRenderer.prototype.setConservation = function (index, data) { // console.log("setting conservation
+
+export function setConservation (data) { // console.log("setting conservation
   var insertions = []
   for (var i = 0; i < data.seq_end.length - 1; i++) {
     var gap = []
@@ -165,5 +166,3 @@ CoverageMapRenderer.prototype.setConservation = function (index, data) { // cons
     insertions.push(gap) // console.log("insertion: " + gap.toString());
   }
 }
-
-module.exports = CoverageMapRenderer

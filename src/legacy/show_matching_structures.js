@@ -97,7 +97,8 @@ ShowMatchingStructures.prototype.refresh = function() {
 };
 
 ShowMatchingStructures.prototype.showMap = function(cluster) {
-	var coverageMapRenderer = new CoverageMapRenderer(cluster, this.rank);
+	CoverageMapRenderer.RenderMap(cluster, this.rank);
+	AQUARIA.showMatchingStructures.cluster = cluster;
 };
 
 ShowMatchingStructures.prototype.addCluster = function(cluster) {

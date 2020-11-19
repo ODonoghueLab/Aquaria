@@ -292,6 +292,8 @@ function drawTrack(datum, i) {
 						  }
 						removeCurrentAnnotationFrom3DViewer();
 						document.querySelector('#outerFeatureMap').remove()
+						AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
+						document.querySelector('#selectedCluster > .outer_container').remove()
 					}
 					else { //console.log("clicked to display feature");
 						if(document.querySelector('#outerFeatureMap')) {
