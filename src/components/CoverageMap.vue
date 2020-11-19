@@ -14,10 +14,10 @@ export default {
 <style scoped>
 #selectedCluster{
   position: absolute;
-  bottom: 24px;
+  bottom: 0px;
 }
 #selectedFeature{
   position: absolute;
-  bottom: 4px;
+  bottom: -20px;
 }
 </style>
