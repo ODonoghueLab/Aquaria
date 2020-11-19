@@ -34,14 +34,14 @@ var servers = [
 			"Server": 'SNAP2',
 			"URL": 'https://rostlab.org/services/aquaria/snap4aquaria/json.php?uniprotAcc=',
 		},
-		/* {
+		{
 			"id": 'CATH',
 			"Server": 'CATH',
 			"URL": window.location.protocol + '//www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
 			"URL_covid": `${window.BACKEND}/covid19cath/`,
 			// ?content-type=application/json
 		},
-		{
+		/* {
 			"id": 'myVariant',
 			"Server": 'myVariant.info',
 			"URL_variantList": 'https:', // POST request
@@ -1381,8 +1381,10 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 					// Step 2.
 					// extractVariantInfo(aggregatedAnnotations, data);
 
-					extractVariantInfoFromUniprot(data);
-					parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url)
+					extractVariantInfoFromUniprot(data).then(function(){
+						parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url);
+					});
+
 				});
 
 			}
@@ -1394,19 +1396,35 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 var checkIfValInSnpResAndAdd = require('./variantResiduesDesc');
 
 function extractVariantInfoFromUniprot(uniprotData){
-	console.log("extractVariantInfoFromUniprot");
-	let variants_featTypesOfInt = ['Modified residue', 'Mutagenesis site', 'Sequence conflict', 'Sequence variant'];
 
-	for (let featureType in uniprotData){
-		console.log("Uniprot: Feature type " + featureType);
-		if (uniprotData[featureType].hasOwnProperty('Features')){
-			for (let i =0; i< uniprotData[featureType]['Features'].length; i++){
-				if (uniprotData[featureType]['Features'][i].hasOwnProperty('Residue')){
-					checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
+	return new Promise(function(resolve, reject) {
+
+		if (uniprotData.length == 0){
+			resolve();
+		}
+		// console.log("extractVariantInfoFromUniprot");
+		let variants_featTypesOfInt = ['Modified residue', 'Mutagenesis site', 'Sequence conflict', 'Sequence variant'];
+
+		let counter = 0;
+		for (let featureType in uniprotData){
+			console.log("Uniprot: Feature type " + featureType);
+			if (uniprotData[featureType].hasOwnProperty('Features')){
+				for (let i =0; i< uniprotData[featureType]['Features'].length; i++){
+					if (uniprotData[featureType]['Features'][i].hasOwnProperty('Residue')){
+						checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
+					}
 				}
 			}
+			counter = counter + 1;
+
+			if (counter >= Object.keys(uniprotData).length){
+				resolve();
+			}
 		}
-	}
+
+	});
+
+
 
 }
 
