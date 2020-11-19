@@ -12,7 +12,7 @@ export default {
 <style>
 #featurelist{
   overflow:  scroll;
-  margin-bottom:  -10px;
+  margin-bottom:  -100px;
   width:  100vw;
 }
 #groupedFeatures{
