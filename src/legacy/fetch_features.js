@@ -863,16 +863,9 @@ var processNextServer = function(primary_accession,
 
 
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
-<<<<<<< HEAD
-			// featureCallback(aggregatedAnnotations);
-
-
-
-=======
 			featureCallback(aggregatedAnnotations);
 			processNextServer(primary_accession,
 				featureCallback);
->>>>>>> test
 		}
 		else if (servers[currentServer]['id'] == 'CATH'){
 			console.log('############################ Requesting Cath features')
@@ -1323,16 +1316,8 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				}
 
 
-<<<<<<< HEAD
-				featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0];
-
-
-
-				// console.log(feature.split(residue)[1][0]);
-=======
 				// featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
 				featureAttributes.Name = feature
->>>>>>> test
 				if(feature.split(residue)[1].toLowerCase() == 'ter'){
 					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
 

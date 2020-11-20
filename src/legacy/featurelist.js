@@ -6,7 +6,9 @@ var groupCount;
 var Highcharts = require('./highstocks.js');
 var d3 = require('d3');
 var featureMap = require('../utils/featureMap')
-var Panels = require('../utils/matches_features_panels')
+var Panels = require('../utils/matches_features_panels');
+
+
 
 function createFeatureUI() {
 	width = document.getElementById("structureviewer").offsetWidth
@@ -27,6 +29,7 @@ function updateFeatureTabTitle(preferredProteinName) {
 var updateFeatureUI = function(featureList) {
 	featureSet = featureList || featureSet;
 	// console.log("featurelist.updateFeatureUI");
+
 
 	$("#featurelist div").remove(); // remove old contents
 //	$("#featureExplanation").text(" Loading...");
@@ -569,6 +572,7 @@ function showAnnotation(f, eid) {
 		.append("div")
 			.attr("class", "popup")
 			.html(balloon);
+
 			// .append(theSuperFam);
 
 	// document.getElementById('balloon').append(theSuperFam);
@@ -852,6 +856,7 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 					featureURLs, featureURLtexts);
 	}
 }
+
 
 module.exports.updateFeatureUI = updateFeatureUI;
 module.exports.updateFeatureTabTitle = updateFeatureTabTitle;

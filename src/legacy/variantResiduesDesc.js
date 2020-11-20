@@ -1,6 +1,7 @@
-
+var counter_complete = 0;
 
 module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType, description, serverName, variants_featTypesOfInt){
+
 
 	if (variants_featTypesOfInt.includes(featureType)){
 		Object.keys(variantResidues).forEach(function(resSnp, i){
@@ -9,8 +10,8 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 				if (serverName == 'SNAP2'){
 					description = getSubstringOfInterest(description, variantResidues[resSnp].newResidue);
 				}
-
-				let aDesc =  " <i> " + featureType + "</i> " + description;
+				console.log("The counter is " + counter_complete);
+				let aDesc =  "<span class=\"teaser\"> <i> " + featureType + "</i> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + description + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> more... </span>";
 
 				if (!variantResidues[resSnp].hasOwnProperty(serverName)){
 					variantResidues[resSnp][serverName] = [];
@@ -18,12 +19,36 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 				}
 				variantResidues[resSnp][serverName].push(aDesc);
 
-				console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName)
+				console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
+
+				counter_complete = counter_complete + 1;
 			}
 		});
 	}
 
 }
+
+
+function generateShowHideFnStr(id_complete){
+	returnStr = "elem = document.getElementById('" + id_complete + "');";
+
+	returnStr = returnStr + "if (elem.style.display == ''){elem.style.display = 'none'; console.log('Next sibling is'); console.log(elem.nextSibling.innerHTML); elem.nextSibling.innerHTML = 'more...';}";
+
+
+	returnStr = returnStr + "else{ elem.style.display = ''; elem.nextSibling.innerHTML = 'less...';}; ";
+
+
+	return (returnStr);
+}
+
+
+$('.more').toggle(function(){
+    $(this).text('less..').siblings('.complete').show();
+}, function(){
+    $(this).text('more..').siblings('.complete').hide();
+});
+
+
 
 
 function getSubstringOfInterest(description, newResidue){
