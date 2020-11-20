@@ -164,7 +164,7 @@ function url_ancestors(superfam_id){
 function handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, residues_, superFamFeatureSet, funFamFeatureSet, convertedFeatures){
 	return new Promise(function(resolve, reject){
 
-		let keyFunFam = "Functional families (CATH-FunFams)";
+		let keyFunFam = "Functional families";
 
 		funFamData.forEach(function(aFunFam, i){
 
@@ -240,7 +240,7 @@ function handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, residues_, supe
 function handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancestorDataObj, dataArr_hc, hcDataObj, residues_, superFamFeatureSet){
 	return new Promise(function(resolve, reject){
 
-		let keySuperFam = "Structural domains (CATH-SuperFamilies)";
+		let keySuperFam = "Structural domains";
 
 		superFamRequests.forEach(function(aSuperFam, i){
 			// console.log(aSuperFam);

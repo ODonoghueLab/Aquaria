@@ -9,7 +9,6 @@ var featureMap = require('../utils/featureMap')
 var Panels = require('../utils/matches_features_panels');
 
 
-
 function createFeatureUI() {
 	width = document.getElementById("structureviewer").offsetWidth
 			- AQUARIA.margin.right - AQUARIA.margin.left; // console.log("width:
