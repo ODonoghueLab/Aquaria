@@ -1,7 +1,18 @@
 const url = require('url');
 
-var variants_featTypesOfInt = ['CONSERVATION_(CONSEQ)'];
+var variants_featTypesOfInt = ['Conservation'];
 var checkIfValInSnpResAndAdd = require('./variantResiduesDesc');
+
+var fs_nameMap = {
+	"SECONDARY_STRUCTURE_(REPROF)": "Secondary structure",
+	"SOLVENT_ACCESSIBILITY_(REPROF)":"Solvent accessibility",
+	"RELATIVE_B-VALUE_(PROF-BVAL)": "Flexibility",
+	"CONSERVATION_(CONSEQ)": "Conservation",
+	"PROTEIN_BINDING_(PRONA)": "Protein binding",
+	"DNA_BINDING_(PRONA)": "DNA binding",
+	"DISORDERED_REGION_(META-DISORDER)": "Disorder",
+	"NON-REGULAR_SECONDARY_STRUCTURE_(NORS-NET)": "Non-regular secondary structure",
+}
 
 module.exports = function (jsonObj, primary_accession, featureCallback, validateAgainstSchema, variantResidues, requestedFeature){
 
@@ -84,7 +95,12 @@ function convertTheFeature(feature, variantResidues, requestedFeature){
 
 
 		if (key == 'type'){
-			featureKey = feature[key];
+			if (fs_nameMap.hasOwnProperty(feature[key])){
+				featureKey = fs_nameMap[feature[key]];
+			}
+			else {
+				featureKey = feature[key];
+			}
 		}
 
 		if (key == 'ftId'){
