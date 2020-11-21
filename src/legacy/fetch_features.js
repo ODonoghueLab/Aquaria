@@ -772,7 +772,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
 		}
 		if (requestedFeature == 'SNAP2'){
-			console.log(response);
+			// console.log(response);
 			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
 		}
 		if (requestedFeature == 'CATH'){
@@ -941,7 +941,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 							console.log(aggregatedAnnotations[i].Tracks[j][k]);
 
 							if (parseInt(residue) >= parseInt(aggregatedAnnotations[i].Tracks[j][k].start) &&  parseInt(residue) <= parseInt(aggregatedAnnotations[i].Tracks[j][k].end)){
-								aggregatedAnnotations[i].Tracks[j][k].desc =  aggregatedAnnotations[i].Tracks[j][k].desc  + description;
+								aggregatedAnnotations[i].Tracks[j][k].desc =  description; // aggregatedAnnotations[i].Tracks[j][k].desc  + description;
 
 								// console.log("The complete description is: " + aggregatedAnnotations[i].Tracks[j][k].desc );
 							}
