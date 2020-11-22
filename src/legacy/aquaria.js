@@ -663,7 +663,7 @@ var MAX_PROTEIN_HISTORY = 5;
                 }
                 AQUARIA.display_member();
               }
-              AQUARIA.showMatchingStructures.showMap(cluster)
+              AQUARIA.showMatchingStructures.drawCoverageMap(cluster)
             }
           } else {
             ///console.log('AQUARIA.loadAccession error: received old data for Best PDB: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);

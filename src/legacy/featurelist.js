@@ -270,89 +270,82 @@ function drawTrack(datum, i) {
 		//console.log(AQUARIA.srw);
 	}
 	for ( var o in features) {
+		var outerdiv = d3.select(this)
+		var nusvg = featureMap.createSVGforFeature(outerdiv, width + AQUARIA.margin.left, 25, width + AQUARIA.margin.left)
+		nusvg
+		.attr("id", "s_" + groupCount + "_" + o)
+		.attr("title", "Click to load feature into 3D view; hover over features to see detailed info.")
 
-
-		d3
-				.select(this)
-				.append("svg")
-				.attr("width", width + AQUARIA.margin.left)
-				.attr("height", 25)
-				.attr("viewBox", "0 0 " + (width + AQUARIA.margin.left) + " 25")
-				.attr("preserveAspectRatio", "none")
-				.attr("id", "s_" + groupCount + "_" + o)
-				.attr("title",
-						"Click to load feature into 3D view; hover over features to see detailed info.")
-
-				.on("click", function() {
-					if(d3.select(this).attr("class") == "loaded") {// deselect feature (it's already displayed)
-						document.querySelector(".featureHeader.actived").click()
-						d3.select("svg.loaded").classed("loaded", false);
-						AQUARIA.panel3d.blankApplet(true, "Removing feature...")
-						AQUARIA.panel3d.blankApplet(false)
-            			// Stu hack to detect feature changes
-						if (typeof AQUARIA.onFeatureChange === 'function') {
-							AQUARIA.onFeatureChange(null, 0);
-						  }
-						removeCurrentAnnotationFrom3DViewer();
-						document.querySelector('#outerFeatureMap').remove()
-						AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
-						document.querySelector('#selectedCluster > .outer_container').remove()
-						Panels.hidePanels()
+		.on("click", function() {
+			if(d3.select(this).attr("class") == "loaded") {// deselect feature (it's already displayed)
+				document.querySelector(".featureHeader.actived").click()
+				d3.select("svg.loaded").classed("loaded", false);
+				AQUARIA.panel3d.blankApplet(true, "Removing feature...")
+				AQUARIA.panel3d.blankApplet(false)
+				// Stu hack to detect feature changes
+				if (typeof AQUARIA.onFeatureChange === 'function') {
+					AQUARIA.onFeatureChange(null, 0);
 					}
-					else { //console.log("clicked to display feature");
-						document.querySelector(".featureHeader.actived").click()
-						if(document.querySelector('#outerFeatureMap')) {
-							document.querySelector('#outerFeatureMap').remove()
-						}
-						var oid = d3.select(this).attr("id").split("_")[2];
-						AQUARIA.panel3d.blankApplet(true, "Loading feature...")
-						AQUARIA.panel3d.blankApplet(false)
-						if(datum.Server != "Added Features"){
-							AQUARIA.addedFeature = false
-						}
-						AQUARIA.passFeature(datum, oid, this);
-						// Stu hack to detect feature changes
-						if (typeof AQUARIA.onFeatureChange === 'function') {
-							AQUARIA.onFeatureChange(datum, oid);
-						}
-						//console.log("Datum");
-						//console.log(datum);
-						// console.log(oid);
-						d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-						d3.select("svg.loaded").classed("loaded", false);
-						d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
-						drawfeatureMap = featureMap.createFeatureMap(datum)
-						Panels.hidePanels()
-						}
-					})
-				.on("mouseover", function() {
-							d3.select(this).selectAll("rect.feature").attr(
-									"fill", function() {
-										return d3.select(this).attr("color");
-									});
-						})
-				.on("mouseout", function() {
-							if(d3.select(this).attr("class") != "loaded"){
-								d3.select(this).selectAll("rect.feature")
-								.attr("fill", "#a4abdf");
-							}
-						})
-					// add background for highlighting
-				.append("rect")
-					.attr("width", width + AQUARIA.margin.left)
-					.attr("height", 25)
-					.attr("class", "bg")
-					.attr("fill", "none");
+				removeCurrentAnnotationFrom3DViewer();
+				document.querySelector('#outerFeatureMap').remove()
+				AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
+				// document.querySelector('#selectedCluster > .outer_container').remove()
+				Panels.hidePanels()
+			}
+			else { //console.log("clicked to display feature");
+				document.querySelector(".featureHeader.actived").click()
+				if(document.querySelector('#outerFeatureMap')) {
+					document.querySelector('#outerFeatureMap').remove()
+				}
+				var oid = d3.select(this).attr("id").split("_")[2];
+				AQUARIA.panel3d.blankApplet(true, "Loading feature...")
+				AQUARIA.panel3d.blankApplet(false)
+				if(datum.Server != "Added Features"){
+					AQUARIA.addedFeature = false
+				}
+				AQUARIA.passFeature(datum, oid, this);
+				// Stu hack to detect feature changes
+				if (typeof AQUARIA.onFeatureChange === 'function') {
+					AQUARIA.onFeatureChange(datum, oid);
+				}
+				//console.log("Datum");
+				//console.log(datum);
+				// console.log(oid);
+				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+				d3.select("svg.loaded").classed("loaded", false);
+				d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
+				drawfeatureMap = featureMap.createFeatureMap(datum)
+				Panels.hidePanels()
+				}
+			})
+		.on("mouseover", function() {
+					d3.select(this).selectAll("rect.feature").attr(
+							"fill", function() {
+								return d3.select(this).attr("color");
+							});
+				})
+		.on("mouseout", function() {
+					if(d3.select(this).attr("class") != "loaded"){
+						d3.select(this).selectAll("rect.feature")
+						.attr("fill", "#a4abdf");
+					}
+				})
+			// add background for highlighting
+		.append("rect")
+			.attr("width", width + AQUARIA.margin.left)
+			.attr("height", 25)
+			.attr("class", "bg")
+			.attr("fill", "none");
 
-			d3.select("svg#s_" + groupCount + "_" + o)
-				.append("g")
-					.attr("transform", "translate(" + AQUARIA.margin.left + ",0)")
-					// add center line
-				.append("rect")
-					.attr("width", width)
-					.attr("height", 1)
-					.attr("transform", "translate(0,13)")
-					.attr("class", "insertion");
+	d3.select("svg#s_" + groupCount + "_" + o)
+		.append("g")
+			.attr("transform", "translate(" + AQUARIA.margin.left + ",0)")
+			// add center line
+		.append("rect")
+			.attr("width", width)
+			.attr("height", 1)
+			.attr("transform", "translate(0,13)")
+			.attr("class", "insertion");
 					// add features
 		for ( var p in features[o]) {
 			// console.log("p is ");
@@ -740,20 +733,20 @@ function updateTheStyleOfHc(){
 
 // DAS annotation handling
 
-var currentAnnotationsIn3DViewer = new Array();
+AQUARIA.currentAnnotationsIn3DViewer = new Array();
 
 /**
  * removes the current annotation track from the 3D viewer
  */
 function removeCurrentAnnotationFrom3DViewer() {
 	// remove existing Annotation
-
+	let currentAnnotationsIn3DViewer = AQUARIA.currentAnnotationsIn3DViewer
 	if (currentAnnotationsIn3DViewer !== undefined) {
 		for ( var i in currentAnnotationsIn3DViewer) {
 
 			// API call
 			AQUARIA.panel3d.removeAnnotation(currentAnnotationsIn3DViewer[i].id,
-					currentAnnotationsIn3DViewer[i].annotationName);
+				currentAnnotationsIn3DViewer[i].annotationName);
 		}
 		currentAnnotationsIn3DViewer.length = 0;
 	}
@@ -847,7 +840,7 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 		"annotationName" : annotations.Category
 	};
 
-	currentAnnotationsIn3DViewer.push(annotationToAdd);
+	AQUARIA.currentAnnotationsIn3DViewer.push(annotationToAdd);
 	// API call
 	AQUARIA.panel3d.addAnnotation(annotationToAdd.id[0],
 					annotationToAdd.annotationName, featureColours,
