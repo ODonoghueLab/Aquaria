@@ -1,5 +1,6 @@
 import d3 from 'd3'
 import $ from 'jquery'
+import * as Panels from './matches_features_panels'
 
 export function createFeatureMap (datum) {
   document.querySelectorAll("#selectedCluster [id*='r_'] rect").forEach(function (part) {
@@ -10,29 +11,84 @@ export function createFeatureMap (datum) {
     part.style.fill = '#a5a5a5'
     part.style.stroke = '#a5a5a5'
   })
+  //   window.AQUARIA.showMatchingStructures.drawCoverageMap(window.AQUARIA.showMatchingStructures.selectedCluster)
   this.width = document.getElementById('structureviewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left
   this.height = 40 - window.AQUARIA.margin.top - window.AQUARIA.margin.bottom + 35 // height
   this.datum = datum
-  this.drawTrack(this.datum)
+  var outerdiv = d3.select('#selectedFeature').append('div').attr('id', 'outerFeatureMap')
+  this.drawTrack(this.datum, this.createSVGforFeature(outerdiv, '100vw', this.height + 30), this.width)
+  d3.select('#outerFeatureMap > svg').attr('class', 'loadedFeature')
+}
+
+// Create SVG for selected feature
+export function createSVGforFeature (outerdiv, width, height, viewboxWidth) {
+  this.nusvg = outerdiv.append('svg').attr('width', width)
+    .attr('height', height)
+    .attr('viewBox', '0 0 ' + viewboxWidth + ' ' + height)
+    .attr('preserveAspectRatio', 'none')
+  return this.nusvg
 }
 
 // Draw selected feature track
-export function drawTrack (datum) {
+export function drawTrack (datum, svg) {
+  var _this = this
   var features = datum.Tracks
-  var outerdiv = d3.select('#selectedFeature').append('div').attr('id', 'outerFeatureMap')
-  this.nusvg = outerdiv.append('svg').attr('width', '100vw')
-    .attr('height', this.height + 30)
-    .attr('viewBox', '0 0 ' + (this.width) + ' ' + (this.height + 30))
-    .attr('preserveAspectRatio', 'none')
+  this.nusvg = svg
+  const AQUARIA = window.AQUARIA
+
+  this.nusvg.on('click', function () {
+    if (d3.select(this).attr('class').includes('loaded')) {
+      // deselect feature (it's already displayed)
+    //   if (document.querySelector('.featureHeader.actived')) {
+    //     document.querySelector('.featureHeader.actived').click()
+    //   }
+      d3.select('svg.loaded').classed('loaded', false)
+      AQUARIA.panel3d.blankApplet(true, 'Removing feature...')
+      AQUARIA.panel3d.blankApplet(false)
+      // Stu hack to detect feature changes
+      if (typeof AQUARIA.onFeatureChange === 'function') {
+        AQUARIA.onFeatureChange(null, 0)
+      }
+      _this.removeCurrentAnnotationFrom3DViewer()
+      document.querySelector('#outerFeatureMap').remove()
+      AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
+      Panels.hidePanels()
+    } else { // console.log("clicked to display feature");
+      document.querySelector('.featureHeader.actived').click()
+      if (document.querySelector('#outerFeatureMap')) {
+        document.querySelector('#outerFeatureMap').remove()
+      }
+      var oid = d3.select(this).attr('id').split('_')[2]
+      AQUARIA.panel3d.blankApplet(true, 'Loading feature...')
+      AQUARIA.panel3d.blankApplet(false)
+      if (datum.Server !== 'Added Features') {
+        AQUARIA.addedFeature = false
+      }
+      AQUARIA.passFeature(datum, oid, this)
+      // Stu hack to detect feature changes
+      if (typeof AQUARIA.onFeatureChange === 'function') {
+        AQUARIA.onFeatureChange(datum, oid)
+      }
+      // console.log("Datum");
+      // console.log(datum);
+      // console.log(oid);
+      d3.selectAll('svg.loaded rect.feature').attr('fill', '#a4abdf')
+      d3.select('svg.loaded').classed('loaded', false)
+      d3.select(this).attr('class', 'loaded') // console.log("it's " + d3.select(this).attr("class"));
+      _this.createFeatureMap(datum)
+      Panels.hidePanels()
+    }
+  })
 
   this.nusvg.append('rect')
-    .attr('width', this.width + window.AQUARIA.margin.left)
+    .attr('width', this.width + AQUARIA.margin.left)
     .attr('height', 25)
     .attr('class', 'bg')
     .attr('fill', 'none')
+
   for (var o in features) {
     // draw outline of the whole chain
-    this.nusg = this.nusvg.append('g').attr('transform', 'translate(' + window.AQUARIA.margin.left + ',0)')
+    this.nusg = this.nusvg.append('g').attr('transform', 'translate(' + AQUARIA.margin.left + ',0)')
     // add center line
     this.nusg.append('rect')
       .attr('width', this.width)
@@ -159,4 +215,22 @@ export function moveTheDiv () {
     const aSuperFamFeature = document.getElementById('superFamCharts_0_go')
     document.getElementById('superFamCharts').append(aSuperFamFeature)
   })
+}
+
+// DAS annotation handling
+
+/**
+ * removes the current annotation track from the 3D viewer
+ */
+export function removeCurrentAnnotationFrom3DViewer () {
+  // remove existing Annotation
+  const currentAnnotationsIn3DViewer = window.AQUARIA.currentAnnotationsIn3DViewer
+  if (currentAnnotationsIn3DViewer !== undefined) {
+    for (var i in currentAnnotationsIn3DViewer) {
+      // API call
+      window.AQUARIA.panel3d.removeAnnotation(currentAnnotationsIn3DViewer[i].id,
+        currentAnnotationsIn3DViewer[i].annotationName)
+    }
+    currentAnnotationsIn3DViewer.length = 0
+  }
 }

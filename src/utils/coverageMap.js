@@ -58,7 +58,7 @@ export function drawClusterContainer (cluster, s, element) {
   }
 
   var outerdiv = d3.select(element).append('div').attr('id', 'out_' + id).attr(
-    'class', 'outer_container')
+    'class', 'coverage_map_container')
   // outerdiv.append('svg').attr('width', 40).attr('height', 40).attr('viewBox',
   //   '0 0 40 40').attr('preserveAspectRatio', 'none')
 

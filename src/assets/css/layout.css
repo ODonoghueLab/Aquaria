@@ -160,6 +160,12 @@ span.icon {
     height: 0;
     transition: All 0.8s ease;
 }
+.coverage_map_container {
+    position: absolute;
+    bottom: 0px;
+    opacity: 1;
+}
+
 :target + .panel, .panel:target {
     background-color: var(--primary-tab);
     opacity: 1;
