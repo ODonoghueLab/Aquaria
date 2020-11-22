@@ -2,6 +2,7 @@ var counter_complete = 0;
 
 module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType, description, serverName, variants_featTypesOfInt){
 
+	// console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
 
 	if (variants_featTypesOfInt.includes(featureType)){
 		Object.keys(variantResidues).forEach(function(resSnp, i){
@@ -10,7 +11,10 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 				if (serverName == 'SNAP2'){
 					description = getSubstringOfInterest(description, variantResidues[resSnp].newResidue);
 				}
-				console.log("The counter is " + counter_complete);
+				else if (serverName == 'CATH'){
+					description = getSubstringOfInterest_cath(description);
+				}
+				// console.log("The counter is " + counter_complete);
 				let aDesc =  "<span class=\"teaser\"> <i> " + featureType + "</i> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + description + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> more... </span>";
 
 				if (!variantResidues[resSnp].hasOwnProperty(serverName)){
@@ -75,4 +79,13 @@ function getSubstringOfInterest(description, newResidue){
 
 
 	return description;
+}
+
+
+function getSubstringOfInterest_cath(description){
+	let desc = description.replace(/\<[^\<\>]+\>/g, '');
+	desc = desc.replace(/\$\$.*$/, '');
+	desc = desc.replace(/^.+\:/, '');
+
+	return desc;
 }

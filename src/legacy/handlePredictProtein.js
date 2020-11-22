@@ -154,14 +154,14 @@ function convertTheFeature(feature, variantResidues, requestedFeature){
 
 	/* Added this because ftId is not present in the normal API e.g. https://api.predictprotein.org/v1/results/molart/Q15084 */
 	if (!convertedFeature.hasOwnProperty('Name')) {
-		convertedFeature['Name'] = convertedFeature.Description
+		convertedFeature['Name'] = convertedFeature.Description;
 	}
 
 
 	return ({'featureKey': featureKey, "convertedFeature": convertedFeature, 'urls': url_evidence, 'sources': source_evidence});
 }
 
-
+/*
 function checkIfValInSnpResAndAdd(resStart_pp, resEnd_pp, variantResidues, featureType, description, requestedFeature){
 	if (variants_featTypesOfInt.includes(featureType)){
 		Object.keys(variantResidues).forEach(function(resSnp, i){
@@ -174,6 +174,7 @@ function checkIfValInSnpResAndAdd(resStart_pp, resEnd_pp, variantResidues, featu
 
 	}
 }
+*/
 
 /* Function to extract url's if present (will later be added to the feature set itself).
 *

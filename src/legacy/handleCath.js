@@ -1,5 +1,7 @@
 // var Highcharts = require('highcharts');
 var Highcharts = require('./highstocks.js');
+var checkIfValInSnpResAndAdd = require('./variantResiduesDesc');
+var variantResFeats = ['Structural domain', 'Functional domain'];
 
 // "https://www.cathdb.info/version/latest/superfamily/" 2.60.40.720
 // http://www.cathdb.info/version/v4_2_0/superfamily/4.10.170.10/funfam/100
@@ -22,7 +24,7 @@ module.exports = {
 
 }
 
-function handleCath(jsonObj1, getFeatures, validateAgainstSchema, primary_accession, featureCallback){
+function handleCath(jsonObj1, getFeatures, validateAgainstSchema, primary_accession, featureCallback, variantResidues){
 
 	 // console.log("$$$$$$$ Requesting CATH :)");
 	 // console.log(jsonObj1);
@@ -53,9 +55,8 @@ function handleCath(jsonObj1, getFeatures, validateAgainstSchema, primary_access
 			return new Promise(function(resolve, reject){
 				handlePromiseData_hc(theData, dataArr_hc).then(function(){
 					resolve();
-				})
+				});
 			});
-
 		})
 		.then(function(){
 			return new Promise(function(resolve, reject){
@@ -63,7 +64,6 @@ function handleCath(jsonObj1, getFeatures, validateAgainstSchema, primary_access
 					handlePromiseData_ancestor(ancestorData, ancestorDataObj).then(function(){
 						resolve();
 					});
-
 				});
 			});
 		})
@@ -72,9 +72,7 @@ function handleCath(jsonObj1, getFeatures, validateAgainstSchema, primary_access
 			return new Promise(function(resolve, reject){
 				Promise.all(thePromises.cathDomains).then(function(superFamRequests){
 
-
-
-					handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancestorDataObj, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet).then(function(resObj){
+					handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancestorDataObj, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet, variantResidues).then(function(resObj){
 						superFamFeatureSet = resObj.superFamFeatureSet;
 						convertedFeatures = resObj.convertedFeatures;
 
@@ -91,7 +89,7 @@ function handleCath(jsonObj1, getFeatures, validateAgainstSchema, primary_access
 				// functional familes (and send data for validation against schema)
 			return new Promise(function(resolve, reject){
 				Promise.all(thePromises.funFamInfo).then(function(funFamData){
-					handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet, funFamFeatureSet, convertedFeatures).then(function(){
+					handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet, funFamFeatureSet, convertedFeatures, variantResidues).then(function(){
 
 						console.log("The hcDataObj is ");
 						console.log(hcDataObj);
@@ -161,7 +159,7 @@ function url_ancestors(superfam_id){
 	return (getRequestProtocol() + "://www.cathdb.info/version/v4_2_0/api/rest/cathtree/cath_id_ancestors/" + superfam_id);
 }
 
-function handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, residues_, superFamFeatureSet, funFamFeatureSet, convertedFeatures){
+function handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, residues_, superFamFeatureSet, funFamFeatureSet, convertedFeatures, variantResidues){
 	return new Promise(function(resolve, reject){
 
 		let keyFunFam = "Functional families";
@@ -211,7 +209,7 @@ function handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, residues_, supe
 
 					hcDataObj = handleEcGoSpecies(dataArr_hc, i, aFunFamFeature['Name'], hcDataObj);
 					// find a superFam with same residue ranges.
-					let funFamFeat_res = handleResidues_funFam(residues_[i], superFamFeatureSet, aFunFamFeature['Name']);
+					let funFamFeat_res = handleResidues_funFam(residues_[i], superFamFeatureSet, aFunFamFeature['Name'], variantResidues);
 
 
 					if (Object.keys(funFamFeat_res).length > 0){
@@ -237,7 +235,7 @@ function handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, residues_, supe
 }
 
 
-function handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancestorDataObj, dataArr_hc, hcDataObj, residues_, superFamFeatureSet){
+function handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancestorDataObj, dataArr_hc, hcDataObj, residues_, superFamFeatureSet, variantResidues){
 	return new Promise(function(resolve, reject){
 
 		let keySuperFam = "Structural domains";
@@ -335,7 +333,7 @@ function handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancesto
 
 				if (Object.keys(aSuperFamFeature).length > 0){
 					hcDataObj = handleEcGoSpecies(dataArr_hc, i, aSuperFamFeature['Name'], hcDataObj);
-					let superFameFeat_res = handleResidues(residues_[i], aSuperFamFeature['Name'], aSuperFam_description);
+					let superFameFeat_res = handleResidues(residues_[i], aSuperFamFeature['Name'], aSuperFam_description, variantResidues);
 					// console.log("The converted array is");
 					// console.log(dataArr_hc);
 
@@ -457,31 +455,41 @@ function addToDict_sfToArray(ancestorDataObj, class_cath, classId_cath, architec
 }
 
 // http://www.cathdb.info/version/v4_2_0/superfamily/1.10.8.10/highcharts/ec
-function handleResidues(res, featureName, description){
+function handleResidues(res, featureName, description, variantResidues){
 
 	let features = [];
 
 	let re = new RegExp("\-");
 
 	if (!Array.isArray(res)){
-		//console.log("HERE HERE HERE HERE HERE ");
-		//console.log(res);
+		console.log("HERE HERE HERE HERE HERE ");
+		console.log(res);
 		if (re.test(res)){
 			let theResToDel = res.split(/\-/).map(Number)
 			features.push({'Name': featureName, 'Residues': theResToDel, 'Description': description});
+
+			checkIfValInSnpResAndAdd(theResToDel[0], theResToDel[1], variantResidues, 'Structural domain', featureName, 'CATH', variantResFeats);
 		}
 		else{
 			features.push({'Name': featureName, 'Residue': res, 'Description': description});
+			checkIfValInSnpResAndAdd(item, item, variantResidues, 'Structural domain', featureName, 'CATH', variantResFeats);
+
 		}
 	}
 	else {
 		res.forEach(function(item, i){
+			console.log("HERE HERE HERE HERE HERE ");
+			console.log(item);
 			if (re.test(item)){
 				let theResToDel = item.split(/\-/).map(Number)
 				features.push({'Name': featureName, 'Residues': theResToDel, 'Description': description});
+
+				checkIfValInSnpResAndAdd(theResToDel[0], theResToDel[1], variantResidues, 'Structural domain', featureName, 'CATH', variantResFeats);
 			}
 			else{
 				features.push({'Name': featureName, 'Residue': item, 'Description': description});
+
+				checkIfValInSnpResAndAdd(item, item, variantResidues, 'Structural domain', featureName, 'CATH', variantResFeats);
 			}
 		});
 	}
@@ -511,7 +519,8 @@ function addToArray_features(features, resKey, superFamArr, idx_superFam, funFam
 }
 
 
-function handleResidues_funFam(res, superFamArr, funFamName){
+function handleResidues_funFam(res, superFamArr, funFamName, variantResidues){
+	console.log("In the funfam handle residues " + funFamName);
 	let features = [];
 
 	let re = new RegExp("\-");
@@ -521,16 +530,23 @@ function handleResidues_funFam(res, superFamArr, funFamName){
 			let theResToDel = res.split(/\-/).map(Number);
 			let idx_superFam = findSuperFamWithRes(theResToDel, superFamArr);
 
+			checkIfValInSnpResAndAdd(theResToDel[0], theResToDel[1], variantResidues, 'Functional domain', funFamName, 'CATH', variantResFeats);
+
 			if (idx_superFam > -1){
 				// to add now.
 
 				features = addToArray_features(features, 'Residues', superFamArr, idx_superFam, funFamName);
+
+
 			}
 			//features.push({'Name': featureName, 'Residues': theResToDel, 'Description': description});
 		}
 		else{
 			let idx_superFam = findSuperFamWithRes(res, superFamArr);
 			//features.push({'Name': featureName, 'Residue': item, 'Description': description});
+
+			checkIfValInSnpResAndAdd(res, res, variantResidues, 'Functional domain', funFamName, 'CATH', variantResFeats);
+
 			if (idx_superFam > -1){
 				// to add now.
 
@@ -544,6 +560,8 @@ function handleResidues_funFam(res, superFamArr, funFamName){
 
 				let theResToDel = item.split(/\-/).map(Number);
 				let idx_superFam = findSuperFamWithRes(theResToDel, superFamArr);
+
+				checkIfValInSnpResAndAdd(theResToDel[0], theResToDel[1], variantResidues, 'Functional domain', funFamName, 'CATH', variantResFeats);
 				//features.push({'Name': featureName, 'Residues': theResToDel, 'Description': description});
 				if (idx_superFam > -1){
 					// to add now.
@@ -551,6 +569,8 @@ function handleResidues_funFam(res, superFamArr, funFamName){
 				}
 			}
 			else{
+
+				checkIfValInSnpResAndAdd(item, item, variantResidues, 'Functional domain', funFamName, 'CATH', variantResFeats);
 				//features.push({'Name': featureName, 'Residue': item, 'Description': description});
 				if (idx_superFam > -1){
 					// to add now.

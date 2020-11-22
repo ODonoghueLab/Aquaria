@@ -780,7 +780,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 			// console.log(response.data)
 			//console.log(getCurrentUrl());
 			//console.log(servers[3].URL_covid);
-			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
 
 
 		}
