@@ -2,7 +2,7 @@
     <div id="Menu" class="panel floating">
       <a href="#" class="close"></a>
       <div>
-        <a class="lnk" id='xr' href="#">XR Mode</a>
+        <!-- <a class="lnk" id='xr' href="#">XR Mode</a> -->
         <a class="lnk" id='print' href="#">Print</a>
       </div>
       <div>
@@ -45,10 +45,10 @@ export default {
       ev.preventDefault() // prevent default navigation
       window.AQUARIA.screenshot() // invoke screenshot feature
     })
-    document.querySelector('#xr').addEventListener('click', function (ev) {
-      ev.preventDefault() // prevent default navigation
-      document.querySelector('.xr-menu-button').click()
-    })
+    // document.querySelector('#xr').addEventListener('click', function (ev) {
+    //   ev.preventDefault() // prevent default navigation
+    //   document.querySelector('.xr-menu-button').click()
+    // })
     document.querySelector('#Sidechains').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
       toggleActive(ev) // toggle active state
