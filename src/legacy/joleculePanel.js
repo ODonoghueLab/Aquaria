@@ -101,7 +101,7 @@ buildFeatures = function(featureNames, featureDescriptions, featurePositions, fe
         Residue: j,
         Color: featureColours[i],
         Name: featureNames[i].replace(/\<[^\>\<]*\>/g, '').replace(/^.*\:/, ''),
-        Description: ""
+        Description: featureDescriptions[i]
       })
     }
   }
