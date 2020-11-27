@@ -1,13 +1,17 @@
-
 <template>
     <div id="about_overlay">
             <h3>About Aquaria <span class='x' v-on:click="hideAbout()">&nbsp;</span></h3>
-            <p id="starter"><img v-bind:src="data.logo"
+            <p id="starter">
+              <p class="intro1">Aquaria helps biologists use 3D structures to gain insight into function. For >500,000 protein sequences,
+                Aquaria has >100 million pre-calculated model structures that can be mapped with >65 million sequence features. </p>
+              <!-- <img v-bind:src="data.logo"
                    width="605"
                    height="167"
-                   alt="Aquaria"></p>
-            <p><strong>Simplifying the generation of insight from protein structures</strong></p>
-            <p><span>Se&aacute;n I. O&rsquo;Donoghue<sup>1,2,3</sup>,</span>
+                   alt="Aquaria"></p> -->
+            <p class="intro1">To learn more, watch the <a>introductory video</a> or read our <a>bioRxiv preprint</a>.</p>
+            <div id="XRcontent"><XRButton /></div>
+            <p><i>Last updated May, 2020. PDB entries released since then are not yet available in Aquaria.</i><p>
+            <p><b>Team: </b><span>Se&aacute;n I. O&rsquo;Donoghue<sup>1,2,3</sup>,</span>
             <span>Andrea Schafferhans<sup>4,5</sup>,</span>
             <span>Neblina Sikta<sup>1</sup>,</span>
             <span>Christian Stolte<sup>1</sup>,</span>
@@ -20,29 +24,29 @@
             <span>Nicola Bordin<sup>7</sup>,</span>
             <span>Burkhard Rost<sup>5</sup></span>
               <br>
-              <!-- <script src="/javascripts/email.js"></script><br> -->
-              <br><strong>Updated: <span class="lastupdate">{{data.message}}</span></strong>
-              <br>This indicates when the Aquaria database (PSSH2) was last calculated.
-              <br>PDB structures released since then are not yet available in Aquaria.
             </p>
             <p class="affiliations">
-              <span>1. Garvan Institute of Medical Research, Sydney, Australia</span>
-              <span>2. CSIRO Data61, Sydney, Australia</span>
-              <span>3. University of NSW, Australia</span>
-              <span>4. Weihenstephan-Tr. University of Applied Sciences, Freising, Germany</span>
-              <span>5. Technische Universit&auml;t M&uuml;nchen, Germany</span>
-              <span>6. The University of Dundee, UK</span>
-              <span>7. University College London, UK.</span>
+              <b>Institutions: </b> <sup>1</sup> Garvan Institute of Medical Research, Sydney, Australia.
+              <sup>2</sup> CSIRO Data61, Sydney, Australia.
+              <sup>3</sup> University of NSW, Australia.
+              <sup>4</sup> Weihenstephan-Tr. University of Applied Sciences, Freising, Germany.
+              <sup>5</sup> Technische Universit&auml;t M&uuml;nchen, Germany.
+              <sup>6</sup> The University of Dundee, UK.
+              <sup>7</sup> University College London, UK.
             </p>
-            <p>We gratefully acknowledge generous support from Amazon AWS in hosting the Aquaria database and server.<br>&nbsp;</p>
+            <p><b>Support: </b>Sony Foundation, Tour de Cure Australia, Amazon AWS..<br>&nbsp;</p>
           </div>
 </template>
 
 <script>
 import store from '@/store/index'
 import $ from 'jquery'
+import XRButton from './XRButton'
 export default {
   name: 'AboutAquaria',
+  components: {
+    XRButton
+  },
   computed: {
     data () {
       return {
@@ -88,7 +92,7 @@ export default {
     overflow: scroll;
     /* visibility: hidden; */
     font-size: 10px;
-    max-height: 90vh;
+    max-height: 92vh;
     height: fit-content;
 }
 #about_overlay h3{
@@ -102,11 +106,16 @@ export default {
     padding: 2px 3px 2px 10px;
     margin: 0px;
 }
+.intro1{
+  font-size: 14px;
+}
 #about_overlay p {
   line-height: 1.4em;
   text-align: center;
   margin: 1.8em;
   line-break: strict;
+  font-size: 80%;
+  text-align: left;
 }
 .affiliations {
   font-size: 70%;
