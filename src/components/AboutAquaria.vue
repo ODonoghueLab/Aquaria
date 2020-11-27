@@ -93,7 +93,7 @@ export default {
     overflow: scroll;
     /* visibility: hidden; */
     font-size: 10px;
-    max-height: 90vh;
+    max-height: 92vh;
     height: fit-content;
 }
 #about_overlay h3{

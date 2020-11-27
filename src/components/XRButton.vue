@@ -494,25 +494,29 @@ export default XRButtonComponent
 <template>
 <div>
       <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'></a>
-        <div id="QRCodeLaptop" v-if="$mq === 'laptop' || $mq === 'tablet'">
-          <div>
-          <!-- QR Code (Auto XR) -->
-          <canvas class="xr-qr" ref="qr" v-if="$mq === 'laptop'"></canvas>
-          <p v-if="$mq === 'laptop'">SCAN IN iOS, Android, OR HoloLens TO SEE THIS STRUCTURE IN AUGMENTED REALITY*</p>
-          <img class="xr-qr" ref="qr" v-bind:src="ar" v-if="$mq === 'tablet'">
-          <p v-if="$mq === 'tablet'">CLICK TO SEE THIS STRUCTURE USING AUGMENTED REALITY*</p>
-          </div>
+        <div id="QRCodeLaptop" v-if="$mq === 'laptop'">
+            <p>See this structure in Mixed Reality (XR)* </p>
+            <div>
+            <!-- QR Code (Auto XR) -->
+            <p v-if="$mq === 'laptop'">SCAN IN iOS, Android, OR HoloLens TO SEE THIS STRUCTURE IN AUGMENTED REALITY*</p>
+            <canvas class="xr-qr" ref="qr" v-if="$mq === 'laptop'"></canvas>
+            </div>
           <p id="footnote">*On most devices, AR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
         </div>
-
-        <div id="QRCodeMobile" v-if="$mq === 'mobile'">
-          <div>
-          <!-- QR Code (Auto XR) -->
-          <img class="xr-qr" ref="qr" v-bind:src="ar" @click="close(); downloadUsd()">
-          <p>CLICK TO SEE THIS STRUCTURE USING AUGMENTED REALITY*</p>
+        <div id="mobileView" v-if="$mq === 'mobile'|| $mq === 'tablet'">
+          <div class="QRCodeMobile">
+            <!-- QR Code (Auto XR) -->
+              <p>CLICK TO SEE THIS STRUCTURE USING AUGMENTED REALITY*</p>
+              <img class="xr-qr" ref="qr" v-bind:src="ar" @click="open()">
+            <p id="footnote">*On most devices, AR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
           </div>
 
-          <p id="footnote">*On most devices, AR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
+          <div class="QRCodeMobile">
+            <!-- QR Code (Auto XR) -->
+              <p>SCAN IN iOS, Android, OR HoloLens TO SEE THIS STRUCTURE IN AUGMENTED REALITY*</p>
+              <canvas class="xr-qr" ref="qr"></canvas>
+            <p id="footnote">*On these devices, Aquaria can show structures in XR.</p>
+          </div>
         </div>
 
         <div id='xrDev' v-if="$mq === 'laptop'">
@@ -547,11 +551,21 @@ export default XRButtonComponent
 </template>
 
 <style scoped>
- img.xr-qr{
-    width: 30%;
-    height: 31%;
-    margin-top: 8%;
- }
+  #mobileView{
+    display: inline-flex;
+  }
+  #QRCodeLaptop .xr-qr {
+    max-width: 200px;
+    max-height: 200px;
+  }
+  #QRCodeLaptop > p {
+    margin-left: 35px;
+    font-weight: 500;
+  }
+  .QRCodeMobile img.xr-qr{
+      width: 180px;
+      height: 180px;
+  }
   #QRCodeLaptop {
     background: #c2c2c2;
     padding: 2.4% 4% 1px 1.4%;
@@ -563,14 +577,14 @@ export default XRButtonComponent
     display: inline-flex;
     margin: 10px 35px 0px 35px;
   }
-  #QRCodeMobile{
+  .QRCodeMobile{
     background: #c2c2c2;
-    padding: 2.4% 4% 1px 1.4%;
+    padding: 1.4% 1.4%;
     border-radius: 20px;
-    width: fit-content;
-    margin: 0px 5%;
+    width: 50%;
+    margin: 0px 1px;
   }
-  #QRCodeMobile  > div {
+  .QRCodeMobile  > div {
     display: inline-flex;
     margin: 10px 3px 0px 3px;
   }
@@ -578,15 +592,14 @@ export default XRButtonComponent
     font-size: 10px;
     margin-left: 35px;
   }
-  #QRCodeMobile > #footnote {
+  .QRCodeMobile > #footnote {
     font-size: 10px;
   }
   #QRCodeLaptop > div > p {
-    margin: 2rem;
     line-height: 2rem;
     font-size: 1rem;
   }
-   #QRCodeMobile > div > p {
+   .QRCodeMobile > div > p {
     margin: 2em 0em 0em 1em;
     font-size: 1em;
   }
@@ -709,12 +722,6 @@ export default XRButtonComponent
     margin-left: 65px;
     margin-top: 10px;
     cursor: pointer;
-  }
-
-  .xr-qr {
-    max-width: 200px;
-    max-height: 200px;
-    margin-top: 30px;
   }
 
 </style>
