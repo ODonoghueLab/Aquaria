@@ -222,9 +222,8 @@ var updateFeatureUI = function(featureList) {
 
 
 	function waitForElement(){
-	AQUARIA.addedFeature = true;
     if(document.getElementById("waitingFrame").style.display != 'none'){
-		setTimeout(waitForElement, 250);
+		setTimeout(waitForElement, 50);
 		console.log("REPEATING")
     }
     else{
@@ -239,10 +238,12 @@ var updateFeatureUI = function(featureList) {
 			var oid = custom_feature.attr("id").split("_")[2];
 			AQUARIA.customfeatureSet = addedFeatures[0]
 			AQUARIA.customfeatureSetioid = oid
+			AQUARIA.passFeature(addedFeatures[0], oid);
 			if(document.querySelector('#outerFeatureMap')){
 				document.querySelector('#outerFeatureMap').remove()
 			}
-			AQUARIA.passFeature(addedFeatures[0], oid);
+			drawfeatureMap = featureMap.createFeatureMap(addedFeatures[0])
+			AQUARIA.addedFeature = true;
 			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 			d3.select("svg.loaded").classed("loaded", false);
 		}
