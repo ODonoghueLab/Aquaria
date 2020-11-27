@@ -390,6 +390,9 @@ const XRButtonComponent = {
     }
   },
   methods: {
+    openXR: function () {
+      document.querySelector('.xr-menu-button').click()
+    },
     open: function () {
       this.isOpen = true
 
@@ -494,30 +497,8 @@ export default XRButtonComponent
 <template>
 <div>
       <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'></a>
-        <div id="QRCodeLaptop" v-if="$mq === 'laptop'">
-            <p>See this structure in Mixed Reality (XR)* </p>
-            <div>
-            <!-- QR Code (Auto XR) -->
-            <p v-if="$mq === 'laptop'">SCAN IN iOS, Android, OR HoloLens TO SEE THIS STRUCTURE IN AUGMENTED REALITY*</p>
-            <canvas class="xr-qr" ref="qr" v-if="$mq === 'laptop'"></canvas>
-            </div>
-          <p id="footnote">*On most devices, AR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
-        </div>
-        <div id="mobileView" v-if="$mq === 'mobile'|| $mq === 'tablet'">
-          <div class="QRCodeMobile">
-            <!-- QR Code (Auto XR) -->
-              <p>CLICK TO SEE THIS STRUCTURE USING AUGMENTED REALITY*</p>
-              <img class="xr-qr" ref="qr" v-bind:src="ar" @click="open()">
-            <p id="footnote">*On most devices, AR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
-          </div>
-
-          <div class="QRCodeMobile">
-            <!-- QR Code (Auto XR) -->
-              <p>SCAN IN iOS, Android, OR HoloLens TO SEE THIS STRUCTURE IN AUGMENTED REALITY*</p>
-              <canvas class="xr-qr" ref="qr"></canvas>
-            <p id="footnote">*On these devices, Aquaria can show structures in XR.</p>
-          </div>
-        </div>
+         <!-- QR Code (Auto XR) -->
+        <canvas class="xr-qr" ref="qr"></canvas>
 
         <div id='xrDev' v-if="$mq === 'laptop'">
         <!-- Download (GLTF) -->
