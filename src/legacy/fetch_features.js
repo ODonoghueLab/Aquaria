@@ -5,6 +5,7 @@ var handlePredictProtein = require('./handlePredictProtein');
 var handleSnap2 = require('./handleSnap2');
 var handleCath = require('./handleCath');
 var handleCath_covid = require('./handleCath_covid');
+var handleMyVariantInfo = require('./handleMyVariantInfo');
 
 function getRequestProtocol(){
 	let arr = window.location.href.split(/\:+/);
@@ -28,6 +29,7 @@ var servers = [
 			"id": 'PredictProtein',
 			"Server": 'PredictProtein',
 			"URL": 'https://api.predictprotein.org/v1/results/molart/',
+			'description': 'This is the precict protein description',
 		},
 		{
 			"id": 'SNAP2',
@@ -40,6 +42,12 @@ var servers = [
 			"URL": window.location.protocol + '//www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
 			"URL_covid": `${window.BACKEND}/covid19cath/`,
 			// ?content-type=application/json
+		},
+		{
+			"id": "myVariant.info",
+			"Server": 'myVariant.info',
+			"URL_myVariant": 'https://http://myvariant.info/v1/query?q=', // p53&fetch_all=TRUE'
+			"URL_myGene": 'https://mygene.info/v3/query?species=human&q=', //P04637',
 		},
 		/* {
 			"id": 'myVariant',
@@ -790,6 +798,10 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 			handleCath_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
 		}
 
+		if (requestedFeature == 'myVariant.info'){
+			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
+		}
+
 		// return featuresFromExtServer
 	})
 	.catch(function (error) {
@@ -885,6 +897,12 @@ var processNextServer = function(primary_accession,
 
 
 
+		}
+
+		else if (servers[currentServer]['id'] == 'myVariant.info'){
+			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL_myGene'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
+			// featureCallback(aggregatedAnnotations);
+			// processNextServer(primary_accession, featureCallback);
 		}
 
 
@@ -1221,7 +1239,8 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 				<a href='https://rostlab.org/owiki/index.php/PROFphd_-_Secondary_Structure,_Solvent_Accessibility_and_Transmembrane_Helices_Prediction'> \
 				transmembrane helices </a>, trans-membrane beta barrel structures, disulphide bridges and \
 				<a href='https://rostlab.org/owiki/index.php/PredictProtein_-_Documentation#Contact_Prediction_.28PROFcon.29'>\
-				inter-residue contacts</a>."
+				inter-residue contacts</a>.";
+				console.log("The predict protein description "  + server);
 			}
 			else if (server === "SNAP2"){
 				description = "<a href='https://www.rostlab.org/services/snap/'>SNAP2</a> provides computational predictions of the \

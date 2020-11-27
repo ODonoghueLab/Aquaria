@@ -277,7 +277,7 @@ var MAX_PROTEIN_HISTORY = 5;
           //deselect feature tracks that may still be active
           d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
           d3.selectAll("svg.loaded").classed("loaded", false);
-        
+
         var attributes = AQUARIA.panel3d.generateAttributes(threeDWidth, threeDHeight,
           pdb_id, pdb_chain, currentBiounit, source_primary_accession,
           sequences, common_names, alignment, '', transform, conservations, AQUARIA.structures2match.version_string);
@@ -414,7 +414,7 @@ var MAX_PROTEIN_HISTORY = 5;
       AQUARIA.blankPanel("#aboutPDB", true);
       //AQUARIA.blankPanel("#uniProtDesc", true);
       // member["sequence"] = sequence["sequence"];
-      
+
       var loadRequest = {
         selector: [sequence.primary_accession],
         selectPDB: this.member.pdb_id,
@@ -1367,14 +1367,14 @@ var MAX_PROTEIN_HISTORY = 5;
           }
           AQUARIA.initialisePanels(true);
           AQUARIA.loadAccession(accession, pdb);
-  
+
         }
         else{
           AQUARIA.initialisePanels(true);
           AQUARIA.loadAccession(accession);
         }
       })
-    } 
+    }
     else if (pathname.match(/\/([A-Za-z]+)/)) {
       //uniprot_accession = RegExp.$1;
       // History:
