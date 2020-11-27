@@ -25,6 +25,7 @@
     "numeric": "^1.2.6",
     "qrcode": "^1.4.4",
     "seedrandom": "^3.0.5",
+    "three": "^0.120.1",
     "v-lazy-image": "^1.4.0",
     "vue": "^2.6.11",
     "vue-material": "^1.0.0-beta-11",

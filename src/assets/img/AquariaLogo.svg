@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 409 124" style="enable-background:new 0 0 409 124;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#D0D0D0;}
+	.st1{fill:#79A65B;}
+	.st2{fill:#FFFFFF;}
+	.st3{opacity:0.501;}
+	.st4{opacity:0.505;fill:#29ABE2;enable-background:new    ;}
+	.st5{fill:#F43030;}
+	.st6{opacity:0.997;fill:url(#Ellipse_49_1_);enable-background:new    ;}
+	.st7{opacity:0.997;fill:url(#Ellipse_50_1_);enable-background:new    ;}
+	.st8{opacity:0.42;fill:#29ABE2;enable-background:new    ;}
+	.st9{opacity:0.18;fill:#29ABE2;enable-background:new    ;}
+	.st10{opacity:0.7;fill:#29ABE2;enable-background:new    ;}
+	
+		.st11{opacity:0.699;fill:none;stroke:#FFFFFF;stroke-width:2.1588;stroke-linecap:round;stroke-miterlimit:10;enable-background:new    ;}
+	.st12{opacity:0.5;fill:url(#Ellipse_49_2_);enable-background:new    ;}
+	.st13{opacity:0.57;fill:url(#Ellipse_50_2_);enable-background:new    ;}
+</style>
+<g id="Layer_1">
+	<g>
+		<g>
+			<g id="Layer_1_4_" transform="translate(-1 -1.35)">
+				<g id="Path_808_4_" transform="translate(-343.917 -185.432)" class="st3">
+					<path class="st2" d="M404.2,293c-0.4,0-0.8-0.1-1.1-0.3l-38.9-22.6c-0.7-0.4-1.1-1.2-1.1-2v-45.2c0-0.8,0.4-1.6,1.1-2
+						l38.9-22.6c0.3-0.2,0.7-0.3,1.1-0.3s0.8,0.1,1.1,0.3l38.9,22.6c0.7,0.4,1.1,1.2,1.1,2v45.2c0,0.8-0.4,1.6-1.1,2l-38.9,22.6
+						C405,292.9,404.6,293,404.2,293z"/>
+					<path class="st2" d="M404.2,198.9C404.2,198.9,404.2,198.9,404.2,198.9l-39.6,23c0,0,0,0,0,0.1v46.2c0,0.1,0,0,0,0l39.4,23.3
+						c0,0,0,0,0,0c0,0,0,0,0.1,0l39.5-22.5c0,0,0-1.2,0-1.2v-45.2c0,0,0,0,0,0L404.2,198.9C404.2,198.9,404.2,198.9,404.2,198.9
+						 M404.2,195.8c0.8,0,1.5,0.2,2.2,0.6l38.9,22.6c1.4,0.8,2.2,2.3,2.2,3.8v45.2c0,1.6-0.8,3.1-2.2,3.8l-38.9,22.6
+						c-0.7,0.4-1.4,0.6-2.2,0.6s-1.5-0.2-2.2-0.6L363.1,272c-1.4-0.8-2.2-2.3-2.2-3.8v-45.2c0-1.6,0.8-3.1,2.2-3.8l38.9-22.6
+						C402.7,196.1,403.4,195.8,404.2,195.8z"/>
+				</g>
+			</g>
+			<g id="Layer_2_4_" transform="translate(1.694 2.146)">
+				<g id="Layer_2-2_4_">
+					<path id="Path_807_4_" class="st4" d="M57.6,10l-0.3,45.8L96.9,80V33.5L57.6,10z"/>
+					<circle id="Ellipse_51_4_" class="st5" cx="57.3" cy="52.4" r="20"/>
+					
+						<radialGradient id="Ellipse_49_1_" cx="36.1353" cy="60.3376" r="10.8868" fx="31.0213" fy="55.4853" gradientTransform="matrix(1 0 0 -1 1.694 123.854)" gradientUnits="userSpaceOnUse">
+						<stop  offset="0.4545" style="stop-color:#FFFFFF"/>
+						<stop  offset="0.6729" style="stop-color:#EDEDED"/>
+						<stop  offset="1" style="stop-color:#CCCCCC"/>
+					</radialGradient>
+					<path id="Ellipse_49_8_" class="st6" d="M38.5,52.3c1.5,0,5.4,2.9,7.4,6.7c1.9,3.4,2.8,9.5,2.2,10.4c-2.2,3.1-5.5,5.4-9.6,5.4
+						c-6.2,0-11.2-5-11.2-11.2S32.3,52.3,38.5,52.3z"/>
+					
+						<radialGradient id="Ellipse_50_1_" cx="75.4096" cy="60.3376" r="11.0068" fx="70.7239" fy="56.9769" gradientTransform="matrix(1 0 0 -1 1.694 123.854)" gradientUnits="userSpaceOnUse">
+						<stop  offset="0" style="stop-color:#FFFFFF"/>
+						<stop  offset="0.4696" style="stop-color:#FCFCFC"/>
+						<stop  offset="0.6816" style="stop-color:#ECECEC"/>
+						<stop  offset="1" style="stop-color:#CCCCCC"/>
+					</radialGradient>
+					<path id="Ellipse_50_8_" class="st7" d="M76.6,52.3c6.2,0,11.2,5,11.2,11.2c0,6.2-5,11.2-11.2,11.2c-4.2,0-7.9-2.4-9.8-5.8
+						c-0.6-1.1-1.1-5.4,1.6-10C70.8,54.9,75.8,52.3,76.6,52.3z"/>
+					<path id="Path_805_4_" class="st8" d="M57.4,102.6L96.9,80V33.5L57.4,55.8V102.6z"/>
+					<path id="Path_806_4_" class="st9" d="M96.9,33.6L57.6,10L18,33l39.4,22.8L96.9,33.6z"/>
+					<path id="Path_807-2_4_" class="st10" d="M18,33v46.3l39.4,23.3V55.8L18,33z"/>
+				</g>
+				<path id="Path_809_4_" class="st11" d="M18,33l39.4,22.8l39.6-22.2"/>
+				<line id="Line_74_4_" class="st11" x1="57.4" y1="56.4" x2="57.4" y2="102.6"/>
+				<circle id="Ellipse_52_4_" class="st2" cx="57.3" cy="55.7" r="2.3"/>
+			</g>
+		</g>
+		
+			<radialGradient id="Ellipse_49_2_" cx="37.8293" cy="62.4836" r="10.8868" fx="32.7153" fy="57.6313" gradientTransform="matrix(1 0 0 -1 1.694 128.146)" gradientUnits="userSpaceOnUse">
+			<stop  offset="0.4545" style="stop-color:#FFFFFF"/>
+			<stop  offset="0.6729" style="stop-color:#EDEDED"/>
+			<stop  offset="1" style="stop-color:#CCCCCC"/>
+		</radialGradient>
+		<path id="Ellipse_49_7_" class="st12" d="M40.2,54.4c1.5,0,5.4,2.9,7.4,6.7c1.9,3.4,2.8,9.5,2.2,10.4c-2.2,3.1-5.5,5.4-9.6,5.4
+			c-6.2,0-11.2-5-11.2-11.2C29,59.5,34,54.4,40.2,54.4z"/>
+		
+			<radialGradient id="Ellipse_50_2_" cx="77.1036" cy="62.4836" r="11.0068" fx="72.4179" fy="59.1229" gradientTransform="matrix(1 0 0 -1 1.694 128.146)" gradientUnits="userSpaceOnUse">
+			<stop  offset="0" style="stop-color:#FFFFFF"/>
+			<stop  offset="0.4696" style="stop-color:#FCFCFC"/>
+			<stop  offset="0.6816" style="stop-color:#ECECEC"/>
+			<stop  offset="1" style="stop-color:#CCCCCC"/>
+		</radialGradient>
+		<path id="Ellipse_50_7_" class="st13" d="M78.3,54.4c6.2,0,11.2,5,11.2,11.2c0,6.2-5,11.2-11.2,11.2c-4.2,0-7.9-2.4-9.8-5.8
+			c-0.6-1.1-1.1-5.4,1.6-10C72.5,57,77.5,54.4,78.3,54.4z"/>
+	</g>
+</g>
+<g id="Layer_2">
+</g>
+</svg>

@@ -1,5 +1,6 @@
 var Cluster = require('./shared/cluster');
 var d3 = require('d3');
+var Panels = require('../utils/matches_features_panels')
 
 var ClusterRenderer = function(cluster, rank, xScale, width, height, onTextClick, onClusterItemClick) {
 
@@ -99,6 +100,7 @@ ClusterRenderer.prototype.drawClusterContainer = function(cluster, s) {
 			.attr("height", 26).on("click", function() {
 				return d3.select(this.parentNode).call(function (d) {
 					console.log('ClusterRenderer.nusvg.select clicked! ' + d);
+					Panels.hidePanels()
 					that.onClusterItemClick(d);
 				});
 			});

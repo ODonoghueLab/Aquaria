@@ -1,7 +1,8 @@
+
 <template>
     <div id="about_overlay">
             <h3>About Aquaria <span class='x' v-on:click="hideAbout()">&nbsp;</span></h3>
-            <p id="starter"><img src="../../public/images/logo-large.png"
+            <p id="starter"><img v-bind:src="data.logo"
                    width="605"
                    height="167"
                    alt="Aquaria"></p>
@@ -20,7 +21,7 @@
             <span>Burkhard Rost<sup>5</sup></span>
               <br>
               <!-- <script src="/javascripts/email.js"></script><br> -->
-              <br><strong>Updated: <span class="lastupdate">{{data}}</span></strong>
+              <br><strong>Updated: <span class="lastupdate">{{data.message}}</span></strong>
               <br>This indicates when the Aquaria database (PSSH2) was last calculated.
               <br>PDB structures released since then are not yet available in Aquaria.
             </p>
@@ -40,12 +41,14 @@
 <script>
 import store from '@/store/index'
 import $ from 'jquery'
-
 export default {
   name: 'AboutAquaria',
   computed: {
     data () {
-      return store.state.message
+      return {
+        message: store.state.message,
+        logo: require('../assets/img/logo-large.png')
+      }
     }
   },
   methods: {
@@ -127,5 +130,4 @@ span {
           font-size: 16px;
       }
   }
-
 </style>

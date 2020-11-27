@@ -1,5 +1,5 @@
-
 var JoleculePanel = function(attachToDiv, chainSelected) {
+  
   this.blankApplet();
   this.attachToDiv = attachToDiv;
   var n = attachToDiv.length
@@ -9,7 +9,7 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
   var newDivId = divId + '-inner'
   var newAttachToDiv = '#' + newDivId
   newDiv.setAttribute('id', newDivId)
-  newDiv.setAttribute('style', 'padding-bottom: 10px; box-sizing: border-box; width: 100%; height: 100%')
+  newDiv.setAttribute('style', 'padding-bottom: 2px; box-sizing: border-box; width: 100%; height: 98.6%%')
   currentDiv.appendChild(newDiv);
   this.chainSelected = chainSelected;
   this.embededJolecule = jolecule.initEmbedJolecule({
@@ -17,7 +17,7 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
     isLoop: false,
     isGrid: true,
     isLegend: true,
-    backgroundColor: "#cccccc",
+    backgroundColor: "#CCC",
     isEditable: true,
     isResidueSelector: false,
     isExtraEditable: true,
@@ -25,7 +25,7 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
     isToolbarOnTop: true,
     isToolbarOn: true,
     isTextOverlay: false,
-    isMouseWheel: false
+    isMouseWheel: true
   });
   // apply Neblina's scripts to alter jolecule appearance
   require('./jolecule-mods');
@@ -80,6 +80,8 @@ var JoleculePanel = function(attachToDiv, chainSelected) {
 
 
 JoleculePanel.prototype.load = function(attributes) {
+  document.querySelector("#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar").style.display = 'none'
+  document.querySelector("#toggle-toolbar-button").style.display = 'none'
   this.reload(attributes);
 }
 
@@ -98,7 +100,7 @@ buildFeatures = function(featureNames, featureDescriptions, featurePositions, fe
         Residue: j,
         Color: featureColours[i],
         Name: featureNames[i].replace(/\<[^\>\<]*\>/g, '').replace(/^.*\:/, ''),
-        Description: featureDescriptions[i]
+        Description: ""
       })
     }
   }
@@ -143,14 +145,30 @@ JoleculePanel.prototype.reload = function(attributes) {
   this.joleculeAlignment.selectNewChain = () => {}
 
   let that = this
+  var DataServer = require('./data-server');
+
+  let PDB_URI = ''
+  if (attributes.biounit == 0) {
+    // 0, null or undefined
+    // url = 'https://files.rcsb.org/download/' + pdbId + '.pdb';
+    // PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb`;
+    PDB_URI = `https://pdbj.org/rest/downloadPDBfile?format=pdb&id=${attributes.pdb_id}`
+  } else {
+    // url = 'https://files.rcsb.org/download/' + pdbId + '.pdb' + biounit;
+    // PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb${attributes.biounit}`;
+    PDB_URI = `https://pdbj.org/rest/downloadPDBfile?format=bu&id=${attributes.pdb_id}.${attributes.biounit}`
+  }
+  console.log(PDB_URI)
+  const dataServer = new DataServer.DataServer(PDB_URI, attributes.pdb_id);
   this.embededJolecule.asyncAddDataServer(
-      jolecule.makeDataServer(
-        attributes.pdb_id,
-        "",
-        false,
-        false,
-        false,
-        attributes.biounit)
+    dataServer
+      // jolecule.makeDataServer(
+      //   attributes.pdb_id,
+      //   "",
+      //   false,
+      //   false,
+      //   false,
+      //   attributes.biounit)
     )
     .then(function() {
       that.setAlignment(attributes)
@@ -161,7 +179,7 @@ JoleculePanel.prototype.reload = function(attributes) {
     })
 };
 
-
+//for generating attributes use location+pdb_id
 JoleculePanel.prototype.generateAttributes = function(threeDWidth, threeDHeight, pdb_id, pdb_chain, biounit, source_primary_accession, sequences, common_names, pssh_alignment, links, transform,
   conservations) {
   var instanceId = sequences[0].primary_accession + '-' + pdb_id + '-' + pdb_chain[0];
@@ -196,7 +214,6 @@ JoleculePanel.prototype.blankApplet = function(isOn, message) {
       appletMessage.text("Please wait...");
     }
     if (!$('#waitingFrame').is(":visible")) {
-
       $('#waitingFrame').hide();
       $('#waitingFrame').fadeIn("fast");
     }

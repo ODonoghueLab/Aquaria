@@ -1,6 +1,5 @@
 <template>
   <div>
-        <XRButton />
         <div id="updateJava3D" class="aquariaWarning">
           <p><strong>Aquaria needs to update your Java3D.</strong></p>
           <form action="/downloads/AquariaSetupMac.dmg">
@@ -24,14 +23,10 @@
 </template>
 
 <script>
-import XRButton from '../components/XRButton'
 import $ from 'jquery'
 
 export default {
   name: 'StructureViewer',
-  components: {
-    XRButton
-  },
   mounted () {
     function checkPhone () {
       var iDevices = [
@@ -84,7 +79,9 @@ export default {
 
 <style scoped>
 #structureviewer{
-  height: 101vh;
+  height: 111vh;
+  /* position: absolute; */
+  /* margin-top: -90px; */
 }
 
 #updateJava3D {
@@ -129,8 +126,8 @@ export default {
     padding: 0px;
     margin: 0px;
     width: 100%;
-    height: 100vh;
-    top: -101vh;
+    height: 107vh;
+    bottom: 112vh;
 }
 
 /* div.panel span#threeD {

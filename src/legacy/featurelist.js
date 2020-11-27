@@ -5,6 +5,9 @@ var featureCount;
 var groupCount;
 var Highcharts = require('./highstocks.js');
 var d3 = require('d3');
+var featureMap = require('../utils/featureMap')
+var Panels = require('../utils/matches_features_panels');
+
 
 function createFeatureUI() {
 	width = document.getElementById("structureviewer").offsetWidth
@@ -25,6 +28,7 @@ function updateFeatureTabTitle(preferredProteinName) {
 var updateFeatureUI = function(featureList) {
 	featureSet = featureList || featureSet;
 	// console.log("featurelist.updateFeatureUI");
+
 
 	$("#featurelist div").remove(); // remove old contents
 //	$("#featureExplanation").text(" Loading...");
@@ -148,7 +152,7 @@ var updateFeatureUI = function(featureList) {
 		content.slideToggle('slow')
 
 		if(content.is(":visible")){
-		  $(this).addClass("active")
+		  $(this).addClass("actived")
 		}
 		if ($(this).children().eq(0).text() == '►') {
 			$(this).children().eq(0).text("▼")
@@ -158,12 +162,12 @@ var updateFeatureUI = function(featureList) {
 			$(this).children("button").css({"visibility": "hidden"})
 		}
 
-		var notThis = $('div[class*="active"]').not(this)
+		var notThis = $('div[class*="actived"]').not(this)
 
 		notThis.children().eq(0).text("►")
 		notThis.parent().children().eq(2).slideUp("slow");
 		notThis.children("button").css({"visibility": "hidden"})
-		notThis.removeClass("active")
+		notThis.removeClass("actived")
 
 		});
 	var timer;
@@ -217,80 +221,43 @@ var updateFeatureUI = function(featureList) {
 	  childList: true
 	  });
 
-	// d3.selectAll("#share").on("click", function() {
-	// 	var dummy = document.createElement('input'),
-	//   text = window.location.href;
-	//   document.body.appendChild(dummy);
-	//   dummy.value = text;
-	//   dummy.select();
-	//   document.execCommand('copy');
-	//   document.body.removeChild(dummy);
-	// })
 
-  //On external features scripts show features
-// 	if($("svg#s_0_0").parent().parent().parent().attr("id") === "Added Features"){
-//       	var custom_feature = $("svg#s_0_0")
-// 		var oid = custom_feature.attr("id").split("_")[2];
-// 		passFeature(clusters[0], oid);
-// 		d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-// 		d3.select("svg.loaded").classed("loaded", false);
-// 		custom_feature.attr("class", "loaded");
-//   }
 
-	var document_observer = new MutationObserver( function (mutations) {
-		// `mutations` is an array of mutations that occurred
-		// `me` is the MutationObserver instance
-		if($(location).attr('href').includes("json")){
-		  mutations.forEach(function(mutation) {
-			if (mutation.attributeName !== 'style') {
-			  return none;
+	function waitForElement(){
+    if(document.getElementById("waitingFrame").style.display != 'none'){
+		setTimeout(waitForElement, 50);
+		console.log("REPEATING")
+    }
+    else{
+		clusters.forEach(function(c){
+			if(c.Server == "Added Features"){
+				addedFeatures.push(c)
 			}
-			else{
-			  var currentValue = mutation.target.style.display;
-			  if (currentValue == "none") {
-				pdb_chain_observer.observe(document.getElementById("waitingFrame"), {
-				  attributes:    true,
-				  attributeFilter: ["style"]
-				})
-			  }
-			}
-			})
-		  }
 		})
-
-	  var pdb_chain_observer = new MutationObserver(function (m, me) {
-		m.forEach( function(mut) {
-		  if (mut.attributeName !== 'style') return;
-		  var currentValue = mut.target.style.display;
-		  if (currentValue == "none") {
-			clusters.forEach(function(c){
-				if(c.Server == "Added Features"){
-					addedFeatures.push(c)
-				}
-			})
-			var custom_feature = $('[id="Added Features"]').children().eq(2).children().eq(0).find("svg")
-			if(custom_feature.length > 0){
-				custom_feature.attr("class", "loaded");
-				var oid = custom_feature.attr("id").split("_")[2];
-				// AQUARIA.panel3d.blankApplet(true, "Loading feature...")
-				// AQUARIA.panel3d.blankApplet(false)
-				passFeature(addedFeatures[0], oid);
-				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-				d3.select("svg.loaded").classed("loaded", false);
-
-				me.disconnect();     // stop observing
+		var custom_feature = $('[id="Added Features"]').children().eq(2).children().eq(0).find("svg")
+		if(custom_feature.length > 0){
+			custom_feature.attr("class", "loaded");
+			var oid = custom_feature.attr("id").split("_")[2];
+			AQUARIA.customfeatureSet = addedFeatures[0]
+			AQUARIA.customfeatureSetioid = oid
+			AQUARIA.passFeature(addedFeatures[0], oid);
+			if(document.querySelector('#outerFeatureMap')){
+				document.querySelector('#outerFeatureMap').remove()
 			}
-		  }
-		})
-	  })
+			drawfeatureMap = featureMap.createFeatureMap(addedFeatures[0])
+			AQUARIA.addedFeature = true;
+			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+			d3.select("svg.loaded").classed("loaded", false);
+		}
+    }
+	}
 
-
-  //   start observing structure change
-	document_observer.observe(document.getElementById("loading-message"), {
-	  attributes:    true,
-	  attributeFilter: ["style"],
-	  characterDataOldValue: true
-	});
+	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
+	var searchParam = window.location.search.split('?')[1]
+	// searchParam = window.location.search.split('=')[0]
+	if((AQUARIA.getUrlParameter("features")|| featureRegex.test(searchParam)) && !AQUARIA.addedFeature){
+		waitForElement()
+	}
 };
 
 
@@ -307,73 +274,82 @@ function drawTrack(datum, i) {
 		//console.log(AQUARIA.srw);
 	}
 	for ( var o in features) {
+		var outerdiv = d3.select(this)
+		var nusvg = featureMap.createSVGforFeature(outerdiv, width + AQUARIA.margin.left, 25, width + AQUARIA.margin.left)
+		nusvg
+		.attr("id", "s_" + groupCount + "_" + o)
+		.attr("title", "Click to load feature into 3D view; hover over features to see detailed info.")
 
-
-		d3
-				.select(this)
-				.append("svg")
-				.attr("width", width + AQUARIA.margin.left)
-				.attr("height", 25)
-				.attr("viewBox", "0 0 " + (width + AQUARIA.margin.left) + " 25")
-				.attr("preserveAspectRatio", "none")
-				.attr("id", "s_" + groupCount + "_" + o)
-				.attr("title",
-						"Click to load feature into 3D view; hover over features to see detailed info.")
-
-				.on("click", function() {
-					if(d3.select(this).attr("class") == "loaded") { // deselect feature (it's already displayed)
-						d3.select("svg.loaded").classed("loaded", false);
-						AQUARIA.panel3d.blankApplet(true, "Removing feature...")
-						AQUARIA.panel3d.blankApplet(false)
-
-            // Stu hack to detect feature changes
-						if (typeof AQUARIA.onFeatureChange === 'function') {
-							AQUARIA.onFeatureChange(null, 0);
-						  }
-
-						removeCurrentAnnotationFrom3DViewer();
+		.on("click", function() {
+			if(d3.select(this).attr("class") == "loaded") {// deselect feature (it's already displayed)
+				document.querySelector(".featureHeader.actived").click()
+				d3.select("svg.loaded").classed("loaded", false);
+				AQUARIA.panel3d.blankApplet(true, "Removing feature...")
+				AQUARIA.panel3d.blankApplet(false)
+				// Stu hack to detect feature changes
+				if (typeof AQUARIA.onFeatureChange === 'function') {
+					AQUARIA.onFeatureChange(null, 0);
 					}
-					else { //console.log("clicked to display feature");
-						var oid = d3.select(this).attr("id").split("_")[2];
-						AQUARIA.panel3d.blankApplet(true, "Loading feature...")
-						AQUARIA.panel3d.blankApplet(false)
-						passFeature(datum, oid, this);
-						//console.log("Datum");
-						//console.log(datum);
-						// console.log(oid);
-						d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-						d3.select("svg.loaded").classed("loaded", false);
-						d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
-						}
-					})
-				.on("mouseover", function() {
-							d3.select(this).selectAll("rect.feature").attr(
-									"fill", function() {
-										return d3.select(this).attr("color");
-									});
-						})
-				.on("mouseout", function() {
-							if(d3.select(this).attr("class") != "loaded"){
-								d3.select(this).selectAll("rect.feature")
-								.attr("fill", "#a4abdf");
-							}
-						})
-					// add background for highlighting
-				.append("rect")
-					.attr("width", width + AQUARIA.margin.left)
-					.attr("height", 25)
-					.attr("class", "bg")
-					.attr("fill", "none");
+				removeCurrentAnnotationFrom3DViewer();
+				document.querySelector('#outerFeatureMap').remove()
+				AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
+				// document.querySelector('#selectedCluster > .outer_container').remove()
+				Panels.hidePanels()
+			}
+			else { //console.log("clicked to display feature");
+				document.querySelector(".featureHeader.actived").click()
+				if(document.querySelector('#outerFeatureMap')) {
+					document.querySelector('#outerFeatureMap').remove()
+				}
+				var oid = d3.select(this).attr("id").split("_")[2];
+				AQUARIA.panel3d.blankApplet(true, "Loading feature...")
+				AQUARIA.panel3d.blankApplet(false)
+				if(datum.Server != "Added Features"){
+					AQUARIA.addedFeature = false
+				}
+				AQUARIA.passFeature(datum, oid, this);
+				// Stu hack to detect feature changes
+				if (typeof AQUARIA.onFeatureChange === 'function') {
+					AQUARIA.onFeatureChange(datum, oid);
+				}
+				//console.log("Datum");
+				//console.log(datum);
+				// console.log(oid);
+				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+				d3.select("svg.loaded").classed("loaded", false);
+				d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
+				drawfeatureMap = featureMap.createFeatureMap(datum)
+				Panels.hidePanels()
+				}
+			})
+		.on("mouseover", function() {
+					d3.select(this).selectAll("rect.feature").attr(
+							"fill", function() {
+								return d3.select(this).attr("color");
+							});
+				})
+		.on("mouseout", function() {
+					if(d3.select(this).attr("class") != "loaded"){
+						d3.select(this).selectAll("rect.feature")
+						.attr("fill", "#a4abdf");
+					}
+				})
+			// add background for highlighting
+		.append("rect")
+			.attr("width", width + AQUARIA.margin.left)
+			.attr("height", 25)
+			.attr("class", "bg")
+			.attr("fill", "none");
 
-			d3.select("svg#s_" + groupCount + "_" + o)
-				.append("g")
-					.attr("transform", "translate(" + AQUARIA.margin.left + ",0)")
-					// add center line
-				.append("rect")
-					.attr("width", width)
-					.attr("height", 1)
-					.attr("transform", "translate(0,13)")
-					.attr("class", "insertion");
+	d3.select("svg#s_" + groupCount + "_" + o)
+		.append("g")
+			.attr("transform", "translate(" + AQUARIA.margin.left + ",0)")
+			// add center line
+		.append("rect")
+			.attr("width", width)
+			.attr("height", 1)
+			.attr("transform", "translate(0,13)")
+			.attr("class", "insertion");
 					// add features
 		for ( var p in features[o]) {
 			// console.log("p is ");
@@ -410,25 +386,20 @@ function drawTrack(datum, i) {
 	groupCount++;
 }
 
+AQUARIA.passFeature = function(trk, nr, elmt) {
+	if (typeof AQUARIA.onFeatureChange === 'function') {
+		AQUARIA.onFeatureChange(trk, nr);
+	}
+	//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
+	sentAnnotationTo3DViewer(trk, parseInt(nr));
+}
+
 function createMouseOverCallback(feature) {
 	return function() {
 		// console.log(">>>>>>>>>> over here ....???");
 		var ID = d3.select(this).attr("id");
 		d3.select(this).call(mouseoverFeature, feature, ID);
 	};
-}
-
-function passFeature(trk, nr, elmt) {
-
-		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
-
-		// Stu hack to detect feature changes
-		if (typeof AQUARIA.onFeatureChange === 'function') {
-			AQUARIA.onFeatureChange(trk, nr);
-		}
-
-		sentAnnotationTo3DViewer(trk, parseInt(nr));
-
 }
 
 var t, s;
@@ -597,6 +568,7 @@ function showAnnotation(f, eid) {
 		.append("div")
 			.attr("class", "popup")
 			.html(balloon);
+
 			// .append(theSuperFam);
 
 	// document.getElementById('balloon').append(theSuperFam);
@@ -765,20 +737,20 @@ function updateTheStyleOfHc(){
 
 // DAS annotation handling
 
-var currentAnnotationsIn3DViewer = new Array();
+AQUARIA.currentAnnotationsIn3DViewer = new Array();
 
 /**
  * removes the current annotation track from the 3D viewer
  */
 function removeCurrentAnnotationFrom3DViewer() {
 	// remove existing Annotation
-
+	let currentAnnotationsIn3DViewer = AQUARIA.currentAnnotationsIn3DViewer
 	if (currentAnnotationsIn3DViewer !== undefined) {
 		for ( var i in currentAnnotationsIn3DViewer) {
 
 			// API call
 			AQUARIA.panel3d.removeAnnotation(currentAnnotationsIn3DViewer[i].id,
-					currentAnnotationsIn3DViewer[i].annotationName);
+				currentAnnotationsIn3DViewer[i].annotationName);
 		}
 		currentAnnotationsIn3DViewer.length = 0;
 	}
@@ -872,7 +844,7 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 		"annotationName" : annotations.Category
 	};
 
-	currentAnnotationsIn3DViewer.push(annotationToAdd);
+	AQUARIA.currentAnnotationsIn3DViewer.push(annotationToAdd);
 	// API call
 	AQUARIA.panel3d.addAnnotation(annotationToAdd.id[0],
 					annotationToAdd.annotationName, featureColours,
@@ -880,6 +852,7 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 					featureURLs, featureURLtexts);
 	}
 }
+
 
 module.exports.updateFeatureUI = updateFeatureUI;
 module.exports.updateFeatureTabTitle = updateFeatureTabTitle;

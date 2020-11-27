@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 import { screenshot } from './utils/Screenshot'
 import store from './store/index'
 
@@ -37,51 +37,74 @@ export default {
       hostname: store.state.url
     }
   },
-  beforeMount () {
+  beforeCreate () {
     // var regex = /(^\d+\/*$)/
     if (window.location.pathname === '/') {
       if (sessionStorage.getItem('link') == null) {
-        window.location.pathname = '/O15350/2xwc/A'
+        window.location.pathname = '/P04637/3kmd'
       } else {
         window.location.pathname = sessionStorage.getItem('link')
       }
     }
-    var url = ''
-    // var hostname = window.location.protocol + '//' + window.location.hostname
-    if (window.location.pathname.split('/')[1] === 'covid19') {
-      url = `${process.env.VUE_APP_AQUARIA_BACKEND}/SARS-CoV-2`
-    } else {
-      url = `${process.env.VUE_APP_AQUARIA_BACKEND}${window.location.pathname}`
-    }
-    axios({
-      method: 'get',
-      url: url
-    })
-      .then(function (response) {
-        if (response.data.initialParams) {
-          window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
-        }
-        if (response.data.primary_accessions) {
-          window.localStorage.setItem('OrgID', response.data.OrganismID)
-          if (response.data.OrganismID === '2697049') {
-            window.location.pathname = 'SARS-CoV-2'
-          } else {
-            window.location.pathname = '/orgID/' + response.data.OrganismID
-          }
-          this.primary_accession = response
-        }
-      }
-      )
   },
-  mounted () {
-    // if (window.location.pathname) {
-    document.querySelector('.matrixLoading').style.visibility = 'visible'
-    var span = document.getElementById('myspan')
+  // beforeMount () {
+  //   // var regex = /(^\d+\/*$)/
+  //   if (window.location.pathname === '/') {
+  //     if (sessionStorage.getItem('link') == null) {
+  //       window.location.pathname = '/O15350/2xwc/A'
+  //     } else {
+  //       window.location.pathname = sessionStorage.getItem('link')
+  //     }
+  //   }
+  //   var url = ''
+  //   // var hostname = window.location.protocol + '//' + window.location.hostname
+  //   if (window.location.pathname.split('/')[1] === 'covid19') {
+  //     url = `${process.env.VUE_APP_AQUARIA_BACKEND}/SARS-CoV-2`
+  //   } else {
+  //     url = `${process.env.VUE_APP_AQUARIA_BACKEND}${window.location.pathname}`
+  //   }
+  //   axios({
+  //     method: 'get',
+  //     url: url
+  //   })
+  //     .then(function (response) {
+  //       if (response.data.initialParams) {
+  //         window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
+  //       }
+  //       if (response.data.primary_accessions) {
+  //         window.localStorage.setItem('OrgID', response.data.OrganismID)
+  //         if (response.data.OrganismID === '2697049') {
+  //           window.location.pathname = 'SARS-CoV-2'
+  //         } else {
+  //           window.location.pathname = '/orgID/' + response.data.OrganismID
+  //         }
+  //         this.primary_accession = response
+  //       }
+  //     }
+  //     )
+  // },
+  // mounted () {
+  //   setTimeout(function () {
+  //     const pdf = window.BACKEND + '/COVID-Structural-Coverage-Map.pdf'
+  //     const js1 = window.BACKEND + '/javascripts/aquaria.js'
+  //     const js2 = window.BACKEND + '/javascripts/jolecule.js'
+  //     axios({
+  //       method: 'get',
+  //       url: pdf
+  //     })
+  //     axios({
+  //       method: 'get',
+  //       url: js1
+  //     })
 
-    setInterval(function () {
-      if ((span.innerHTML += '.').length === 5) { span.innerHTML = '' }
-    }, 500)
-    // }
+  //     axios({
+  //       method: 'get',
+  //       url: js2
+  //     })
+  //   }, 15000)
+  // },
+  updated () {
+    sessionStorage.setItem('link', window.location.pathname)
   }
 }
 </script>
@@ -99,7 +122,6 @@ export default {
 }
 
 #wrapper{
-  position: absolute;
   width: 100vw;
 }
 
@@ -153,9 +175,9 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  /* text-align: center; */
   color: #2c3e50;
-  background-color: #c0c0c0;
+  background-color: #cccccc;
   overflow: auto;
   height: 100vh;
 }
@@ -179,5 +201,28 @@ html{
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+div.dimmer {
+    background: #5E5E5E;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    opacity: 0.68;
+    -moz-opacity: 0.68;
+    width: 100%;
+    z-index: 0;
+}
+div.dimmer2 {
+    background: #5E5E5E;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    opacity: 0.68;
+    -moz-opacity: 0.68;
+    width: 100%;
+    z-index: 2;
 }
 </style>
