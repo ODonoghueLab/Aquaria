@@ -32,7 +32,7 @@ export default {
     // dim background
       if (document.getElementsByClassName('dimmer').length === 0) {
         $('body').append('<div class="dimmer"></div>')
-        // document.querySelector('.xr-menu-button').click()
+        document.querySelector('#xr-button').click()
         $('div.dimmer').on('click', function () {
           $('div#about_overlay, div#help_overlay').hide()
           $('div.dimmer').remove()

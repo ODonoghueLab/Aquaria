@@ -54,7 +54,6 @@ const XRButtonComponent = {
     }
   },
   mounted: function () {
-    this.open()
     this.hevsViewUpdateDebounced = debounce(() => this.hevsViewUpdate(), HEVS_UPDATE_INTERVAL, { leading: true, maxWait: HEVS_UPDATE_INTERVAL })
     // shim the chainSelected function to detect changes
     let chainSelectionOriginal
@@ -444,7 +443,8 @@ export default XRButtonComponent
 
 <template>
 <div>
-      <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'></a>
+      <!-- <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'></a> -->
+      <div @click="open()" id='xr-button'>
         <div id="QRCodeLaptop" v-if="$mq === 'laptop'">
             <p>See this structure in Mixed Reality (XR)* </p>
             <div>
@@ -458,7 +458,8 @@ export default XRButtonComponent
           <div class="QRCodeMobile">
             <!-- QR Code (Auto XR) -->
               <p>CLICK TO SEE THIS STRUCTURE USING AUGMENTED REALITY*</p>
-              <img class="xr-qr" ref="qr" v-bind:src="ar" @click="open()">
+              <!-- <img class="xr-qr" ref="qr" v-bind:src="ar" @click="open()"> -->
+              <img v-if="dataReceived" @click="open()" class="xr-qr" v-bind:src="ar">
             <p id="footnote">*On most devices, AR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
           </div>
 
@@ -497,7 +498,7 @@ export default XRButtonComponent
         <button v-if="advancedViewerEnabled" class="xr-item default-button" @click="close(); openInAdvancedViewer()">Open in Advanced Viewer</button>
 
         </div>
-
+      </div>
 </div>
 </template>
 
