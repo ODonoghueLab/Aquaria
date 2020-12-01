@@ -66,7 +66,7 @@ export function drawClusterContainer (cluster, s, element) {
   this.nusvg = outerdiv.append('div').attr('id', 'c_' + id).attr('class',
     'coveragemap').append('svg').attr('width', '100vw').attr('height',
     this.height + 30)
-    .attr('viewBox', '0 0 ' + (this.width) + ' ' + (this.height + 30)).attr(
+    .attr('viewBox', '0 0 ' + (this.width + 20) + ' ' + (this.height + 30)).attr(
       'preserveAspectRatio', 'none')
 
   // add center line

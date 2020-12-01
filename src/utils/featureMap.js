@@ -12,11 +12,13 @@ export function createFeatureMap (datum) {
     part.style.stroke = '#a5a5a5'
   })
   //   window.AQUARIA.showMatchingStructures.drawCoverageMap(window.AQUARIA.showMatchingStructures.selectedCluster)
+  // this.width = document.getElementById('structureviewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left
+  // this.height = 40 - window.AQUARIA.margin.top - window.AQUARIA.margin.bottom + 35 // height
   this.width = document.getElementById('structureviewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left
   this.height = 40 - window.AQUARIA.margin.top - window.AQUARIA.margin.bottom + 35 // height
   this.datum = datum
   var outerdiv = d3.select('#selectedFeature').append('div').attr('id', 'outerFeatureMap')
-  this.drawTrack(this.datum, this.createSVGforFeature(outerdiv, '100vw', this.height + 30), this.width)
+  this.drawTrack(this.datum, this.createSVGforFeature(outerdiv, '100vw', this.height + 30, this.width + 20))
   d3.select('#outerFeatureMap > svg').attr('class', 'loadedFeature')
 }
 
