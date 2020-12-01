@@ -3,6 +3,7 @@ import * as XR from '../utils/XRUtils'
 import QRCode from 'qrcode'
 import debounce from 'lodash.debounce'
 import * as THREE from 'three'
+import * as common from '../utils/common'
 // const CHAIN_JOIN_CHAR = '~'
 const RES_SEPERATE_CHAR = ','
 const DECIMAL_PRECISION = 2
@@ -359,7 +360,11 @@ const XRButtonComponent = {
       // reconstruct URL for QR code
       const url = `${location.protocol}//${location.host}${location.pathname}${searchString}${location.hash}`
       console.info(`Auto-XR (QR) URI: ${url}`)
-      this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url)) // need to wait for canvas to render (its behind a v-if)
+      if (common.checkPhone()) {
+        this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url, { width: 130 }))
+      } else {
+        this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url)) // need to wait for canvas to render (its behind a v-if)
+      }
     },
     close: function () {
       this.isOpen = false
@@ -472,7 +477,7 @@ export default XRButtonComponent
           <div class="QRCodeMobile">
             <!-- QR Code (Auto XR) -->
               <p>SCAN IN iOS, Android, OR HoloLens TO SEE THIS STRUCTURE IN AUGMENTED REALITY*</p>
-              <canvas class="xr-qr" ref="qr"></canvas>
+              <canvas class="xr-qr" ref="qr" height="180" width="180"></canvas>
             <p id="footnote">*On these devices, Aquaria can show structures in XR.</p>
           </div>
         </div>
@@ -522,7 +527,6 @@ export default XRButtonComponent
   }
   .QRCodeMobile img.xr-qr{
       width: 180px;
-      height: 180px;
   }
   #QRCodeLaptop {
     background: #c2c2c2;
