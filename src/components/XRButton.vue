@@ -444,7 +444,7 @@ export default XRButtonComponent
 <template>
 <div>
       <!-- <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'></a> -->
-      <div @click="open()" id='xr-button'>
+      <div @click="open()" v-if="dataReceived" id='xr-button'>
         <div id="QRCodeLaptop" v-if="$mq === 'laptop'">
             <p>See this structure in Mixed Reality (XR)* </p>
             <div>
@@ -458,8 +458,14 @@ export default XRButtonComponent
           <div class="QRCodeMobile">
             <!-- QR Code (Auto XR) -->
               <p>CLICK TO SEE THIS STRUCTURE USING AUGMENTED REALITY*</p>
-              <!-- <img class="xr-qr" ref="qr" v-bind:src="ar" @click="open()"> -->
-              <img v-if="dataReceived" @click="open()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && !hevsPlatform && !psvrEnabled && !advancedViewerEnabled && !windowsMr && !quickLook && !sceneViewer" @click="close(); downloadUsd()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && sceneViewer" @click="close(); openInSceneViewer()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && quickLook" @click="close(); openInQuickLook()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && windowsMr && polycount <= 10000" @click="close(); openInWindowsMR()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && psvrEnabled" @click="close(); psvrExport()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && hevsPlatform" @click="close(); hevsExport()" class="xr-qr" v-bind:src="ar">
+              <button v-if="hevsPlatform && hevsAsset" :disabled="!!hevsAsset" class="xr-item default-button" @click="close(); hevsExport()">{{hevsAsset ? 'Connected to HEVS' : ''}}</button>
+              <img v-if="dataReceived && advancedViewerEnabled" @click="close(); openInAdvancedViewer()" class="xr-qr" v-bind:src="ar">
             <p id="footnote">*On most devices, AR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
           </div>
 
