@@ -77,7 +77,7 @@ export default {
 
         if (accession && pdbId && score) {
           _this.organism_name = window.AQUARIA.organismName
-          _this.primary_accession = window.AQUARIA.preferred_protein_name
+          _this.primary_accession = window.AQUARIA.Gene
           _this.text = 'aligned onto'
           _this.pdb = pdbId + '-' + chainId
 

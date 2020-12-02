@@ -442,6 +442,7 @@ if (data.synonyms == "none") {
 			gnames = "<b>Gene:</b>&nbsp;";
 		}
 		gnames += "<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession+"' title='Go to UniProt'>" + gns[0] + "</a>";
+		AQUARIA.Gene = gns[0]
 		for (var i = 1; i < gns.length; i++) {
 			gnames += ", " + gns[i];
 		}
