@@ -573,6 +573,7 @@ export default XRButtonComponent
     font-variant: small-caps;
     font-family: Helvetica;
     color: #707070;
+    font-weight: 600;
   }
   #XRbutton{
     display: grid;
