@@ -454,15 +454,15 @@ export default XRButtonComponent
             <p>See this structure in Mixed Reality (XR)* </p>
             <div>
             <!-- QR Code (Auto XR) -->
-            <p v-if="$mq === 'laptop'">SCAN IN iOS, Android, OR HoloLens TO SEE THIS STRUCTURE IN AUGMENTED REALITY*</p>
+            <p v-if="$mq === 'laptop'">Scan to open on iOS, Android, HoloLens, or Windows Mixed Reality devices.*</p>
             <canvas class="xr-qr" ref="qr" v-if="$mq === 'laptop'"></canvas>
             </div>
-          <p id="footnote">*On most devices, AR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
+          <p id="footnote">*On most devices, XR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
         </div>
         <div id="mobileView" v-if="$mq === 'mobile'|| $mq === 'tablet'">
           <div class="QRCodeMobile">
             <!-- QR Code (Auto XR) -->
-              <p>CLICK TO SEE THIS STRUCTURE USING AUGMENTED REALITY*</p>
+              <p>Tap to see structure in Mixed Reality (XR)*</p>
               <img v-if="dataReceived && !hevsPlatform && !psvrEnabled && !advancedViewerEnabled && !windowsMr && !quickLook && !sceneViewer" @click="close(); downloadUsd()" class="xr-qr" v-bind:src="ar">
               <img v-if="dataReceived && sceneViewer" @click="close(); openInSceneViewer()" class="xr-qr" v-bind:src="ar">
               <img v-if="dataReceived && quickLook" @click="close(); openInQuickLook()" class="xr-qr" v-bind:src="ar">
@@ -471,12 +471,12 @@ export default XRButtonComponent
               <img v-if="dataReceived && hevsPlatform" @click="close(); hevsExport()" class="xr-qr" v-bind:src="ar">
               <button v-if="hevsPlatform && hevsAsset" :disabled="!!hevsAsset" class="xr-item default-button" @click="close(); hevsExport()">{{hevsAsset ? 'Connected to HEVS' : ''}}</button>
               <img v-if="dataReceived && advancedViewerEnabled" @click="close(); openInAdvancedViewer()" class="xr-qr" v-bind:src="ar">
-            <p id="footnote">*On most devices, AR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
+            <p id="footnote">*On most devices XR is currently limited to ≲ 1,000 amino acids.</p>
           </div>
 
           <div class="QRCodeMobile">
             <!-- QR Code (Auto XR) -->
-              <p>SCAN IN iOS, Android, OR HoloLens TO SEE THIS STRUCTURE IN AUGMENTED REALITY*</p>
+              <p>Scan to open on iOS, Android, HoloLens, or Windows Mixed Reality devices.*</p>
               <canvas class="xr-qr" ref="qr" height="180" width="180"></canvas>
             <p id="footnote">*On these devices, Aquaria can show structures in XR.</p>
           </div>
@@ -553,17 +553,26 @@ export default XRButtonComponent
   #QRCodeLaptop > #footnote {
     font-size: 10px;
     margin-left: 35px;
+    color: #707070;
   }
   .QRCodeMobile > #footnote {
     font-size: 10px;
+    color: #707070;
   }
-  #QRCodeLaptop > div > p {
+  #QRCodeLaptop > p:nth-child(1), #QRCodeLaptop > div > p:nth-child(1){
+    font-variant: small-caps;
     line-height: 2rem;
-    font-size: 1rem;
+    font-size: 1.2rem;
+    font-family: Helvetica;
+    font-weight: 600;
+    color: #707070;
   }
-   .QRCodeMobile > div > p {
-    margin: 2em 0em 0em 1em;
+   .QRCodeMobile > p:nth-child(1) {
+    margin: 0.2em 0em 0em 1em;
     font-size: 1em;
+    font-variant: small-caps;
+    font-family: Helvetica;
+    color: #707070;
   }
   #XRbutton{
     display: grid;
