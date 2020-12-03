@@ -3,6 +3,7 @@ import * as XR from '../utils/XRUtils'
 import QRCode from 'qrcode'
 import debounce from 'lodash.debounce'
 import * as THREE from 'three'
+import * as common from '../utils/common'
 // const CHAIN_JOIN_CHAR = '~'
 const RES_SEPERATE_CHAR = ','
 const DECIMAL_PRECISION = 2
@@ -49,7 +50,8 @@ const XRButtonComponent = {
       hevsAsset: null,
       hevsUploadedCollections: [],
       psvrEnabled: !!search.get('PSVR'),
-      advancedViewerEnabled: !!search.get('dev')
+      advancedViewerEnabled: !!search.get('dev'),
+      ar: require('../assets/img/ar-button.png')
     }
   },
   mounted: function () {
@@ -358,7 +360,11 @@ const XRButtonComponent = {
       // reconstruct URL for QR code
       const url = `${location.protocol}//${location.host}${location.pathname}${searchString}${location.hash}`
       console.info(`Auto-XR (QR) URI: ${url}`)
-      this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url)) // need to wait for canvas to render (its behind a v-if)
+      if (common.checkPhone()) {
+        this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url, { width: 130 }))
+      } else {
+        this.$nextTick(() => QRCode.toCanvas(this.$refs.qr, url)) // need to wait for canvas to render (its behind a v-if)
+      }
     },
     close: function () {
       this.isOpen = false
@@ -442,22 +448,46 @@ export default XRButtonComponent
 
 <template>
 <div>
-  <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'>XR Mode</a>
-  <!-- <img v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" src="/images/ar-button.png"> -->
-  <div class="column xr-modal" v-if="isOpen">
-    <div class="column inner-modal">
-      <div class="row modal-header">
-        <div></div>
-        <h2>XR Options</h2>
-        <button @click="close()">×</button>
-      </div>
-      <div class="column modal-content">
+      <!-- <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'></a> -->
+      <div @click="open()" v-if="dataReceived" id='xr-button'>
+        <div id="QRCodeLaptop" v-if="$mq === 'laptop'">
+            <p>See this structure in Mixed Reality (XR)* </p>
+            <div>
+            <!-- QR Code (Auto XR) -->
+            <p v-if="$mq === 'laptop'">Scan to open on iOS, Android, HoloLens, or Windows Mixed Reality devices.*</p>
+            <canvas class="xr-qr" ref="qr" v-if="$mq === 'laptop'"></canvas>
+            </div>
+          <p id="footnote">*On most devices, XR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
+        </div>
+        <div id="mobileView" v-if="$mq === 'mobile'|| $mq === 'tablet'">
+          <div class="QRCodeMobile">
+            <!-- QR Code (Auto XR) -->
+              <p>Tap to see structure in Mixed Reality (XR)*</p>
+              <img v-if="dataReceived && !hevsPlatform && !psvrEnabled && !advancedViewerEnabled && !windowsMr && !quickLook && !sceneViewer" @click="close(); downloadUsd()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && sceneViewer" @click="close(); openInSceneViewer()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && quickLook" @click="close(); openInQuickLook()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && windowsMr && polycount <= 10000" @click="close(); openInWindowsMR()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && psvrEnabled" @click="close(); psvrExport()" class="xr-qr" v-bind:src="ar">
+              <img v-if="dataReceived && hevsPlatform" @click="close(); hevsExport()" class="xr-qr" v-bind:src="ar">
+              <button v-if="hevsPlatform && hevsAsset" :disabled="!!hevsAsset" class="xr-item default-button" @click="close(); hevsExport()">{{hevsAsset ? 'Connected to HEVS' : ''}}</button>
+              <img v-if="dataReceived && advancedViewerEnabled" @click="close(); openInAdvancedViewer()" class="xr-qr" v-bind:src="ar">
+            <p id="footnote">*On most devices XR is currently limited to ≲ 1,000 amino acids.</p>
+          </div>
 
+          <div class="QRCodeMobile">
+            <!-- QR Code (Auto XR) -->
+              <p>Scan to open on iOS, Android, HoloLens, or Windows Mixed Reality devices.*</p>
+              <canvas class="xr-qr" ref="qr" height="180" width="180"></canvas>
+            <p id="footnote">*On these devices, Aquaria can show structures in XR.</p>
+          </div>
+        </div>
+
+        <div id='xrDev' v-if="$mq === 'laptop'">
         <!-- Download (GLTF) -->
-        <button class="xr-item default-button" @click="close(); downloadGltf()">Download GLTF (.glb)</button>
+        <button class="xr-item default-button" @click="close(); downloadGltf()">Download GLB</button>
 
         <!-- Download (USD) -->
-        <button class="xr-item default-button" @click="close(); downloadUsd()">Download USD (.usdz)</button>
+        <button class="xr-item default-button" @click="close(); downloadUsd()">Download USDZ</button>
 
         <!-- Scene Viewer -->
         <button v-if="sceneViewer" class="xr-item default-button" @click="close(); openInSceneViewer()">Open in Scene Viewer</button>
@@ -478,16 +508,81 @@ export default XRButtonComponent
         <!-- Advanced Viewer (Debug) -->
         <button v-if="advancedViewerEnabled" class="xr-item default-button" @click="close(); openInAdvancedViewer()">Open in Advanced Viewer</button>
 
-        <!-- QR Code (Auto XR) -->
-        <canvas class="xr-qr" ref="qr"></canvas>
-
+        </div>
       </div>
-    </div>
-  </div>
 </div>
 </template>
 
 <style scoped>
+  #mobileView{
+    display: inline-flex;
+  }
+  #QRCodeLaptop .xr-qr {
+    max-width: 200px;
+    max-height: 200px;
+  }
+  #QRCodeLaptop > p {
+    margin-left: 35px;
+    font-weight: 500;
+  }
+  .QRCodeMobile img.xr-qr{
+      width: 180px;
+  }
+  #QRCodeLaptop {
+    background: #c2c2c2;
+    padding: 2.4% 4% 1px 1.4%;
+    border-radius: 20px;
+    width: fit-content;
+    margin: 0px 80px;
+  }
+  #QRCodeLaptop  > div {
+    display: inline-flex;
+    margin: 10px 35px 0px 35px;
+  }
+  .QRCodeMobile{
+    background: #c2c2c2;
+    padding: 1.4% 1.4%;
+    border-radius: 20px;
+    width: 50%;
+    margin: 0px 1px;
+  }
+  .QRCodeMobile  > div {
+    display: inline-flex;
+    margin: 10px 3px 0px 3px;
+  }
+  #QRCodeLaptop > #footnote {
+    font-size: 10px;
+    margin-left: 35px;
+    color: #707070;
+  }
+  .QRCodeMobile > #footnote {
+    font-size: 10px;
+    color: #707070;
+  }
+  #QRCodeLaptop > p:nth-child(1), #QRCodeLaptop > div > p:nth-child(1){
+    font-variant: small-caps;
+    line-height: 2rem;
+    font-size: 1.2rem;
+    font-family: Helvetica;
+    font-weight: 600;
+    color: #707070;
+  }
+   .QRCodeMobile > p:nth-child(1) {
+    margin: 0.2em 0em 0em 1em;
+    font-size: 1em;
+    font-variant: small-caps;
+    font-family: Helvetica;
+    color: #707070;
+    font-weight: 600;
+  }
+  #XRbutton{
+    display: grid;
+  }
+  #xrDev{
+    display: none;
+    background-color: #dddddd;
+    margin: 0.4em 2em 0em 2em;
+  }
   .xr-modal {
     position: absolute;
     top: 1vh;
@@ -501,18 +596,21 @@ export default XRButtonComponent
     padding: 1rem;
   }
   .default-button {
-    margin: 5px;
+    /* margin: 5px;
     color: black;
-    background-color: white;
-    border-radius: 5px;
-    font-size: 1.15em;
+    background-color: white; */
+    border-radius: 10px;
+    border: none;
+    color: white;
+    background-color: #999999;
+    /* font-size: 1.15em;
     box-shadow: none;
     border: 2px solid black;
     padding: 3px;
     line-height: 100%;
     cursor: pointer;
     min-width: 180px;
-    padding: 10px;
+    padding: 10px; */
   }
   .default-button:hover:enabled {
     color: white;
@@ -583,9 +681,5 @@ export default XRButtonComponent
     margin-left: 65px;
     margin-top: 10px;
     cursor: pointer;
-  }
-  .xr-qr {
-    max-width: 200px;
-    max-height: 200px;
   }
 </style>

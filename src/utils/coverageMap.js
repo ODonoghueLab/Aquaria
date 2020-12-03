@@ -66,7 +66,7 @@ export function drawClusterContainer (cluster, s, element) {
   this.nusvg = outerdiv.append('div').attr('id', 'c_' + id).attr('class',
     'coveragemap').append('svg').attr('width', '100vw').attr('height',
     this.height + 30)
-    .attr('viewBox', '0 0 ' + (this.width) + ' ' + (this.height + 30)).attr(
+    .attr('viewBox', '0 0 ' + (this.width - 5) + ' ' + (this.height + 30)).attr(
       'preserveAspectRatio', 'none')
 
   // add center line
@@ -75,7 +75,7 @@ export function drawClusterContainer (cluster, s, element) {
     'translate(0,33)').attr('class', 'insertion')
 
   this.nusvg.append('g').attr('id', 'structure_' + id).attr('transform',
-    'translate(' + (window.AQUARIA.margin.left + structStart) + ',20)')
+    'translate(1,20)')
 
   // .append('rect') // background shape for cluster size label
   // .attr('transform', 'translate(' + (structEnd - structStart - 5) + ',5)')
