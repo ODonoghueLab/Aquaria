@@ -451,7 +451,7 @@ export default XRButtonComponent
       <!-- <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'></a> -->
       <div @click="open()" v-if="dataReceived" id='xr-button'>
         <div id="QRCodeLaptop" v-if="$mq === 'laptop'">
-            <p>See this structure in Mixed Reality (XR)* </p>
+            <p>See this structure in Extended Reality (XR)* </p>
             <div>
             <!-- QR Code (Auto XR) -->
             <p v-if="$mq === 'laptop'">Scan to open on iOS, Android, HoloLens, or Windows Mixed Reality devices.*</p>
@@ -462,7 +462,7 @@ export default XRButtonComponent
         <div id="mobileView" v-if="$mq === 'mobile'|| $mq === 'tablet'">
           <div class="QRCodeMobile">
             <!-- QR Code (Auto XR) -->
-              <p>Tap to see structure in Mixed Reality (XR)*</p>
+              <p>Tap to see structure in Extended Reality (XR)*</p>
               <img v-if="dataReceived && !hevsPlatform && !psvrEnabled && !advancedViewerEnabled && !windowsMr && !quickLook && !sceneViewer" @click="close(); downloadUsd()" class="xr-qr" v-bind:src="ar">
               <img v-if="dataReceived && sceneViewer" @click="close(); openInSceneViewer()" class="xr-qr" v-bind:src="ar">
               <img v-if="dataReceived && quickLook" @click="close(); openInQuickLook()" class="xr-qr" v-bind:src="ar">
