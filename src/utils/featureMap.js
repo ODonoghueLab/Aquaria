@@ -18,7 +18,7 @@ export function createFeatureMap (datum) {
   this.height = 40 - window.AQUARIA.margin.top - window.AQUARIA.margin.bottom + 35 // height
   this.datum = datum
   var outerdiv = d3.select('#selectedFeature').append('div').attr('id', 'outerFeatureMap')
-  this.drawTrack(this.datum, this.createSVGforFeature(outerdiv, '100vw', this.height + 30, this.width + 5))
+  this.drawTrack(this.datum, this.createSVGforFeature(outerdiv, '100vw', this.height + 30, this.width))
   d3.select('#outerFeatureMap > svg').attr('class', 'loadedFeature')
 }
 

@@ -2,25 +2,21 @@
   <div>
     <div id="structureviewerexplanation" class="explanation">
       <div id='titlebar'>
-        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel">
+        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" v-if="organism_name">
+          <img v-bind:src="search">
           {{organism_name}} <strong>{{primary_accession}}</strong>
         </span>
-        <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">{{text}} </span>
-        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel">{{pdb}}</span>
+        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" v-if="!organism_name">
+          <img v-bind:src="search">
+          Protein Sequence
+        </span>
+        <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">aligned onto </span>
+        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="pdb">{{pdb}}</span>
+        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="!pdb">PDB-ID </span>
+        <!-- <span id="search">?</span> -->
       </div>
-      <!-- <a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a> -->
     </div>
     <div id='contentPanel'>
-      <!-- <h3 id="structureviewerexplanation_1" > -->
-        <!-- <span id='titlebar' class="explanation">
-          <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel">
-            <! -- <img v-bind:src="search" id='search'/> -->
-            <!-- {{organism_name}} {{primary_accession}}
-          </span>
-          <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">{{text}} </span>
-          <span id="pdbpanel" class='titlepanel' @click="showPdbPanel">{{pdb}}</span>
-        </span> -->
-      <!-- </h3> -->
       <div id='panel1' class='contents'>
         <SearchPanel id="searchByName"/>
         <AboutUniprot id="uniprot"/>
@@ -28,14 +24,6 @@
       <AboutPDB id="gallery" class='contents'/>
       <Explanation id="explanation" class='contents'/>
     </div>
-    <!-- <div class="rightHeaderBar">
-        <a href="javascript:;" title="Toggle full window view" data-intro="Full window" data-position="bottom">
-          <span id="expander" class="roundButton" style="display: inline-block;">&nbsp;</span>
-        </a>
-        <a class="launchApplicationLink" href="#" target="_blank" title="Launch stand-alone Java application" data-intro="Standalone application" data-position="top">
-            <span class="applauncher roundButton" style="display: inline-block;">&nbsp;</span>
-        </a>
-  </div> -->
 </div>
 </template>
 
@@ -94,41 +82,14 @@ export default {
         }
       } else {
         $('#accession_link').text(window.AQUARIA.preferred_protein_name)
-        // $("#help3D").hide();
       }
     }
-    // var searchLeft = $('#affordance_mode').width() / 2 - $('#searchByName').width() / 2
-    // searchLeft = searchLeft + 'px'
-    // $('#searchByName').css({
-    //   'margin-left': searchLeft
-    // })
   },
   methods: {
-    // select: function () {
-    //   event.currentTarget.style.background = 'orange'
-    //   if (event.currentTarget.children[0]) {
-    //     document.querySelector('#search').style.background = 'orange'
-    //   } else {
-    //     document.querySelector('#search').style.background = '#5d5d5d'
-    //   }
-    // },
-    // diselect: function () {
-    //   event.currentTarget.style.background = '#5d5d5d'
-    // },
-    // showSearch: function (ev) {
-    //   document.querySelector('#search').style.display = 'inline'
-    // document.querySelector('#threeDexplanation').style.borderLeft = '1px solid white'
-    // document.querySelector('#threeDexplanation').style.borderRight = '1px solid white'
-    // },
-    // hideSearch: function () {
-    //   document.querySelector('#search').style.display = 'none'
-    // document.querySelector('#threeDexplanation').style.border = 'none'
-    // },
     resetSelection: function () {
       document.querySelectorAll('#titlebar span').forEach(el => {
         el.className = 'titlepanel'
       })
-      // document.querySelector('#search').style.background = '#5d5d5d'
       document.querySelectorAll('.contents').forEach(el => {
         el.style.display = 'none'
       })
@@ -140,18 +101,15 @@ export default {
       this.resetSelection()
       ev.target.className = 'titlepanel active'
       document.querySelector('#contentPanel').style.display = 'block'
-      // document.querySelector('#structureviewerexplanation').style.display = 'none'
       document.querySelector('#panel1').style.display = 'block'
       document.querySelector('#uniprot').style.display = 'block'
       document.querySelector('#searchByName').style.display = 'block'
-      // document.querySelector('#contentPanel > #titlebar > #uniprotpanel').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#uniprot').style.display = 'none'
         document.querySelector('#contentPanel').style.display = 'none'
         document.querySelector('#structureviewerexplanation').style.display = 'grid'
         document.querySelector('div.dimmer').remove()
-        // $('#gene_name').show()
       })
     },
     showPdbPanel: function (ev) {
@@ -162,14 +120,10 @@ export default {
       ev.target.className = 'titlepanel active'
       document.querySelector('#gallery').style.display = 'block'
       document.querySelector('#contentPanel').style.display = 'block'
-      // document.querySelector('#structureviewerexplanation').style.display = 'none'
-      // document.querySelector('#contentPanel > #titlebar > #pdbpanel').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#contentPanel').style.display = 'none'
-        // document.querySelector('#structureviewerexplanation').style.display = 'grid'
         document.querySelector('div.dimmer').remove()
-        // $('#gene_name').show()
       })
     },
     showthreeDexplanation: function (ev) {
@@ -180,12 +134,9 @@ export default {
       ev.target.className = 'titlepanel active'
       document.querySelector('#explanation').style.display = 'block'
       document.querySelector('#contentPanel').style.display = 'block'
-      // document.querySelector('#structureviewerexplanation').style.display = 'none'
-      // document.querySelector('#contentPanel >  #titlebar > #threeDexplanation').style.background = 'orange'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#contentPanel').style.display = 'none'
-        // document.querySelector('#structureviewerexplanation').style.display = 'grid'
         document.querySelector('div.dimmer').remove()
       })
     }
@@ -202,18 +153,22 @@ export default {
     input.placeholder = window.AQUARIA.preferred_protein_name
     input.setAttribute('size', input.getAttribute('placeholder').length)
   }
-  // updated () {
-  //   var titleLeft = document.querySelector('#affordance_mode').offsetWidth / 2 - document.querySelector('#structureviewerexplanation').offsetWidth / 2
-  //   // var searchLeft = titleLeft + 5
-  //   titleLeft = titleLeft + 'px'
-  //   document.querySelector('#structureviewerexplanation').style.marginLeft = titleLeft
-  //   // document.querySelector('#search').style.left = searchLeft + 'px'
-  //   document.querySelector('#contentPanel').style.marginLeft = titleLeft
-  // }
 }
 </script>
 
 <style>
+/* #search {
+  font-weight: 500;
+    padding: 1px 8px;
+    margin-right: 12px;
+    color: black;
+    background: white;
+    border-radius: 11rem;
+    margin-left: 5px;
+} */
+#uniprotpanel > img {
+ height: calc(12px + .6vw);
+}
 /* Christian */
 #titlebar {
     flex-basis: auto;
@@ -254,12 +209,7 @@ span#uniprotpanel {
   background-size: 0;
   transition: all 0.7s ease;
 }
-span#uniprotpanel:hover, #title:hover span#uniprotpanel {
-    padding-left: 2rem;
-    background-image: url("../assets/img/search_24.png");
-    background-repeat: no-repeat;
-    background-size: 1rem;
-}
+
 span#pdbpanel {
   padding-right: 1rem;
   font-weight: 600;
@@ -270,60 +220,11 @@ span#pdbpanel {
 /* Neblina */
 #titlebar {
     display: -webkit-box;
-    /* margin-left: 12px;
-    margin-top: calc(12px + 1.5vh);
-    margin-bottom: 20px; */
     margin: auto;
-    /* display: inline-table; */
-    /* -webkit-box-align: baseline;
-    -ms-flex-align: baseline;
-    align-items: baseline; */
     border-radius: 5em;
     background-color: var(--primary-label);
     min-width: 260px;
 }
-/* #search {
-    display: none;
-    height: calc(1.2rem + 0.2vh);
-    width: 32px;
-    height: 32px;
-    position: absolute;
-    padding: 6px 2px 3px 6px;
-    background: #5d5d5d;
-    border-top-left-radius: 14px;
-    border-bottom-left-radius: 14px;
-    margin-left: -31px;
-} */
-/* #gallery{
-    top: 20vh;
-    margin: 10px 0px;
-    width: 100%;
-    height: fit-content;
-    z-index: 20;
-} */
-/* #uniprotpanel { */
-    /* padding-left: 14px; */
-    /* padding: 8px 0px 8px 14px;
-    border-top-left-radius: 14px;
-    border-bottom-left-radius: 14px;
-    line-height: 31px;
-    transition: all 0s ease 0s */
-/* } */
-/* #threeDexplanation { */
-    /* padding: 8px 1px 8px 1px;
-    line-height: 31px;
-    margin: 0px -1px; */
-/* } */
-/* #pdbpanel{
-    padding: 8px 14px 8px 2px;
-    border-top-right-radius: 14px;
-    border-bottom-right-radius: 14px;
-    line-height: 31px;
-    margin-left: -1px;
-}
-.titlepanel {
-  cursor: pointer;
-} */
 .roundButton {
     color: #999;
     height: 17px;
@@ -354,9 +255,6 @@ span#pdbpanel {
     display: block;
     overflow: auto;
     width: fit-content;
-    /* top: 40vh; */
-    /* position: absolute; */
-    /* background-color: #d1d1d1; */
     padding: 5px;
     border-radius: 10px;
     z-index: 200;
@@ -365,7 +263,6 @@ span#pdbpanel {
 #uniprot {
     display: block;
     margin: 10px 0px;
-    /* position: absolute; */
     width: 100%;
     height: fit-content;
     padding: 10px;
