@@ -179,9 +179,29 @@ ShowMatchingStructures.prototype.clusterItemClick = function(d) {
 	if(($(location).attr('href').includes("json") || featureRegex.test(searchParam))){
 		waitForElement()
 	}
-	document.querySelector('#selectedCluster').children[0].remove()
-	that.showMap(that.clusters[cluster_nbr])
+	document.querySelectorAll('.coverage_map_container').forEach(function(map){
+		map.remove()
+	})
+	that.drawCoverageMap(that.clusters[cluster_nbr])
+	//document.querySelector(".featureTrack svg.loaded") check if exists to keep the feature.
 };
+
+ShowMatchingStructures.prototype.drawCoverageMap = function (cluster) {
+	AQUARIA.showMatchingStructures.clusters.forEach(function(c){
+		AQUARIA.showMatchingStructures.showMap(c)
+	})
+	document.querySelectorAll("#selectedCluster [id*='c_'] rect").forEach(function (part) {
+		part.style.fill = '#a5a5a5'
+		part.style.stroke = '#a5a5a5'
+		part.style.opacity = '0.2'
+	})
+	document.querySelectorAll("#selectedCluster [id*='c_'] polygon").forEach(function (part) {
+		part.style.fill = '#a5a5a5'
+		part.style.stroke = '#a5a5a5'
+		part.style.opacity = '0.2'
+	})
+	that.showMap(cluster)
+}
 
 ShowMatchingStructures.prototype.drawAxisRuler = function(layerId) { // console.log("Ruler
 																																// width:

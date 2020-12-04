@@ -21,7 +21,6 @@ var show_expanded_cluster = require('./show_expanded_clusters');
 var d3 = require('d3');
 var axios = require('axios');
 var resize_app = require('./resize_app');
-var screenshot = require('./screenshot');
 
 require('./utilities');
 
@@ -663,7 +662,7 @@ var MAX_PROTEIN_HISTORY = 5;
                 }
                 AQUARIA.display_member();
               }
-              AQUARIA.showMatchingStructures.showMap(cluster)
+              AQUARIA.showMatchingStructures.drawCoverageMap(cluster)
             }
           } else {
             ///console.log('AQUARIA.loadAccession error: received old data for Best PDB: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
@@ -1471,23 +1470,6 @@ AQUARIA.blankAll = function(isOn, message) {
   AQUARIA.blankPanel("#uniProtDesc", isOn);
   AQUARIA.blankPanel("#featurelist", isOn);
 };
-
-AQUARIA.screenshot = function() {
-  // construct a temporary anchor element with a download attribute and click it
-  // alternatively this could be wired up to a declared html element
-  var a = document.createElement('a');
-  screenshot(7680, 4320, 0, 0).then(function (href) {
-    a.href = href; // href is always a string. whether blob uri (Object URL) or data uri depends on browser support
-    a.download = 'aquaria-screenshot.png'; // @TODO consider a more meaningful filename here. maybe use protein name w/ a timestamp
-    a.click();
-  });
-};
-
-// hijack the old applet button for screenshot feature
-$(".launchApplicationLink").click(function (ev) {
-  ev.preventDefault(); // prevent default navigation
-  AQUARIA.screenshot(); // invoke screenshot feature
-});
 
 window.ATL_JQ_PAGE_PROPS = {
   //  window.ATL_JQ_PAGE_PROPS = $.extend(window.ATL_JQ_PAGE_PROPS, {

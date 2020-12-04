@@ -2,7 +2,7 @@
     <div id="Menu" class="panel floating">
       <a href="#" class="close"></a>
       <div>
-        <a class="lnk" id='xr' href="#">XR Mode</a>
+        <!-- <a class="lnk" id='xr' href="#">XR Mode</a> -->
         <a class="lnk" id='print' href="#">Print</a>
       </div>
       <div>
@@ -20,6 +20,9 @@
     </div>
 </template>
 <script>
+
+import { screenshot } from '../utils/Screenshot'
+
 export default {
   name: 'Menu',
   data () {
@@ -41,14 +44,19 @@ export default {
         ev.target.className = 'lnk active'
       }
     }
-    document.querySelector('#print').addEventListener('click', function (ev) {
+    document.querySelector('#print').addEventListener('click', async function (ev) {
       ev.preventDefault() // prevent default navigation
-      window.AQUARIA.screenshot() // invoke screenshot feature
+      const screenshotHref = await screenshot(7680, 4320, 0, 0)
+      // construct a temporary anchor element with a download attribute and click it
+      const a = document.createElement('a')
+      a.href = screenshotHref // href is always a string. whether blob uri (Object URL) or data uri depends on browser support
+      a.download = 'aquaria-screenshot.png' // @TODO consider a more meaningful filename here. maybe use protein name w/ a timestamp
+      a.click()
     })
-    document.querySelector('#xr').addEventListener('click', function (ev) {
-      ev.preventDefault() // prevent default navigation
-      document.querySelector('.xr-menu-button').click()
-    })
+    // document.querySelector('#xr').addEventListener('click', function (ev) {
+    //   ev.preventDefault() // prevent default navigation
+    //   document.querySelector('.xr-menu-button').click()
+    // })
     document.querySelector('#Sidechains').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
       toggleActive(ev) // toggle active state

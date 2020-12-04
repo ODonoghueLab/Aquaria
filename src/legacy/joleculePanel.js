@@ -1,4 +1,3 @@
-
 var JoleculePanel = function(attachToDiv, chainSelected) {
   
   this.blankApplet();
@@ -101,7 +100,7 @@ buildFeatures = function(featureNames, featureDescriptions, featurePositions, fe
         Residue: j,
         Color: featureColours[i],
         Name: featureNames[i].replace(/\<[^\>\<]*\>/g, '').replace(/^.*\:/, ''),
-        Description: featureDescriptions[i]
+        Description: ""
       })
     }
   }
@@ -152,10 +151,12 @@ JoleculePanel.prototype.reload = function(attributes) {
   if (attributes.biounit == 0) {
     // 0, null or undefined
     // url = 'https://files.rcsb.org/download/' + pdbId + '.pdb';
-    PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb`;
+    // PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb`;
+    PDB_URI = `https://pdbj.org/rest/downloadPDBfile?format=pdb&id=${attributes.pdb_id}`
   } else {
     // url = 'https://files.rcsb.org/download/' + pdbId + '.pdb' + biounit;
-    PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb${attributes.biounit}`;
+    // PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb${attributes.biounit}`;
+    PDB_URI = `https://pdbj.org/rest/downloadPDBfile?format=bu&id=${attributes.pdb_id}.${attributes.biounit}`
   }
   console.log(PDB_URI)
   const dataServer = new DataServer.DataServer(PDB_URI, attributes.pdb_id);

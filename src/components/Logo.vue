@@ -25,7 +25,6 @@
 <script>
 import store from '@/store/index'
 import $ from 'jquery'
-
 export default {
   name: 'Logo',
   methods: {
@@ -33,6 +32,7 @@ export default {
     // dim background
       if (document.getElementsByClassName('dimmer').length === 0) {
         $('body').append('<div class="dimmer"></div>')
+        document.querySelector('#xr-button').click()
         $('div.dimmer').on('click', function () {
           $('div#about_overlay, div#help_overlay').hide()
           $('div.dimmer').remove()
@@ -40,7 +40,6 @@ export default {
       } else {
         $('div.dimmer').remove()
       }
-
       $('div#about_overlay').slideToggle('slow')
     },
     showExplanations: function () {
@@ -52,7 +51,6 @@ export default {
       $('#tree_helper').html('<img src="/images/tree-overlay.png" />')
       $('body').chardinJs('start')
     }
-
   },
   computed: {
     data () {

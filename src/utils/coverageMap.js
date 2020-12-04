@@ -58,7 +58,7 @@ export function drawClusterContainer (cluster, s, element) {
   }
 
   var outerdiv = d3.select(element).append('div').attr('id', 'out_' + id).attr(
-    'class', 'outer_container')
+    'class', 'coverage_map_container')
   // outerdiv.append('svg').attr('width', 40).attr('height', 40).attr('viewBox',
   //   '0 0 40 40').attr('preserveAspectRatio', 'none')
 
@@ -66,7 +66,7 @@ export function drawClusterContainer (cluster, s, element) {
   this.nusvg = outerdiv.append('div').attr('id', 'c_' + id).attr('class',
     'coveragemap').append('svg').attr('width', '100vw').attr('height',
     this.height + 30)
-    .attr('viewBox', '0 0 ' + (this.width) + ' ' + (this.height + 30)).attr(
+    .attr('viewBox', '0 0 ' + (this.width + 4) + ' ' + (this.height + 30)).attr(
       'preserveAspectRatio', 'none')
 
   // add center line
@@ -75,7 +75,7 @@ export function drawClusterContainer (cluster, s, element) {
     'translate(0,33)').attr('class', 'insertion')
 
   this.nusvg.append('g').attr('id', 'structure_' + id).attr('transform',
-    'translate(' + (window.AQUARIA.margin.left + structStart) + ',20)')
+    'translate(' + (structStart) + ',20)')
 
   // .append('rect') // background shape for cluster size label
   // .attr('transform', 'translate(' + (structEnd - structStart - 5) + ',5)')

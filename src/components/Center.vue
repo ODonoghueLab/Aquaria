@@ -1,6 +1,5 @@
 <template>
 <div>
-    <XRButton />
     <div id="menu-btn" class="item"><a href="#Menu"><img :src="menu" /></a></div>
     <Menu />
     <StructureViewer id="structureviewer"/>
@@ -17,16 +16,13 @@ import StructureViewer from './StructureViewer'
 import AboutAquaria from './AboutAquaria'
 import Tabs from '../components/Tabs'
 import $ from 'jquery'
-import XRButton from './XRButton'
 import Menu from './Menu'
-
 export default {
   name: 'Center',
   components: {
     StructureViewer,
     AboutAquaria,
     Tabs,
-    XRButton,
     Menu,
     CoverageMap
   },
