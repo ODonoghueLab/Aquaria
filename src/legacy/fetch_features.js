@@ -930,10 +930,14 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 		console.log("Variant residues " + residue);
 		let description = "";
 
+		if (variantResidues[residue].hasOwnProperty('defaultDesc')){
+			description = "<br> " + variantResidues[residue].defaultDesc + "<br>";
+		}
+
 		for (let serverName in variantResidues[residue]){
 
 			console.log('Server name is ' + serverName);
-			if (serverName != 'newResidue'){
+			if (serverName != 'newResidue' && serverName != 'defaultDesc'){
 				variantResidues[residue][serverName].forEach(function(anDesc, anDesc_i){
 					description = description + "<br><b>" + serverName + "</b>" + anDesc;
 				});
@@ -959,7 +963,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 							console.log(aggregatedAnnotations[i].Tracks[j][k]);
 
 							if (parseInt(residue) >= parseInt(aggregatedAnnotations[i].Tracks[j][k].start) &&  parseInt(residue) <= parseInt(aggregatedAnnotations[i].Tracks[j][k].end)){
-								aggregatedAnnotations[i].Tracks[j][k].desc =  description; // aggregatedAnnotations[i].Tracks[j][k].desc  + description;
+								aggregatedAnnotations[i].Tracks[j][k].desc = description; // aggregatedAnnotations[i].Tracks[j][k].desc  + description;
 
 								// console.log("The complete description is: " + aggregatedAnnotations[i].Tracks[j][k].desc );
 							}
@@ -1058,6 +1062,7 @@ function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featu
 					"Source": {"type": "string"},
 					"URL": {"type": "string"},
 					"Description": {"type": "string"},
+					'Color': {'type': 'string'},
 					additionalProperties: false,
 				},
 				"required": ['Features'],
@@ -1325,6 +1330,7 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				featureAttributes.Color = "#F73C3C"
 
 				if(description){
+					// console.log("The description is scott adams " + description);
 					if(description.includes('"')){
 						description = description.split('"')[1]
 					}
@@ -1346,6 +1352,10 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 					featureAttributes.Residue = residue;
 					variantResidues[featureAttributes.Residue] = {};
 					variantResidues[featureAttributes.Residue] = {'newResidue': feature.split(residue)[1][0]};
+					if (description && featureAttributes.hasOwnProperty('Description')){
+						variantResidues[featureAttributes.Residue] = {'defaultDesc': featureAttributes.Description};
+					}
+
 				}
 				data['AddedFeatures'].Features.push(featureAttributes)
 
