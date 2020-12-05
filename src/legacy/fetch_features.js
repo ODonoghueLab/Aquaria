@@ -781,14 +781,14 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 		if (requestedFeature == 'SNAP2'){
 			// console.log(response);
-			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
+			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
 			// console.log(response.data)
 			//console.log(getCurrentUrl());
 			//console.log(servers[3].URL_covid);
-			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
 
 
 		}
@@ -901,8 +901,8 @@ var processNextServer = function(primary_accession,
 
 		else if (servers[currentServer]['id'] == 'myVariant.info'){
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL_myGene'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
-			// featureCallback(aggregatedAnnotations);
-			// processNextServer(primary_accession, featureCallback);
+			featureCallback(aggregatedAnnotations);
+			processNextServer(primary_accession, featureCallback);
 		}
 
 
@@ -1342,24 +1342,35 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 
 
 				// featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
+				let newResidue = '';
 				featureAttributes.Name = feature
-				if(feature.split(residue)[1].toLowerCase() == 'ter'){
+				if(feature.split(residue)[1].toLowerCase() == 'ter' || feature.split(residue)[1].toLowerCase() == 'x'){
 					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
-
 					// variantResidues[featureAttributes.Residues[0] + '-' + featureAttributes.Residues[0]] = "";
+					newResidue = 'X';
 				}
 				else{
 					featureAttributes.Residue = residue;
-					variantResidues[featureAttributes.Residue] = {};
-					variantResidues[featureAttributes.Residue] = {'newResidue': feature.split(residue)[1][0]};
-					if (description && featureAttributes.hasOwnProperty('Description')){
-						variantResidues[featureAttributes.Residue] = {'defaultDesc': featureAttributes.Description};
+					let theUserRes = feature.split(residue)[1];
+					if (theUserRes.length > 1){
+						// console.log("Thi is three letter code " + feature.split(residue)[1]);
+						newResidue = checkIfInKey_ig(theUserRes);
+						// console.log('the one letter code is ' + res);
 					}
-
+					else if (theUserRes.length == 1){
+						console.log("Now to check if in the one letter codes");
+						newResidue = checkIfInVal_ig(theUserRes);
+					}
 				}
 				data['AddedFeatures'].Features.push(featureAttributes)
 
 				// data[feature].URL = feature
+				console.log("The new residue is " + newResidue);
+				variantResidues[featureAttributes.Residue] = {};
+				variantResidues[featureAttributes.Residue] = {'newResidue': newResidue};
+				if (description && featureAttributes.hasOwnProperty('Description')){
+					variantResidues[featureAttributes.Residue] = {'defaultDesc': featureAttributes.Description};
+				}
 			}
 		})
 
@@ -1374,6 +1385,57 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 	}
 }
 
+const threeToOneResMap = {
+	Gly: 'G',
+	Ala: 'A',
+	Leu: 'L',
+	Met: 'M',
+	Phe: 'F',
+	Trp: 'W',
+	Lys: 'K',
+	Gln: 'Q',
+	Glu: 'E',
+	Ser: 'S',
+	Pro: 'P',
+	Val: 'V',
+	Ile: 'I',
+	Cys: 'C',
+	Try: 'Y',
+	His: 'H',
+	Arg: 'R',
+	Asn: 'N',
+	Asp: 'D',
+	Thr: 'T',
+};
+
+function checkIfInKey_ig(threeLetterCode){
+	let key = Object.keys(threeToOneResMap).find(k => k.toLowerCase() === threeLetterCode.toLowerCase());
+	console.log("The key is " + key);
+	if (key){
+		return (threeToOneResMap[key]);
+	}
+	else {
+		return '-';
+	}
+}
+
+
+function checkIfInVal_ig(oneLetterCode){
+	// let isFound = false;
+	let newRes = '-';
+	Object.keys(threeToOneResMap).forEach(function(item, i){
+		if (threeToOneResMap[item].toLowerCase() === oneLetterCode.toLowerCase()){
+			newRes = oneLetterCode.toUpperCase();
+		}
+	});
+	return newRes;
+    /* for (var prop in threeToOneResMap) {
+        if (threeToOneResMap.hasOwnProperty(prop) && threeToOneResMap[prop].toLowerCase() === oneLetterCode.toLowerCase()) {
+            return threeToOneResMap[prop];
+        }
+    }
+    return '-'; */
+}
 /**
  * This function collects all annotations for a given protein id from a
  * specified server

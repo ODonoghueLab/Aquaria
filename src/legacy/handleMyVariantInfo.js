@@ -2,8 +2,6 @@
 
 module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, primary_accession, featureCallback){
 
-	console.log("in this cool function");
-	console.log(geneInfoObj);
 
 	let genename = '';
 	let featuresObj = {};
@@ -31,11 +29,9 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 					for (let i =0; i< callsToMake; i++){
 						let from = 1000 * (i + 1);
 						promises_.push(getFromLocation(url_myVariantInfo(genename, 1000, from)));
-						console.log("Now calling position " + from);
 
 						if (i == (callsToMake -1)){
 							resolve({response: response, promises_: promises_});
-							console.log("over here! .... . .. . .. blahblah");
 						}
 					}
 
@@ -53,7 +49,6 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 
 				handlePromiseData(respData, featuresObj, fsName_cosmic, fs_cosmic_byTissue, features_snpeff, features_cosmic)
 				.then(function(){
-					console.log("over here - job biden");
 					resolve(data.promises_);
 				});
 
@@ -65,8 +60,6 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 				// 	return new Promise(function(resolve, reject){
 						let promises_processing = [];
 						theData.forEach(function(item, i){
-							console.log("A data point is ");
-							console.log(item);
 							promises_processing.push(handlePromiseData(item, featuresObj, fsName_cosmic, fs_cosmic_byTissue, features_snpeff, features_cosmic));
 						});
 
@@ -102,13 +95,11 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 				featuresObj[key_fs]['Features'] = fs_cosmic_byTissue[key];
 
 			}
-			console.log("In the last bit here!");
-			validateAgainstSchema(featuresObj, primary_accession, featureCallback, 'myVariant.info');
+			validateAgainstSchema(featuresObj, primary_accession, featureCallback, 'COSMIC mutations');
 		});
-		console.log('genename is ' + genename);
 	}
 	else{
-		validateAgainstSchema(featuresObj, primary_accession, featureCallback, 'myVariant.info');
+		validateAgainstSchema(featuresObj, primary_accession, featureCallback, 'COSMIC mutations');
 	}
 
 
@@ -200,7 +191,6 @@ var axios = require('axios')
 function getFromLocation(url){
 	return new Promise(function(resolve, reject){
 
-		console.log("The myvariant.info url is " + url);
 		let featuresFromExtServer = {};
 
 		axios({
