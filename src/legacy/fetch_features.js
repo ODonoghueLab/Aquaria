@@ -1500,7 +1500,7 @@ function extractVariantInfoFromUniprot(uniprotData){
 			if (uniprotData[featureType].hasOwnProperty('Features')){
 				for (let i =0; i< uniprotData[featureType]['Features'].length; i++){
 					if (uniprotData[featureType]['Features'][i].hasOwnProperty('Residue')){
-						checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
+						// checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
 					}
 				}
 			}

@@ -10,14 +10,31 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 			console.log("The new residue is " + variantResidues[resSnp].newResidue);
 
 			if (parseInt(resSnp) >= parseInt(resStart_pp) && parseInt(resSnp) <= parseInt(resEnd_pp)){
-				if (!variantResidues[resSnp].hasOwnProperty(serverName)){
-					variantResidues[resSnp][serverName] = [];
-					console.log("over here! " + serverName);
 
-					console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
+				if (!variantResidues[resSnp].hasOwnProperty(serverName)){
+
+
+					variantResidues[resSnp][serverName] = [];
 
 
 				}
+
+				let obj_featType = {};
+				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
+					let obj_inFeatType = cleanData_pp(description);
+					obj_featType[featureType] = obj_inFeatType;
+					console.log(' does come in here ... ');
+					console.log(obj_inFeatType);
+				}
+
+				variantResidues[resSnp][serverName].push(obj_featType);
+
+
+				console.log("over here! " + serverName);
+
+				console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
+
+
 				/*
 				if (serverName == 'SNAP2'){
 					description = getSubstringOfInterest(description, variantResidues[resSnp].newResidue);
@@ -41,6 +58,8 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 			}
 		});
 	}
+
+
 
 
 
@@ -72,6 +91,19 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 		});
 	}
 	*/
+}
+
+
+function cleanData_pp(desc){
+	desc = desc.replace(/\s+/g, '');
+
+	let arr = desc.split(/\:/);
+	let arr_1 = arr[1].split(/\(/);
+	arr_1[1] = arr_1[1].replace(/\)/, '');
+
+	let obj_inFeatType = {mainToShow: arr_1[1], mainToHide: "Score: " + arr_1[0]};
+
+	return obj_inFeatType;
 }
 
 
