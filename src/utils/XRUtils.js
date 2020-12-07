@@ -218,7 +218,15 @@ function openUriInSceneViewer (uri, title) {
   const action = 'android.intent.action.VIEW'
   const mode = 'ar_preferred' // default to AR view if available, fall back to a 3D model view if AR not supported or Google Play Services for AR not installed
   const fallback = 'https://developers.google.com/ar' // this will only be visited if Google Search pkg is out of date or unavailable
-  const fullUri = `intent://arvr.google.com/scene-viewer/1.0?file=${uri}&mode=${mode}&title=${title}#Intent;scheme=https;package=${pkg};action=${action};S.browser_fallback_url=${fallback};end;`
+
+  // need to encode just the query part of the model URI or scene viewer won't respect it correctly
+  const [uriBase, uriQuery] = uri.split('?')
+  // const encodedQuery = uriQuery ? encodeURIComponent(`?${uriQuery}`) : ''
+  const encodedQuery = uriQuery ? ('?' + uriQuery.replace(/&/g, '%26')) : ''
+  const encodedUri = uriBase + encodedQuery
+  console.log(encodedUri)
+
+  const fullUri = `intent://arvr.google.com/scene-viewer/1.0?file=${encodedUri}&mode=${mode}&title=${title}#Intent;scheme=https;package=${pkg};action=${action};S.browser_fallback_url=${fallback};end;`
   const link = document.createElement('a')
   link.href = fullUri
   link.click()
