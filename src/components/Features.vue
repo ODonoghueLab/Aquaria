@@ -1,5 +1,6 @@
 <template>
-  <div  id="featurelist"></div>
+  <div  id="featurelist">
+  </div>
 </template>
 
 <script>
@@ -10,6 +11,19 @@ export default {
 </script>
 
 <style>
+
+.complete{
+  display:none;
+}
+
+.more{
+  background:lightblue;
+  color:navy;
+  font-size:13px;
+  padding:3px;
+  cursor:pointer;
+}
+
 #featurelist{
   overflow:  scroll;
   margin-bottom:  -100px;
@@ -149,6 +163,11 @@ div.balloon  h3  {
   background-color:  #999;
   margin-bottom:  1em;
   }
+
+div.balloon{
+  overflow: scroll;
+  max-height: 800px;
+}
 
 div.popup.top  div.balloon  {
   border-radius:  16px;
