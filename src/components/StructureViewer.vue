@@ -84,7 +84,7 @@ export default {
   margin-top: -90px; */
     position: fixed;
     top: 0px;
-    height: 150vh;
+    height: 107vh;
 }
 
 #updateJava3D {
