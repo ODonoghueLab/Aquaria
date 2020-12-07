@@ -279,7 +279,7 @@ function drawTrack(datum, i) {
 		var nusvg = featureMap.createSVGforFeature(outerdiv, width + AQUARIA.margin.left, 25, viewBoxwidth)
 		nusvg
 		.attr("id", "s_" + groupCount + "_" + o)
-		.attr("title", "Click to load feature into 3D view; hover over features to see detailed info.")
+		// .attr("title", "Click to load feature into 3D view; hover over features to see detailed info.")
 
 		.on("click", function() {
 			if(d3.select(this).attr("class") == "loaded") {// deselect feature (it's already displayed)
