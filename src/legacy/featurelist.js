@@ -267,6 +267,7 @@ function drawTrack(datum, i) {
 
 	var features = datum.Tracks;
 
+	viewBoxwidth = document.getElementById('structureviewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left
 
 	if (datum.Server == 'UniProt'){
 		//console.log("========");
@@ -275,13 +276,14 @@ function drawTrack(datum, i) {
 	}
 	for ( var o in features) {
 		var outerdiv = d3.select(this)
-		var nusvg = featureMap.createSVGforFeature(outerdiv, width + AQUARIA.margin.left, 25, width + AQUARIA.margin.left)
+		var nusvg = featureMap.createSVGforFeature(outerdiv, width + AQUARIA.margin.left, 25, viewBoxwidth)
 		nusvg
 		.attr("id", "s_" + groupCount + "_" + o)
 		.attr("title", "Click to load feature into 3D view; hover over features to see detailed info.")
 
 		.on("click", function() {
 			if(d3.select(this).attr("class") == "loaded") {// deselect feature (it's already displayed)
+				AQUARIA.oid = null
 				document.querySelector(".featureHeader.actived").click()
 				d3.select("svg.loaded").classed("loaded", false);
 				AQUARIA.panel3d.blankApplet(true, "Removing feature...")
@@ -302,6 +304,7 @@ function drawTrack(datum, i) {
 					document.querySelector('#outerFeatureMap').remove()
 				}
 				var oid = d3.select(this).attr("id").split("_")[2];
+				AQUARIA.oid = oid
 				AQUARIA.panel3d.blankApplet(true, "Loading feature...")
 				AQUARIA.panel3d.blankApplet(false)
 				if(datum.Server != "Added Features"){
