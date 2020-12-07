@@ -34,9 +34,14 @@ export function createSVGforFeature (outerdiv, width, height, viewboxWidth) {
 // Draw selected feature track
 export function drawTrack (datum, svg) {
   var _this = this
-  var features = datum.Tracks
+  var features = []
   this.nusvg = svg
   const AQUARIA = window.AQUARIA
+  if (AQUARIA.oid) {
+    features[0] = datum.Tracks[AQUARIA.oid]
+  } else {
+    features = datum.Tracks
+  }
 
   this.nusvg.on('click', function () {
     if (d3.select(this).attr('class').includes('loaded')) {
@@ -113,7 +118,7 @@ export function drawFeatures (p, o, features) {
     .attr('width', function () { return (/* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) > 2) ? /* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) : 2 })
     .attr('height', 14)
     .attr('id', 'r_' + o + '_' + p)
-    .attr('transform', 'translate(' + /* parseInt */ (features[o][p].start * (window.AQUARIA.srw - 0.0085)) + ',6)')
+    .attr('transform', 'translate(' + /* parseInt */ (features[o][p].start * (window.AQUARIA.srw - 0.0095)) + ',6)')
     .attr('color', features[o][p].color).attr('fill', '#a4abdf')
     .attr('class', 'feature')
     .on('mouseover', createMouseOverCallback(features[o][p]))

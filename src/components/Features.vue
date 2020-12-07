@@ -14,6 +14,7 @@ export default {
   overflow:  scroll;
   margin-bottom:  -100px;
   width:  100vw;
+  max-height: 80vh;
 }
 #groupedFeatures{
   margin-left:  6px;
