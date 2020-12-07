@@ -79,9 +79,12 @@ export default {
 
 <style scoped>
 #structureviewer{
-  height: 150vh;
-  /* position: absolute; */
-  margin-top: -90px;
+  /* height: 150vh;
+  position: absolute;
+  margin-top: -90px; */
+    position: fixed;
+    top: 0px;
+    height: 150vh;
 }
 
 #updateJava3D {
