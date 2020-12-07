@@ -6,7 +6,7 @@
 </template>
 
 <script>
-// import d3 from 'd3'
+// import * as ShowMatch from '../legacy/show_matching_structures'
 export default {
   name: 'MatchingStructures',
   data () {
@@ -15,103 +15,8 @@ export default {
     }
   }
   // mounted () {
-  //   // scale start and end coordinates
-  //   var that = window.AQUARIA.showMatchingStructures
-  //   var cluster = this.clusters
-  //   var s = that.rank
-  //   // var member = cluster.members[0]
-  //   var pdbChain = cluster.pdb_chain[0]
-  //   // //var repeat_domain = data.Repeat_domains[0];
-
-  //   if (cluster.secondary_structure.length === 0 || cluster.secondary_structure[0].length === 0) {
-  //     console.log('ClusterRenderer.drawClusterContainer error: cannot draw cluster as it has no secondary structure: ', cluster)
-  //     return
-  //   }
-
-  //   var structStart = this.xScale(cluster.secondary_structure[0][0].start)
-  //   var structEnd = this.xScale(cluster.secondary_structure[0][cluster.secondary_structure[0].length - 1].end)
-  //   // console.log ("structStart: " + structStart + ", structEnd: " +
-  //   // structEnd);
-  //   var id = cluster.pdb_id.toLowerCase() + '_' + s
-  //   this.clustSize = cluster.cluster_size
-  //   // ///var cluster_nbr = s;
-  //   var identityScore = cluster.alignment_identity_score
-  //   // set padding for labels
-  //   var pad = 0
-  //   if (this.clustSize > 99) {
-  //     pad = 8
-  //   }
-  //   if (this.clustSize > 999) {
-  //     pad = 18
-  //   }
-  //   if (this.clustSize < 10) {
-  //     pad = -6
-  //   }
-
-  //   var outerdiv = d3.select('#allclusters').append('div').attr('id', 'out_' + id).attr(
-  //     'class', 'outer_container')
-  //   outerdiv.append('svg').attr('width', 40).attr('height', 40).attr('viewBox',
-  //     '0 0 40 40').attr('preserveAspectRatio', 'none')
-  //   // add identity percentage
-  //     .append('text').attr('text-anchor', 'end').attr('class', 'percentage').attr(
-  //       'x', 28).attr('y', 26).text(identityScore + '%')
-
-  //   // draw outline of the whole chain
-  //   this.nusvg = outerdiv.append('div').attr('id', 'c_' + id).attr('class',
-  //     'container').append('svg').attr('width', this.width + 200).attr('height',
-  //     this.height + 30)
-  //     .attr('viewBox', '0 0 ' + (this.width + 200) + ' ' + (this.height + 30)).attr(
-  //       'preserveAspectRatio', 'none')
-
-  //   this.nusvg.append('g').attr('id', 'structure_' + id).attr('transform',
-  //     'translate(' + (window.AQUARIA.margin.left + structStart) + ',20)').on(
-  //     'mouseover', function () {
-  //       return d3.select(this).call(that.mouseover, that)
-  //     }).on('mouseout', function () {
-  //     return d3.select(this).call(that.mouseout, that)
-  //   }).append('rect') // background shape for cluster size label
-  //     .attr('transform', 'translate(' + (structEnd - structStart - 5) + ',5)')
-  //     .attr('class', 'handle').attr('width', 32 + pad).attr('height', 16).attr(
-  //       'rx', 6)
-
-  //   this.nusvg.select('g#structure_' + id).append('g').attr('class', 'cluster').attr(
-  //     'title',
-  //     'Click to load ' + id.substr(0, 4) + ', chain ' + pdbChain + ' into structure view. Compared to the specified protein, this structure has ' + identityScore + '% sequence identity. ').attr('width', structEnd - structStart + 2)
-  //     .attr('height', 26).on('click', function () {
-  //       return d3.select(this.parentNode).call(function (d) {
-  //         console.log('ClusterRenderer.nusvg.select clicked! ' + d)
-  //         that.onClusterItemClick(d)
-  //       })
-  //     })
-
-  //   this.nusvg.select('g#structure_' + id + ' g.cluster').append('rect').attr('class',
-  //     'cluster').attr('width', structEnd - structStart + 3).attr('height', 26)
-  //     .attr('rx', 6)
-
-  //   // add center line
-  //   this.nusvg.select('g#structure_' + id + ' g.cluster').append('rect').attr('width',
-  //     structEnd - structStart).attr('height', 1).attr('transform',
-  //     'translate(0,13)').attr('class', 'insertion')
-
-  //   // add thumbnail images
-  //   this.addThumbnails(id, structStart, structEnd, pad)
-
-  //   this.nusvg.select('g#structure_' + id).append('text') // label for cluster size
-  //     .attr('text-anchor', 'end').attr('fill', 'white').attr('x',
-  //       (structEnd - structStart + 24 + pad)).attr('y', 13).attr('dx', -3) // padding-right
-  //     .attr('dy', '.35em') // vertical-align: middle)
-
-  //   var clickTitle = 'Click to see ' + that.clustSize + ' structures in this cluster'
-  //   this.nusvg.select('g#structure_' + id + ' text, g#structure_' + id).attr('class',
-  //     'expandable').attr('title',
-  //     clickTitle)
-
-  //   this.nusvg.select('g#structure_' + id + ' text').on(
-  //     'click', function () {
-  //       that.onTextClick(d3.select(this.parentNode), that.cluster)
-  //     })
-
-  //   outerdiv()
+  //   const ShowMatchingStructures = new ShowMatch()
+  //   ShowMatchingStructures.drawAxisRuler('vis')
   // }
 }
 </script>

@@ -21,7 +21,6 @@ var show_expanded_cluster = require('./show_expanded_clusters');
 var d3 = require('d3');
 var axios = require('axios');
 var resize_app = require('./resize_app');
-var screenshot = require('./screenshot');
 
 require('./utilities');
 
@@ -277,7 +276,7 @@ var MAX_PROTEIN_HISTORY = 5;
           //deselect feature tracks that may still be active
           d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
           d3.selectAll("svg.loaded").classed("loaded", false);
-        
+
         var attributes = AQUARIA.panel3d.generateAttributes(threeDWidth, threeDHeight,
           pdb_id, pdb_chain, currentBiounit, source_primary_accession,
           sequences, common_names, alignment, '', transform, conservations, AQUARIA.structures2match.version_string);
@@ -414,7 +413,7 @@ var MAX_PROTEIN_HISTORY = 5;
       AQUARIA.blankPanel("#aboutPDB", true);
       //AQUARIA.blankPanel("#uniProtDesc", true);
       // member["sequence"] = sequence["sequence"];
-      
+
       var loadRequest = {
         selector: [sequence.primary_accession],
         selectPDB: this.member.pdb_id,
@@ -1367,14 +1366,14 @@ var MAX_PROTEIN_HISTORY = 5;
           }
           AQUARIA.initialisePanels(true);
           AQUARIA.loadAccession(accession, pdb);
-  
+
         }
         else{
           AQUARIA.initialisePanels(true);
           AQUARIA.loadAccession(accession);
         }
       })
-    } 
+    }
     else if (pathname.match(/\/([A-Za-z]+)/)) {
       //uniprot_accession = RegExp.$1;
       // History:
@@ -1471,23 +1470,6 @@ AQUARIA.blankAll = function(isOn, message) {
   AQUARIA.blankPanel("#uniProtDesc", isOn);
   AQUARIA.blankPanel("#featurelist", isOn);
 };
-
-AQUARIA.screenshot = function() {
-  // construct a temporary anchor element with a download attribute and click it
-  // alternatively this could be wired up to a declared html element
-  var a = document.createElement('a');
-  screenshot(7680, 4320, 0, 0).then(function (href) {
-    a.href = href; // href is always a string. whether blob uri (Object URL) or data uri depends on browser support
-    a.download = 'aquaria-screenshot.png'; // @TODO consider a more meaningful filename here. maybe use protein name w/ a timestamp
-    a.click();
-  });
-};
-
-// hijack the old applet button for screenshot feature
-$(".launchApplicationLink").click(function (ev) {
-  ev.preventDefault(); // prevent default navigation
-  AQUARIA.screenshot(); // invoke screenshot feature
-});
 
 window.ATL_JQ_PAGE_PROPS = {
   //  window.ATL_JQ_PAGE_PROPS = $.extend(window.ATL_JQ_PAGE_PROPS, {

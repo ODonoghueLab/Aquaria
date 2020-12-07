@@ -63,6 +63,10 @@ export default {
   //   injectLibFromStack()
   // },
   mounted () {
+    window.scrollBy(0, 100)
+    window.addEventListener('resize', function () {
+      window.scrollBy(0, 100)
+    })
     if (document.querySelector('#header')) {
       document.querySelector('#header').remove()
     }

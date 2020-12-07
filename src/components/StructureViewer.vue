@@ -79,9 +79,12 @@ export default {
 
 <style scoped>
 #structureviewer{
-  height: 111vh;
-  /* position: absolute; */
-  /* margin-top: -90px; */
+  /* height: 150vh;
+  position: absolute;
+  margin-top: -90px; */
+    position: fixed;
+    top: 0px;
+    height: 107vh;
 }
 
 #updateJava3D {
@@ -119,15 +122,18 @@ export default {
 
 #waitingFrame {
     overflow: hidden;
-    position: relative;
+    width: 100vw;
+    top: 0px;
+    height: 100vh;
+    position: fixed;
     z-index: 101;
     pointer-events: none;
     display: none;
-    padding: 0px;
+    /* padding: 0px;
     margin: 0px;
     width: 100%;
     height: 107vh;
-    bottom: 112vh;
+    bottom: 112vh; */
 }
 
 /* div.panel span#threeD {

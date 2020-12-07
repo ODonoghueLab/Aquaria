@@ -63,7 +63,7 @@ export default {
 <style scoped>
     img{
       width: 50px;
-      position: relative;
+      position: fixed;
       padding: 4px 0px 0px 0px;
     }
     #logo{

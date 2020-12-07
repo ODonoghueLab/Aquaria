@@ -208,7 +208,7 @@ ShowMatchingStructures.prototype.drawAxisRuler = function(layerId) { // console.
 //	d3.select("#" + layerId + "div.ruler").remove();																															// "+width+",
 
 	var rsvg = d3.select("#" + layerId)
-		.append("div")
+		.insert("div",":first-child")
 			.attr("class", "ruler")
 			.attr("data-intro","Graphical representation of the specified protein's sequence")
 			.attr("data-position", "left")
