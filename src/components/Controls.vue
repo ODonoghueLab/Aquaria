@@ -35,7 +35,7 @@ export default {
   flex-basis: auto;
   color: white;
   text-align: center;
-  line-height: 2.5;
+  /* line-height: 2.5; */
   padding: 0.5rem 1.5rem;
   border-radius: 1.5rem;
   margin: auto;
