@@ -5,7 +5,7 @@
                     name="myform"
                     ACTION="#"
                     method="post">
-                <img v-bind:src="search"/>
+                <!-- <img v-bind:src="search"/> -->
                 <p id="input2"><input class="search"
                                       type="text"
                                       id="organism_syn_input"
@@ -13,7 +13,8 @@
                                       placeholder="Organism"
                                       autocomplete="on"
                                       data-intro="Enter an organism name (human is default)."
-                                      data-position="right" /></p>
+                                      data-position="right"
+                                      /></p>
                 <p id="input1"><input class="search"
                                       type="text"
                                       id="protein_syn_input"
@@ -21,7 +22,8 @@
                                       placeholder="Protein name/ID"
                                       autocomplete="on"
                                       data-intro="START HERE - specify a protein name (or UniProt identifier, or PDB ID), then press 'Enter'."
-                                      data-position="right" /></p>
+                                      data-position="right"
+                                      size="12" /></p>
                                      <p>&nbsp;</p>
                 <!--<input type="hidden" id="organismid" name="organismid" value="9606"/>-->
               </form>
@@ -57,20 +59,26 @@ export default {
     padding-left: 4px;
 }
 #myform{
-  display: inline-flex;
+  display: flex;
   background: white;
+  border-radius: 1rem;
+  padding: 2px 1rem;
 }
 
 #input1, #input2{
+  display: inline;
   padding: 4px;
+  margin: 0;
 }
 
 input[type=search].ui-autocomplete-loading {
     background: white url('../../public/images/ui-anim_basic_16x16.gif') right center no-repeat;
   }
-
+.contents p {
+  margin: 0.5em 0;
+}
   div.auto_complete {
-    width: 350px;
+    width: 150px;
     background: #fff;
   }
 
@@ -78,7 +86,7 @@ input[type=search].ui-autocomplete-loading {
     border: 1px solid #888;
     margin: 0;
     padding: 0;
-    width: 100%;
+    /* width: 100%; */
     list-style-type: none;
   }
 
@@ -109,7 +117,7 @@ input[type=search].ui-autocomplete-loading {
   }
 
   .ui-autocomplete ul {
-    width: 100%;
+    max-width: 30rem;
     list-style-position: outside;
     list-style: none;
     padding: 0;
@@ -137,7 +145,7 @@ input[type=search].ui-autocomplete-loading {
     margin-bottom: -20px;
     text-align: right;
     text-transform: uppercase;
-    width: 97%;
+    width: 30em;
   }
 
   .ui-autocomplete li.ui-autocomplete-category:first-child {
@@ -210,7 +218,8 @@ input[type=search].ui-autocomplete-loading {
   }
 
   .ui-widget-content {
-    background: #BBDDEE none;
+    background: #BBDDEE;
+    max-width: 15rem;
   }
 
   .ui-tabs .ui-tabs-nav li a {

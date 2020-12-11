@@ -4,7 +4,6 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 	// console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
 
-
 	if (variants_featTypesOfInt.includes(featureType)){
 		Object.keys(variantResidues).forEach(function(resSnp, i){
 			console.log("The new residue is " + variantResidues[resSnp].newResidue);
