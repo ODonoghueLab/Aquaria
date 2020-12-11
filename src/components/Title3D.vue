@@ -2,18 +2,25 @@
   <div>
     <div id="structureviewerexplanation" class="explanation">
       <div id='titlebar'>
-        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" v-if="organism_name">
+        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" v-if="organism_name && !seqRes">
           <img v-bind:src="search">
           {{organism_name}} <strong>{{primary_accession}}</strong>
         </span>
-        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" v-if="!organism_name">
+        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" v-if="!organism_name && !seqRes">
           <img v-bind:src="search">
           Protein Sequence
         </span>
-        <span id="threeDexplanation" class='titlepanel' @click="showthreeDexplanation">aligned onto </span>
-        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="pdb">{{pdb}}</span>
+        <span id="threeDexplanation" class='titlepanel' v-if="!seqRes" @click="showthreeDexplanation">aligned onto </span>
+        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="pdb && !seqRes">{{pdb}}</span>
         <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="!pdb">PDB-ID </span>
-        <!-- <span id="search">?</span> -->
+        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" v-if="seqRes">
+          <img v-bind:src="search">
+          <span>
+          Sequence <br/>Structure
+          </span>
+        </span>
+        <span id="threeDexplanation" class='titlepanel' v-if="seqRes"><strong>{{primary_accession}}:</strong> <br/> <strong>{{pdb}}:</strong> </span>
+        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="seqRes">{{seqRes}} <br/> {{structRes}}</span>
       </div>
     </div>
     <div id='contentPanel'>
@@ -48,7 +55,9 @@ export default {
       primary_accession: null,
       text: null,
       pdb: null,
-      search: require('../assets/img/search_100.png')
+      search: require('../assets/img/search_100.png'),
+      seqRes: null,
+      structRes: null
     }
   },
   beforeMount () {
@@ -145,6 +154,7 @@ export default {
     this.resetSelection()
   },
   updated () {
+    var _this = this
     var input
     input = document.querySelector('#organism_syn_input')
     input.placeholder = window.AQUARIA.organismName
@@ -152,11 +162,31 @@ export default {
     input = document.querySelector('#protein_syn_input')
     input.placeholder = window.AQUARIA.preferred_protein_name
     input.setAttribute('size', input.getAttribute('placeholder').length)
+
+    var selectedRes = new MutationObserver(function () {
+      if (document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display === 'none') {
+        _this.seqRes = null
+        _this.structRes = null
+      } else {
+        var residues = document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').innerText.split('\n')
+        var pdb = window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain + ':'
+        var accession = window.AQUARIA.Gene + ':'
+        _this.seqRes = residues[1].split(accession)[1]
+        _this.structRes = residues[0].split(pdb)[1]
+      }
+    })
+
+    selectedRes.observe(document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection'), {
+      attributes: true, childList: true, characterData: true
+    })
   }
 }
 </script>
 
 <style>
+.titlepanel {
+  text-align: left;
+}
 /* #search {
   font-weight: 500;
     padding: 1px 8px;

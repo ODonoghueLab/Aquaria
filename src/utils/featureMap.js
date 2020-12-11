@@ -1,6 +1,7 @@
 import d3 from 'd3'
 import $ from 'jquery'
 import * as Panels from './matches_features_panels'
+import * as common from '../utils/common'
 
 export function createFeatureMap (datum) {
   document.querySelectorAll("#selectedCluster [id*='r_'] rect").forEach(function (part) {
@@ -151,7 +152,7 @@ function showAnnotation (f, eid) {
     }
     urlhtml += '</p>'
   }
-  $('div.popup').remove()
+  // $('div.popup').remove()
   var balloon = "<div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>" + f.label + ' ('
   if (f.start === f.end) {
     balloon = balloon + 'Residue ' + f.start
@@ -161,36 +162,51 @@ function showAnnotation (f, eid) {
 
   balloon = balloon + ')<br/>' + f.desc + '</p>' + urlhtml + '</div>'
 
-  d3.select('body')
-    .append('div')
-    .attr('class', 'popup')
-    .html(balloon)
+  // d3.select('#popuptext')
+  //   // .append('div')
+  //   // .attr('class', 'popup')
+  //   .html(balloon)
 
-  var popheight = $('div.popup').innerHeight()
+  // $('div.popup').fadeIn()
+  // var popheight = $('div.popup').innerHeight()
 
   var fpos = $('#' + eid).offset()
   var fwidth = $('#' + eid).attr('width')
+  // var fleft = d3.select('#' + eid).attr('transform').split('(')[1].split(',')[0]
+  // var ftop = fpos.top
+  common.appendPopup(balloon, fpos, fwidth, s)
 
-  var bleft = parseInt(fpos.left + fwidth / 2 - 160)
-  var btop = parseInt(fpos.top - popheight)
+  // var bleft = parseInt(fpos.left + (fwidth / 2) - 235)
+  // var btop = parseInt(fpos.top - popheight)
 
-  $('div.popup').css({
-    left: bleft + 'px',
-    top: btop + 'px',
-    width: '470px'
-  }).fadeIn(600)
+  // if (bleft < 0) {
+  //   bleft = 0
+  //   document.querySelector('div#popup').style.backgroundPositionX = '0px'
+  // } else if (parseInt(fpos.left + (fwidth / 2)) + (470 / 2) > window.innerWidth) {
+  //   bleft = bleft - 470 / 2
+  //   document.querySelector('div#popup').style.backgroundPositionX = 'right'
+  // } else {
+  //   document.querySelector('div#popup').style.backgroundPositionX = 'center'
+  // }
 
-  $('span.x').on('click', function () {
-    $('div.popup').fadeOut()
-  })
+  // $('div#popup').css({
+  //   left: bleft + 'px',
+  //   top: btop + 'px',
+  //   width: '470px'
+  // })
 
-  $('div.popup').on('hover', function () {
-    clearTimeout(s)
-  }, function () {
-    s = setTimeout(function () {
-      $('div.popup').fadeOut()
-    }, 500)
-  })
+  // // Click on X to close popup
+  // $('span.x').on('click', function () {
+  //   $('div.popup').fadeOut()
+  // })
+
+  // $('div.popup').on('hover', function () {
+  //   clearTimeout(s)
+  // }, function () {
+  //   s = setTimeout(function () {
+  //     $('div#popup').fadeOut()
+  //   }, 500)
+  // })
 }
 
 var t, s

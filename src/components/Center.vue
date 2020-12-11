@@ -7,6 +7,7 @@
     <AboutAquaria />
     <Tabs />
     <CoverageMap />
+    <PopUp />
 </div>
 </template>
 
@@ -17,6 +18,7 @@ import AboutAquaria from './AboutAquaria'
 import Tabs from '../components/Tabs'
 import $ from 'jquery'
 import Menu from './Menu'
+import PopUp from './PopUp'
 export default {
   name: 'Center',
   components: {
@@ -24,7 +26,8 @@ export default {
     AboutAquaria,
     Tabs,
     Menu,
-    CoverageMap
+    CoverageMap,
+    PopUp
   },
   data () {
     return {
