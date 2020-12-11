@@ -22,11 +22,133 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
 					let obj_inFeatType = cleanData_pp(description);
 					obj_featType[featureType] = obj_inFeatType;
-					console.log(' does come in here ... ');
-					console.log(obj_inFeatType);
+					// console.log(' does come in here ... ');
+					// console.log(obj_inFeatType);
+
+					variantResidues[resSnp][serverName].push(obj_featType);
 				}
 
-				variantResidues[resSnp][serverName].push(obj_featType);
+				else if (serverName == 'SNAP2'){
+					// 1. Check if object exists with name Mutational sensitivity
+
+					let obj_featType = {};
+					let idx = checkAndRetIdx(variantResidues[resSnp][serverName], 'Mutational sensitivity') ;
+					console.log('snap2 idx is ' + idx);
+					if (idx != -1){
+						obj_featType = variantResidues[resSnp][serverName][idx];
+					}
+					if (featureType == 'Mutational sensitivity (SNAP2 ratio of effect mutations)'){
+						cleanData_snap2_effects(description, obj_featType, variantResidues[resSnp].newResidue);
+					}
+					else if (featureType == 'Mutation score (average SNAP2 score)'){
+						cleanData_snap2_getAvgScore(description, obj_featType);
+					}
+					else {
+						console.log("feature name is " + featureType);
+					}
+
+
+					if (idx != -1){
+						variantResidues[resSnp][serverName][idx] = obj_featType;
+					}
+					else {
+						variantResidues[resSnp][serverName].push(obj_featType);
+					}
+
+
+				}
+				else if (serverName == 'CATH') {
+					obj_featType = cleanData_cath(description);
+					variantResidues[resSnp][serverName].push(obj_featType);
+				}
+
+				else if (serverName == 'UniProt'){
+					console.log('uniprot featuretype is ' + featureType);
+					console.log("uniprot feature description is "  + description);
+
+					if (featureType == 'Metal ion-binding site'){
+						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
+
+						if (idx == -1){
+							obj_featType[featureType] = {};
+							obj_featType[featureType]['mainToShow'] = "Binds to " + description;
+							variantResidues[resSnp][serverName].push(obj_featType);
+						}
+						else { // already exists, hence append;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+						}
+
+					}
+					else if (featureType == 'Site'){
+						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
+
+						if (idx == -1){
+							obj_featType[featureType] = {};
+							obj_featType[featureType]['mainToShow'] = description;
+							variantResidues[resSnp][serverName].push(obj_featType);
+						}
+						else { // already exists, hence append;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+						}
+					}
+
+					else if (featureType == 'Modified residue'){
+						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
+
+						if (idx == -1){
+							obj_featType[featureType] = {};
+							obj_featType[featureType]['mainToShow'] = description;
+							variantResidues[resSnp][serverName].push(obj_featType);
+						}
+						else { // already exists, hence append;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+						}
+					}
+					else if (featureType == 'Cross-link'){
+						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
+
+						if (idx == -1){
+							obj_featType[featureType] = {};
+							obj_featType[featureType]['mainToShow'] = description;
+							variantResidues[resSnp][serverName].push(obj_featType);
+						}
+						else { // already exists, hence append;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+						}
+					}
+					else if (featureType == 'Sequence variant'){
+						// check for the right residue;
+						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
+
+						if (idx == -1){
+							obj_featType[featureType] = {};
+							obj_featType[featureType]['mainToShow'] = description;
+							variantResidues[resSnp][serverName].push(obj_featType);
+						}
+						else { // already exists, hence append;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+						}
+					}
+					else if (featureType == "Mutagenesis site"){
+						// Also some need check for the right residue. 
+						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
+
+						if (idx == -1){
+							obj_featType[featureType] = {};
+							obj_featType[featureType]['mainToShow'] = description;
+							variantResidues[resSnp][serverName].push(obj_featType);
+						}
+						else { // already exists, hence append;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+						}
+					}
+
+				}
+
+
+
+
+
 
 
 				console.log("over here! " + serverName);
@@ -93,6 +215,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 }
 
 
+/// Cleaning descriptions;
 function cleanData_pp(desc){
 	desc = desc.replace(/\s+/g, '');
 
@@ -105,6 +228,140 @@ function cleanData_pp(desc){
 	return obj_inFeatType;
 }
 
+
+
+function cleanData_uniprot_metalIon(desc){
+
+}
+
+function cleanData_snap2_getAvgScore(desc, obj_featType){
+	console.log ('snap2 desc is ' + desc);
+	desc = desc.replace(/^[^\;]+\;/, '');
+	desc = desc.replace(/\;.*$/, '');
+
+	let arr = desc.split(/\:/);
+
+	let mainToShow = "Average score: " + arr[1];
+
+	if (!obj_featType.hasOwnProperty('Mutational sensitivity')) {
+		obj_featType['Mutational sensitivity'] = {};
+	}
+
+	if (! obj_featType['Mutational sensitivity'].hasOwnProperty('mainToShow')){
+		obj_featType['Mutational sensitivity']['mainToShow'] = mainToShow;
+	}
+	else {
+		obj_featType['Mutational sensitivity']['mainToShow'] =  obj_featType['Mutational sensitivity']['mainToShow'] + "<br>" + mainToShow;
+	}
+
+	// let obj_inFeatType = {mainToShow: "Average score: " + arr[1]};
+	// return obj_inFeatType;
+}
+
+
+function cleanData_cath(desc){
+	desc = desc.replace(/\<span[^\>]*\>/, '');
+	desc = desc.replace(/\<i\>/, '');
+	desc = desc.replace(/\<\/i\>/, '');
+	desc = desc.replace(/\<\/span\>/, '');
+	desc = desc.replace(/\$.*$/, '');
+
+	let arr = desc.split(/\:\s/);
+	arr[0] = arr[0].replace(/CATH/, '');
+
+	let obj_featType = {};
+
+	obj_featType[arr[0]] = {'mainToShow': arr[1]};
+	// {mainToShow: arr_1[1], mainToHide: "Score: " + arr_1[0]};
+
+	console.log('cleaned cath desc is ' + desc + " arr[0]" + arr[0] + " arr[1]:" + arr[1]);
+	return (obj_featType);
+}
+
+function cleanData_snap2_effects(desc, obj_featType, newRes){
+	console.log("now the snap2 desc is " + desc);
+
+	let arr = desc.split("\;");
+	let mainToHide = '';
+	let mainToShow = arr[0];
+	let otherResidues = '';
+
+	if (arr.length > 2){
+		// individual residue values are present
+		// Search for newResidue; // Data is in mainToHide, otherResidues;
+
+		arr[2] = arr[2].replace(/^[^\:]+:/, '');
+		let arr_1 = arr[2].split("\,");
+
+		otherResidues = arr_1.length + "/20 residues add to change. " + 'Additional residues adding to mutational sensitivity ';
+
+		let isNewResFound = false;
+
+		let regex = new RegExp("^[\\s]*" + newRes);
+		let foundIdx = -1;
+		console.log("regex is " + regex);
+		arr_1.forEach(function(item, i){
+			if (item.match(regex)){
+				console.log("found ! " + item);
+				isNewResFound = true;
+				mainToHide = "Score with which residue adds to change " + item;
+				foundIdx = i;
+
+			}
+			else {
+				otherResidues = otherResidues + " " + item;
+			}
+			// console.log(item + " " + newRes);
+		});
+
+		if (isNewResFound == false){
+			// This residue does not add to change;
+			mainToHide = "This residue does not add to mutational sensitivity.";
+		}
+	}
+	else{
+		// Place as is in the mainToHide section;
+		mainToHide = arr[1];
+	}
+
+
+
+	if (!obj_featType.hasOwnProperty('Mutational sensitivity')) {
+		obj_featType['Mutational sensitivity'] = {};
+	}
+
+	if (! obj_featType['Mutational sensitivity'].hasOwnProperty('mainToShow')){
+		obj_featType['Mutational sensitivity']['mainToShow'] = mainToShow;
+	}
+	else {
+		obj_featType['Mutational sensitivity']['mainToShow'] = mainToShow + "<br>" + obj_featType['Mutational sensitivity']['mainToShow'];
+	}
+
+	if (mainToHide != ''){
+		obj_featType['Mutational sensitivity']['mainToHide'] = mainToHide;
+	}
+
+	if (otherResidues != ''){
+		obj_featType['Mutational sensitivity']['otherResidues'] = otherResidues;
+	}
+
+
+}
+
+
+
+function checkAndRetIdx(arrOfObjs, key){
+	let idx = -1;
+	for (let i = 0; i< arrOfObjs.length; i++){
+		if (arrOfObjs[i].hasOwnProperty(key)){
+			idx =  i;
+		}
+	}
+
+	return idx;
+}
+
+/////////
 
 function generateShowHideFnStr(id_complete){
 	returnStr = "elem = document.getElementById('" + id_complete + "');";
