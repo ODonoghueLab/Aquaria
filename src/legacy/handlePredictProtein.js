@@ -60,6 +60,7 @@ module.exports = function (jsonObj, primary_accession, featureCallback, validate
 	console.log(variantResidues);
 
 	validateAgainstSchema(aquariaJsonObj, primary_accession, featureCallback, 'PredictProtein'); 
+
 	// console.log(aquariaJsonObj);
 	//return (aquariaJsonObj);
 }

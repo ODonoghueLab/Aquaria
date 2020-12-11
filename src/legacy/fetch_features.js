@@ -1346,6 +1346,7 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				featureAttributes.Name = feature
 				if(feature.split(residue)[1].toLowerCase() == 'ter' || feature.split(residue)[1].toLowerCase() == 'x'){
 					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
+
 					// variantResidues[featureAttributes.Residues[0] + '-' + featureAttributes.Residues[0]] = "";
 					newResidue = 'X';
 				}

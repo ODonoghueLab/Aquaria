@@ -55,7 +55,7 @@ export default {
       primary_accession: null,
       text: null,
       pdb: null,
-      search: require('../assets/img/search.png'),
+      search: require('../assets/img/search_100.png'),
       seqRes: null,
       structRes: null
     }
@@ -213,12 +213,11 @@ export default {
 #titlebar span {
   display: inline-block;
   background-color: var(--primary-label);
-  background-position: 1rem 50%;
-  background-size: 0;
   padding: calc(0.4rem + 3 * ((100vw - 320px) / 680)) 0.2rem;
   transition: all 0.5s ease;
   color: var(--text);
   text-decoration: none;
+  line-height: calc(14px + .6vw);
 }
 #titlebar span:hover {
   background-color: var(--primary-link);
@@ -235,8 +234,6 @@ span#uniprotpanel {
   padding-left: 1rem;
   border-top-left-radius: 1.5rem;
   border-bottom-left-radius: 1.5rem;
-  background-position: 0.5rem 50%;
-  background-size: 0;
   transition: all 0.7s ease;
 }
 
@@ -249,11 +246,11 @@ span#pdbpanel {
 
 /* Neblina */
 #titlebar {
-    display: -webkit-box;
+    /* display: -webkit-box;
     margin: auto;
-    border-radius: 5em;
+    border-radius: 5em; */
     background-color: var(--primary-label);
-    min-width: 260px;
+    min-width: 245px;
 }
 .roundButton {
     color: #999;
@@ -304,9 +301,12 @@ span#pdbpanel {
   border-radius: 2em;
   background: rgb(222, 222, 222);
   max-height: 80vh;
-  top: -40px;
+  top: -30px;
   position: relative;
-  padding-top: 40px;
+  padding: 4rem 0 2rem 0;
+}
+#panel1 {
+  margin-top: -1rem;
 }
 #structureviewerexplanation_1 > #titlebar >  #uniprotpanel {
   padding-right: 5px;
