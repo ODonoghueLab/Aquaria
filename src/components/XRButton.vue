@@ -482,7 +482,7 @@ export default XRButtonComponent
           </div>
         </div>
 
-        <div id='xrDev' v-if="$mq === 'laptop'">
+        <div id='xrDev'>
         <!-- Download (GLTF) -->
         <button class="xr-item default-button" @click="close(); downloadGltf()">Download GLB</button>
 
@@ -579,7 +579,6 @@ export default XRButtonComponent
     display: grid;
   }
   #xrDev{
-    display: none;
     background-color: #dddddd;
     margin: 0.4em 2em 0em 2em;
   }
