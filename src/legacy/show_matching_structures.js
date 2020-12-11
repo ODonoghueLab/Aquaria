@@ -62,6 +62,9 @@ ShowMatchingStructures.prototype.initialise = function(sequence) {
 
 		this.removeAll();
 
+		if(document.querySelector('#vis > .ruler')){
+			document.querySelector('#vis > .ruler').remove()
+		}
 		// draw axis ruler
 		this.drawAxisRuler("vis");
 		
