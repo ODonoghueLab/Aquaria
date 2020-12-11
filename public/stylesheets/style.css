@@ -714,7 +714,7 @@ div.balloon p.quality.twilight { background: #455; color: #CC3; }
 
 div.balloon p.quality.high { background: #555; color: #DFF; }
 */
-  div.balloon h3 {
+  /* div.balloon h3 {
     background-color: #999;
     margin-bottom: 1em;
   }
@@ -749,7 +749,7 @@ div.balloon p.quality.high { background: #555; color: #DFF; }
 
   div.popup.top {
     background: transparent none;
-  }
+  } */
 
   div.large-ppi-diagram {
     position: absolute;
