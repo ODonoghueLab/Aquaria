@@ -952,7 +952,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 								description = description + " " + featTypes[aFeatType].mainToHide;
 							}
 							if (featTypes[aFeatType].hasOwnProperty('otherResidues')){
-								description = description + " " + featTypes[aFeatType].otherResidues;
+								description = description + " *** " + featTypes[aFeatType].otherResidues;
 							}
 						});
 					// });

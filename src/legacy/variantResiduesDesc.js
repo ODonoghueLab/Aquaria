@@ -6,7 +6,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 	if (variants_featTypesOfInt.includes(featureType)){
 		Object.keys(variantResidues).forEach(function(resSnp, i){
-			console.log("The new residue is " + variantResidues[resSnp].newResidue);
+			// console.log("The new residue is " + variantResidues[resSnp].newResidue);
 
 			if (parseInt(resSnp) >= parseInt(resStart_pp) && parseInt(resSnp) <= parseInt(resEnd_pp)){
 
@@ -116,32 +116,34 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
 						}
 					}
-					else if (featureType == 'Sequence variant'){
+					else if (featureType == 'Sequence variant' || featureType == 'Mutagenesis site'){
 						// check for the right residue;
+						let objWithInfo = cleanData_uniprot_seqVar(description, variantResidues[resSnp].newResidue);
 						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
 
 						if (idx == -1){
 							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = description;
+							if (objWithInfo.hasOwnProperty('mainToShow')){
+								obj_featType[featureType]['mainToShow'] = objWithInfo.mainToShow;
+							}
+							if (objWithInfo.hasOwnProperty('otherResidues')){
+								obj_featType[featureType]['otherResidues'] = objWithInfo.otherResidues;
+							}
+							// obj_featType[featureType]['mainToShow'] = objWithInfo.mainToShow;
 							variantResidues[resSnp][serverName].push(obj_featType);
 						}
 						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
-						}
-					}
-					else if (featureType == "Mutagenesis site"){
-						// Also some need check for the right residue. 
-						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
 
-						if (idx == -1){
-							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = description;
-							variantResidues[resSnp][serverName].push(obj_featType);
-						}
-						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+							if (objWithInfo.hasOwnProperty('mainToShow')){
+								variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] + objWithInfo.mainToShow;
+							}
+							if (objWithInfo.hasOwnProperty('otherResidues')){
+								variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] = variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] + objWithInfo.otherResidues;
+							}
+							// variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
 						}
 					}
+					
 
 				}
 
@@ -230,12 +232,39 @@ function cleanData_pp(desc){
 
 
 
-function cleanData_uniprot_metalIon(desc){
+function cleanData_uniprot_seqVar(desc, newRes, feat_toObj){
+	// main to show, other residues;
 
+	desc = desc.replace(/^[\s]+/, "");
+	let arr = desc.split(/[\s]+/);
+	let mainToShow = "";
+	let otherResidues = "";
+	if (arr[1] == '>'){
+		if (arr[2] == newRes){
+			mainToShow = desc;
+		}
+		else {
+			otherResidues = desc;
+		}
+	}
+	else {
+		mainToShow = desc;
+	}
+
+	let objToReturn = {};
+
+	if (mainToShow != ''){
+		objToReturn['mainToShow'] = mainToShow;
+	}
+	if (otherResidues != ''){
+		objToReturn['otherResidues'] = otherResidues;
+	}
+
+	return ({'mainToShow': mainToShow, 'otherResidues': otherResidues})
 }
 
 function cleanData_snap2_getAvgScore(desc, obj_featType){
-	console.log ('snap2 desc is ' + desc);
+	// console.log ('snap2 desc is ' + desc);
 	desc = desc.replace(/^[^\;]+\;/, '');
 	desc = desc.replace(/\;.*$/, '');
 
@@ -274,7 +303,7 @@ function cleanData_cath(desc){
 	obj_featType[arr[0]] = {'mainToShow': arr[1]};
 	// {mainToShow: arr_1[1], mainToHide: "Score: " + arr_1[0]};
 
-	console.log('cleaned cath desc is ' + desc + " arr[0]" + arr[0] + " arr[1]:" + arr[1]);
+	// console.log('cleaned cath desc is ' + desc + " arr[0]" + arr[0] + " arr[1]:" + arr[1]);
 	return (obj_featType);
 }
 
