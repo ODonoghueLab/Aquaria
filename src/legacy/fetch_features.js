@@ -917,6 +917,17 @@ var processNextServer = function(primary_accession,
 
 
 
+function generateShowHideFnStr2(id_complete){
+	console.log(id_complete);
+	returnStr = "elem = document.getElementById('" + id_complete + "');";
+
+	returnStr = returnStr + "if (elem.style.display == ''){elem.style.display = 'none'; console.log('Next sibling is'); console.log(elem.nextSibling.innerHTML); elem.nextSibling.innerHTML = '[Additional residues]';}";
+
+	returnStr = returnStr + "else{ elem.style.display = ''; elem.nextSibling.innerHTML = '[Hide]';}; ";
+	return (returnStr);
+}
+
+
 function generateShowHideFnStr(id_complete){
 	console.log(id_complete);
 	returnStr = "elem = document.getElementById('" + id_complete + "');";
@@ -950,24 +961,27 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 
 		for (let serverName in variantResidues[residue]){
 
-			console.log('Server name is ' + serverName);
+			// console.log('Server name is ' + serverName);
 			if (serverName != 'newResidue' && serverName != 'defaultDesc'){
+				description = description + "<br> <br><b>" + serverName + "</b> ";
 				variantResidues[residue][serverName].forEach(function(featTypes, featType_i){
 					// console.log("What is this??");
 					// console.log(featTypes);
 
 					// arr_featTypes.forEach(function(aFeatObj, aFeatObj_i){
 						Object.keys(featTypes).forEach(function(aFeatType, aFeatType_i){
-							description = description + "<br><b>" + serverName + "</b> " + aFeatType;
+							description = description + "<br> <i>"+ aFeatType + "</i>";
 							if (featTypes[aFeatType].hasOwnProperty('mainToShow')){
-								description = description + " " + featTypes[aFeatType].mainToShow;
+								description = description + " <br>" + featTypes[aFeatType].mainToShow;
 							}
 							if (featTypes[aFeatType].hasOwnProperty('mainToHide')){
-								description = description + " <span class=\"teaser\"> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + featTypes[aFeatType].mainToHide + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> [+] </span>";
+								description = description + " <span class=\"teaser\"> </span> <div id=\"complete" + counter_complete + "\" style=\"display: none\"> " + featTypes[aFeatType].mainToHide + " </div><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> [+] </span>";
 								counter_complete = counter_complete + 1;
 							}
 							if (featTypes[aFeatType].hasOwnProperty('otherResidues')){
-								description = description + " *** " + featTypes[aFeatType].otherResidues;
+								description = description + " <span class=\"teaser\"> </span> <div id=\"complete" + counter_complete + "\" style=\"display: none\"> Additional residues: <ul>" + featTypes[aFeatType].otherResidues + "</ul> </div><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr2("complete"+counter_complete) + "  })();\"> [Additional residues] </span>";
+
+								counter_complete = counter_complete + 1;
 							}
 						});
 					// });

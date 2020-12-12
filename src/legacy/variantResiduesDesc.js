@@ -143,7 +143,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 							// variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
 						}
 					}
-					
+
 
 				}
 
@@ -244,7 +244,7 @@ function cleanData_uniprot_seqVar(desc, newRes, feat_toObj){
 			mainToShow = desc;
 		}
 		else {
-			otherResidues = desc;
+			otherResidues = "<li>" +  desc  + "</li>";
 		}
 	}
 	else {
