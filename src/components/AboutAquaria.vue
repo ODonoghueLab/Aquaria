@@ -34,7 +34,7 @@
               <sup>6</sup> The University of Dundee, UK.
               <sup>7</sup> University College London, UK.
             </p>
-            <p><b>Support: </b>Sony Foundation, Tour de Cure Australia, Amazon AWS..<br>&nbsp;</p>
+            <p><b>Support: </b>Sony Foundation, Tour de Cure Australia, Amazon AWS.<br>&nbsp;</p>
           </div>
 </template>
 

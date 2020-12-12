@@ -533,6 +533,9 @@ function doThePlotting_v2(divId, theSeriesData_inner, theSeriesData_outer, theTi
 	});
 }
 
+ 
+var common = require('../utils/common');
+
 function showAnnotation(f, eid) {
 	// console.log(eid);
 	// console.log("Hovered "+f.name+" "+f.start+"-"+f.end+": "+f.desc);
@@ -567,10 +570,10 @@ function showAnnotation(f, eid) {
 
 
 
-	d3.select("body")
-		.append("div")
-			.attr("class", "popup")
-			.html(balloon);
+	// d3.select("body")
+	// 	.append("div")
+	// 		.attr("class", "popup")
+	// 		.html(balloon);
 
 			// .append(theSuperFam);
 
@@ -583,31 +586,32 @@ function showAnnotation(f, eid) {
 	}
 
 
-	var popheight = $("div.popup").innerHeight();
+	// var popheight = $("div.popup").innerHeight();
 
 	var fpos = $("#" + eid).offset();
 	var fwidth = $("#" + eid).attr("width");
+	
+	common.appendPopup(balloon, fpos, fwidth, s)
+	// var bleft = parseInt(fpos.left + fwidth / 2 - 160);
+	// var btop = parseInt(fpos.top - popheight);
 
-	var bleft = parseInt(fpos.left + fwidth / 2 - 160);
-	var btop = parseInt(fpos.top - popheight);
+	// $("div.popup").css({
+	// 	"left" : bleft + "px",
+	// 	"top" : btop + "px",
+	// 	"width": "470px"
+	// }).fadeIn(600);
 
-	$("div.popup").css({
-		"left" : bleft + "px",
-		"top" : btop + "px",
-		"width": "470px"
-	}).fadeIn(600);
+	// $("span.x").click(function() {
+	// 	$("div.popup").fadeOut();
+	// });
 
-	$("span.x").click(function() {
-		$("div.popup").fadeOut();
-	});
-
-	$("div.popup").hover(function() {
-		clearTimeout(s);
-	}, function() {
-		s = setTimeout(function() {
-			$("div.popup").fadeOut();
-		}, 500);
-	});
+	// $("div.popup").hover(function() {
+	// 	clearTimeout(s);
+	// }, function() {
+	// 	s = setTimeout(function() {
+	// 		$("div.popup").fadeOut();
+	// 	}, 500);
+	// });
 
 }
 
