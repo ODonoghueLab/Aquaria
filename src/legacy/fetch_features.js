@@ -916,6 +916,20 @@ var processNextServer = function(primary_accession,
 };
 
 
+
+function generateShowHideFnStr(id_complete){
+	console.log(id_complete);
+	returnStr = "elem = document.getElementById('" + id_complete + "');";
+
+	returnStr = returnStr + "if (elem.style.display == ''){elem.style.display = 'none'; console.log('Next sibling is'); console.log(elem.nextSibling.innerHTML); elem.nextSibling.innerHTML = '[+]';}";
+
+	returnStr = returnStr + "else{ elem.style.display = ''; elem.nextSibling.innerHTML = '[-]';}; ";
+	return (returnStr);
+}
+
+var counter_complete = 0;
+
+
 function toDescAndAddToAdedFeat(){ // convert to description and add to added feature's description
 	// return new Promise(function(resolve, reject) {
 	console.log("Convert the variant features to description, and update added feature's description");
@@ -949,7 +963,8 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 								description = description + " " + featTypes[aFeatType].mainToShow;
 							}
 							if (featTypes[aFeatType].hasOwnProperty('mainToHide')){
-								description = description + " " + featTypes[aFeatType].mainToHide;
+								description = description + " <span class=\"teaser\"> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + featTypes[aFeatType].mainToHide + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> [+] </span>";
+								counter_complete = counter_complete + 1;
 							}
 							if (featTypes[aFeatType].hasOwnProperty('otherResidues')){
 								description = description + " *** " + featTypes[aFeatType].otherResidues;
@@ -960,6 +975,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 			}
 
 
+			// let aDesc =  "<span class=\"teaser\"> <i> " + featureType + "</i> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + description + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> more... </span>";
 			// description = description + "<tr>";
 
 			// description = description + "</tr>";
