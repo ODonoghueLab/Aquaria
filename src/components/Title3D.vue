@@ -11,8 +11,8 @@
           Protein Sequence
         </span>
         <span id="threeDexplanation" class='titlepanel' v-if="!seqRes" @click="showthreeDexplanation">aligned onto </span>
-        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="pdb && !seqRes">{{pdb}}</span>
-        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="!pdb">PDB-ID </span>
+        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="pdb && !seqRes">{{pdb}} <a href="javascript: alert('HELP')" class="help">?</a></span>
+        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="!pdb">PDB-ID <a href="javascript: alert('HELP')" class="help">?</a></span>
         <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" v-if="seqRes">
           <img v-bind:src="search">
           <span>
@@ -20,7 +20,7 @@
           </span>
         </span>
         <span id="threeDexplanation" class='titlepanel' v-if="seqRes"><strong>{{primary_accession}}:</strong> <br/> <strong>{{pdb}}:</strong> </span>
-        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="seqRes">{{seqRes}} <br/> {{structRes}}</span>
+        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="seqRes">{{seqRes}} <br/> {{structRes}} <a href="javascript: alert('HELP')" class="help">?</a></span>
       </div>
     </div>
     <div id='contentPanel'>
@@ -244,7 +244,7 @@ span#uniprotpanel {
 }
 
 span#pdbpanel {
-  padding-right: 1rem;
+  padding-right: 0.5rem;
   font-weight: 600;
   border-top-right-radius: 1.5rem;
   border-bottom-right-radius: 1.5rem;
@@ -326,5 +326,23 @@ span#pdbpanel {
 }
 #structureviewerexplanation_1 > #titlebar >  #pdbpanel {
   padding-left: 8px;
+}
+/* #pdbpanel .help {
+  position: relative;
+} */
+#pdbpanel .help {
+    width: 0.8rem;
+    height: 0.8rem;
+    position: relative;
+    left: 0.2rem;
+    display: inline-flex;
+    /* z-index: 11; */
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-highlight);
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    font-size: 0.6rem;
 }
 </style>
