@@ -109,7 +109,7 @@ export default {
       }
       this.resetSelection()
       ev.target.className = 'titlepanel active'
-      document.querySelector('#contentPanel').style.display = 'block'
+      document.querySelector('#contentPanel').style.display = 'flex'
       document.querySelector('#panel1').style.display = 'block'
       document.querySelector('#uniprot').style.display = 'block'
       document.querySelector('#searchByName').style.display = 'block'
@@ -117,7 +117,7 @@ export default {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#uniprot').style.display = 'none'
         document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = 'grid'
+        document.querySelector('#structureviewerexplanation').style.display = 'flex'
         document.querySelector('div.dimmer').remove()
       })
     },
@@ -128,7 +128,7 @@ export default {
       this.resetSelection()
       ev.target.className = 'titlepanel active'
       document.querySelector('#gallery').style.display = 'block'
-      document.querySelector('#contentPanel').style.display = 'block'
+      document.querySelector('#contentPanel').style.display = 'flex'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#contentPanel').style.display = 'none'
@@ -142,7 +142,7 @@ export default {
       this.resetSelection()
       ev.target.className = 'titlepanel active'
       document.querySelector('#explanation').style.display = 'block'
-      document.querySelector('#contentPanel').style.display = 'block'
+      document.querySelector('#contentPanel').style.display = 'flex'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#contentPanel').style.display = 'none'
@@ -197,7 +197,7 @@ export default {
     margin-left: 5px;
 } */
 #uniprotpanel > img {
- height: calc(12px + .6vw);
+ height: calc(10px + .6vw);
 }
 /* Christian */
 #titlebar {
@@ -213,7 +213,7 @@ export default {
 #titlebar span {
   display: inline-block;
   background-color: var(--primary-label);
-  padding: calc(0.4rem + 3 * ((100vw - 320px) / 680)) 0.2rem;
+  padding: 0 0.2rem;
   transition: all 0.5s ease;
   color: var(--text);
   text-decoration: none;
@@ -230,6 +230,12 @@ export default {
   border-right: 1px dotted var(--background);
   border-left: 1px dotted var(--background);
 }
+
+span#uniprotpanel, span#pdbpanel, span#threeDexplanation {
+  padding-top: 0.25rem;
+  padding-bottom: 0.3rem;
+}
+
 span#uniprotpanel {
   padding-left: 1rem;
   border-top-left-radius: 1.5rem;
@@ -249,8 +255,8 @@ span#pdbpanel {
     /* display: -webkit-box;
     margin: auto;
     border-radius: 5em; */
-    background-color: var(--primary-label);
-    min-width: 245px;
+    /* background-color: var(--primary-label); */
+    min-width: 272px;
 }
 .roundButton {
     color: #999;
@@ -259,17 +265,17 @@ span#pdbpanel {
     padding: 0 4px;
 }
 .contents {
-  padding: 0px 40px;
+  padding: 0 1rem;
   text-align: left;
   color: #5d5d5d;
   overflow: auto;
 }
 #structureviewerexplanation,#structureviewerexplanation_1 {
-    display: grid;
+    display: flex;
     background-color: var(--transparent);
     position: fixed;
     left: 50%;
-    top: 28px;
+    top: 4.5vh;
     transform: translate(-50%, -50%);
     -webkit-box-align: baseline;
     align-items: baseline;
@@ -292,7 +298,6 @@ span#pdbpanel {
     margin: 10px 0px;
     width: 100%;
     height: fit-content;
-    padding: 10px;
     z-index: 20;
 }
 #contentPanel {
