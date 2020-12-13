@@ -66,16 +66,16 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					console.log('uniprot featuretype is ' + featureType);
 					console.log("uniprot feature description is "  + description);
 
-					if (featureType == 'Metal ion-binding site'){
+					if (featureType == 'Metal ion-binding site' ){
 						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
 
 						if (idx == -1){
 							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = "Binds to " + description;
+							obj_featType[featureType]['mainToShow'] = "<li> Binds to " + description + "</li>";
 							variantResidues[resSnp][serverName].push(obj_featType);
 						}
 						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + "<li>" + description + "</li>";
 						}
 
 					}
@@ -84,11 +84,11 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 						if (idx == -1){
 							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = description;
+							obj_featType[featureType]['mainToShow'] = "<li>" + description + "</li>";
 							variantResidues[resSnp][serverName].push(obj_featType);
 						}
 						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + "<li> " + description + "</li>";
 						}
 					}
 
@@ -97,11 +97,11 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 						if (idx == -1){
 							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = description;
+							obj_featType[featureType]['mainToShow'] = "<li>" + description + "</li>";
 							variantResidues[resSnp][serverName].push(obj_featType);
 						}
 						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '<li>' + description + "</li>";
 						}
 					}
 					else if (featureType == 'Cross-link'){
@@ -109,11 +109,11 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 						if (idx == -1){
 							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = description;
+							obj_featType[featureType]['mainToShow'] = "<li>" + description + "</li>";
 							variantResidues[resSnp][serverName].push(obj_featType);
 						}
 						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
+							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + "<li>" + description + "</li>";
 						}
 					}
 					else if (featureType == 'Sequence variant' || featureType == 'Mutagenesis site'){
@@ -127,7 +127,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 								obj_featType[featureType]['mainToShow'] = objWithInfo.mainToShow;
 							}
 							if (objWithInfo.hasOwnProperty('otherResidues')){
-								obj_featType[featureType]['otherResidues'] = objWithInfo.otherResidues;
+								obj_featType[featureType]['otherResidues'] = "<li>" + objWithInfo.otherResidues + "</li>";
 							}
 							// obj_featType[featureType]['mainToShow'] = objWithInfo.mainToShow;
 							variantResidues[resSnp][serverName].push(obj_featType);
@@ -138,13 +138,16 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 								variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] + objWithInfo.mainToShow;
 							}
 							if (objWithInfo.hasOwnProperty('otherResidues')){
-								variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] = variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] + objWithInfo.otherResidues;
+								variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] = variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] + "<li>" + objWithInfo.otherResidues + "</li>";
 							}
 							// variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
 						}
 					}
 
 
+				}
+				else if (serverName == 'COSMIC mutations'){
+					console.log("The cosmic description is " + description); 
 				}
 
 
@@ -244,7 +247,7 @@ function cleanData_uniprot_seqVar(desc, newRes, feat_toObj){
 			mainToShow = desc;
 		}
 		else {
-			otherResidues = "<li>" +  desc  + "</li>";
+			otherResidues = desc;
 		}
 	}
 	else {
@@ -260,7 +263,7 @@ function cleanData_uniprot_seqVar(desc, newRes, feat_toObj){
 		objToReturn['otherResidues'] = otherResidues;
 	}
 
-	return ({'mainToShow': mainToShow, 'otherResidues': otherResidues})
+	return (objToReturn)
 }
 
 function cleanData_snap2_getAvgScore(desc, obj_featType){

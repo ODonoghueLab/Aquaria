@@ -799,7 +799,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 
 		if (requestedFeature == 'myVariant.info'){
-			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
+			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
 		}
 
 		// return featuresFromExtServer
@@ -972,10 +972,15 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 						Object.keys(featTypes).forEach(function(aFeatType, aFeatType_i){
 							description = description + "<br> <i>"+ aFeatType + "</i>";
 							if (featTypes[aFeatType].hasOwnProperty('mainToShow')){
-								description = description + " <br>" + featTypes[aFeatType].mainToShow;
+								if (serverName == 'UniProt'){
+									description = description + " <br> <ul>" + featTypes[aFeatType].mainToShow + "</ul>";
+								}
+								else {
+									description = description + " <br>" + featTypes[aFeatType].mainToShow;
+								}
 							}
 							if (featTypes[aFeatType].hasOwnProperty('mainToHide')){
-								description = description + " <span class=\"teaser\"> </span> <div id=\"complete" + counter_complete + "\" style=\"display: none\"> " + featTypes[aFeatType].mainToHide + " </div><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> [+] </span>";
+								description = description + " <span class=\"teaser\"> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + featTypes[aFeatType].mainToHide + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> [+] </span>";
 								counter_complete = counter_complete + 1;
 							}
 							if (featTypes[aFeatType].hasOwnProperty('otherResidues')){
