@@ -187,15 +187,7 @@ export default {
 .titlepanel {
   text-align: left;
 }
-/* #search {
-  font-weight: 500;
-    padding: 1px 8px;
-    margin-right: 12px;
-    color: black;
-    background: white;
-    border-radius: 11rem;
-    margin-left: 5px;
-} */
+
 #uniprotpanel > img {
  height: calc(10px + .6vw);
 }
@@ -232,12 +224,12 @@ export default {
 }
 
 span#uniprotpanel, span#pdbpanel, span#threeDexplanation {
-  padding-top: 0.25rem;
-  padding-bottom: 0.3rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.4rem;
 }
 
 span#uniprotpanel {
-  padding-left: 1rem;
+  padding-left: 0.6rem;
   border-top-left-radius: 1.5rem;
   border-bottom-left-radius: 1.5rem;
   transition: all 0.7s ease;
@@ -284,14 +276,6 @@ span#pdbpanel {
     font-size: calc(8px + .6vw);
     z-index: 2;
 }
-#searchByName {
-    display: block;
-    overflow: auto;
-    width: fit-content;
-    padding: 5px;
-    border-radius: 10px;
-    z-index: 200;
-}
 
 #uniprot {
     display: block;
@@ -331,8 +315,8 @@ span#pdbpanel {
   position: relative;
 } */
 #pdbpanel .help {
-    width: 0.8rem;
-    height: 0.8rem;
+    width: calc(12px + .6vw);
+    height: calc(12px + .6vw);
     position: relative;
     left: 0.2rem;
     display: inline-flex;
@@ -343,6 +327,6 @@ span#pdbpanel {
     border-radius: 50%;
     color: white;
     cursor: pointer;
-    font-size: 0.6rem;
+    /* font-size: 0.6rem; */
 }
 </style>

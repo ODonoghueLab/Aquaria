@@ -53,16 +53,21 @@ export default {
 </script>
 
 <style>
+#searchByName {
+  width: 100%;
+}
 #searchByName img{
     height: calc(0.25rem + 2vh);
-    margin-top: 8px;
+    margin: 8px 0 0 2px;
     padding-left: 4px;
 }
 #myform{
   display: flex;
   background: white;
-  /* border-radius: 1rem; */
+  border: 1px solid var(--background);
   padding: 2px 0;
+  width: 100%;
+  justify-content: flex-start;
 }
 
 #input1, #input2{
