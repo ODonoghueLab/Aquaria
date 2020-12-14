@@ -43,6 +43,7 @@ var updateFeatureUI = function(featureList) {
 	var clusters = [];
 	var addedFeatures = [];
 	var orderedFeatures = [];
+	AQUARIA.currentFeature = {}
 	//Group by feature source
 	  AQUARIA.groupedFeatures = _.groupBy(featureSet, function(feature) {
 		return feature.Server;
@@ -283,7 +284,8 @@ function drawTrack(datum, i) {
 
 		.on("click", function() {
 			if(d3.select(this).attr("class") == "loaded") {// deselect feature (it's already displayed)
-				AQUARIA.oid = null
+				AQUARIA.currentFeature.oid = null
+				AQUARIA.currentFeature.data = null
 				document.querySelector(".featureHeader.actived").click()
 				d3.select("svg.loaded").classed("loaded", false);
 				AQUARIA.panel3d.blankApplet(true, "Removing feature...")
@@ -294,17 +296,19 @@ function drawTrack(datum, i) {
 					}
 				removeCurrentAnnotationFrom3DViewer();
 				document.querySelector('#outerFeatureMap').remove()
+				document.querySelector('#popup').style.display = 'none'
 				AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
 				// document.querySelector('#selectedCluster > .outer_container').remove()
 				Panels.hidePanels()
 			}
 			else { //console.log("clicked to display feature");
-				document.querySelector(".featureHeader.actived").click()
+				// document.querySelector(".featureHeader.actived").click()
 				if(document.querySelector('#outerFeatureMap')) {
 					document.querySelector('#outerFeatureMap').remove()
 				}
 				var oid = d3.select(this).attr("id").split("_")[2];
-				AQUARIA.oid = oid
+				AQUARIA.currentFeature.oid = oid
+				AQUARIA.currentFeature.data = datum
 				AQUARIA.panel3d.blankApplet(true, "Loading feature...")
 				AQUARIA.panel3d.blankApplet(false)
 				if(datum.Server != "Added Features"){
@@ -321,7 +325,7 @@ function drawTrack(datum, i) {
 				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 				d3.select("svg.loaded").classed("loaded", false);
 				d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
-				drawfeatureMap = featureMap.createFeatureMap(datum)
+				drawfeatureMap = featureMap.createFeatureMap(AQUARIA.currentFeature.data)
 				Panels.hidePanels()
 				}
 			})

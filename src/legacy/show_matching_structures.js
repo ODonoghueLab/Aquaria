@@ -1,6 +1,7 @@
 var ClusterRenderer = require('./clusterRenderer');
 var CoverageMapRenderer = require('../utils/coverageMap')
 var d3 = require('d3');
+// var featureMap = require('../utils/featureMap')
 
 // Render 2D structures in SVG.
 //
@@ -102,6 +103,9 @@ ShowMatchingStructures.prototype.refresh = function() {
 ShowMatchingStructures.prototype.showMap = function(cluster) {
 	CoverageMapRenderer.RenderMap(cluster, this.rank);
 	AQUARIA.showMatchingStructures.cluster = cluster;
+	if(document.querySelector('#outerFeatureMap')){
+		document.querySelector('#outerFeatureMap').remove()
+	}
 };
 
 ShowMatchingStructures.prototype.addCluster = function(cluster) {
