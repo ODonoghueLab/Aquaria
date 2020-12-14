@@ -781,14 +781,14 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 		if (requestedFeature == 'SNAP2'){
 			// console.log(response);
-			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
+			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
 			// console.log(response.data)
 			//console.log(getCurrentUrl());
 			//console.log(servers[3].URL_covid);
-			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
 
 
 		}
@@ -799,7 +799,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 
 		if (requestedFeature == 'myVariant.info'){
-			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
+			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
 		}
 
 		// return featuresFromExtServer
@@ -916,6 +916,31 @@ var processNextServer = function(primary_accession,
 };
 
 
+
+function generateShowHideFnStr2(id_complete){
+	console.log(id_complete);
+	returnStr = "elem = document.getElementById('" + id_complete + "');";
+
+	returnStr = returnStr + "if (elem.style.display == ''){elem.style.display = 'none'; console.log('Next sibling is'); console.log(elem.nextSibling.innerHTML); elem.nextSibling.innerHTML = '[Additional residues]';}";
+
+	returnStr = returnStr + "else{ elem.style.display = ''; elem.nextSibling.innerHTML = '[Hide]';}; ";
+	return (returnStr);
+}
+
+
+function generateShowHideFnStr(id_complete){
+	console.log(id_complete);
+	returnStr = "elem = document.getElementById('" + id_complete + "');";
+
+	returnStr = returnStr + "if (elem.style.display == ''){elem.style.display = 'none'; console.log('Next sibling is'); console.log(elem.nextSibling.innerHTML); elem.nextSibling.innerHTML = '[+]';}";
+
+	returnStr = returnStr + "else{ elem.style.display = ''; elem.nextSibling.innerHTML = '[-]';}; ";
+	return (returnStr);
+}
+
+var counter_complete = 0;
+
+
 function toDescAndAddToAdedFeat(){ // convert to description and add to added feature's description
 	// return new Promise(function(resolve, reject) {
 	console.log("Convert the variant features to description, and update added feature's description");
@@ -936,14 +961,40 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 
 		for (let serverName in variantResidues[residue]){
 
-			console.log('Server name is ' + serverName);
+			// console.log('Server name is ' + serverName);
 			if (serverName != 'newResidue' && serverName != 'defaultDesc'){
-				variantResidues[residue][serverName].forEach(function(anDesc, anDesc_i){
-					description = description + "<br><b>" + serverName + "</b>" + anDesc;
+				description = description + "<br> <br><b>" + serverName + "</b> ";
+				variantResidues[residue][serverName].forEach(function(featTypes, featType_i){
+					// console.log("What is this??");
+					// console.log(featTypes);
+
+					// arr_featTypes.forEach(function(aFeatObj, aFeatObj_i){
+						Object.keys(featTypes).forEach(function(aFeatType, aFeatType_i){
+							description = description + "<br> <i>"+ aFeatType + "</i>";
+							if (featTypes[aFeatType].hasOwnProperty('mainToShow')){
+								if (serverName == 'UniProt'){
+									description = description + " <br> <ul>" + featTypes[aFeatType].mainToShow + "</ul>";
+								}
+								else {
+									description = description + " <br>" + featTypes[aFeatType].mainToShow;
+								}
+							}
+							if (featTypes[aFeatType].hasOwnProperty('mainToHide')){
+								description = description + " <span class=\"teaser\"> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + featTypes[aFeatType].mainToHide + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> [+] </span>";
+								counter_complete = counter_complete + 1;
+							}
+							if (featTypes[aFeatType].hasOwnProperty('otherResidues')){
+								description = description + " <span class=\"teaser\"> </span> <div id=\"complete" + counter_complete + "\" style=\"display: none\"> Additional residues: <ul>" + featTypes[aFeatType].otherResidues + "</ul> </div><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr2("complete"+counter_complete) + "  })();\"> [Additional residues] </span>";
+
+								counter_complete = counter_complete + 1;
+							}
+						});
+					// });
 				});
 			}
 
 
+			// let aDesc =  "<span class=\"teaser\"> <i> " + featureType + "</i> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + description + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> more... </span>";
 			// description = description + "<tr>";
 
 			// description = description + "</tr>";
@@ -1257,6 +1308,9 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 				CATH provides extensive information for each domain, including functional annotations, species diversity, and enzyme \
 				classifications."
 			}
+			else if (server === 'COSMIC mutations'){
+				description = "Catalogue of Somatic Mutations in Cancer (COSMIC) catalogues somatic mutations in humans."
+			}
 			else{
 				description = description
 			}
@@ -1493,7 +1547,7 @@ function extractVariantInfoFromUniprot(uniprotData){
 			resolve();
 		}
 		// console.log("extractVariantInfoFromUniprot");
-		let variants_featTypesOfInt = ['Modified residue', 'Mutagenesis site', 'Sequence conflict', 'Sequence variant'];
+		let variants_featTypesOfInt = ['Modified residue', 'Mutagenesis site', 'Sequence conflict', 'Sequence variant', 'Cross-link', 'Site', 'Metal ion-binding site'];
 
 		let counter = 0;
 		for (let featureType in uniprotData){
@@ -1501,7 +1555,7 @@ function extractVariantInfoFromUniprot(uniprotData){
 			if (uniprotData[featureType].hasOwnProperty('Features')){
 				for (let i =0; i< uniprotData[featureType]['Features'].length; i++){
 					if (uniprotData[featureType]['Features'][i].hasOwnProperty('Residue')){
-						// checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
+						checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
 					}
 				}
 			}

@@ -5,7 +5,7 @@
                     name="myform"
                     ACTION="#"
                     method="post">
-                <!-- <img v-bind:src="search"/> -->
+                <img v-bind:src="search"/>
                 <p id="input2"><input class="search"
                                       type="text"
                                       id="organism_syn_input"
@@ -53,16 +53,21 @@ export default {
 </script>
 
 <style>
+#searchByName {
+  width: 100%;
+}
 #searchByName img{
     height: calc(0.25rem + 2vh);
-    margin-top: 8px;
+    margin: 8px 0 0 2px;
     padding-left: 4px;
 }
 #myform{
   display: flex;
   background: white;
-  border-radius: 1rem;
-  padding: 2px 1rem;
+  border: 1px solid var(--background);
+  padding: 2px 0;
+  width: 100%;
+  justify-content: flex-start;
 }
 
 #input1, #input2{
@@ -113,9 +118,14 @@ input[type=search].ui-autocomplete-loading {
   input {
     z-index: 40;
     border: none;
-    font-size: 16px;
+    color: #333333;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.9rem;
   }
-
+  #input2 input {
+    border-radius: 1rem;
+    background: var(--background);
+  }
   .ui-autocomplete ul {
     max-width: 30rem;
     list-style-position: outside;
