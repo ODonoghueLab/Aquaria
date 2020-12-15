@@ -22,8 +22,9 @@ export default {
 <style scoped>
 #controls{
   /* padding-left: 10px; */
-  width: 66%;
-  min-width: 300px;
+  width: 80%;
+  min-width: 272px;
+  max-width: 30rem;
   display: flex;
   margin: auto;
 }
@@ -36,7 +37,7 @@ export default {
   color: white;
   text-align: center;
   /* line-height: 2.5; */
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 0;
   border-radius: 1.5rem;
   margin: auto;
   transition: all 0.7s ease;

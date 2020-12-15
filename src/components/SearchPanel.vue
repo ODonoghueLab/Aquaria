@@ -1,20 +1,58 @@
 <template>
     <div id="searchByName">
+      <v-app>
+    <v-card>
+      <v-card-text>
+        Search Proteins
+      </v-card-text>
+      <v-card-text>
+        <v-autocomplete
+          v-model="model"
+          :items="items"
+          :loading="isLoading"
+          :search-input.sync="search2"
+          color="white"
+          hide-no-data
+          hide-selected
+          item-text="Description"
+          item-value="API"
+          placeholder="Specify an organism"
+          prepend-icon="mdi-database-search"
+          return-object
+        ></v-autocomplete>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          :disabled="!model"
+          color="grey darken-3"
+          @click="model = null"
+        >
+          Clear
+          <v-icon right>
+            mdi-close-circle
+          </v-icon>
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-app>
             <p>Search proteins</p>
               <form id="myform"
                     name="myform"
                     ACTION="#"
                     method="post">
-                <!-- <img v-bind:src="search"/> -->
+                <img v-bind:src="search"/>
                 <p id="input2"><input class="search"
                                       type="text"
                                       id="organism_syn_input"
                                       name="organism_syn_input"
-                                      placeholder="Organism"
+                                      placeholder="Specify an organism"
                                       autocomplete="on"
                                       data-intro="Enter an organism name (human is default)."
                                       data-position="right"
-                                      /></p>
+                                      size="12"
+                                      />
+                                      </p>
                 <p id="input1"><input class="search"
                                       type="text"
                                       id="protein_syn_input"
@@ -33,13 +71,122 @@
 </template>
 
 <script>
-
+import axios from 'axios'
+import $ from 'jquery'
+import * as textpanel from '../legacy/textpanels'
+import * as resizeApp from '../legacy/resize_app'
 export default {
   name: 'SearchPanel',
   data () {
     return {
-      search: require('../assets/img/search_dark.png')
+      search: require('../assets/img/search_dark.png'),
+      descriptionLimit: 60,
+      entries: [],
+      isLoading: false,
+      model: null,
+      search2: null,
+      items: ['Florida', 'Georgia', 'Nebraska', 'California', 'New York']
     }
+  },
+  mounted () {
+    var AQUARIA = window.AQUARIA
+    // set up autocomplete for organism names
+    var OrganismSynonyms = {}
+    $('#organism_syn_input').autocomplete({
+      source: function (request, response) {
+        resizeApp.startLogoSpin()
+        var labelValues
+        var term = request.term
+        if (term in OrganismSynonyms) {
+          response(OrganismSynonyms[term])
+          return
+        };
+
+        var url = `${window.BACKEND}/getQueryOrganism/${term}`
+        axios({
+          method: 'get',
+          url: url
+        })
+          .then(function (res) {
+            const data = res.data
+            // AQUARIA.remote.queryOrganism(term,
+            // resize_appstopLogoSpin();
+            if (data.length > 0) {
+              labelValues = $.map(data, function (item) {
+                return {
+                  label: item.Synonym,
+                  value: item.Synonym,
+                  id: item.Organism_ID
+                }
+              })
+
+              OrganismSynonyms[term] = labelValues
+            } else {
+              labelValues = {
+                label: 'No organisms for: ' + term,
+                value: 0
+              }
+            }
+            response(labelValues)
+          })
+      },
+      // focus : function() {
+      // AQUARIA.blankAll(true);
+      // },
+      close: function (event, ui) {
+        if (event.handleObj.type === 'menuselect') { // user selected an item
+          // handled in select()
+        } else if (event.handleObj.type === 'keydown' && event.keyCode === $.ui.keyCode.ESCAPE) { // user escaped
+          $(this).val('')
+          AQUARIA.blankAll(false)
+        }
+      },
+      minLength: 1,
+      delay: 100,
+      mustMatch: true,
+      autoFocus: true,
+      select: function (event, ui) {
+        if (ui.item.value &&
+          ui.item.value.indexOf('No organisms for: ') !== 0) {
+          if (ui.item.id !== AQUARIA.Organism.ID) {
+            const url = `${window.BACKEND}/getOrganismSynonyms`
+            axios({
+              method: 'get',
+              url: url,
+              params: {
+                organism_id: AQUARIA.Organism.ID
+              }
+            })
+              .then(function (response) {
+                const orgNames = response.data
+                AQUARIA.Organism.ID = ui.item.id
+                localStorage.preferred_organism_name = ui.item.value
+                textpanel.displayOrgSynonyms(orgNames)
+              })
+
+            // AQUARIA.remote.getOrganismSynonyms([{
+            //   "organism_id": ui.item.id
+            // }],
+
+            AQUARIA.loadAccession(null)
+            $('#protein_syn_input').focus()
+          }
+        } else {
+          event.preventDefault()
+        }
+      }
+    })
+    // .on('focus', function() {
+    //  $("#organism_syn_input").val(localStorage.preferred_organism_name);
+    //  AQUARIA.blankAll(true, "Please specify an organism.");
+    //  //$(this).autocomplete("search");
+    //  $(this).select();
+    // }).on('input', function() {
+    //   AQUARIA.blankAll(true, "Please specify an organism.");
+    // });
+
+    // $("#organism_syn_input").autocomplete();
+    // set up autocomplete for protein names
   },
   methods: {
     fillin: function (term) {
@@ -47,22 +194,54 @@ export default {
       setTimeout(function () {
         window.location.href = '/P04637'
       }, 300)
+    },
+    selectOrganism: function (event) {
+
+    },
+    placeholderText: function (organism, protein) {
+      var orgInput = document.querySelector('#organism_syn_input')
+      var protInput = document.querySelector('#protein_syn_input')
+      orgInput.placeholder = organism
+      orgInput.setAttribute('size', orgInput.getAttribute('placeholder').length)
+      protInput.placeholder = protein
+      protInput.setAttribute('size', protInput.getAttribute('placeholder').length)
+
+      $('#organism_syn_input').focus(function () {
+        $(this).attr('placeholder', 'Specify an organism')
+        orgInput.setAttribute('size', orgInput.getAttribute('placeholder').length)
+      }).blur(function () {
+        $(this).attr('placeholder', organism)
+        orgInput.setAttribute('size', orgInput.getAttribute('placeholder').length)
+      })
+
+      $('#protein_syn_input').focus(function () {
+        $(this).attr('placeholder', 'Specify a protein')
+        protInput.setAttribute('size', protInput.getAttribute('placeholder').length)
+      }).blur(function () {
+        $(this).attr('placeholder', protein)
+        protInput.setAttribute('size', protInput.getAttribute('placeholder').length)
+      })
     }
   }
 }
 </script>
 
 <style>
+#searchByName {
+  width: 100%;
+}
 #searchByName img{
     height: calc(0.25rem + 2vh);
-    margin-top: 8px;
+    margin: 8px 0 0 2px;
     padding-left: 4px;
 }
 #myform{
   display: flex;
   background: white;
-  border-radius: 1rem;
-  padding: 2px 1rem;
+  border: 1px solid var(--background);
+  padding: 2px 0;
+  width: 100%;
+  justify-content: flex-start;
 }
 
 #input1, #input2{
@@ -113,9 +292,14 @@ input[type=search].ui-autocomplete-loading {
   input {
     z-index: 40;
     border: none;
-    font-size: 16px;
+    color: #333333;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.9rem;
   }
-
+  #input2 input {
+    border-radius: 1rem;
+    background: var(--background);
+  }
   .ui-autocomplete ul {
     max-width: 30rem;
     list-style-position: outside;
