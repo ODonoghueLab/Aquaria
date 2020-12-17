@@ -456,9 +456,9 @@ var displayProtSynonyms = function(data) {
 	
 	
 	// clear form field if not empty
-	if ($("#protein_syn_input")[0].value != "") { $("#protein_syn_input")[0].value = ""; }
-	$("#input1 input").attr("placeholder", $("#gsyns a").html())
-	$("#input2 input").attr("placeholder", $("#osyns a").html());
+	// if ($("#protein_syn_input")[0].value != "") { $("#protein_syn_input")[0].value = ""; }
+	// $("#input1 input").attr("placeholder", $("#gsyns a").html())
+	// $("#input2 input").attr("placeholder", $("#osyns a").html());
 };
 
 function showAll() {

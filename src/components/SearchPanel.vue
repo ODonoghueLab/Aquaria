@@ -6,25 +6,8 @@
                     ACTION="#"
                     method="post">
                 <img v-bind:src="search"/>
-                <p id="input2"><input class="search"
-                                      type="text"
-                                      id="organism_syn_input"
-                                      name="organism_syn_input"
-                                      placeholder="Organism"
-                                      autocomplete="on"
-                                      data-intro="Enter an organism name (human is default)."
-                                      data-position="right"
-                                      /></p>
-                <p id="input1"><input class="search"
-                                      type="text"
-                                      id="protein_syn_input"
-                                      name="protein_syn_input"
-                                      placeholder="Protein name/ID"
-                                      autocomplete="on"
-                                      data-intro="START HERE - specify a protein name (or UniProt identifier, or PDB ID), then press 'Enter'."
-                                      data-position="right"
-                                      size="12" /></p>
-                                     <p>&nbsp;</p>
+                <SearchOrganism/>
+                <SearchProtein/>
                 <!--<input type="hidden" id="organismid" name="organismid" value="9606"/>-->
               </form>
       <!-- </span> -->
@@ -33,8 +16,14 @@
 </template>
 
 <script>
-
+import $ from 'jquery'
+import SearchOrganism from './SearchOrganism'
+import SearchProtein from './SearchProtein'
 export default {
+  components: {
+    SearchOrganism,
+    SearchProtein
+  },
   name: 'SearchPanel',
   data () {
     return {
@@ -47,6 +36,33 @@ export default {
       setTimeout(function () {
         window.location.href = '/P04637'
       }, 300)
+    },
+    selectOrganism: function (event) {
+
+    },
+    placeholderText: function (organism, protein) {
+      var orgInput = document.querySelector('#organism_syn_input')
+      var protInput = document.querySelector('#protein_syn_input')
+      orgInput.placeholder = organism
+      orgInput.setAttribute('size', orgInput.getAttribute('placeholder').length)
+      protInput.placeholder = protein
+      protInput.setAttribute('size', protInput.getAttribute('placeholder').length)
+
+      $('#organism_syn_input').focus(function () {
+        $(this).attr('placeholder', 'Specify an organism')
+        orgInput.setAttribute('size', orgInput.getAttribute('placeholder').length)
+      }).blur(function () {
+        $(this).attr('placeholder', organism)
+        orgInput.setAttribute('size', orgInput.getAttribute('placeholder').length)
+      })
+
+      $('#protein_syn_input').focus(function () {
+        $(this).attr('placeholder', 'Specify a protein')
+        protInput.setAttribute('size', protInput.getAttribute('placeholder').length)
+      }).blur(function () {
+        $(this).attr('placeholder', protein)
+        protInput.setAttribute('size', protInput.getAttribute('placeholder').length)
+      })
     }
   }
 }
@@ -74,6 +90,7 @@ export default {
   display: inline;
   padding: 4px;
   margin: 0;
+  max-width: 50%;
 }
 
 input[type=search].ui-autocomplete-loading {
@@ -125,6 +142,7 @@ input[type=search].ui-autocomplete-loading {
   #input2 input {
     border-radius: 1rem;
     background: var(--background);
+    max-width: 100%;
   }
   .ui-autocomplete ul {
     max-width: 30rem;

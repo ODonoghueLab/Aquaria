@@ -73,7 +73,7 @@ export default {
         window.AQUARIA.short_moleculeName = shortName
 
         if (accession && pdbId && score) {
-          _this.organism_name = window.AQUARIA.organismName
+          _this.organism_name = window.AQUARIA.Organism.Name
           _this.primary_accession = window.AQUARIA.Gene
           _this.text = 'aligned onto'
           _this.pdb = pdbId + '-' + chainId
@@ -84,7 +84,7 @@ export default {
           // $('#help3D').show().parent().attr('onmouseenter', "AQUARIA.explainTitle('" + accession + "','" + window.AQUARIA.preferred_protein_name + "','" + shortName + "','" + pdbId + "','" + chainId +
           //   "','" + score + "','" + evalue + "');")
         } else { // DNA or RNA (no accession)
-          _this.organism_name = window.AQUARIA.organismName
+          _this.organism_name = window.AQUARIA.Organism.Name
           _this.primary_accession = shortName
           _this.text = 'structure from'
           _this.pdb = pdbId + '-' + chainId
@@ -159,14 +159,7 @@ export default {
   },
   updated () {
     var _this = this
-    var input
-    input = document.querySelector('#organism_syn_input')
-    input.placeholder = window.AQUARIA.organismName
-    input.setAttribute('size', input.getAttribute('placeholder').length)
-    input = document.querySelector('#protein_syn_input')
-    input.placeholder = window.AQUARIA.preferred_protein_name
-    input.setAttribute('size', input.getAttribute('placeholder').length)
-
+    this.$children[0].placeholderText(window.AQUARIA.Organism.Name, window.AQUARIA.preferred_protein_name)
     var selectedRes = new MutationObserver(function () {
       if (document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display === 'none') {
         _this.seqRes = null

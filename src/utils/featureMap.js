@@ -19,7 +19,7 @@ export function createFeatureMap (datum) {
   this.height = 40 - window.AQUARIA.margin.top - window.AQUARIA.margin.bottom + 35 // height
   this.datum = datum
   var outerdiv = d3.select('#selectedFeature').append('div').attr('id', 'outerFeatureMap')
-  this.drawTrack(this.datum, this.createSVGforFeature(outerdiv, '100vw', this.height + 30, this.width))
+  this.drawTrack(this.datum, this.createSVGforFeature(outerdiv, '100vw', this.height + 30, this.width + 1))
   d3.select('#outerFeatureMap > svg').attr('class', 'loadedFeature')
 }
 
@@ -38,8 +38,8 @@ export function drawTrack (datum, svg) {
   var features = []
   this.nusvg = svg
   const AQUARIA = window.AQUARIA
-  if (AQUARIA.oid) {
-    features[0] = datum.Tracks[AQUARIA.oid]
+  if (AQUARIA.currentFeature.oid && datum.Tracks.length > 1) {
+    features[0] = datum.Tracks[AQUARIA.currentFeature.oid]
   } else {
     features = datum.Tracks
   }
@@ -50,17 +50,24 @@ export function drawTrack (datum, svg) {
     //   if (document.querySelector('.featureHeader.actived')) {
     //     document.querySelector('.featureHeader.actived').click()
     //   }
-      d3.select('svg.loaded').classed('loaded', false)
-      AQUARIA.panel3d.blankApplet(true, 'Removing feature...')
-      AQUARIA.panel3d.blankApplet(false)
-      // Stu hack to detect feature changes
-      if (typeof AQUARIA.onFeatureChange === 'function') {
-        AQUARIA.onFeatureChange(null, 0)
+      if (window.location.hash.includes('Features')) {
+        d3.select('svg.loaded').classed('loaded', false)
+        AQUARIA.panel3d.blankApplet(true, 'Removing feature...')
+        AQUARIA.panel3d.blankApplet(false)
+        // Stu hack to detect feature changes
+        if (typeof AQUARIA.onFeatureChange === 'function') {
+          AQUARIA.onFeatureChange(null, 0)
+        }
+        _this.removeCurrentAnnotationFrom3DViewer()
+        AQUARIA.currentFeature.oid = null
+        AQUARIA.currentFeature.data = null
+        document.querySelector('#outerFeatureMap').remove()
+        document.querySelector('#popup').style.display = 'none'
+        AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
+        Panels.hidePanels()
+      } else {
+
       }
-      _this.removeCurrentAnnotationFrom3DViewer()
-      document.querySelector('#outerFeatureMap').remove()
-      AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
-      Panels.hidePanels()
     } else { // console.log("clicked to display feature");
       document.querySelector('.featureHeader.actived').click()
       if (document.querySelector('#outerFeatureMap')) {

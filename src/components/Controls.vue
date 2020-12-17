@@ -30,7 +30,7 @@ export default {
 }
 
 .title{
-  z-index: 1;
+  z-index: 2;
   position: relative;
   top: 4vh;
   flex-basis: auto;
