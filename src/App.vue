@@ -212,7 +212,7 @@ div.dimmer {
     opacity: 0.68;
     -moz-opacity: 0.68;
     width: 100%;
-    z-index: 0;
+    z-index: 1;
 }
 div.dimmer2 {
     background: #5E5E5E;
@@ -223,6 +223,6 @@ div.dimmer2 {
     opacity: 0.68;
     -moz-opacity: 0.68;
     width: 100%;
-    z-index: 2;
+    z-index: 3;
 }
 </style>

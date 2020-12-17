@@ -5,7 +5,6 @@ import App from './App'
 import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
 import VueMq from 'vue-mq'
 import ToggleSwitch from 'vuejs-toggle-switch'
-import Vuetify from 'vuetify'
 
 // import styles (would be cleaner to do this through a top-level main.css)
 import 'vue-material/dist/vue-material.min.css'
@@ -29,7 +28,6 @@ Vue.use(ToggleSwitch)
 Vue.use(MdButton)
 Vue.use(MdContent)
 Vue.use(MdTabs)
-Vue.use(Vuetify)
 Vue.use(VueMq, {
   breakpoints: {
     mobile: 450,

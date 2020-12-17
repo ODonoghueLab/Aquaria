@@ -383,7 +383,12 @@ console.log("textpanels.displayOrgSynonyms: " + orgNames.synonyms[0]);
 let entries = orgNames.synonyms.length
 AQUARIA.Organism = {}
 AQUARIA.Organism.Name = orgNames.synonyms[entries-1];
-AQUARIA.Organism.ID = orgNames.synonyms[0]
+if(orgNames.organism_id) {
+	AQUARIA.Organism.ID = orgNames.organism_id
+}
+else {
+	AQUARIA.Organism.ID =  orgNames.synonyms[0]
+}
 var onames = "<a href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="+orgNames.synonyms[0]+"' title='Go to NCBI' target='_blank' >" + orgNames.synonyms[1] + "</a>";
 for (var n=2; n < orgNames.synonyms.length; n++) { //omit first name (numeric ID)
 	onames += ", " + orgNames.synonyms[n];
