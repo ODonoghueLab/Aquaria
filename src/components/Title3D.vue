@@ -22,7 +22,7 @@
             </span>
           </span>
           <span class='titlepanel' v-if="seqRes"><strong>{{primary_accession}}:</strong> <br/> <strong>{{pdb}}:</strong> </span>
-          <span id='right' class='titlepanel' @click="showthreeDexplanation" v-if="seqRes">{{seqRes}} <br/> {{structRes}} <a class="help">?</a></span>
+          <span id='right' class='titlepanel' @click="showthreeDexplanation" v-if="seqRes">{{seqRes}} <br/> {{structRes}} <a href="#" class="close">×</a></span>
         </div>
       </div>
     </div>
@@ -162,6 +162,10 @@ export default {
         document.querySelector('#contentPanel').style.display = 'none'
         document.querySelector('div.dimmer').remove()
       })
+    },
+    release: function () {
+      document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display = 'none'
+      this.resetSelection()
     }
   },
   mounted () {
@@ -283,6 +287,7 @@ span#uniprotpanel {
   border-top-left-radius: 1.5rem;
   border-bottom-left-radius: 1.5rem;
   transition: all 0.7s ease;
+  text-align: right;
 }
 
 span#pdbpanel {
@@ -290,8 +295,11 @@ span#pdbpanel {
   font-weight: 600;
   border-top-right-radius: 1.5rem;
   border-bottom-right-radius: 1.5rem;
+  position: relative;
 }
-
+span#pdbpanel.wide {
+  padding-right: 2rem;
+}
 /* Neblina */
 #titlebar {
     /* display: -webkit-box;
@@ -326,7 +334,11 @@ span#pdbpanel {
     font-size: calc(8px + .6vw);
     z-index: 2;
 }
-
+@media screen and (min-width: 2100px) {
+  #structureviewerexplanation,#structureviewerexplanation_1  {
+    font-size: 22px;
+  }
+}
 #uniprot {
     display: block;
     margin: 10px 0px;
@@ -378,5 +390,21 @@ span#pdbpanel {
     color: white;
     cursor: pointer;
     /* font-size: 0.6rem; */
+}
+#pdbpanel .close {
+  right: 0.25rem;
+    top: 1rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: absolute;
+    display: flex;
+    z-index: 11;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,.5);
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
 }
 </style>
