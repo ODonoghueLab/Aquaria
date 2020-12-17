@@ -72,10 +72,10 @@ export function drawClusterContainer (cluster, s, element) {
   // add center line
   this.nusvg.append('rect').attr('width',
     '100%').attr('height', 1).attr('transform',
-    'translate(0,33)').attr('class', 'insertion')
+    'translate(0,53)').attr('class', 'insertion')
 
   this.nusvg.append('g').attr('id', 'structure_' + id).attr('transform',
-    'translate(' + (structStart) + ',20)')
+    'translate(' + (structStart) + ',40)')
 
   // .append('rect') // background shape for cluster size label
   // .attr('transform', 'translate(' + (structEnd - structStart - 5) + ',5)')
