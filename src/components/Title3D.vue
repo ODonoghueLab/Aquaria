@@ -183,19 +183,19 @@ export default {
         _this.structRes = residues[0].split(pdb)[1]
         _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
 
-        var showAlignment = new MutationObserver(function () {
-          if (document.querySelector('.expandable-text-line').style.whiteSpace === '') {
-            document.querySelector('#alignment').style.display = 'none'
-            document.querySelector('#msg').style.display = 'block'
-          } else {
-            document.querySelector('#msg').style.display = 'none'
-            document.querySelector('#alignment').style.display = 'block'
-          }
-        })
+        // var showAlignment = new MutationObserver(function () {
+        //   if (document.querySelector('.expandable-text-line').style.whiteSpace === '') {
+        //     document.querySelector('#alignment').style.display = 'none'
+        //     document.querySelector('#msg').style.display = 'block'
+        //   } else {
+        //     document.querySelector('#msg').style.display = 'none'
+        //     document.querySelector('#alignment').style.display = 'block'
+        //   }
+        // })
 
-        showAlignment.observe(document.querySelector('.expandable-text-line'), {
-          attributes: true, childList: true, characterData: true
-        })
+        // showAlignment.observe(document.querySelector('.expandable-text-line'), {
+        //   attributes: true, childList: true, characterData: true
+        // })
       }
     })
 

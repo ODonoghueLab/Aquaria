@@ -9,12 +9,10 @@
     <p class='quality'> This alignment has an HHblits E-value of {{evalueString}} &times; <nobr>10<sup>{{power}}</sup></nobr>, which is considered to be {{quality}}.
         Based on cross-validation, the likelihood that your specified protein ({{uniprotName}}) adopts a structure similar to that shown is estimated to be {{precisiontxt}}%.</p>
         <p>Note that the structure shown is taken directly from the PDB; it has not been derived by ab-initio or comparative modeling.</p>
-    <p>
     <expandable-text-line :use-click="Hover" v-if="alignment">
-        <p id='msg' v-if="$mq === 'laptop' || $mq === 'tablet'"><strong>Click here to see the alignment....</strong></p>
-        <p id='alignment' v-if="$mq === 'laptop' || $mq === 'tablet'"><strong>{{alignment}}</strong></p>
+        <!-- <p v-if="$mq === 'laptop' || $mq === 'tablet'"><strong>Click here to see the alignment....</strong></p> -->
+        <p v-if="$mq === 'laptop' || $mq === 'tablet'"><strong>Alignment: {{alignment}}</strong></p>
     </expandable-text-line>
-    </p>
     </div>
 </template>
 
@@ -152,7 +150,7 @@ export default {
 </script>
 
 <style scoped>
-#alignment{
-  display: none;
+.expandable-text-line{
+  max-width: 50vw;
 }
 </style>
