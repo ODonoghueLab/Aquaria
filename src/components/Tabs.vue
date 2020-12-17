@@ -51,8 +51,10 @@ export default {
     },
     showMatches: function () {
       const _this = this
-      // const soupController = window.AQUARIA.panel3d.embededJolecule.controller
-      // soupController.clearSelectedResidues()
+      if (window.AQUARIA.panel3d) {
+        const soupController = window.AQUARIA.panel3d.embededJolecule.controller
+        soupController.clearSelectedResidues()
+      }
       _this.showPanel('vis', 'Structures')
       Panels.hidePanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {
@@ -60,7 +62,7 @@ export default {
       }
       document.querySelector('div.dimmer').style.zIndex = '0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelector('#center > div.icons').style.bottom = '76px'
+        document.querySelector('#center > div.icons').style.bottom = '50px'
         Panels.hidePanels()
       })
     },
@@ -77,7 +79,7 @@ export default {
       }
       document.querySelector('div.dimmer').style.zIndex = '0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelector('#center > div.icons').style.bottom = '76px'
+        document.querySelector('#center > div.icons').style.bottom = '50px'
         Panels.hidePanels()
       })
     }
@@ -97,7 +99,7 @@ export default {
 .icons{
     z-index: 1;
     position: absolute;
-    bottom: 76px;
+    bottom: 50px;
 }
 
 .highlighted{

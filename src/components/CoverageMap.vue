@@ -18,6 +18,6 @@ export default {
 }
 #selectedFeature{
   position: absolute;
-  bottom: -20px;
+  bottom: 0px;
 }
 </style>
