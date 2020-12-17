@@ -10,17 +10,20 @@
           <img v-bind:src="search">
           Protein Sequence
         </span>
-        <span id="threeDexplanation" class='titlepanel' v-if="!seqRes" @click="showthreeDexplanation">aligned onto </span>
+        <span id="threeDexplanation" class='titlepanel' v-if="!seqRes" @click="showthreeDexplanation">aligned onto
+        </span>
         <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="pdb && !seqRes">{{pdb}} <a href="javascript: alert('HELP')" class="help">?</a></span>
         <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="!pdb">PDB-ID <a href="javascript: alert('HELP')" class="help">?</a></span>
-        <span id="uniprotpanel" class='titlepanel' @click="showUniprotPanel" v-if="seqRes">
-          <img v-bind:src="search">
-          <span>
-          Sequence <br/>Structure
+        <div id='titleAlign' @click="showthreeDexplanation" @mouseover="highlightTitle" @mouseout="removeHighlight">
+          <span id='left' class='titlepanel' @click="showUniprotPanel" v-if="seqRes">
+            <img v-bind:src="search">
+            <span>
+            Sequence <br/>Structure
+            </span>
           </span>
-        </span>
-        <span id="threeDexplanation" class='titlepanel' v-if="seqRes"><strong>{{primary_accession}}:</strong> <br/> <strong>{{pdb}}:</strong> </span>
-        <span id="pdbpanel" class='titlepanel' @click="showPdbPanel" v-if="seqRes">{{seqRes}} <br/> {{structRes}} <a href="javascript: alert('HELP')" class="help">?</a></span>
+          <span class='titlepanel' v-if="seqRes"><strong>{{primary_accession}}:</strong> <br/> <strong>{{pdb}}:</strong> </span>
+          <span id='right' class='titlepanel' @click="showthreeDexplanation" v-if="seqRes">{{seqRes}} <br/> {{structRes}} <a class="help">?</a></span>
+        </div>
       </div>
     </div>
     <div id='contentPanel'>
@@ -29,7 +32,7 @@
         <AboutUniprot id="uniprot"/>
       </div>
       <AboutPDB id="gallery" class='contents'/>
-      <Explanation id="explanation" class='contents'/>
+      <Explanation id="explanation" class='contents' v-bind:alignment='alignment'/>
     </div>
 </div>
 </template>
@@ -57,7 +60,8 @@ export default {
       pdb: null,
       search: require('../assets/img/search_100.png'),
       seqRes: null,
-      structRes: null
+      structRes: null,
+      alignment: null
     }
   },
   beforeMount () {
@@ -95,6 +99,16 @@ export default {
     }
   },
   methods: {
+    removeHighlight: function () {
+      document.querySelectorAll('#titleAlign span').forEach(el => {
+        el.style.background = '#888888'
+      })
+    },
+    highlightTitle: function () {
+      document.querySelectorAll('#titleAlign span').forEach(el => {
+        el.style.background = '#3ca8f7'
+      })
+    },
     resetSelection: function () {
       document.querySelectorAll('#titlebar span').forEach(el => {
         el.className = 'titlepanel'
@@ -160,12 +174,28 @@ export default {
       if (document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display === 'none') {
         _this.seqRes = null
         _this.structRes = null
+        _this.alignment = null
       } else {
         var residues = document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').innerText.split('\n')
         var pdb = window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain + ':'
         var accession = window.AQUARIA.Gene + ':'
         _this.seqRes = residues[1].split(accession)[1]
         _this.structRes = residues[0].split(pdb)[1]
+        _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+
+        var showAlignment = new MutationObserver(function () {
+          if (document.querySelector('.expandable-text-line').style.whiteSpace === '') {
+            document.querySelector('#alignment').style.display = 'none'
+            document.querySelector('#msg').style.display = 'block'
+          } else {
+            document.querySelector('#msg').style.display = 'none'
+            document.querySelector('#alignment').style.display = 'block'
+          }
+        })
+
+        showAlignment.observe(document.querySelector('.expandable-text-line'), {
+          attributes: true, childList: true, characterData: true
+        })
       }
     })
 
@@ -177,6 +207,30 @@ export default {
 </script>
 
 <style>
+#titleAlign > .titlepanel {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  margin-top: 1rem;
+}
+#titleAlign > .titlepanel#left{
+  padding-left: 0.5rem;
+}
+#titleAlign > .titlepanel#right{
+  padding-right: 0.5rem;
+}
+#left {
+  border-top-left-radius: 1.5rem;
+  border-bottom-left-radius: 1.5rem;
+  padding-left: 0.6rem;
+}
+#left > img {
+  height: calc(10px + .6vw);
+}
+#right {
+  border-top-right-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
+  padding-right: 0.6rem;
+}
 .titlepanel {
   text-align: left;
 }
@@ -208,6 +262,9 @@ export default {
   background-color: var(--primary-link);
 }
 #titlebar span.titlepanel.active {
+  background-color: var(--primary-highlight);
+}
+#titleAlign.active {
   background-color: var(--primary-highlight);
 }
 
