@@ -1,5 +1,5 @@
 <template>
-        <p id="input1"><input class="search"
+        <!-- <p id="input1"><input class="search"
                                       type="text"
                                       id="protein_syn_input"
                                       name="protein_syn_input"
@@ -7,15 +7,27 @@
                                       autocomplete="on"
                                       data-intro="START HERE - specify a protein name (or UniProt identifier, or PDB ID), then press 'Enter'."
                                       data-position="right"
-                                      size="12" /></p>
+                                      size="12" /></p> -->
+                                      <autocomplete
+    id="protein_syn_input"
+    :search="search"
+    :get-result-value="getResultValue"
+    @submit="handleSubmit"
+    ref="autocomplete"
+  ></autocomplete>
 </template>
 <script>
 import axios from 'axios'
 import * as textpanel from '../legacy/textpanels'
 import * as resizeApp from '../legacy/resize_app'
-import $ from 'jquery'
+import Autocomplete from '@trevoreyre/autocomplete-vue'
+import '@trevoreyre/autocomplete-vue/dist/style.css'
+
 export default {
   name: 'SearchProtein',
+  components: {
+    Autocomplete
+  },
   data () {
     return {
       callbackData: {
@@ -30,59 +42,274 @@ export default {
       collectResponsevalues: null
     }
   },
-  mounted () {
-    $.widget('custom.catcomplete', $.ui.autocomplete, {
-      _create: function () {
-        this._super()
-        this.widget().menu('option', 'items', '> :not(.ui-autocomplete-category)')
-      },
-      _renderMenu: function (ul, items) {
-        var that = this
-        var currentCategory = ''
-        $.each(items, function (index, item) {
-          var li
-          if (item.category && item.category !== currentCategory) {
-            ul.append("<li class='ui-autocomplete-category'>" + item.category + '</li>')
-            currentCategory = item.category
-          }
-          li = that._renderItemData(ul, item)
-          if (item.category) {
-            li.attr('aria-label', item.category + ' : ' + item.label)
-          }
-        })
-      },
-      _renderItem: function (ul, item) {
-        var label = item.label
-        if (item.suffix) {
-          label += ' <span class="auto_complete_identifier">(' + item.suffix + ')</span>'
-        }
-        return $('<li>')
-          .append('<a>' + label + '</a>')
-          .appendTo(ul)
+  //   mounted () {
+  //     $.widget('custom.catcomplete', $.ui.autocomplete, {
+  //       _create: function () {
+  //         this._super()
+  //         this.widget().menu('option', 'items', '> :not(.ui-autocomplete-category)')
+  //       },
+  //       _renderMenu: function (ul, items) {
+  //         var that = this
+  //         var currentCategory = ''
+  //         $.each(items, function (index, item) {
+  //           var li
+  //           if (item.category && item.category !== currentCategory) {
+  //             ul.append("<li class='ui-autocomplete-category'>" + item.category + '</li>')
+  //             currentCategory = item.category
+  //           }
+  //           li = that._renderItemData(ul, item)
+  //           if (item.category) {
+  //             li.attr('aria-label', item.category + ' : ' + item.label)
+  //           }
+  //         })
+  //       },
+  //       _renderItem: function (ul, item) {
+  //         var label = item.label
+  //         if (item.suffix) {
+  //           label += ' <span class="auto_complete_identifier">(' + item.suffix + ')</span>'
+  //         }
+  //         return $('<li>')
+  //           .append('<a>' + label + '</a>')
+  //           .appendTo(ul)
+  //       }
+  //     })
+  //     //   },
+  //     //   mounted () {
+  //     var AQUARIA = window.AQUARIA
+  //     var _this = this
+  //     var proteinAutocomplete = $('#protein_syn_input')
+  //     proteinAutocomplete.catcomplete({
+  //       source: function (request, outerResponse) {
+  //         _this.term = request.term
+  //         _this.callbackData.LRU = _this.getLRU()
+  //         if (_this.term === '') {
+  //           _this.collectResponse()
+  //           if (_this.collectResponsevalues) {
+  //             outerResponse(_this.collectResponsevalues)
+  //           }
+  //         } else {
+  //           resizeApp.startLogoSpin()
+  //           _this.proteinSynonymOrgId = _this.term + '%' + AQUARIA.Organism.ID
+  //           if (_this.proteinSynonymOrgId in _this.cacheProteinSynonyms) {
+  //             outerResponse(_this.cacheProteinSynonyms[_this.proteinSynonymOrgId])
+  //             return
+  //           };
+
+  //           var url = `${window.BACKEND}/queryProtein/${_this.term}/${AQUARIA.Organism.ID}`
+  //           axios({
+  //             method: 'get',
+  //             url: url
+  //           })
+  //             .then(function (response) {
+  //               const data = response.data
+  //               if (!isNaN(parseInt(_this.term.charAt(0)))) {
+  //                 _this.pdbCallback(data)
+  //                 if (_this.collectResponsevalues) {
+  //                   outerResponse(_this.collectResponsevalues)
+  //                 }
+  //               } else {
+  //                 if (data.length > 0) {
+  //                   if (data[0].isID === 0) {
+  //                     _this.nameCallback(data)
+  //                     if (_this.collectResponsevalues) {
+  //                       outerResponse(_this.collectResponsevalues)
+  //                     }
+  //                   } else {
+  //                     _this.idCallback(data)
+  //                   }
+  //                 } else {
+  //                   if (data.isID === 0) {
+  //                     _this.nameCallback(data)
+  //                     if (_this.collectResponsevalues) {
+  //                       outerResponse(_this.collectResponsevalues)
+  //                     }
+  //                   } else {
+  //                     _this.idCallback(data)
+  //                     if (_this.collectResponsevalues) {
+  //                       outerResponse(_this.collectResponsevalues)
+  //                     }
+  //                   }
+  //                 }
+  //               }
+  //             })
+  //         }
+  //       },
+
+  //       close: function (event, ui) {
+  //         if (event.handleObj) {
+  //           if (event.handleObj.type === 'blur') { // user selected an item
+  //             // handled in select()
+  //           } else if (event.handleObj.type === 'keydown' && event.keyCode === $.ui.keyCode.ESCAPE) { // user escaped
+  //             $('#organism_syn_input').val('')
+  //             if (typeof AQUARIA.structures2match.Selected_PDB === 'undefined') { // no structure loaded yet, keep panels blanked
+  //               AQUARIA.blankAll(true)
+  //             } else {
+  //               AQUARIA.blankAll(false)
+  //             }
+  //           }
+  //         }
+  //         $(this).val('')
+  //       },
+  //       minLength: 0,
+  //       autoFocus: true,
+  //       delay: 300,
+  //       // user has selected an item from the autocomplete list
+  //       select: function (event, ui) {
+  //         if (ui.item.value &&
+  //           ui.item.value.indexOf('No structures for: ') !== 0) {
+  //           var primaryAccession = ui.item.id
+  //           if (primaryAccession.indexOf('/') > -1) {
+  //             var parts = primaryAccession.split('/')
+  //             primaryAccession = parts[0]
+  //             _this.pdbId = parts[1]
+  //           }
+  //           if (ui.item.type === 'PDB') {
+  //             console.log('AQUARIA.proteinAutocomplete.select pdb', ui.item.value)
+  //             AQUARIA.blankAll(true, 'Waiting for data...')
+  //             var chain = null
+  //             var url = `${window.BACKEND}/getAccessionForPDB/${ui.item.value}/${chain}`
+  //             axios({
+  //               method: 'get',
+  //               url: url
+  //             })
+  //               .then(function (response) {
+  //                 const accessionObject = response.data
+  //                 AQUARIA.loadAccession([accessionObject.Accession], ui.item.value, null, false, accessionObject.Accession)
+  //               })
+  //             // AQUARIA.remote.getAccessionForPDB(ui.item.value, chain, function(accessionObject) {
+  //             //   AQUARIA.loadAccession([accessionObject.Accession], ui.item.value, null, false, accessionObject.Accession);
+
+  //             // })
+  //           } else if (ui.item.id === AQUARIA.protein_primary_accession) {
+  //             if (ui.item.value === AQUARIA.preferred_protein_name) {
+  //               AQUARIA.blankAll(false)
+  //               // do nothing
+  //             } else {
+  //               console.log('AQUARIA.proteinAutocomplete.select same protein, different name', ui.item.value)
+
+  //               AQUARIA.preferred_protein_name = ui.item.value
+  //               // AQUARIA.remote.getProteinSynonyms(AQUARIA.protein_primary_accession, //localStorage.organism_id, displayProtSynonyms, null);
+  //               url = `${window.BACKEND}/getProteinSynonyms/${AQUARIA.protein_primary_accession};`
+  //               axios({
+  //                 method: 'get',
+  //                 url: url
+  //               })
+  //                 .then(function (response) {
+  //                   textpanel.displayProtSynonyms(response.data)
+  //                 })
+  //                 // Figure out a way to bring currentData
+  //             //   AQUARIA.update3DTitle(AQUARIA.structures2match.source_primary_accession,
+  //             //     currentData.pdb_id, AQUARIA.currentChain, AQUARIA.molecule_name, AQUARIA.currentMember.alignment_identity_score)
+  //             //   AQUARIA.updateDocumentTitle(AQUARIA.currentMember.alignment_identity_score, currentData.pdb_id, AQUARIA.currentChain)
+  //             //   featurelist.updateFeatureTabTitle(AQUARIA.preferred_protein_name)
+  //             }
+  //           } else {
+  //             /// console.log('AQUARIA.proteinAutocomplete.select new protein', ui.item.value);
+  //             document.querySelector('#protein_syn_input').placeholder = ui.item.value
+  //             AQUARIA.blankAll(true, 'Waiting for data...')
+  //             AQUARIA.loadAccession([primaryAccession], _this.pdbId, null, false, ui.item.value)
+  //           }
+  //         } else {
+  //           event.preventDefault()
+  //         }
+  //       }
+  //     })
+  //   },
+  methods: {
+    getResultValue (result) {
+      if (window.location.href.includes(result.id)) {
+        return ('Current selection: ' + result.value + ' (' + result.id + ')')
+      } else if (result.category === 'Recent') {
+        return ('Previous search: ' + result.value + ' (' + result.id + ')')
+      } else {
+        return (result.value + ' (' + result.id + ')')
       }
-    })
-    //   },
-    //   mounted () {
-    var AQUARIA = window.AQUARIA
-    var _this = this
-    var proteinAutocomplete = $('#protein_syn_input')
-    proteinAutocomplete.catcomplete({
-      source: function (request, outerResponse) {
-        _this.term = request.term
-        _this.callbackData.LRU = _this.getLRU()
+    },
+    clear () {
+      this.value = ''
+      this.$refs.autocomplete.value = ''
+    },
+    handleSubmit (result) {
+      var _this = this
+      var AQUARIA = window.AQUARIA
+      if (result.value &&
+          result.value.indexOf('No structures for: ') !== 0) {
+        var primaryAccession = result.id
+        if (primaryAccession.indexOf('/') > -1) {
+          var parts = primaryAccession.split('/')
+          primaryAccession = parts[0]
+          _this.pdbId = parts[1]
+        }
+        if (result.type === 'PDB') {
+          console.log('AQUARIA.proteinAutocomplete.select pdb', result.value)
+          AQUARIA.blankAll(true, 'Waiting for data...')
+          //   var chain = null
+          var url = `${window.BACKEND}/getAccessionForPDB/${result.value}`
+          axios({
+            method: 'get',
+            url: url
+          })
+            .then(function (response) {
+              const accessionObject = response.data
+              AQUARIA.loadAccession([accessionObject.Accession], result.value, null, false, accessionObject.Accession)
+            })
+            // AQUARIA.remote.getAccessionForPDB(ui.item.value, chain, function(accessionObject) {
+            //   AQUARIA.loadAccession([accessionObject.Accession], ui.item.value, null, false, accessionObject.Accession);
+
+          // })
+        } else if (result.id === AQUARIA.protein_primary_accession) {
+          if (result.value === AQUARIA.preferred_protein_name) {
+            AQUARIA.blankAll(false)
+            // do nothing
+          } else {
+            console.log('AQUARIA.proteinAutocomplete.select same protein, different name', result.value)
+
+            AQUARIA.preferred_protein_name = result.value
+            // AQUARIA.remote.getProteinSynonyms(AQUARIA.protein_primary_accession, //localStorage.organism_id, displayProtSynonyms, null);
+            url = `${window.BACKEND}/getProteinSynonyms/${AQUARIA.protein_primary_accession};`
+            axios({
+              method: 'get',
+              url: url
+            })
+              .then(function (response) {
+                textpanel.displayProtSynonyms(response.data)
+              })
+            // Figure out a way to bring currentData
+            //   AQUARIA.update3DTitle(AQUARIA.structures2match.source_primary_accession,
+            //     currentData.pdb_id, AQUARIA.currentChain, AQUARIA.molecule_name, AQUARIA.currentMember.alignment_identity_score)
+            //   AQUARIA.updateDocumentTitle(AQUARIA.currentMember.alignment_identity_score, currentData.pdb_id, AQUARIA.currentChain)
+            //   featurelist.updateFeatureTabTitle(AQUARIA.preferred_protein_name)
+          }
+        } else {
+          /// console.log('AQUARIA.proteinAutocomplete.select new protein', ui.item.value);
+          document.querySelector('#protein_syn_input').placeholder = result.value
+          document.querySelector('#protein_syn_input').value = ''
+          AQUARIA.blankAll(true, 'Waiting for data...')
+          AQUARIA.loadAccession([primaryAccession], _this.pdbId, null, false, result.value)
+        }
+      } else {
+        event.preventDefault()
+      }
+    },
+    search (input) {
+      var AQUARIA = window.AQUARIA
+      var _this = this
+      _this.term = input
+      _this.callbackData.LRU = _this.getLRU()
+      return new Promise(resolve => {
         if (_this.term === '') {
           _this.collectResponse()
           if (_this.collectResponsevalues) {
-            outerResponse(_this.collectResponsevalues)
+            resolve(_this.collectResponsevalues)
           }
         } else {
           resizeApp.startLogoSpin()
           _this.proteinSynonymOrgId = _this.term + '%' + AQUARIA.Organism.ID
           if (_this.proteinSynonymOrgId in _this.cacheProteinSynonyms) {
-            outerResponse(_this.cacheProteinSynonyms[_this.proteinSynonymOrgId])
+            resolve(_this.cacheProteinSynonyms[_this.proteinSynonymOrgId])
             return
           };
-
+          document.querySelector('.autocomplete-result-list').style.maxHeight = '390px'
           var url = `${window.BACKEND}/queryProtein/${_this.term}/${AQUARIA.Organism.ID}`
           axios({
             method: 'get',
@@ -93,14 +320,14 @@ export default {
               if (!isNaN(parseInt(_this.term.charAt(0)))) {
                 _this.pdbCallback(data)
                 if (_this.collectResponsevalues) {
-                  outerResponse(_this.collectResponsevalues)
+                  resolve(_this.collectResponsevalues)
                 }
               } else {
                 if (data.length > 0) {
                   if (data[0].isID === 0) {
                     _this.nameCallback(data)
                     if (_this.collectResponsevalues) {
-                      outerResponse(_this.collectResponsevalues)
+                      resolve(_this.collectResponsevalues)
                     }
                   } else {
                     _this.idCallback(data)
@@ -109,101 +336,20 @@ export default {
                   if (data.isID === 0) {
                     _this.nameCallback(data)
                     if (_this.collectResponsevalues) {
-                      outerResponse(_this.collectResponsevalues)
+                      resolve(_this.collectResponsevalues)
                     }
                   } else {
                     _this.idCallback(data)
                     if (_this.collectResponsevalues) {
-                      outerResponse(_this.collectResponsevalues)
+                      resolve(_this.collectResponsevalues)
                     }
                   }
                 }
               }
             })
         }
-      },
-
-      close: function (event, ui) {
-        if (event.handleObj) {
-          if (event.handleObj.type === 'blur') { // user selected an item
-            // handled in select()
-          } else if (event.handleObj.type === 'keydown' && event.keyCode === $.ui.keyCode.ESCAPE) { // user escaped
-            $('#organism_syn_input').val('')
-            if (typeof AQUARIA.structures2match.Selected_PDB === 'undefined') { // no structure loaded yet, keep panels blanked
-              AQUARIA.blankAll(true)
-            } else {
-              AQUARIA.blankAll(false)
-            }
-          }
-        }
-        $(this).val('')
-      },
-      minLength: 0,
-      autoFocus: true,
-      delay: 300,
-      // user has selected an item from the autocomplete list
-      select: function (event, ui) {
-        if (ui.item.value &&
-          ui.item.value.indexOf('No structures for: ') !== 0) {
-          var primaryAccession = ui.item.id
-          if (primaryAccession.indexOf('/') > -1) {
-            var parts = primaryAccession.split('/')
-            primaryAccession = parts[0]
-            _this.pdbId = parts[1]
-          }
-          if (ui.item.type === 'PDB') {
-            console.log('AQUARIA.proteinAutocomplete.select pdb', ui.item.value)
-            AQUARIA.blankAll(true, 'Waiting for data...')
-            var chain = null
-            var url = `${window.BACKEND}/getAccessionForPDB/${ui.item.value}/${chain}`
-            axios({
-              method: 'get',
-              url: url
-            })
-              .then(function (response) {
-                const accessionObject = response.data
-                AQUARIA.loadAccession([accessionObject.Accession], ui.item.value, null, false, accessionObject.Accession)
-              })
-            // AQUARIA.remote.getAccessionForPDB(ui.item.value, chain, function(accessionObject) {
-            //   AQUARIA.loadAccession([accessionObject.Accession], ui.item.value, null, false, accessionObject.Accession);
-
-            // })
-          } else if (ui.item.id === AQUARIA.protein_primary_accession) {
-            if (ui.item.value === AQUARIA.preferred_protein_name) {
-              AQUARIA.blankAll(false)
-              // do nothing
-            } else {
-              console.log('AQUARIA.proteinAutocomplete.select same protein, different name', ui.item.value)
-
-              AQUARIA.preferred_protein_name = ui.item.value
-              // AQUARIA.remote.getProteinSynonyms(AQUARIA.protein_primary_accession, //localStorage.organism_id, displayProtSynonyms, null);
-              url = `${window.BACKEND}/getProteinSynonyms/${AQUARIA.protein_primary_accession};`
-              axios({
-                method: 'get',
-                url: url
-              })
-                .then(function (response) {
-                  textpanel.displayProtSynonyms(response.data)
-                })
-                // Figure out a way to bring currentData
-            //   AQUARIA.update3DTitle(AQUARIA.structures2match.source_primary_accession,
-            //     currentData.pdb_id, AQUARIA.currentChain, AQUARIA.molecule_name, AQUARIA.currentMember.alignment_identity_score)
-            //   AQUARIA.updateDocumentTitle(AQUARIA.currentMember.alignment_identity_score, currentData.pdb_id, AQUARIA.currentChain)
-            //   featurelist.updateFeatureTabTitle(AQUARIA.preferred_protein_name)
-            }
-          } else {
-            /// console.log('AQUARIA.proteinAutocomplete.select new protein', ui.item.value);
-            document.querySelector('#protein_syn_input').placeholder = ui.item.value
-            AQUARIA.blankAll(true, 'Waiting for data...')
-            AQUARIA.loadAccession([primaryAccession], _this.pdbId, null, false, ui.item.value)
-          }
-        } else {
-          event.preventDefault()
-        }
-      }
-    })
-  },
-  methods: {
+      })
+    },
     getLRU: function () {
       return window.AQUARIA.proteinTopTen.getAll().map(function (item) {
         return {
@@ -246,17 +392,17 @@ export default {
     nameCallback: function (nameData) {
       var labelValues
       var _this = this
-      labelValues = $.map(nameData,
-        function (item) {
-          return {
-            label: item.Synonym,
-            suffix: null,
-            value: item.Synonym,
-            type: 'Synonym',
-            category: 'Names',
-            id: item.Primary_Accession
-          }
-        })
+      labelValues = nameData.map(function (item) {
+        return {
+          label: item.Synonym,
+          suffix: null,
+          value: item.Synonym,
+          type: 'Synonym',
+          category: 'Names',
+          id: item.Primary_Accession,
+          organism: item.Organism_ID
+        }
+      })
       labelValues.sort(function (a, b) {
         return a.label > b.label ? 1 : -1
       })
@@ -285,21 +431,20 @@ export default {
     idCallback: function (idData) {
       var _this = this
       var labelValues
-      labelValues = $.map(idData,
-        function (item) {
-          var suffix = item.Source_Field
-          if (suffix === 'AC' || suffix === 'ID') {
-            suffix = 'UniProt'
-          }
-          return {
-            label: item.Synonym,
-            suffix: suffix,
-            value: item.Synonym,
-            type: suffix,
-            category: 'Identifiers',
-            id: item.Primary_Accession
-          }
-        })
+      labelValues = idData.map(function (item) {
+        var suffix = item.Source_Field
+        if (suffix === 'AC' || suffix === 'ID') {
+          suffix = 'UniProt'
+        }
+        return {
+          label: item.Synonym,
+          suffix: suffix,
+          value: item.Synonym,
+          type: suffix,
+          category: 'Identifiers',
+          id: item.Primary_Accession
+        }
+      })
       labelValues.sort(function (a, b) {
         return a.label > b.label ? 1 : -1
       })
@@ -311,17 +456,16 @@ export default {
     pdbCallback: function (pdbData) {
       var _this = this
       var labelValues
-      labelValues = $.map(pdbData,
-        function (item) {
-          return {
-            label: item.Synonym,
-            suffix: 'PDB',
-            type: 'PDB',
-            value: item.Synonym,
-            category: item.Category,
-            id: item.Synonym
-          }
-        })
+      labelValues = pdbData.map(function (item) {
+        return {
+          label: item.Synonym,
+          suffix: 'PDB',
+          type: 'PDB',
+          value: item.Synonym,
+          category: item.Category,
+          id: item.Synonym
+        }
+      })
       _this.callbackData.pdbIDs = labelValues
       _this.collectResponse()
       resizeApp.stopLogoSpin()

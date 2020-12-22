@@ -1,15 +1,9 @@
 <template>
     <div id="about" data-intro="UniProt summary of the specified protein's function." data-position="right">
-      <h3>About <span class="explanation"> Uniprot ID</span></h3>
-      <div id='psyns'>
-                  <p>(example: <a href="#" v-on:click="fillin('p53')">p53</a> or <a href="#" v-on:click="fillin('P04637');">P04637</a>)</p>
-              </div>
+      <!-- <h3>About <span class="explanation"> Uniprot ID</span></h3> -->
               <div style="display:none;"
                     id='gsyns'>
                 <p>Genes: &nbsp;</p>
-              </div>
-              <div id='osyns'>
-                  <p>&nbsp;</p>
               </div>
         <div id="uniProtDesc"></div>
     </div>
