@@ -167,7 +167,7 @@ function handle_cosmic(cosmic, featureSet, snpPos, featSets_cosmic_byTissue, var
 		description = "<br>" + effect;
 	}
 
-	console.log("Varint in protein format is " + variantProtFmt);
+	console.log("Variant in protein format is " + variantProtFmt);
 	if (variantProtFmt != ''){
 		name = variantProtFmt;
 		if (cosmic.hasOwnProperty('mut_nt')){

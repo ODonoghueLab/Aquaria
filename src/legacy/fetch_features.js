@@ -980,14 +980,17 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 								}
 							}
 							if (featTypes[aFeatType].hasOwnProperty('mainToHide')){
-								description = description + " <span class=\"teaser\"> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + featTypes[aFeatType].mainToHide + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> [+] </span>";
-								counter_complete = counter_complete + 1;
+								description = description + featTypes[aFeatType].mainToHide;
 							}
 							if (featTypes[aFeatType].hasOwnProperty('otherResidues')){
-								description = description + " <span class=\"teaser\"> </span> <div id=\"complete" + counter_complete + "\" style=\"display: none\"> Additional residues: <ul>" + featTypes[aFeatType].otherResidues + "</ul> </div><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr2("complete"+counter_complete) + "  })();\"> [Additional residues] </span>";
+								description = description + featTypes[aFeatType].otherResidues;
 
 								counter_complete = counter_complete + 1;
 							}
+
+							description = description + "<toReplace> Whatever you did, you have officially been labelled the disturber of peace! Gandalf I am glad you are back, so am I dear boy! Hello world! </toReplace>"
+
+
 						});
 					// });
 				});
