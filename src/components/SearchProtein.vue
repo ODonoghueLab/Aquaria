@@ -217,13 +217,7 @@ export default {
   //   },
   methods: {
     getResultValue (result) {
-      if (window.location.href.includes(result.id)) {
-        return ('Current selection: ' + result.value + ' (' + result.id + ')')
-      } else if (result.category === 'Recent') {
-        return ('Previous search: ' + result.value + ' (' + result.id + ')')
-      } else {
-        return (result.value + ' (' + result.id + ')')
-      }
+      return (result.value + ' (' + result.id + ')')
     },
     clear () {
       this.value = ''
