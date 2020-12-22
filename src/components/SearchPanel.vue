@@ -1,15 +1,22 @@
 <template>
     <div id="searchByName">
-            <p>Search proteins</p>
-              <form id="myform"
+            <p>Organism</p>
+              <!-- <form id="myform"
                     name="myform"
                     ACTION="#"
                     method="post">
-                <img v-bind:src="search"/>
+                <img v-bind:src="search"/> -->
                 <SearchOrganism/>
+                <div id='osyns'>
+                    <p>&nbsp;</p>
+                </div>
+                <p>Protein</p>
                 <SearchProtein/>
+                <div id='psyns'>
+                  <p>(example: <a href="#" v-on:click="fillin('p53')">p53</a> or <a href="#" v-on:click="fillin('P04637');">P04637</a>)</p>
+                </div>
                 <!--<input type="hidden" id="organismid" name="organismid" value="9606"/>-->
-              </form>
+              <!-- </form> -->
       <!-- </span> -->
       </div>
 
