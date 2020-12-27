@@ -777,7 +777,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 
 		if (requestedFeature == 'PredictProtein'){
 			// convert feature first
-			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
+			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
 		}
 		if (requestedFeature == 'SNAP2'){
 			// console.log(response);
@@ -788,7 +788,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 			// console.log(response.data)
 			//console.log(getCurrentUrl());
 			//console.log(servers[3].URL_covid);
-			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
 
 
 		}
@@ -799,7 +799,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 
 		if (requestedFeature == 'myVariant.info'){
-			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
+			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
 		}
 
 		// return featuresFromExtServer
@@ -1528,9 +1528,9 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 					// Step 2.
 					// extractVariantInfo(aggregatedAnnotations, data);
 
-					extractVariantInfoFromUniprot(data).then(function(){
+					// extractVariantInfoFromUniprot(data).then(function(){ // UNCOMMENT for variant popup 
 						parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url);
-					});
+					// }); // UNCOMMENT for variant popup
 
 				});
 

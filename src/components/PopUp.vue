@@ -4,7 +4,7 @@
     <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
     <!-- <div id="mydivheader">
     </div> -->
-    <div id="laters">Over here?</div>
+    <div id="divVariantInfo">Over here?</div>
     <expandable-text-line>This is some expandable text line mate blabh blahbl balbhal balbhalkao asldfjasoekne;qleisoel.</expandable-text-line>
     <p id='popuptext' width="400px">Pop-up text box component for features</p>
     <img v-bind:src="popupTail" id='popupTail'>
