@@ -20,12 +20,14 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 				let obj_featType = {};
 				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
-					let obj_inFeatType = cleanData_pp(description);
-					obj_featType[featureType] = obj_inFeatType;
+					let varInfo = [];
+					cleanData_pp(description, varInfo);
+					// obj_featType[featureType] = obj_inFeatType;
 					// console.log(' does come in here ... ');
 					// console.log(obj_inFeatType);
 
-					variantResidues[resSnp][serverName].push(obj_featType);
+					// variantResidues[resSnp][serverName].push(obj_featType);
+					addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'PredictProtein');
 				}
 
 				else if (serverName == 'SNAP2'){
@@ -43,8 +45,11 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 				}
 				else if (serverName == 'CATH') {
-					obj_featType = cleanData_cath(description);
-					variantResidues[resSnp][serverName].push(obj_featType);
+					let varInfo = [];
+					cleanData_cath(description, varInfo);
+
+					addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'CATH ' + featureType);
+					// variantResidues[resSnp][serverName].push(obj_featType);
 				}
 
 				else if (serverName == 'UniProt'){
@@ -236,16 +241,19 @@ function addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherRe
 }
 
 /// Cleaning descriptions;
-function cleanData_pp(desc){
+function cleanData_pp(desc, varInfo){
 	desc = desc.replace(/\s+/g, '');
 
 	let arr = desc.split(/\:/);
 	let arr_1 = arr[1].split(/\(/);
 	arr_1[1] = arr_1[1].replace(/\)/, '');
 
-	let obj_inFeatType = {mainToShow: arr_1[1], mainToHide: "Score: " + arr_1[0]};
+	// let obj_inFeatType = {mainToShow: arr_1[1], mainToHide: "Score: " + arr_1[0]};
+	varInfo.push(arr_1[1] + " (score:" + arr_1[0] + ")")
 
-	return obj_inFeatType;
+	console.log("The pridict protein value is: " + arr_1[1] + " (score:" + arr_1[0] + ")")
+
+	// return obj_inFeatType;
 }
 
 
@@ -308,7 +316,7 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo){
 }
 
 
-function cleanData_cath(desc){
+function cleanData_cath(desc, varInfo){
 	desc = desc.replace(/\<span[^\>]*\>/, '');
 	desc = desc.replace(/\<i\>/, '');
 	desc = desc.replace(/\<\/i\>/, '');
@@ -318,13 +326,16 @@ function cleanData_cath(desc){
 	let arr = desc.split(/\:\s/);
 	arr[0] = arr[0].replace(/CATH/, '');
 
-	let obj_featType = {};
 
-	obj_featType[arr[0]] = {'mainToShow': arr[1]};
+	varInfo.push(arr[1]);
+
+	// let obj_featType = {};
+
+	// obj_featType[arr[0]] = {'mainToShow': arr[1]};
 	// {mainToShow: arr_1[1], mainToHide: "Score: " + arr_1[0]};
 
 	// console.log('cleaned cath desc is ' + desc + " arr[0]" + arr[0] + " arr[1]:" + arr[1]);
-	return (obj_featType);
+	// return (obj_featType);
 }
 
 function cleanData_snap2_effects(desc, newAa, arr_varInfo, arr_otherResInfo){

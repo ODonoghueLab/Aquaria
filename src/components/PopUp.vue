@@ -4,7 +4,11 @@
     <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
     <!-- <div id="mydivheader">
     </div> -->
-    <div id="divVariantInfo">Over here?</div>
+    <div id="divVariantInfo">Over here?
+        <div id="divVI_varInfo"></div>
+        <div id="divVI_posInfo"></div>
+        <div id="divVI_otherResInfo"></div>
+    </div>
     <expandable-text-line>This is some expandable text line mate blabh blahbl balbhal balbhalkao asldfjasoekne;qleisoel.</expandable-text-line>
     <p id='popuptext' width="400px">Pop-up text box component for features</p>
     <img v-bind:src="popupTail" id='popupTail'>
@@ -47,48 +51,27 @@ export default {
     handler: function () {
       const ExpandableTextLineCtor = Vue.extend(ExpandableTextLine)
 
-      const a = document.getElementById('popup')
+      const a = document.getElementById('divVI_otherResInfo')
       console.log('a is ' + a)
-      const b = document.getElementsByTagName('toReplace')
+      const b = document.getElementsByTagName('toreplace')
       console.log('The number of nodes to remove are: ' + b.length)
 
       if (b.length > 0) {
-        var componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: 'LORD OF THE RINGS, THE FELLOWSHIP, gandalf the ring cannot stay here. I had a dream that perhaps they must decide how to end it. My people are leaving these shores.' } } })
-        console.log(componentinstance)
+        for (var j = 0; j < b.length; j++) {
+          console.log('Grays anatomy')
+          console.log(b[j].innerHTML)
+          var componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b[j].innerHTML } } })
+          console.log(componentinstance)
 
-        // console.log(document.getElementsByTagName('expandable-text-line'))
-        componentinstance.$mount()
-        componentinstance.$el.innerHTML = 'LORD OF THE RINGS, THE FELLOWSHIP, gandalf the ring cannot stay here. I had a dream that perhaps they must decide how to end it. My people are leaving these shores.'
-        document.getElementById('laters').appendChild(componentinstance.$el)
-        this.expandTextLine.push(componentinstance)
-        // console.log(this.expandTextLine)
-        // extendTextLine.append(componentinstance)
-        // componentinstance.$mount('#popup') //  componentinstance.$mount('#elementidhere').$mount('#mount')
-        // document.getElementById('app').appendChild(component.$el)
-        // var $element = a.append('<expandable-text-line>LORD OF THE RINGS, THE FELLOWSHIP, gandalf the ring cannot stay here. I had a dream that perhaps they must decide how to end it. My people are leaving these shores.</expandable-text-line>')
-        // this.$compile($element.get(0))
-        // console.log($element)
-      } /* else {
-        for (let i = 0; i < this.expandTextLine.length; i++) {
-          this.expandTextLine[i].$el.parentNode.removeChild(this.expandTextLine[i].$el)
-          this.expandTextLine[i].$destroy()
+          componentinstance.$mount()
+          componentinstance.$el.innerHTML = b[j].innerHTML
+          document.getElementById('balloon').appendChild(componentinstance.$el)
+          this.expandTextLine.push(componentinstance)
         }
-        this.expandTextLine = []
-      } */
-      for (var i = 0, len = b.length; i !== len; ++i) {
-        b[0].parentNode.removeChild(b[0])
-      }
-
-      // const c = new ExpandableTextLine()
-      /* for (let i = 0; i < b.length; i++) {
-        const c = document.createElement('expandable-text-line')
-        c.textContent = 'LORD OF THE RINGS, THE FELLOWSHIP, gandalf the ring cannot stay here. I had a dream that perhaps they must decide how to end it. My people are leaving these shores.'
-        console.log(c)
-        a.appendChild(c)
       }
       for (var i = 0, len = b.length; i !== len; ++i) {
         b[0].parentNode.removeChild(b[0])
-      } */
+      }
     },
     appendPopup: function (text, position, width) {
       var s, tailLeft

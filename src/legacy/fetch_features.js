@@ -777,7 +777,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 
 		if (requestedFeature == 'PredictProtein'){
 			// convert feature first
-			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
+			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
 		}
 		if (requestedFeature == 'SNAP2'){
 			// console.log(response);
@@ -788,7 +788,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 			// console.log(response.data)
 			//console.log(getCurrentUrl());
 			//console.log(servers[3].URL_covid);
-			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
 
 
 		}
@@ -959,7 +959,42 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 			description = "<br> " + variantResidues[residue].defaultDesc + "<br>";
 		}
 
-		for (let serverName in variantResidues[residue]){
+
+		if (variantResidues[residue].hasOwnProperty('variantInfo')){
+			for (let serverAndFsName in variantResidues[residue].variantInfo){
+				console.log("The serverAndFsName is " + serverAndFsName);
+				// document.getElementById('divVI_varInfo').innerHTML = '<toReplace>' + variantResidues[residue]['variantInfo'][serverAndFsName][0] + '</toReplace>';
+
+				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " +  variantResidues[residue]['variantInfo'][serverAndFsName][0] + '</toReplace> <br>';
+			}
+		}
+
+		if (variantResidues[residue].hasOwnProperty('positionInfo')){
+			for (let serverAndFsName in variantResidues[residue].positionInfo){
+				console.log("The serverAndFsName is " + serverAndFsName);
+				// document.getElementById('divVI_posInfo').innerHTML = '<toReplace>' +  variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace>';
+
+				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace> <br>';
+			}
+		}
+
+
+		if (variantResidues[residue].hasOwnProperty('otherResInfo')){
+			for (let serverAndFsName in variantResidues[residue].otherResInfo){
+				console.log("The serverAndFsName is " + serverAndFsName);
+
+				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['otherResInfo'][serverAndFsName][0] + '</toReplace> <br>';
+
+			}
+		}
+
+
+		for (let dataType in variantResidues[residue]){ // dataType == variantInfo | positionInfo | otherResInfo
+
+			console.log("The dataType is " + dataType);
+
+			// if (serverName != 'newResidue' && serverName != 'defa')
+			/*
 
 			// console.log('Server name is ' + serverName);
 			if (serverName != 'newResidue' && serverName != 'defaultDesc'){
@@ -996,13 +1031,14 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 				});
 			}
 
+			*/
 
 			// let aDesc =  "<span class=\"teaser\"> <i> " + featureType + "</i> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + description + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> more... </span>";
 			// description = description + "<tr>";
 
 			// description = description + "</tr>";
 		}
-		// Aggregated Annotations
+		// Aggregated Annotations - (other annotations)
 		for (let i =0; i < aggregatedAnnotations.length; i++){
 
 
@@ -1528,7 +1564,7 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 					// Step 2.
 					// extractVariantInfo(aggregatedAnnotations, data);
 
-					// extractVariantInfoFromUniprot(data).then(function(){ // UNCOMMENT for variant popup 
+					// extractVariantInfoFromUniprot(data).then(function(){ // UNCOMMENT for variant popup
 						parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url);
 					// }); // UNCOMMENT for variant popup
 
