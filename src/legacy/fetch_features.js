@@ -965,7 +965,13 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 				console.log("The serverAndFsName is " + serverAndFsName);
 				// document.getElementById('divVI_varInfo').innerHTML = '<toReplace>' + variantResidues[residue]['variantInfo'][serverAndFsName][0] + '</toReplace>';
 
-				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " +  variantResidues[residue]['variantInfo'][serverAndFsName][0] + '</toReplace> <br>';
+				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				for (let i =0; i<variantResidues[residue]['variantInfo'][serverAndFsName].length; i++){
+					description = description +  variantResidues[residue]['variantInfo'][serverAndFsName][i] +". ";
+				}
+
+				description = description + '</toReplace> <br>';
+
 			}
 		}
 
@@ -974,7 +980,15 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 				console.log("The serverAndFsName is " + serverAndFsName);
 				// document.getElementById('divVI_posInfo').innerHTML = '<toReplace>' +  variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace>';
 
-				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace> <br>';
+				// description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace> <br>';
+
+
+				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				for (let i =0; i<variantResidues[residue]['positionInfo'][serverAndFsName].length; i++){
+					description = description +  variantResidues[residue]['positionInfo'][serverAndFsName][i] +". ";
+				}
+
+				description = description + '</toReplace> <br>';
 			}
 		}
 
@@ -983,7 +997,14 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 			for (let serverAndFsName in variantResidues[residue].otherResInfo){
 				console.log("The serverAndFsName is " + serverAndFsName);
 
-				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['otherResInfo'][serverAndFsName][0] + '</toReplace> <br>';
+				// description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['otherResInfo'][serverAndFsName][0] + '</toReplace> <br>';
+
+				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				for (let i =0; i<variantResidues[residue]['otherResInfo'][serverAndFsName].length; i++){
+					description = description +  variantResidues[residue]['otherResInfo'][serverAndFsName][i] +". ";
+				}
+
+				description = description + '</toReplace> <br>';
 
 			}
 		}
@@ -1564,9 +1585,9 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 					// Step 2.
 					// extractVariantInfo(aggregatedAnnotations, data);
 
-					// extractVariantInfoFromUniprot(data).then(function(){ // UNCOMMENT for variant popup
+					extractVariantInfoFromUniprot(data).then(function(){ // UNCOMMENT for variant popup
 						parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url);
-					// }); // UNCOMMENT for variant popup
+					}); // UNCOMMENT for variant popup
 
 				});
 

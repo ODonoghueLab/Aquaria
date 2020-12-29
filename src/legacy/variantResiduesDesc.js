@@ -10,13 +10,13 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 			if (parseInt(resSnp) >= parseInt(resStart_pp) && parseInt(resSnp) <= parseInt(resEnd_pp)){
 
-				if (!variantResidues[resSnp].hasOwnProperty(serverName)){
+				/* if (!variantResidues[resSnp].hasOwnProperty(serverName)){
 
 
 					variantResidues[resSnp][serverName] = [];
 
 
-				}
+				} */
 
 				let obj_featType = {};
 				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
@@ -27,7 +27,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					// console.log(obj_inFeatType);
 
 					// variantResidues[resSnp][serverName].push(obj_featType);
-					addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'PredictProtein');
+					addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'PredictProtein Conservation');
 				}
 
 				else if (serverName == 'SNAP2'){
@@ -56,61 +56,41 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					console.log('uniprot featuretype is ' + featureType);
 					console.log("uniprot feature description is "  + description);
 
+					description = description.replace(/[\s]+$/, '');
 					if (featureType == 'Metal ion-binding site' ){
-						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
 
-						if (idx == -1){
-							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = "<li> Binds to " + description + "</li>";
-							variantResidues[resSnp][serverName].push(obj_featType);
-						}
-						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + "<li>" + description + "</li>";
-						}
+						let varInfo = [];
+						varInfo.push(description);
+						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'UniProt metal ion-binding site');
 
 					}
 					else if (featureType == 'Site'){
-						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
-
-						if (idx == -1){
-							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = "<li>" + description + "</li>";
-							variantResidues[resSnp][serverName].push(obj_featType);
-						}
-						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + "<li> " + description + "</li>";
-						}
+						let varInfo = [];
+						varInfo.push(description);
+						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'UniProt site');
 					}
 
 					else if (featureType == 'Modified residue'){
-						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
-
-						if (idx == -1){
-							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = "<li>" + description + "</li>";
-							variantResidues[resSnp][serverName].push(obj_featType);
-						}
-						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '<li>' + description + "</li>";
-						}
+						let varInfo = [];
+						varInfo.push(description);
+						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'UniProt modified residue');
 					}
+
 					else if (featureType == 'Cross-link'){
-						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
-
-						if (idx == -1){
-							obj_featType[featureType] = {};
-							obj_featType[featureType]['mainToShow'] = "<li>" + description + "</li>";
-							variantResidues[resSnp][serverName].push(obj_featType);
-						}
-						else { // already exists, hence append;
-							variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + "<li>" + description + "</li>";
-						}
+						let varInfo = [];
+						varInfo.push(description);
+						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'UniProt cross-link');
 					}
-					else if (featureType == 'Sequence variant' || featureType == 'Mutagenesis site'){
-						// check for the right residue;
-						let objWithInfo = cleanData_uniprot_seqVar(description, variantResidues[resSnp].newResidue);
-						let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
 
+					else if (featureType == 'Sequence variant' || featureType == 'Mutagenesis site'){
+						let varInfo = []; let otherResInfo = [];
+						// check for the right residue;
+						cleanData_uniprot_seqVar(description, variantResidues[resSnp].newResidue, varInfo, otherResInfo);
+
+						addToVariantResidues(variantResidues, resSnp, varInfo, [], otherResInfo, 'UniProt ' + featureType);
+
+						// let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
+						/*
 						if (idx == -1){
 							obj_featType[featureType] = {};
 							if (objWithInfo.hasOwnProperty('mainToShow')){
@@ -131,7 +111,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 								variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] = variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] + "<li>" + objWithInfo.otherResidues + "</li>";
 							}
 							// variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
-						}
+						}*/
 					}
 
 
@@ -226,6 +206,43 @@ function addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherRe
 
 
 	if (varInfo.length > 0){
+		console.log("The VAR INFO IS " + varInfo);
+		console.log(varInfo);
+		if (!variantResidues[resSnp]['variantInfo'].hasOwnProperty(serverName)){
+			console.log(' IF YOU WANT MORE ' + serverName + " here1");
+			variantResidues[resSnp]['variantInfo'][serverName] = varInfo;
+		}
+		else {
+			variantResidues[resSnp]['variantInfo'][serverName] = variantResidues[resSnp]['variantInfo'][serverName].concat(varInfo);
+			console.log(variantResidues[resSnp]['variantInfo'][serverName])
+		}
+	}
+
+
+	if (posInfo.length > 0){
+		if (!variantResidues[resSnp]['positionInfo'].hasOwnProperty(serverName)){
+			variantResidues[resSnp]['positionInfo'][serverName] = posInfo;
+		}
+		else {
+			variantResidues[resSnp]['positionInfo'][serverName] = variantResidues[resSnp]['positionInfo'][serverName].concat(posInfo);
+		}
+	}
+
+	if (otherResInfo.length > 0){
+		console.log("The OTHERRES INFO IS " + otherResInfo);
+		if (!variantResidues[resSnp]['otherResInfo'].hasOwnProperty(serverName)){
+			variantResidues[resSnp]['otherResInfo'][serverName] = otherResInfo;
+		}
+		else {
+			console.log("THE OTHERRES INFO appending");
+			variantResidues[resSnp]['otherResInfo'][serverName] = variantResidues[resSnp]['otherResInfo'][serverName].concat(otherResInfo);
+			console.log(variantResidues[resSnp]['otherResInfo'][serverName])
+		}
+	}
+
+
+	/*
+	if (varInfo.length > 0){
 		variantResidues[resSnp]['variantInfo'][serverName] = varInfo;
 	}
 
@@ -236,7 +253,7 @@ function addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherRe
 	if (otherResInfo.length > 0){
 		variantResidues[resSnp]['otherResInfo'][serverName] = otherResInfo;
 	}
-
+	*/
 
 }
 
@@ -258,25 +275,25 @@ function cleanData_pp(desc, varInfo){
 
 
 
-function cleanData_uniprot_seqVar(desc, newRes, feat_toObj){
+function cleanData_uniprot_seqVar(desc, newAa, varInfo, otherResInfo){
 	// main to show, other residues;
 
 	desc = desc.replace(/^[\s]+/, "");
+	desc = desc.replace(/\.$/, '');
+	desc = desc.replace(/\>/, '&#8594;')
 	let arr = desc.split(/[\s]+/);
-	let mainToShow = "";
-	let otherResidues = "";
-	if (arr[1] == '>'){
-		if (arr[2] == newRes){
-			mainToShow = desc;
+	if (arr[1] == '&#8594;'){
+		if (arr[2] == newAa){
+			varInfo.push(desc);
 		}
 		else {
-			otherResidues = desc;
+			otherResInfo.push(desc);
 		}
 	}
 	else {
-		mainToShow = desc;
+		varInfo.push(desc);
 	}
-
+	/*
 	let objToReturn = {};
 
 	if (mainToShow != ''){
@@ -287,6 +304,7 @@ function cleanData_uniprot_seqVar(desc, newRes, feat_toObj){
 	}
 
 	return (objToReturn)
+	*/
 }
 
 function cleanData_snap2_getAvgScore(desc, arr_posInfo){
@@ -364,9 +382,9 @@ function cleanData_snap2_effects(desc, newAa, arr_varInfo, arr_otherResInfo){
 		arr_1.forEach(function(item, i){
 			item = item.replace(/\s/g, '');
 			if (item.match(regex)){
-				console.log("found ! " + item);
+				// console.log("found ! " + item);
 				isNewResFound = true;
-				toAdd_varInfo =  toAdd_varInfo + ". Residue's specific score " + item + '.';
+				toAdd_varInfo =  toAdd_varInfo + ". Residue's specific score " + item;
 				foundIdx = i;
 
 			}
@@ -378,14 +396,19 @@ function cleanData_snap2_effects(desc, newAa, arr_varInfo, arr_otherResInfo){
 
 		if (isNewResFound == false){
 			// This residue does not add to change;
-			toAdd_varInfo = toAdd_varInfo + "This residue does not add to mutational sensitivity.";
+			toAdd_varInfo = toAdd_varInfo + "This residue does not add to mutational sensitivity";
 		}
 
-		console.log("Testing 123: " + toAdd_varInfo + "| " + toAdd_otherResInfo);
+		// console.log("Testing 123: " + toAdd_varInfo + "| " + toAdd_otherResInfo);
 	}
 
-	arr_varInfo.push(toAdd_varInfo);
-	arr_otherResInfo.push(toAdd_otherResInfo);
+	if (toAdd_varInfo != ''){
+		arr_varInfo.push(toAdd_varInfo);
+	}
+	if (toAdd_otherResInfo != ''){
+		arr_otherResInfo.push(toAdd_otherResInfo);
+	}
+
 
 }
 
