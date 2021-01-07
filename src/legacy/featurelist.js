@@ -537,7 +537,7 @@ function doThePlotting_v2(divId, theSeriesData_inner, theSeriesData_outer, theTi
 	});
 }
 
- 
+
 var common = require('../utils/common');
 
 function showAnnotation(f, eid) {
@@ -554,7 +554,7 @@ function showAnnotation(f, eid) {
 		urlhtml += "</p>";
 	}
 	$("div.popup").remove();
-	var balloon = "<div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
+	var balloon = "<div><div id='divVI_varInfo'><b>Variant information</b></div> <div id='divVI_posInfo'><br><b>Position information</b></div> <div id='divVI_otherResInfo'><br><b>Other residue information</b></div> </div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
 			+ f.label + " (";
 	if (f.start == f.end){
 		balloon = balloon + "Residue "+f.start;
@@ -594,7 +594,7 @@ function showAnnotation(f, eid) {
 
 	var fpos = $("#" + eid).offset();
 	var fwidth = $("#" + eid).attr("width");
-	
+
 	common.appendPopup(balloon, fpos, fwidth, s)
 	// var bleft = parseInt(fpos.left + fwidth / 2 - 160);
 	// var btop = parseInt(fpos.top - popheight);

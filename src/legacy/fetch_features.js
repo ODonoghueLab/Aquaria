@@ -956,7 +956,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 		let description = "";
 
 		if (variantResidues[residue].hasOwnProperty('defaultDesc')){
-			description = "<br> " + variantResidues[residue].defaultDesc + "<br>";
+			description = "<br> " + variantResidues[residue].defaultDesc;
 		}
 
 
@@ -965,15 +965,17 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 				console.log("The serverAndFsName is " + serverAndFsName);
 				// document.getElementById('divVI_varInfo').innerHTML = '<toReplace>' + variantResidues[residue]['variantInfo'][serverAndFsName][0] + '</toReplace>';
 
-				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				description = description + '<toReplace_varInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
 				for (let i =0; i<variantResidues[residue]['variantInfo'][serverAndFsName].length; i++){
 					description = description +  variantResidues[residue]['variantInfo'][serverAndFsName][i] +". ";
 				}
 
-				description = description + '</toReplace> <br>';
+				description = description + '</toReplace_varInfo>';
 
 			}
 		}
+
+		// description = description + "<hr>";
 
 		if (variantResidues[residue].hasOwnProperty('positionInfo')){
 			for (let serverAndFsName in variantResidues[residue].positionInfo){
@@ -983,12 +985,12 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 				// description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace> <br>';
 
 
-				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				description = description + '<toReplace_posInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
 				for (let i =0; i<variantResidues[residue]['positionInfo'][serverAndFsName].length; i++){
 					description = description +  variantResidues[residue]['positionInfo'][serverAndFsName][i] +". ";
 				}
 
-				description = description + '</toReplace> <br>';
+				description = description + '</toReplace_posInfo> <br>';
 			}
 		}
 
@@ -999,12 +1001,12 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 
 				// description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['otherResInfo'][serverAndFsName][0] + '</toReplace> <br>';
 
-				description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				description = description + '<toReplace_otherResInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
 				for (let i =0; i<variantResidues[residue]['otherResInfo'][serverAndFsName].length; i++){
 					description = description +  variantResidues[residue]['otherResInfo'][serverAndFsName][i] +". ";
 				}
 
-				description = description + '</toReplace> <br>';
+				description = description + '</toReplace_otherResInfo> <br>';
 
 			}
 		}
