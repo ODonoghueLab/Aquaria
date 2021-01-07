@@ -92,7 +92,7 @@ export default {
           const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b3[j].innerHTML } } })
           // console.log(componentinstance)
 
-          console.log('Nice day: ' + b3[j].innerHTML)
+          // console.log('Nice day: ' + b3[j].innerHTML)
           componentinstance.$mount()
           componentinstance.$el.innerHTML = b3[j].innerHTML
           otherResInfo.appendChild(componentinstance.$el)

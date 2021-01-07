@@ -990,7 +990,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 					description = description +  variantResidues[residue]['positionInfo'][serverAndFsName][i] +". ";
 				}
 
-				description = description + '</toReplace_posInfo> <br>';
+				description = description + '</toReplace_posInfo>';
 			}
 		}
 
@@ -1006,7 +1006,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 					description = description +  variantResidues[residue]['otherResInfo'][serverAndFsName][i] +". ";
 				}
 
-				description = description + '</toReplace_otherResInfo> <br>';
+				description = description + '</toReplace_otherResInfo>';
 
 			}
 		}
