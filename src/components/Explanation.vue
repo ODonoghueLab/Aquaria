@@ -9,15 +9,24 @@
     <p class='quality'> This alignment has an HHblits E-value of {{evalueString}} &times; <nobr>10<sup>{{power}}</sup></nobr>, which is considered to be {{quality}}.
         Based on cross-validation, the likelihood that your specified protein ({{uniprotName}}) adopts a structure similar to that shown is estimated to be {{precisiontxt}}%.</p>
         <p>Note that the structure shown is taken directly from the PDB; it has not been derived by ab-initio or comparative modeling.</p>
+    <expandable-text-line :use-click="Hover" v-if="alignment">
+        <!-- <p v-if="$mq === 'laptop' || $mq === 'tablet'"><strong>Click here to see the alignment....</strong></p> -->
+        <p v-if="$mq === 'laptop' || $mq === 'tablet'"><strong>Alignment: {{alignment}}</strong></p>
+    </expandable-text-line>
     </div>
 </template>
 
 <script>
 import $ from 'jquery'
 import d3 from 'd3'
+import ExpandableTextLine from 'vue-expandable-text-line'
 
 export default {
   name: 'Explanation',
+  components: {
+    ExpandableTextLine
+  },
+  props: ['alignment'],
   data () {
     return {
       pdbName: null,
@@ -139,3 +148,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.expandable-text-line{
+  max-width: 50vw;
+}
+</style>

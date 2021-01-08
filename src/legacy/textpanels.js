@@ -413,7 +413,8 @@ $("div#osyns p").expander({
 
 var displayProtSynonyms = function(data) {
 //console.log(data);
-var pnames = "<b>Synonyms:</b>&nbsp;";
+var pnames = ''
+// </b>&nbsp;";
 var gnames = "<b>Genes:</b>&nbsp;";
 if (data.synonyms == "none") { 
 	AQUARIA.preferred_protein_name = "unknown"; 
