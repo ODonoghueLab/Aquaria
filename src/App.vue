@@ -2,13 +2,13 @@
   <div id="app">
       <router-view/>
       <div class="matrixLoading">
-      <div id="waiting_gif">
-          <img id="loading_gif" src="./assets/img/aquaria-spin.gif">
-      </div>
-      <div id="loading_overlay"> LOADING<span id="myspan"></span></div>
+        <div id="waiting_gif">
+            <img id="loading_gif" src="./assets/img/aquaria-spin.gif">
+        </div>
+        <div id="loading_overlay"> LOADING<span id="myspan"></span></div>
       </div>
       <div id="superFamCharts" style="display: none">
-    </div>
+      </div>
   </div>
 </template>
 

@@ -12,7 +12,9 @@ module.exports = {
   },
   rules: {
     'no-console': 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+	"strict": "off",
+	'no-unused-vars': 'off'
   },
   ignorePatterns: [
     'src/legacy/**/*.js',

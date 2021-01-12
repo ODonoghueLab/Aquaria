@@ -20,10 +20,10 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 			return new Promise(function(resolve, reject){
 				let promises_ = [];
 				if (response.hasOwnProperty('data') && response.data.hasOwnProperty('total')){
-					console.log("The total myVariant.info is " + response.data.total);
+					// console.log("The total myVariant.info is " + response.data.total);
 					let total = parseInt(response.data.total);
 					let callsToMake = Math.ceil(total/1000) - 1;
-					console.log("Total calls to make to myVariant.info is " + callsToMake);
+					// console.log("Total calls to make to myVariant.info is " + callsToMake);
 
 
 					for (let i =0; i< callsToMake; i++){
@@ -46,7 +46,7 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 			return new Promise(function(resolve, reject){
 				let respData = data.response;
 				let promises_ = data.promises_;
-				console.log("Comes in here 1");
+				// console.log("Comes in here 1");
 				handlePromiseData(respData, featuresObj, fsName_cosmic, fs_cosmic_byTissue, features_snpeff, features_cosmic, variantResidues)
 				.then(function(){
 					resolve(data.promises_);
@@ -60,7 +60,7 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 				// 	return new Promise(function(resolve, reject){
 						let promises_processing = [];
 						theData.forEach(function(item, i){
-							console.log("Comes in here 2");
+							// console.log("Comes in here 2");
 							promises_processing.push(handlePromiseData(item, featuresObj, fsName_cosmic, fs_cosmic_byTissue, features_snpeff, features_cosmic, variantResidues));
 						});
 
@@ -88,7 +88,7 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 			featuresObj[fsName_cosmic]['Color'] = '#FF0000';
 			featuresObj[fsName_cosmic]['Features'] = features_cosmic;
 
-			console.log(fs_cosmic_byTissue);
+			// console.log(fs_cosmic_byTissue);
 			for (let key in fs_cosmic_byTissue){
 				let key_fs = key;
 				featuresObj[key_fs] = {};
@@ -112,13 +112,16 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 
 function handlePromiseData(respData, featuresObj, fsName_cosmic, fs_cosmic_byTissue, features_snpeff, features_cosmic, variantResidues){
 	return new Promise(function (resolve, reject){
-		console.log("Scholastic sanctuary!");
 		if (respData.hasOwnProperty('data') && respData.data.hasOwnProperty('hits') && respData.data.hits.length > 0){
 			respData.data.hits.forEach(function(item, item_i){
 
 				if (item.hasOwnProperty('snpeff') && item.snpeff.hasOwnProperty('ann') && item.snpeff.ann.length > 0){
 					let snpEff_obj = handle_snpeff(item.snpeff.ann, features_snpeff);
-					if (snpEff_obj.snpPos > -1 && item.hasOwnProperty('cosmic')){
+					if (snpEff_obj.snpPos > -1 && !snpEff_obj.effect.match('synonymous_variant') && item.hasOwnProperty('cosmic')){
+						if (item.hasOwnProperty('dbnsfp')){
+							// console.log('Now also handle the dbnsfp');
+							handle_dbnsfp(item.dbnsfp, snpEff_obj);
+						}
 						handle_cosmic(item.cosmic, features_cosmic, snpEff_obj.snpPos, fs_cosmic_byTissue, variantResidues, snpEff_obj.variant_protFormat, snpEff_obj.effect);
 					}
 				}
@@ -133,6 +136,21 @@ function handlePromiseData(respData, featuresObj, fsName_cosmic, fs_cosmic_byTis
 		}
 	});
 }
+
+function handle_dbnsfp(dbnsfpObj, snpEff_obj){
+	let mutFormat = '';
+	if (dbnsfpObj.hasOwnProperty('aa')){
+		if (dbnsfpObj.aa.hasOwnProperty('alt') && dbnsfpObj.aa.hasOwnProperty('ref')){
+			mutFormat = dbnsfpObj.aa.ref + ">" + dbnsfpObj.aa.alt;
+			snpEff_obj.effect = snpEff_obj.effect + " (" + snpEff_obj.variant_protFormat + ")";
+			snpEff_obj.variant_protFormat = mutFormat;
+
+		}
+	}
+
+	// return mutFormat;
+}
+
 
 
 function handle_snpeff(snpeffAnn, featureSet){
@@ -164,10 +182,10 @@ function handle_cosmic(cosmic, featureSet, snpPos, featSets_cosmic_byTissue, var
 
 
 	if (effect != ''){
-		description = "<br>" + effect;
+		description = "<br>Effect: " + effect;
 	}
 
-	console.log("Varint in protein format is " + variantProtFmt);
+	// console.log("Variant in protein format is " + variantProtFmt);
 	if (variantProtFmt != ''){
 		name = variantProtFmt;
 		if (cosmic.hasOwnProperty('mut_nt')){
