@@ -190,11 +190,12 @@ function showAnnotation (f, eid) {
     console.log(f)
   }
 
-  var fpos = $('#' + eid).offset()
-  var fwidth = $('#' + eid).attr('width')
+  var fpos = document.querySelector('#' + eid).getBoundingClientRect()
+  var svgdim = document.querySelector('#' + eid).getBBox()
+  var fwidth = svgdim.width
   // var fleft = d3.select('#' + eid).attr('transform').split('(')[1].split(',')[0]
   // var ftop = fpos.top
-  common.appendPopup(balloon, fpos, fwidth, s)
+  common.appendPopup(balloon, fpos, fwidth, true)
 
   // var bleft = parseInt(fpos.left + (fwidth / 2) - 235)
   // var btop = parseInt(fpos.top - popheight)

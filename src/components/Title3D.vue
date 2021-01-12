@@ -157,6 +157,9 @@ export default {
       ev.target.className = 'titlepanel active'
       document.querySelector('#explanation').style.display = 'block'
       document.querySelector('#contentPanel').style.display = 'flex'
+      if (document.querySelector('.expandable-text-line')) {
+        document.querySelector('.expandable-text-line').style.maxWidth = document.querySelector('#structureviewerexplanation').offsetWidth + 20 + 'px'
+      }
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#contentPanel').style.display = 'none'
@@ -166,6 +169,10 @@ export default {
     release: function () {
       document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display = 'none'
       this.resetSelection()
+    },
+    formatAlignment: function (alignment) {
+      alignment.replace(/\n\n/g, '<br /><br />')
+      return alignment
     }
   },
   mounted () {
@@ -186,7 +193,9 @@ export default {
         _this.seqRes = residues[1].split(accession)[1]
         _this.structRes = residues[0].split(pdb)[1]
         _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
-
+        // _this.alignment = '<p>' + _this.alignment
+        // _this.alignment = _this.alignment.replace(/\n\n/g, '</p><br /><p>"')
+        // _this.alignment = _this.alignment.replace(/\n/g, '</p><p>')
         // var showAlignment = new MutationObserver(function () {
         //   if (document.querySelector('.expandable-text-line').style.whiteSpace === '') {
         //     document.querySelector('#alignment').style.display = 'none'
