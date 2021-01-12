@@ -5,7 +5,7 @@
     </h3>
     <h3 class="sub inactive" title="Click to see annotated features" rel="featurelist" id="h_featurelist" data-intro="Provides access to sequence features." data-position="top" v-on:click="widepanel()">Features |
       <span class="explanation" id="featureExplanation"></span>
-      <span class="counter" id="featureCounter"></span>
+      <!-- <span class="counter" id="featureCounter"></span> -->
     </h3>
     <!-- <span class="x"></span> -->
     </div>

@@ -11,7 +11,7 @@
         <p>Note that the structure shown is taken directly from the PDB; it has not been derived by ab-initio or comparative modeling.</p>
     <expandable-text-line :use-click="Hover" v-if="alignment">
         <!-- <p v-if="$mq === 'laptop' || $mq === 'tablet'"><strong>Click here to see the alignment....</strong></p> -->
-        <p v-if="$mq === 'laptop' || $mq === 'tablet'"><strong>Alignment: {{alignment}}</strong></p>
+        <p><strong>Alignment: {{alignment}}</strong></p>
     </expandable-text-line>
     </div>
 </template>
@@ -127,8 +127,8 @@ export default {
       var btop = parseInt(fpos.top + 30)
 
       $('div.popup').css({
-        left: bleft + 'px',
-        top: btop + 'px'
+        left: bleft + 'px'
+        // top: btop + 'px'
       }).draggable().fadeIn(600)
 
       $('span.x').click(function () {
@@ -150,7 +150,8 @@ export default {
 </script>
 
 <style scoped>
-.expandable-text-line{
-  max-width: 50vw;
+.expandable-text-line > p{
+  font-family: monospace;
+  font-size: 9px;
 }
 </style>

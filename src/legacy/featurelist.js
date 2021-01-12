@@ -623,10 +623,14 @@ function showAnnotation(f, eid) {
 
 	// var popheight = $("div.popup").innerHeight();
 
-	var fpos = $("#" + eid).offset();
-	var fwidth = $("#" + eid).attr("width");
+	// var fpos = $("#" + eid).offset();
+	// var fwidth = $("#" + eid).attr("width");
+	var fpos = document.querySelector('#' + eid).getBoundingClientRect()
+	var svgdim = document.querySelector('#' + eid).getBBox()
+	var fwidth = svgdim.width
 
-	common.appendPopup(balloon, fpos, fwidth, s)
+	common.appendPopup(balloon, fpos, fwidth, false)
+	// common.appendPopup(balloon, fpos, fwidth, s)
 	// var bleft = parseInt(fpos.left + fwidth / 2 - 160);
 	// var btop = parseInt(fpos.top - popheight);
 

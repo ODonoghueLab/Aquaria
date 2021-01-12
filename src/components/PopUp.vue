@@ -107,49 +107,49 @@ export default {
       // const divVarInfo = document.getElementById('divVariantInfo')
       // document.getElementById('balloon').appendChild(divVarInfo)
     },
-    appendPopup: function (text, position, width) {
-      var s, tailLeft
-      document.querySelector('#popuptext').innerHTML = text
-      $('div#popup').fadeIn()
-      var popheight = document.querySelector('div#popup').offsetHeight
+    // appendPopup: function (text, position, width) {
+    //   var s, tailLeft
+    //   document.querySelector('#popuptext').innerHTML = text
+    //   $('div#popup').fadeIn()
+    //   var popheight = document.querySelector('div#popup').offsetHeight
 
-      var bleft = parseInt(position.left + (width / 2) - 120)
-      var btop = parseInt(position.top - popheight)
+    //   var bleft = parseInt(position.left + (width / 2) - 120)
+    //   var btop = parseInt(position.top - popheight)
 
-      // var tailLeft = parseInt(position.left + (width / 2))
-      document.querySelector('#popupTail').style.marginLeft = '107px'
-      // document.querySelector('#popupTail').style.top = btop + 'px'
+    //   // var tailLeft = parseInt(position.left + (width / 2))
+    //   document.querySelector('#popupTail').style.marginLeft = '107px'
+    //   // document.querySelector('#popupTail').style.top = btop + 'px'
 
-      $('div#popup').css({
-        left: bleft + 'px',
-        top: btop + 'px',
-        width: '400px'
-      }).fadeIn(600)
+    //   $('div#popup').css({
+    //     left: bleft + 'px',
+    //     top: btop + 'px',
+    //     width: '400px'
+    //   }).fadeIn(600)
 
-      if (bleft < 0) {
-        tailLeft = 107 + bleft + 3
-        document.querySelector('#popupTail').style.marginLeft = tailLeft + 'px'
-        document.querySelector('div#popup').style.left = '-5px'
-      }
-      if (bleft + document.querySelector('div#popup').offsetWidth + 10 > document.querySelector('#structureviewer').clientWidth) {
-        document.querySelector('div#popup').style.left = (document.querySelector('#structureviewer').clientWidth + 11 - 400) + 'px'
-        tailLeft = 107 + (400 - (document.querySelector('#structureviewer').clientWidth - bleft) - 11)
-        document.querySelector('#popupTail').style.marginLeft = tailLeft + 'px'
-      }
+    //   if (bleft < 0) {
+    //     tailLeft = 107 + bleft + 3
+    //     document.querySelector('#popupTail').style.marginLeft = tailLeft + 'px'
+    //     document.querySelector('div#popup').style.left = '-5px'
+    //   }
+    //   if (bleft + document.querySelector('div#popup').offsetWidth + 10 > document.querySelector('#structureviewer').clientWidth) {
+    //     document.querySelector('div#popup').style.left = (document.querySelector('#structureviewer').clientWidth + 11 - 400) + 'px'
+    //     tailLeft = 107 + (400 - (document.querySelector('#structureviewer').clientWidth - bleft) - 11)
+    //     document.querySelector('#popupTail').style.marginLeft = tailLeft + 'px'
+    //   }
 
-      // Click on X to close popup
-      $('span.x').on('click', function () {
-        $('div#popup').fadeOut()
-      })
+    //   // Click on X to close popup
+    //   $('span.x').on('click', function () {
+    //     $('div#popup').fadeOut()
+    //   })
 
-      $('div#popup').on('hover', function () {
-        clearTimeout(s)
-      }, function () {
-        s = setTimeout(function () {
-          $('div#popup').fadeOut()
-        }, 500)
-      })
-    },
+    //   $('div#popup').on('hover', function () {
+    //     clearTimeout(s)
+    //   }, function () {
+    //     s = setTimeout(function () {
+    //       $('div#popup').fadeOut()
+    //     }, 500)
+    //   })
+    // },
     dragElement: function (elmnt) {
       var pos1 = 0; var pos2 = 0; var pos3 = 0; var pos4 = 0
       if (document.getElementById(elmnt.id + 'header')) {
