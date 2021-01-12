@@ -43,6 +43,7 @@ var updateFeatureUI = function(featureList) {
 	var clusters = [];
 	var addedFeatures = [];
 	var orderedFeatures = [];
+	AQUARIA.currentFeature = {}
 	//Group by feature source
 	  AQUARIA.groupedFeatures = _.groupBy(featureSet, function(feature) {
 		return feature.Server;
@@ -283,7 +284,8 @@ function drawTrack(datum, i) {
 
 		.on("click", function() {
 			if(d3.select(this).attr("class") == "loaded") {// deselect feature (it's already displayed)
-				AQUARIA.oid = null
+				AQUARIA.currentFeature.oid = null
+				AQUARIA.currentFeature.data = null
 				document.querySelector(".featureHeader.actived").click()
 				d3.select("svg.loaded").classed("loaded", false);
 				AQUARIA.panel3d.blankApplet(true, "Removing feature...")
@@ -294,17 +296,19 @@ function drawTrack(datum, i) {
 					}
 				removeCurrentAnnotationFrom3DViewer();
 				document.querySelector('#outerFeatureMap').remove()
+				document.querySelector('#popup').style.display = 'none'
 				AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
 				// document.querySelector('#selectedCluster > .outer_container').remove()
 				Panels.hidePanels()
 			}
 			else { //console.log("clicked to display feature");
-				document.querySelector(".featureHeader.actived").click()
+				// document.querySelector(".featureHeader.actived").click()
 				if(document.querySelector('#outerFeatureMap')) {
 					document.querySelector('#outerFeatureMap').remove()
 				}
 				var oid = d3.select(this).attr("id").split("_")[2];
-				AQUARIA.oid = oid
+				AQUARIA.currentFeature.oid = oid
+				AQUARIA.currentFeature.data = datum
 				AQUARIA.panel3d.blankApplet(true, "Loading feature...")
 				AQUARIA.panel3d.blankApplet(false)
 				if(datum.Server != "Added Features"){
@@ -321,7 +325,7 @@ function drawTrack(datum, i) {
 				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 				d3.select("svg.loaded").classed("loaded", false);
 				d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
-				drawfeatureMap = featureMap.createFeatureMap(datum)
+				drawfeatureMap = featureMap.createFeatureMap(AQUARIA.currentFeature.data)
 				Panels.hidePanels()
 				}
 			})
@@ -442,96 +446,124 @@ function mouseoutFeature(el, eid) {
 }
 
 function createANewDiv_hcNoData(divId){
-	let newDiv = document.createElement('div');
-	newDiv.id = divId;
-	newDiv.style = "width: 100px; height: 100px; margin: 0 auto; background-color: white;";
-	document.getElementById('superFamCharts').append(newDiv);
+	return new Promise(function(resolve, reject){
+		if (document.getElementById(divId)){
+				document.getElementById(divId).remove(); //  = '';
+		}
+		// if (!document.getElementById(divId)){
+			let newDiv = document.createElement('div');
+			document.getElementById('superFamCharts').append(newDiv);
+			newDiv.id = divId;
+			newDiv.style = "width: 100px; height: 100px; margin: 0 auto; background-color: white;";
+
+
+			// if (document.getElementById(divId)){
+				resolve();
+			// }
+		// }
+	});
 }
 
 function doThePlotting_v2(divId, theSeriesData_inner, theSeriesData_outer, theTitle, theSize_inner, labelCol_inner, labelDist_inner, innerSize_outer, name_inner, name_outer, labelCol_outer){
 	return new Promise(function(resolve, reject){
-		try{
-			let newDiv = document.createElement('div');
-			newDiv.id = divId;
-			newDiv.style = "width: 100px; height: 100px; margin: 0 auto";
-			document.getElementById('superFamCharts').append(newDiv);
+		//try{
+		//	let newDiv = document.createElement('div');
+		//	newDiv.id = divId;
+		//	newDiv.style = "width: 100px; height: 100px; margin: 0 auto";
+		//	document.getElementById('superFamCharts').append(newDiv);
 
-			// First add new Div.
-			Highcharts.chart(divId, {
-			    chart: {
-			        type: 'pie',
-					margin: 0
-			    },
-			    title: {
-			        text: theTitle
-			    }, /*
-			    subtitle: {
-			        text: 'Source: <a href="http://statcounter.com" target="_blank">statcounter.com</a>'
-			    },*/
-			    plotOptions: {
-			        pie: {
-			            shadow: false,
-			            center: ['50%', '50%']
-			        }
-			    },
-			    tooltip: {
-			        valueSuffix: '%'
-			    },
-			    series: [{
-			        name: name_inner,
-			        data: theSeriesData_inner,
-			        size: theSize_inner,
-			        dataLabels: {
-						enabled: false,
-			            formatter: function () {
-			                return this.y > 3 ? this.point.name : null;
-			            },
-			            color: labelCol_inner,
-			            distance: labelDist_inner
-			        }
-			    }, {
-			        name: name_outer,
-			        data: theSeriesData_outer,
-			        // size: '80%',
-			        innerSize: innerSize_outer,
-			        dataLabels: {
-						enabled: false,
-			            formatter: function () {
-			                // display only if larger than 1
-			                return this.y > 1 ? '<b>' + this.point.name + ':</b> ' +
-			                    this.y + '%' : null;
-			            },
-						color: labelCol_outer
-			        },
-			        id: 'versions'
-			    }],
-			    responsive: {
-			        rules: [{
-			            condition: {
-			                maxWidth: 100
-			            },
-			            chartOptions: {
-			                series: [{
-			                }, {
-			                    id: 'versions',
-			                    dataLabels: {
-			                        enabled: false
-			                    }
-			                }]
-			            }
-			        }]
-			    }
+		  createANewDiv_hcNoData(divId).then(function(){
+				// First add new Div.
+				try{
+					Highcharts.chart(divId, {
+					    chart: {
+					        type: 'pie',
+							margin: 0
+					    },
+					    title: {
+					        text: theTitle
+					    }, /*
+					    subtitle: {
+					        text: 'Source: <a href="http://statcounter.com" target="_blank">statcounter.com</a>'
+					    },*/
+					    plotOptions: {
+					        pie: {
+					            shadow: false,
+					            center: ['50%', '50%']
+					        }
+					    },
+					    tooltip: {
+					        valueSuffix: '%'
+					    },
+					    series: [{
+					        name: name_inner,
+					        data: theSeriesData_inner,
+					        size: theSize_inner,
+					        dataLabels: {
+								enabled: false,
+					            formatter: function () {
+					                return this.y > 3 ? this.point.name : null;
+					            },
+					            color: labelCol_inner,
+					            distance: labelDist_inner
+					        }
+					    }, {
+					        name: name_outer,
+					        data: theSeriesData_outer,
+					        // size: '80%',
+					        innerSize: innerSize_outer,
+					        dataLabels: {
+								enabled: false,
+					            formatter: function () {
+					                // display only if larger than 1
+					                return this.y > 1 ? '<b>' + this.point.name + ':</b> ' +
+					                    this.y + '%' : null;
+					            },
+								color: labelCol_outer
+					        },
+					        id: 'versions'
+					    }],
+					    responsive: {
+					        rules: [{
+					            condition: {
+					                maxWidth: 100
+					            },
+					            chartOptions: {
+					                series: [{
+					                }, {
+					                    id: 'versions',
+					                    dataLabels: {
+					                        enabled: false
+					                    }
+					                }]
+					            }
+					        }]
+					    }
+					});
+					resolve();
+					console.log("In the highcharts plotting function");
+				}
+				catch (error){
+					console.log("Highcharts error");
+					console.log(error);
+					resolve();
+					console.log("In the highcharts plotting function");
+				}
+
+
 			});
-			resolve();
-		}
+		/* }
 		catch(error){
 			console.log("Highcharts error");
 			console.log(error);
-		}
+		} */
 
 
 	});
 }
+
+
+var common = require('../utils/common');
 
 function showAnnotation(f, eid) {
 	// console.log(eid);
@@ -547,7 +579,7 @@ function showAnnotation(f, eid) {
 		urlhtml += "</p>";
 	}
 	$("div.popup").remove();
-	var balloon = "<div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
+	var balloon = "<div style='display: none;'><div id='divVI_varInfo'><br><b>Variant information</b></div> <div id='divVI_posInfo'><br><b>Position information</b></div> <div id='divVI_otherResInfo'><br><b>Other mutations information</b></div> </div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
 			+ f.label + " (";
 	if (f.start == f.end){
 		balloon = balloon + "Residue "+f.start;
@@ -567,78 +599,94 @@ function showAnnotation(f, eid) {
 
 
 
-	d3.select("body")
-		.append("div")
-			.attr("class", "popup")
-			.html(balloon);
+	// d3.select("body")
+	// 	.append("div")
+	// 		.attr("class", "popup")
+	// 		.html(balloon);
 
 			// .append(theSuperFam);
 
 	// document.getElementById('balloon').append(theSuperFam);
 
 	if (f.hasOwnProperty('hc_go') && f.hasOwnProperty('hc_ec') && f.hasOwnProperty('hc_species')){
+		console.log("CATH plot data");
+		console.log(f);
 		handleCathPopups(f).then(function(){
 			updateTheStyleOfHc();
 		});
 	}
+	else{
+		console.log("CATH plot no data");
+		console.log(f);
+	}
 
 
-	var popheight = $("div.popup").innerHeight();
+	// var popheight = $("div.popup").innerHeight();
 
-	var fpos = $("#" + eid).offset();
-	var fwidth = $("#" + eid).attr("width");
+	// var fpos = $("#" + eid).offset();
+	// var fwidth = $("#" + eid).attr("width");
+	var fpos = document.querySelector('#' + eid).getBoundingClientRect()
+	var svgdim = document.querySelector('#' + eid).getBBox()
+	var fwidth = svgdim.width
 
-	var bleft = parseInt(fpos.left + fwidth / 2 - 160);
-	var btop = parseInt(fpos.top - popheight);
+	common.appendPopup(balloon, fpos, fwidth, false)
+	// common.appendPopup(balloon, fpos, fwidth, s)
+	// var bleft = parseInt(fpos.left + fwidth / 2 - 160);
+	// var btop = parseInt(fpos.top - popheight);
 
-	$("div.popup").css({
-		"left" : bleft + "px",
-		"top" : btop + "px",
-		"width": "470px"
-	}).fadeIn(600);
+	// $("div.popup").css({
+	// 	"left" : bleft + "px",
+	// 	"top" : btop + "px",
+	// 	"width": "470px"
+	// }).fadeIn(600);
 
-	$("span.x").click(function() {
-		$("div.popup").fadeOut();
-	});
+	// $("span.x").click(function() {
+	// 	$("div.popup").fadeOut();
+	// });
 
-	$("div.popup").hover(function() {
-		clearTimeout(s);
-	}, function() {
-		s = setTimeout(function() {
-			$("div.popup").fadeOut();
-		}, 500);
-	});
+	// $("div.popup").hover(function() {
+	// 	clearTimeout(s);
+	// }, function() {
+	// 	s = setTimeout(function() {
+	// 		$("div.popup").fadeOut();
+	// 	}, 500);
+	// });
 
 }
 
 function handleCathPopups(f){
 	return new Promise(function(resolve, reject){
+		console.log("here...??");
 		// handle this one.
 		if (typeof f.hc_go !== 'undefined' && f.hc_go.hasOwnProperty('data') && f.hc_go.data.hasOwnProperty('series') && f.hc_go.data.series.length >= 2){
 			doThePlotting_v2('hc_go_div', f.hc_go.data.series[0].data, f.hc_go.data.series[1].data, '', f.hc_go.data.series[0].size, f.hc_go.data.series[0].dataLabels.color, f.hc_go.data.series[0].dataLabels.dist, f.hc_go.data.series[1].innerSize, f.hc_go.data.series[0].name, f.hc_go.data.series[1].name, f.hc_go.data.series[1].dataLabels.color).then(function(){
+				console.log("CATH plot: 1");
 				document.getElementById('hc_go').prepend(document.getElementById('hc_go_div'));
 			})
 			.catch(function(error){
-				if (!document.getElementById('hc_go_noData')){
+				console.log("CATH plot: 2");
+				// if (!document.getElementById('hc_go_noData')){
 					// create element
-					createANewDiv_hcNoData('hc_go_noData');
-				}
-
-				document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
-				document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <br> <center> No data</center>';
-				console.log('featureslist.showAnnotation ERROR ' + error);
+				createANewDiv_hcNoData('hc_go_noData').then(function(){
+					document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
+					document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+					console.log('featureslist.showAnnotation ERROR ' + error);
+				});
+				// }
 			});
 		}
 		else{
 			// no data.
 
-			if (!document.getElementById('hc_go_noData')){
+			// if (!document.getElementById('hc_go_noData')){
 				// create element
-				createANewDiv_hcNoData('hc_go_noData');
-			}
+			createANewDiv_hcNoData('hc_go_noData').then(function(){
+				document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
+				document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+			});
+			// }
+			console.log("CATH plot: 3");
 
-			document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
-			document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <br> <center> No data</center>';
 			// document.getElementById('hc_go_div').style['background-color'] = "white";
 		}
 
@@ -647,26 +695,33 @@ function handleCathPopups(f){
 				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_div'));
 			})
 			.catch(function(error){
-				if (!document.getElementById('hc_ec_noData')){
+				// if (!document.getElementById('hc_ec_noData')){
 					// create element
-					createANewDiv_hcNoData('hc_ec_noData');
-				}
+				createANewDiv_hcNoData('hc_ec_noData').then(function(){
+					document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
+					document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+					console.log('featureslist.showAnnotation ERROR ' + error);
+				});
+				// }
 
-				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
-				document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <br> <center> No data</center>';
-				console.log('featureslist.showAnnotation ERROR ' + error);
 			});
 		}
 		else{
 			// no data
 			// document.getElementById('hc_ec').innerHTML = document.getElementById('hc_ec').innerHTML + ' <br> No data';
-			if (!document.getElementById('hc_ec_noData')){
+			// if (!document.getElementById('hc_ec_noData')){
 				// create element
-				createANewDiv_hcNoData('hc_ec_noData');
-			}
+			createANewDiv_hcNoData('hc_ec_noData').then(function(){
 
-			document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
-			document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
+				document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+			})
+			.catch(function(){
+
+			});
+			// }
+
+
 		}
 
 		if (typeof f.hc_species !== 'undefined' &&  f.hc_species.hasOwnProperty('data') && f.hc_species.data.hasOwnProperty('series') && f.hc_species.data.series.length >= 2){
@@ -676,28 +731,31 @@ function handleCathPopups(f){
 			})
 			.catch(function(error){
 
-				if (!document.getElementById('hc_species_noData')){
+				// if (!document.getElementById('hc_species_noData')){
 					// create element
-					createANewDiv_hcNoData('hc_species_noData');
-				}
+				createANewDiv_hcNoData('hc_species_noData').then(function(){
 
-				document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
-				document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+					document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
+					document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <br> <center> No data</center>';
 
 
-				console.log('featureslist.showAnnotation ERROR ' + error);
+					console.log('featureslist.showAnnotation ERROR ' + error);
+				});
+				// }
+
+
 			});
 		}
 		else {
 			// no data
 			// document.getElementById('hc_species').innerHTML = document.getElementById('hc_species').innerHTML + ' <br> No data';
-			if (!document.getElementById('hc_species_noData')){
+		//	if (!document.getElementById('hc_species_noData')){
 				// create element
-				createANewDiv_hcNoData('hc_species_noData');
-			}
-
-			document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
-			document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+				createANewDiv_hcNoData('hc_species_noData').then(function(){
+					document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
+					document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+				});
+		//	}
 		}
 
 		resolve();

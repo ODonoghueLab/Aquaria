@@ -34,7 +34,7 @@ module.exports = function (jsonObj, primary_accession, featureCallback, validate
 				// console.log("SNAP2 description is " + jsonObj[featureSet]['Features'][i]['Description'] + " " + featureSet);
 
 				// let descToDisp = getSubstringOfInterest(, variantResidues);
-				checkIfValInSnpResAndAdd(jsonObj[featureSet]['Features'][i]['Residue'], jsonObj[featureSet]['Features'][i]['Residue'], variantResidues, featureSet, jsonObj[featureSet]['Features'][i]['Description'], requestedFeature, variants_featTypesOfInt);
+				checkIfValInSnpResAndAdd(jsonObj[featureSet]['Features'][i]['Residue'], jsonObj[featureSet]['Features'][i]['Residue'], variantResidues, featureSet, jsonObj[featureSet]['Features'][i]['Name'] + ";" + jsonObj[featureSet]['Features'][i]['Description'], requestedFeature, variants_featTypesOfInt);
 
 
 			}
@@ -42,7 +42,7 @@ module.exports = function (jsonObj, primary_accession, featureCallback, validate
 				jsonObj[featureSet]['Features'][i]['Residues'] = jsonObj[featureSet]['Features'][i]['Residue'].map(function(x){
 					return parseInt(x)
 				});
-				console.log("Snap2 " +  jsonObj[featureSet]['Features'][i]['Residues'])
+				// console.log("Snap2 " +  jsonObj[featureSet]['Features'][i]['Residues'])
 
 				// checkIfValInSnpResAndAdd(jsonObj[featureSet]['Features'][i]['Residue'], jsonObj[featureSet]['Features'][i]['Residue'], variantResidues, featureSet, descToDisp, requestedFeature, variants_featTypesOfInt);
 			}

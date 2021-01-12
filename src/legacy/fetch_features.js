@@ -39,7 +39,7 @@ var servers = [
 		{
 			"id": 'CATH',
 			"Server": 'CATH',
-			"URL": window.location.protocol + '//www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
+			"URL": window.location.protocol + '//www.cathdb.info/version/v4_3_0/api/rest/uniprot_to_funfam/',
 			"URL_covid": `${window.BACKEND}/covid19cath/`,
 			// ?content-type=application/json
 		},
@@ -589,7 +589,7 @@ function clusterRegions(sequence_annotations, categories, aboutFeaturesource, hc
 
 
 				if(typeof hcDataObj != "undefined" &&  hcDataObj != null &&  hcDataObj.hasOwnProperty(clusters[i].Tracks[0][0].name)){
-					console.log(hcDataObj[clusters[i].Tracks[0][0].name]);
+					// console.log(hcDataObj[clusters[i].Tracks[0][0].name]);
 
 				}
 
@@ -743,7 +743,7 @@ function fetch_annotations(primary_accession,
 		featureCallback) {
 
 	// get fresh set of annotations as well
-	console.log("fetch_features.fetch_annotations: reset DAS annotations");
+	// console.log("fetch_features.fetch_annotations: reset DAS annotations");
 	resetDASAnnotations();
 
 	processNextServer(primary_accession,
@@ -771,7 +771,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		// handle success
 		// console.log("Success");
 		// console.log(response.data);
-		console.log("fetch_features.getJsonFromUrl data recieved successfully for " + primary_accession )
+		// console.log("fetch_features.getJsonFromUrl data recieved successfully for " + primary_accession )
 		// featuresFromExtServer['status'] = "success";
 		// featuresFromExtServer['data'] = response.data;
 
@@ -781,14 +781,14 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 		if (requestedFeature == 'SNAP2'){
 			// console.log(response);
-			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
+			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
 			// console.log(response.data)
 			//console.log(getCurrentUrl());
 			//console.log(servers[3].URL_covid);
-			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
 
 
 		}
@@ -799,7 +799,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 
 		if (requestedFeature == 'myVariant.info'){
-			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
+			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
 		}
 
 		// return featuresFromExtServer
@@ -838,7 +838,7 @@ var processNextServer = function(primary_accession,
 
 			// is feature requested by user
 
-		console.log("fetch_features.processNextServer isFetchingFromServer = ", servers[currentServer]['Server']);
+		// console.log("fetch_features.processNextServer isFetchingFromServer = ", servers[currentServer]['Server']);
 
 		if (servers[currentServer]['Server'] == "Added Features"){
 			// check URL for json url
@@ -854,8 +854,8 @@ var processNextServer = function(primary_accession,
 		}
 		else if (servers[currentServer]['Server'] == "UniProt"){
 
-			console.log("The aggregatedAnnotations are: ");
-			console.log(aggregatedAnnotations);
+			// console.log("The aggregatedAnnotations are: ");
+			// console.log(aggregatedAnnotations);
 
 			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
 			featureCallback(aggregatedAnnotations);
@@ -880,7 +880,7 @@ var processNextServer = function(primary_accession,
 				featureCallback);
 		}
 		else if (servers[currentServer]['id'] == 'CATH'){
-			console.log('############################ Requesting Cath features')
+			// console.log('############################ Requesting Cath features')
 
 			if (primary_accession == 'P0DTC1' || primary_accession == 'P0DTC2'|| primary_accession == 'P0DTC7' || primary_accession == 'P0DTD1'){
 				// console.log("!!!!!!!!!! A COVID PROTEIN ENCOUNTERED");
@@ -909,46 +909,159 @@ var processNextServer = function(primary_accession,
 
 	}
 	else {
-		console.log("fetch_features.processNextServer finish DAS");
+		// console.log("fetch_features.processNextServer finish DAS");
 		toDescAndAddToAdedFeat();
 		featureCallback(aggregatedAnnotations);
 	}
 };
 
 
+
+function generateShowHideFnStr2(id_complete){
+	// console.log(id_complete);
+	returnStr = "elem = document.getElementById('" + id_complete + "');";
+
+	returnStr = returnStr + "if (elem.style.display == ''){elem.style.display = 'none'; console.log('Next sibling is'); console.log(elem.nextSibling.innerHTML); elem.nextSibling.innerHTML = '[Additional residues]';}";
+
+	returnStr = returnStr + "else{ elem.style.display = ''; elem.nextSibling.innerHTML = '[Hide]';}; ";
+	return (returnStr);
+}
+
+
+function generateShowHideFnStr(id_complete){
+	console.log(id_complete);
+	returnStr = "elem = document.getElementById('" + id_complete + "');";
+
+	returnStr = returnStr + "if (elem.style.display == ''){elem.style.display = 'none'; console.log('Next sibling is'); console.log(elem.nextSibling.innerHTML); elem.nextSibling.innerHTML = '[+]';}";
+
+	returnStr = returnStr + "else{ elem.style.display = ''; elem.nextSibling.innerHTML = '[-]';}; ";
+	return (returnStr);
+}
+
+var counter_complete = 0;
+
+
 function toDescAndAddToAdedFeat(){ // convert to description and add to added feature's description
 	// return new Promise(function(resolve, reject) {
-	console.log("Convert the variant features to description, and update added feature's description");
+	// console.log("Convert the variant features to description, and update added feature's description");
 	// });
 
-	console.log(variantResidues);
+	// console.log(variantResidues);
 
 
 
 	//Variant residues
 	for (let residue in variantResidues){
-		console.log("Variant residues " + residue);
+		// console.log("Variant residues " + residue);
 		let description = "";
 
 		if (variantResidues[residue].hasOwnProperty('defaultDesc')){
-			description = "<br> " + variantResidues[residue].defaultDesc + "<br>";
+			description = "<br> " + variantResidues[residue].defaultDesc;
 		}
 
-		for (let serverName in variantResidues[residue]){
 
-			console.log('Server name is ' + serverName);
+		if (variantResidues[residue].hasOwnProperty('variantInfo')){
+			for (let serverAndFsName in variantResidues[residue].variantInfo){
+				// console.log("The serverAndFsName is " + serverAndFsName);
+				// document.getElementById('divVI_varInfo').innerHTML = '<toReplace>' + variantResidues[residue]['variantInfo'][serverAndFsName][0] + '</toReplace>';
+
+				description = description + '<toReplace_varInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				for (let i =0; i<variantResidues[residue]['variantInfo'][serverAndFsName].length; i++){
+					description = description +  variantResidues[residue]['variantInfo'][serverAndFsName][i] +". ";
+				}
+
+				description = description + '</toReplace_varInfo>';
+
+			}
+		}
+
+		// description = description + "<hr>";
+
+		if (variantResidues[residue].hasOwnProperty('positionInfo')){
+			for (let serverAndFsName in variantResidues[residue].positionInfo){
+				// console.log("The serverAndFsName is " + serverAndFsName);
+				// document.getElementById('divVI_posInfo').innerHTML = '<toReplace>' +  variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace>';
+
+				// description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace> <br>';
+
+
+				description = description + '<toReplace_posInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				for (let i =0; i<variantResidues[residue]['positionInfo'][serverAndFsName].length; i++){
+					description = description +  variantResidues[residue]['positionInfo'][serverAndFsName][i] +". ";
+				}
+
+				description = description + '</toReplace_posInfo>';
+			}
+		}
+
+
+		if (variantResidues[residue].hasOwnProperty('otherResInfo')){
+			for (let serverAndFsName in variantResidues[residue].otherResInfo){
+				// console.log("The serverAndFsName is " + serverAndFsName);
+
+				// description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['otherResInfo'][serverAndFsName][0] + '</toReplace> <br>';
+
+				description = description + '<toReplace_otherResInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				for (let i =0; i<variantResidues[residue]['otherResInfo'][serverAndFsName].length; i++){
+					description = description +  variantResidues[residue]['otherResInfo'][serverAndFsName][i] +". ";
+				}
+
+				description = description + '</toReplace_otherResInfo>';
+
+			}
+		}
+
+
+		for (let dataType in variantResidues[residue]){ // dataType == variantInfo | positionInfo | otherResInfo
+
+			// console.log("The dataType is " + dataType);
+
+			// if (serverName != 'newResidue' && serverName != 'defa')
+			/*
+
+			// console.log('Server name is ' + serverName);
 			if (serverName != 'newResidue' && serverName != 'defaultDesc'){
-				variantResidues[residue][serverName].forEach(function(anDesc, anDesc_i){
-					description = description + "<br><b>" + serverName + "</b>" + anDesc;
+				description = description + "<br> <br><b>" + serverName + "</b> ";
+				variantResidues[residue][serverName].forEach(function(featTypes, featType_i){
+					// console.log("What is this??");
+					// console.log(featTypes);
+
+					// arr_featTypes.forEach(function(aFeatObj, aFeatObj_i){
+						Object.keys(featTypes).forEach(function(aFeatType, aFeatType_i){
+							description = description + "<br> <i>"+ aFeatType + "</i>";
+							if (featTypes[aFeatType].hasOwnProperty('mainToShow')){
+								if (serverName == 'UniProt'){
+									description = description + " <br> <ul>" + featTypes[aFeatType].mainToShow + "</ul>";
+								}
+								else {
+									description = description + " <br>" + featTypes[aFeatType].mainToShow;
+								}
+							}
+							if (featTypes[aFeatType].hasOwnProperty('mainToHide')){
+								description = description + featTypes[aFeatType].mainToHide;
+							}
+							if (featTypes[aFeatType].hasOwnProperty('otherResidues')){
+								description = description + featTypes[aFeatType].otherResidues;
+
+								counter_complete = counter_complete + 1;
+							}
+
+							description = description + "<toReplace> Whatever you did, you have officially been labelled the disturber of peace! Gandalf I am glad you are back, so am I dear boy! Hello world! </toReplace>"
+
+
+						});
+					// });
 				});
 			}
 
+			*/
 
+			// let aDesc =  "<span class=\"teaser\"> <i> " + featureType + "</i> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + description + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> more... </span>";
 			// description = description + "<tr>";
 
 			// description = description + "</tr>";
 		}
-		// Aggregated Annotations
+		// Aggregated Annotations - (other annotations)
 		for (let i =0; i < aggregatedAnnotations.length; i++){
 
 
@@ -960,7 +1073,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 
 					for (j = 0; j < aggregatedAnnotations[i].Tracks.length; j++){
 						for (k = 0; k < aggregatedAnnotations[i].Tracks[j].length; k++){
-							console.log(aggregatedAnnotations[i].Tracks[j][k]);
+							// console.log(aggregatedAnnotations[i].Tracks[j][k]);
 
 							if (parseInt(residue) >= parseInt(aggregatedAnnotations[i].Tracks[j][k].start) &&  parseInt(residue) <= parseInt(aggregatedAnnotations[i].Tracks[j][k].end)){
 								aggregatedAnnotations[i].Tracks[j][k].desc = description; // aggregatedAnnotations[i].Tracks[j][k].desc  + description;
@@ -1245,7 +1358,7 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 				transmembrane helices </a>, trans-membrane beta barrel structures, disulphide bridges and \
 				<a href='https://rostlab.org/owiki/index.php/PredictProtein_-_Documentation#Contact_Prediction_.28PROFcon.29'>\
 				inter-residue contacts</a>.";
-				console.log("The predict protein description "  + server);
+				// console.log("The predict protein description "  + server);
 			}
 			else if (server === "SNAP2"){
 				description = "<a href='https://www.rostlab.org/services/snap/'>SNAP2</a> provides computational predictions of the \
@@ -1256,6 +1369,9 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 				functional similarity (‘FunFams’), as well as domains based only on structural similarity (‘CATH superfamilies’). \
 				CATH provides extensive information for each domain, including functional annotations, species diversity, and enzyme \
 				classifications."
+			}
+			else if (server === 'COSMIC mutations'){
+				description = "Catalogue of Somatic Mutations in Cancer (COSMIC) catalogues somatic mutations in humans."
 			}
 			else{
 				description = description
@@ -1276,8 +1392,6 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 	var clustered_annotations = clusterRegions(sequence_annotations, categories, description, cathDataArr_hc);
 
 
-	console.log("The clustered annotations are: ");
-	console.log(clustered_annotations);
 
 	finishServer(clustered_annotations, primary_accession, featureCallback);
 
@@ -1327,6 +1441,7 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				feature = feature.split('=')[0]
 				residue = feature.replace(/[A-Za-z$-]/g, "")
 				residue = parseInt(residue)
+				console.log("The feature is " + feature + " " + residue); 
 				featureAttributes.Color = "#F73C3C"
 
 				if(description){
@@ -1471,9 +1586,9 @@ fetch_uniprot = function(primary_accession, server, featureCallback) {
 					// Step 2.
 					// extractVariantInfo(aggregatedAnnotations, data);
 
-					extractVariantInfoFromUniprot(data).then(function(){
+					extractVariantInfoFromUniprot(data).then(function(){ // UNCOMMENT for variant popup
 						parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, url);
-					});
+					}); // UNCOMMENT for variant popup
 
 				});
 
@@ -1493,7 +1608,7 @@ function extractVariantInfoFromUniprot(uniprotData){
 			resolve();
 		}
 		// console.log("extractVariantInfoFromUniprot");
-		let variants_featTypesOfInt = ['Modified residue', 'Mutagenesis site', 'Sequence conflict', 'Sequence variant'];
+		let variants_featTypesOfInt = ['Modified residue', 'Mutagenesis site', 'Sequence conflict', 'Sequence variant', 'Cross-link', 'Site', 'Metal ion-binding site'];
 
 		let counter = 0;
 		for (let featureType in uniprotData){
@@ -1501,7 +1616,7 @@ function extractVariantInfoFromUniprot(uniprotData){
 			if (uniprotData[featureType].hasOwnProperty('Features')){
 				for (let i =0; i< uniprotData[featureType]['Features'].length; i++){
 					if (uniprotData[featureType]['Features'][i].hasOwnProperty('Residue')){
-						// checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
+						checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
 					}
 				}
 			}

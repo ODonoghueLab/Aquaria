@@ -258,8 +258,9 @@ ClusterRenderer.prototype.addThumbnails = function(protein, offset, end, pad) {
 	var thumb = d3.select("g#structure_" + protein + " g.thumbnail").append(
 			"image").attr("width", "30px").attr("height", "30px").attr("x", 15).attr(
 			"y", 15).attr("xlink:href",
-			"https://www.rcsb.org/pdb/images/" + imgName + "_bio_r_65.jpg").attr(
-			"clip-path", "url(#path_" + protein + ")");
+			"https://www.ebi.ac.uk/pdbe/static/entry/"+ imgName.toLowerCase() + "_assembly_1_chain_front_image-200x200.png")
+			.attr("clip-path", "url(#path_" + protein + ")");
+			// "https://www.rcsb.org/pdb/images/" + imgName + "_bio_r_65.jpg").attr(
 };
 
 ClusterRenderer.prototype.mouseover = function(d, that) {

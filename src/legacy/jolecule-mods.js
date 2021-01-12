@@ -5,6 +5,7 @@ var selectRes = new MutationObserver(function () {
     document.querySelector('#threeDSpan-inner').style.height = '99.5%'
     document.querySelector('#selectedCluster').style.display = 'block'
     document.querySelector('#selectedFeature').style.display = 'block'
+    document.querySelector('#center > div.icons').style.bottom = '50px'
   }
   else{
     document.querySelector('.jolecule-embed-footer').style.visibility = 'visible'
@@ -12,6 +13,7 @@ var selectRes = new MutationObserver(function () {
     document.querySelector('#threeDSpan-inner').style.height = '95%'
     document.querySelector('#selectedCluster').style.display = 'none'
     document.querySelector('#selectedFeature').style.display = 'none'
+    document.querySelector('#center > div.icons').style.bottom = '76px'
   }
 })
 

@@ -1,6 +1,7 @@
 var ClusterRenderer = require('./clusterRenderer');
 var CoverageMapRenderer = require('../utils/coverageMap')
 var d3 = require('d3');
+// var featureMap = require('../utils/featureMap')
 
 // Render 2D structures in SVG.
 //
@@ -62,6 +63,9 @@ ShowMatchingStructures.prototype.initialise = function(sequence) {
 
 		this.removeAll();
 
+		if(document.querySelector('#vis > .ruler')){
+			document.querySelector('#vis > .ruler').remove()
+		}
 		// draw axis ruler
 		this.drawAxisRuler("vis");
 		
@@ -99,6 +103,9 @@ ShowMatchingStructures.prototype.refresh = function() {
 ShowMatchingStructures.prototype.showMap = function(cluster) {
 	CoverageMapRenderer.RenderMap(cluster, this.rank);
 	AQUARIA.showMatchingStructures.cluster = cluster;
+	if(document.querySelector('#outerFeatureMap')){
+		document.querySelector('#outerFeatureMap').remove()
+	}
 };
 
 ShowMatchingStructures.prototype.addCluster = function(cluster) {
@@ -118,7 +125,7 @@ ShowMatchingStructures.prototype.addCluster = function(cluster) {
 ShowMatchingStructures.prototype.finishedLoading = function() {
 	var structureCount = totalStructures(this.clusters);
 	console.log('ShowMatchingStructures.finishedLoading', structureCount + " structures total!");
-	$("#structureexplanation").html("<span class='counter'>" + structureCount + "</span>");
+	$("#Structures span.counter").html(structureCount);
 	$("#structurematches h3 span.counter, div.container svg g.expandable text").digits();
 	
 };

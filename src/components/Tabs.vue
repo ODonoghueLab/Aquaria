@@ -2,11 +2,11 @@
     <div class="icons">
         <div class="tabs">
             <div class="tab" id="Structures" @click='showMatches'>
-                <a href="#Structures">Matching Structures&nbsp;
+                <a href="#Structures"><span class="counter"></span> Matching Structures&nbsp;
                 <span class="icon"><img v-bind:src="MS" /></span></a>
             </div>
             <div class="tab" id="Features" @click='showFeatures'>
-                <a href="#Features"><span class="icon"><img v-bind:src="FT" /></span> Features</a>
+                <a href="#Features"><span class="icon"><img v-bind:src="FT" /></span> Features <span class="counter" id="featureCounter"></span></a>
             </div>
         </div>
         <MatchingStructures />
@@ -51,8 +51,10 @@ export default {
     },
     showMatches: function () {
       const _this = this
-      // const soupController = window.AQUARIA.panel3d.embededJolecule.controller
-      // soupController.clearSelectedResidues()
+      if (window.AQUARIA.panel3d) {
+        const soupController = window.AQUARIA.panel3d.embededJolecule.controller
+        soupController.clearSelectedResidues()
+      }
       _this.showPanel('vis', 'Structures')
       Panels.hidePanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {
@@ -60,7 +62,7 @@ export default {
       }
       document.querySelector('div.dimmer').style.zIndex = '0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelector('#center > div.icons').style.bottom = '76px'
+        document.querySelector('#center > div.icons').style.bottom = '50px'
         Panels.hidePanels()
       })
     },
@@ -77,7 +79,7 @@ export default {
       }
       document.querySelector('div.dimmer').style.zIndex = '0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelector('#center > div.icons').style.bottom = '76px'
+        document.querySelector('#center > div.icons').style.bottom = '50px'
         Panels.hidePanels()
       })
     }
@@ -91,13 +93,19 @@ export default {
 </script>
 
 <style>
+/* span.counter {
+  background: #707070;
+  color: white;
+  border-radius: 10px;
+  padding: 0px 6px;
+} */
 #Structures, #Features {
     color: '#ffffff00'
 }
 .icons{
     z-index: 1;
     position: absolute;
-    bottom: 76px;
+    bottom: 50px;
 }
 
 .highlighted{
@@ -134,7 +142,13 @@ export default {
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
-.tab.active a, .tab.active a:hover {
+.tab.active span.counter, .tab.inactive span.counter, .tab:hover span.counter {
+  background: #707070;
+  color: white;
+  border-radius: 10px;
+  padding: 0px 6px;
+}
+.tab.active a, .tab.active a:hover{
     color: var(--dark-text);
 }
 .tab.active, .tab.active:hover {
@@ -158,12 +172,13 @@ span.icon {
 /* .tab.active a span.icon {
     background-color: transparent;
 } */
-.tab a {
+.tab a, span.counter {
     color: var(--transparent);
     text-decoration: none;
     transition: All 0.5s ease;
+    background-color: var(--transparent);
 }
-.tab a:hover  {
+.tab a:hover {
     color: #FFF;
     text-decoration: none;
     transition: All 0.5s ease;
