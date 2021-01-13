@@ -93,12 +93,6 @@ export default {
 </script>
 
 <style>
-/* span.counter {
-  background: #707070;
-  color: white;
-  border-radius: 10px;
-  padding: 0px 6px;
-} */
 #Structures, #Features {
     color: '#ffffff00'
 }
@@ -131,7 +125,7 @@ export default {
     transform: translate(-50%, 15%);
     align-items: baseline;
     padding: 5px calc(4px + 0.4vw);
-    font-size: calc(8px + .6vw);
+    /* font-size: calc(8px + .6vw); */
 }
 .tab {
     flex: 0 3 auto;
@@ -141,6 +135,7 @@ export default {
     min-width: 6rem;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
+    font-size: calc(6px + .7vw);
 }
 .tab.active span.counter, .tab.inactive span.counter, .tab:hover span.counter {
   background: #707070;
