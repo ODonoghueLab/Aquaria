@@ -390,7 +390,7 @@ span#pdbpanel.wide {
     height: calc(12px + .6vw);
     position: relative;
     left: 0.2rem;
-    display: inline-flex;
+    /* display: inline-flex; */
     /* z-index: 11; */
     align-items: center;
     justify-content: center;
