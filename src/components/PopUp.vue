@@ -4,7 +4,7 @@
     <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
     <!-- <div id="mydivheader">
     </div> -->
-    <!-- expandable-text-line>This is some expandable text line mate blabh blahbl balbhal balbhalkao asldfjasoekne;qleisoel.</expandable-text-line-->
+    <!-- expandable-text-line use-click>This is some expandable text line mate blabh blahbl balbhal balbhalkao asldfjasoekne;qleisoel.</expandable-text-line -->
     <p id='popuptext' width="400px">Pop-up text box component for features</p>
     <img v-bind:src="popupTail" id='popupTail'>
     </div>
@@ -52,7 +52,7 @@ export default {
       if (b.length > 0) {
         var varInfoDiv = document.getElementById('divVI_varInfo')
         for (let j = 0; j < b.length; j++) {
-          const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b[j].innerHTML } } })
+          const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b[j].innerHTML } }, propsData: { useClick: true } })
           // console.log(componentinstance)
 
           componentinstance.$mount()
@@ -71,7 +71,7 @@ export default {
       if (b2.length > 0) {
         var posInfoDiv = document.getElementById('divVI_posInfo')
         for (let j = 0; j < b2.length; j++) {
-          const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b2[j].innerHTML } } })
+          const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b2[j].innerHTML } }, propsData: { useClick: true } })
           // console.log(componentinstance)
 
           componentinstance.$mount()
@@ -89,7 +89,7 @@ export default {
       if (b3.length > 0) {
         var otherResInfo = document.getElementById('divVI_otherResInfo')
         for (let j = 0; j < b3.length; j++) {
-          const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b3[j].innerHTML } } })
+          const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b3[j].innerHTML } }, propsData: { useClick: true } })
           // console.log(componentinstance)
 
           // console.log('Nice day: ' + b3[j].innerHTML)
