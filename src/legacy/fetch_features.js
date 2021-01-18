@@ -6,6 +6,7 @@ var handleSnap2 = require('./handleSnap2');
 var handleCath = require('./handleCath');
 var handleCath_covid = require('./handleCath_covid');
 var handleMyVariantInfo = require('./handleMyVariantInfo');
+var consequence = require('./consequentInfo.js');
 
 function getRequestProtocol(){
 	let arr = window.location.href.split(/\:+/);
@@ -1398,11 +1399,9 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 }
 
 function checkURLForFeatures(primary_accession, server, featureCallback){
-	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
+	var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/);
 	var searchParam = decodeURIComponent(window.location.search.split('?')[1])
-	// searchParam = searchParam.split('=')[0]
 
-	console.log("The search param is " + searchParam);
 	var url = AQUARIA.getUrlParameter("features");
 	if (url){
 		axios({
@@ -1418,19 +1417,32 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, responseJSON["data"], url)
 			}
 		})
-		//$.getJSON( url, function (responseJSON) { //After load, parse data returned by xhr.responseText
-		// parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, responseJSON, url);
-		// });
 	}
 	else if (featureRegex.test(searchParam)) {
-		// console.log("over here!");
+
+		console.log("Passes the regex");
+
 		var data = {}
 		var residue;
 		var features = searchParam.split('&')
 		data['AddedFeatures'] = {}
 		data['AddedFeatures'].Features = []
 		features.forEach(function(feature){
-			if(featureRegex.test(feature)){
+			aFeature = {};
+
+			feature = feature.replace(/%22/g, '\"');
+
+			let out = extractDescription(feature);
+			feature = out.featStr;
+			aFeature['Description'] = out.description;
+
+			console.log("The feature is 1." + feature + " " + out.description);
+
+			consequence.getConsInfo(feature);
+
+			// handleVarAddedFeat()
+			/* if(featureRegex.test(feature)){
+
 				var featureAttributes = {}
 				var description = feature.split('=')[1]
 
@@ -1438,14 +1450,13 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 					description = description.split('"')[1]
 
 				}
-				feature = feature.split('=')[0]
+				feature = feature.replace(/^p./, '');
+				feature = feature.split('=\"')[0]
 				residue = feature.replace(/[A-Za-z$-]/g, "")
 				residue = parseInt(residue)
-				console.log("The feature is " + feature + " " + residue); 
 				featureAttributes.Color = "#F73C3C"
 
 				if(description){
-					// console.log("The description is scott adams " + description);
 					if(description.includes('"')){
 						description = description.split('"')[1]
 					}
@@ -1455,39 +1466,33 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 					featureAttributes.Description = feature
 				}
 
-
-				// featureAttributes.Name =  feature.split(residue)[0][0] + " > " + feature.split(residue)[1][0]
+				let featInfo = consequence.getConsInfo(feature);
+				// console.log("Feature is " + feature + "|" + consequentStr);
 				let newResidue = '';
-				featureAttributes.Name = feature
+				featureAttributes.Name = feature; // + "<br>" + consequentStr;
 				if(feature.split(residue)[1].toLowerCase() == 'ter' || feature.split(residue)[1].toLowerCase() == 'x'){
 					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
-
-					// variantResidues[featureAttributes.Residues[0] + '-' + featureAttributes.Residues[0]] = "";
 					newResidue = 'X';
 				}
 				else{
 					featureAttributes.Residue = residue;
 					let theUserRes = feature.split(residue)[1];
 					if (theUserRes.length > 1){
-						// console.log("Thi is three letter code " + feature.split(residue)[1]);
 						newResidue = checkIfInKey_ig(theUserRes);
-						// console.log('the one letter code is ' + res);
 					}
 					else if (theUserRes.length == 1){
-						console.log("Now to check if in the one letter codes");
 						newResidue = checkIfInVal_ig(theUserRes);
 					}
 				}
 				data['AddedFeatures'].Features.push(featureAttributes)
 
-				// data[feature].URL = feature
-				console.log("The new residue is " + newResidue);
 				variantResidues[featureAttributes.Residue] = {};
 				variantResidues[featureAttributes.Residue] = {'newResidue': newResidue};
 				if (description && featureAttributes.hasOwnProperty('Description')){
 					variantResidues[featureAttributes.Residue] = {'defaultDesc': featureAttributes.Description};
 				}
-			}
+
+			} */
 		})
 
 
@@ -1500,6 +1505,32 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 			featureCallback);
 	}
 }
+
+function extractDescription(feature){
+	let desc = ''; let featStr = feature;
+
+	if (featStr.match(/\=\"/)){
+		let arr = feature.split(/\=\"/);
+		desc = arr[1];
+		desc = desc.replace(/\"$/, '');
+		featStr = arr[0];
+	}
+	console.log("The feature is featStr" + featStr);
+	return {featStr: featStr, description: desc};
+}
+
+function getTheTwoPositions(featStr){
+	let arr = featStr.split(/\_/);
+	arr[0] = arr[0].replace(/[A-Za-z]/g, '');
+	arr[1] = arr[1].replace(/[A-Za-z\*]/g, '');
+
+	arr[0] = parseInt(arr[0]);
+	arr[1] = parseInt(arr[1]);
+
+	return {posStart: arr[0], posEnd: arr[1]};
+}
+
+
 
 const threeToOneResMap = {
 	Gly: 'G',

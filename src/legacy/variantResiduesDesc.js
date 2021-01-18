@@ -396,7 +396,7 @@ function cleanData_snap2_effects(desc, newAa, arr_varInfo, arr_otherResInfo){
 
 		if (isNewResFound == false){
 			// This residue does not add to change;
-			toAdd_varInfo = toAdd_varInfo + "This residue does not add to mutational sensitivity";
+			toAdd_varInfo = toAdd_varInfo + ". This residue does not add to mutational sensitivity";
 		}
 
 		// console.log("Testing 123: " + toAdd_varInfo + "| " + toAdd_otherResInfo);
