@@ -21,11 +21,11 @@ jobs:
       VUE_APP_STATIC_SPA_MODE: true
       # production specific settings
       AQUARIA_CLIENT_EMIT_CNAME_PROD: aquaria.app
-      VUE_APP_AQUARIA_BACKEND_PROD: http://odonoghuelab.org:8010
+      VUE_APP_AQUARIA_BACKEND_PROD: https://odonoghuelab.org:8011
       PUBLISH_REPO_PROD: aqclient/aqclient.github.io
       # test specific settings
       AQUARIA_CLIENT_EMIT_CNAME_TEST: test.aquaria.app
-      VUE_APP_AQUARIA_BACKEND_TEST: http://odonoghuelab.org:8010
+      VUE_APP_AQUARIA_BACKEND_TEST: https://odonoghuelab.org:8011
       PUBLISH_REPO_TEST: aqclient/test.aqclient.github.io
 
     steps:
