@@ -165,6 +165,9 @@ export default {
         document.querySelector('#contentPanel').style.display = 'none'
         document.querySelector('div.dimmer').remove()
       })
+      if (this.alignment) {
+        this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+      }
     },
     release: function () {
       document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display = 'none'
@@ -192,7 +195,12 @@ export default {
         var accession = window.AQUARIA.Gene + ':'
         _this.seqRes = residues[1].split(accession)[1]
         _this.structRes = residues[0].split(pdb)[1]
-        _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+        _this.alignment = true
+        // setTimeout(function () {
+        //   _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+        // }, 50)
+        // _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+
         // _this.alignment = '<p>' + _this.alignment
         // _this.alignment = _this.alignment.replace(/\n\n/g, '</p><br /><p>"')
         // _this.alignment = _this.alignment.replace(/\n/g, '</p><p>')
