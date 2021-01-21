@@ -123,7 +123,7 @@ export default {
       }
       this.resetSelection()
       ev.target.className = 'titlepanel active'
-      document.querySelector('#contentPanel').style.display = 'flex'
+      document.querySelector('#contentPanel').style.display = 'table'
       document.querySelector('#panel1').style.display = 'block'
       document.querySelector('#uniprot').style.display = 'block'
       document.querySelector('#searchByName').style.display = 'block'
@@ -131,7 +131,7 @@ export default {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#uniprot').style.display = 'none'
         document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = 'flex'
+        document.querySelector('#structureviewerexplanation').style.display = 'table'
         document.querySelector('div.dimmer').remove()
       })
     },
@@ -142,7 +142,7 @@ export default {
       this.resetSelection()
       ev.target.className = 'titlepanel active'
       document.querySelector('#gallery').style.display = 'block'
-      document.querySelector('#contentPanel').style.display = 'flex'
+      document.querySelector('#contentPanel').style.display = 'table'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#contentPanel').style.display = 'none'
@@ -156,16 +156,26 @@ export default {
       this.resetSelection()
       ev.target.className = 'titlepanel active'
       document.querySelector('#explanation').style.display = 'block'
-      document.querySelector('#contentPanel').style.display = 'flex'
+      document.querySelector('#contentPanel').style.display = 'table'
+      if (document.querySelector('.expandable-text-line')) {
+        document.querySelector('.expandable-text-line').style.maxWidth = document.querySelector('#structureviewerexplanation').offsetWidth + 20 + 'px'
+      }
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
         document.querySelector('#contentPanel').style.display = 'none'
         document.querySelector('div.dimmer').remove()
       })
+      if (this.alignment) {
+        this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+      }
     },
     release: function () {
       document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display = 'none'
       this.resetSelection()
+    },
+    formatAlignment: function (alignment) {
+      alignment.replace(/\n\n/g, '<br /><br />')
+      return alignment
     }
   },
   mounted () {
@@ -185,8 +195,15 @@ export default {
         var accession = window.AQUARIA.Gene + ':'
         _this.seqRes = residues[1].split(accession)[1]
         _this.structRes = residues[0].split(pdb)[1]
-        _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+        _this.alignment = true
+        // setTimeout(function () {
+        //   _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+        // }, 50)
+        // _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
 
+        // _this.alignment = '<p>' + _this.alignment
+        // _this.alignment = _this.alignment.replace(/\n\n/g, '</p><br /><p>"')
+        // _this.alignment = _this.alignment.replace(/\n/g, '</p><p>')
         // var showAlignment = new MutationObserver(function () {
         //   if (document.querySelector('.expandable-text-line').style.whiteSpace === '') {
         //     document.querySelector('#alignment').style.display = 'none'
@@ -321,7 +338,7 @@ span#pdbpanel.wide {
   overflow: auto;
 }
 #structureviewerexplanation,#structureviewerexplanation_1 {
-    display: flex;
+    display: table;
     background-color: var(--transparent);
     position: fixed;
     left: 50%;
@@ -381,7 +398,7 @@ span#pdbpanel.wide {
     height: calc(12px + .6vw);
     position: relative;
     left: 0.2rem;
-    display: inline-flex;
+    /* display: inline-flex; */
     /* z-index: 11; */
     align-items: center;
     justify-content: center;
@@ -397,7 +414,7 @@ span#pdbpanel.wide {
     width: 1.25rem;
     height: 1.25rem;
     position: absolute;
-    display: flex;
+    display: table;
     z-index: 11;
     align-items: center;
     justify-content: center;
