@@ -1428,17 +1428,32 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 		data['AddedFeatures'] = {}
 		data['AddedFeatures'].Features = []
 		features.forEach(function(feature){
-			aFeature = {};
-
 			feature = feature.replace(/%22/g, '\"');
 
-			let out = extractDescription(feature);
-			feature = out.featStr;
-			aFeature['Description'] = out.description;
+			let featAndDesc = extractDescription(feature);
+			let consInfo = consequence.getConsInfo(featAndDesc.featStr);
 
-			console.log("The feature is 1." + feature + " " + out.description);
+			for(let resNum in consInfo){
+				let aFeature = {};
+				aFeature['Residue'] = resNum;
+				aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
+				aFeature['Name'] = featAndDesc.featStr;
+				aFeature['Color'] = "#F73C3C"
 
-			consequence.getConsInfo(feature);
+				// Adding for display
+				data['AddedFeatures'].Features.push(aFeature);
+
+				// Adding for filling up pop-up info.
+				variantResidues[resNum] = {};
+				variantResidues[resNum] = {'newResidue': consInfo[resNum]['newAas'][0]};
+				variantResidues[resNum] = {'defaultDesc': aFeature['Description']};
+
+			}
+
+
+
+			console.log("The consInfo is: ");
+			console.log(consInfo);
 
 			// handleVarAddedFeat()
 			/* if(featureRegex.test(feature)){
