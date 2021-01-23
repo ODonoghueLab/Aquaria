@@ -96,11 +96,11 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 				featuresObj[key_fs]['Features'] = fs_cosmic_byTissue[key];
 
 			}
-			validateAgainstSchema(featuresObj, primary_accession, featureCallback, 'COSMIC mutations');
+			validateAgainstSchema(featuresObj, primary_accession, featureCallback, 'COSMIC');
 		});
 	}
 	else{
-		validateAgainstSchema(featuresObj, primary_accession, featureCallback, 'COSMIC mutations');
+		validateAgainstSchema(featuresObj, primary_accession, featureCallback, 'COSMIC');
 	}
 
 

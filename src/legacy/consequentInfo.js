@@ -1,3 +1,5 @@
+var grantham = require('./getGranthamConservation.js');
+
 exports.getConsInfo = getConsInfo;
 
 // module.exports = function (featStr){
@@ -284,7 +286,9 @@ function getConsInfo(featStr){
 		let newRes = getNewRes(featStr);
 
 		addToObj(newResidues[resPos], 'newAas', newRes.newRes);
-		newResidues[resPos]['consStr'] = consequentStr;
+
+		let granthamStr = grantham.getGranthamIsCons(newRes.oldRes, newRes.newRes);
+		newResidues[resPos]['consStr'] = consequentStr + "<br>" + granthamStr;
 	}
 
 	// Substitution - translation initiation codon

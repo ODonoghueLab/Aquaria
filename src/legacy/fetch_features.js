@@ -1592,7 +1592,7 @@ const threeToOneResMap = {
 	Val: 'V',
 	Ile: 'I',
 	Cys: 'C',
-	Try: 'Y',
+	Tyr: 'Y',
 	His: 'H',
 	Arg: 'R',
 	Asn: 'N',
