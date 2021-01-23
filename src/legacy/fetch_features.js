@@ -6,7 +6,10 @@ var handleSnap2 = require('./handleSnap2');
 var handleCath = require('./handleCath');
 var handleCath_covid = require('./handleCath_covid');
 var handleMyVariantInfo = require('./handleMyVariantInfo');
+var handleFunVar_cancer = require('./handleFunVar_cancer');
 var consequence = require('./consequentInfo.js');
+
+
 
 function getRequestProtocol(){
 	let arr = window.location.href.split(/\:+/);
@@ -49,6 +52,12 @@ var servers = [
 			"Server": 'myVariant.info',
 			"URL_myVariant": 'https://http://myvariant.info/v1/query?q=', // p53&fetch_all=TRUE'
 			"URL_myGene": 'https://mygene.info/v3/query?species=human&q=', //P04637',
+		},
+		{
+			"id": "FunVar",
+			"Server": "FunVar",
+			"URL_CATH_v2": window.location.protocol + "//www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/",
+			"URL_funVar_cancer": window.location.protocol + "//funvar.cathdb.info/api/nfe/version/v4_2_0?funfam_id=",
 		},
 		/* {
 			"id": 'myVariant',
@@ -799,6 +808,12 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 			handleCath_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
 		}
 
+		if (requestedFeature == 'FunVar'){
+			console.log("FunVar response is ");
+			console.log(response);
+			handleFunVar_cancer(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
+		}
+
 		if (requestedFeature == 'myVariant.info'){
 			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
 		}
@@ -899,7 +914,19 @@ var processNextServer = function(primary_accession,
 
 
 		}
+		else if (servers[currentServer]['id'] == 'FunVar'){
+			if (primary_accession == 'P0DTC1' || primary_accession == 'P0DTC2'|| primary_accession == 'P0DTC7' || primary_accession == 'P0DTD1'){
+				// FunVar covid
+	 		}
+			else {
+				// FunVar cancer
+				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL_CATH_v2'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet);
+				featureCallback(aggregatedAnnotations);
+				processNextServer(primary_accession,
+					featureCallback);
+			}
 
+		}
 		else if (servers[currentServer]['id'] == 'myVariant.info'){
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL_myGene'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
 			featureCallback(aggregatedAnnotations);
@@ -1373,6 +1400,9 @@ function parseFeatures(primary_accession, categories, server, featureCallback, d
 			}
 			else if (server === 'COSMIC mutations'){
 				description = "Catalogue of Somatic Mutations in Cancer (COSMIC) catalogues somatic mutations in humans."
+			}
+			else if (server === 'FunVar'){
+				description = "Functional Variation platform. Variants (specifically residue mutations) are mapped to protein structures, where available, to allow assessment of their proximity to functional sites and therefore possible impact on protein function."
 			}
 			else{
 				description = description

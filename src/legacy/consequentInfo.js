@@ -155,6 +155,7 @@ function getConsInfo(featStr){
 			consequentStr = consequentStr + 'multiple amino acids ';
 			// New translation initiation site (downstream);
 			// get second residue,
+			getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
 		}
 		addToObj(newResidues[resPos], 'newAas', 'del');
 		newResidues[resPos]['consStr'] = consequentStr;
@@ -192,9 +193,11 @@ function getConsInfo(featStr){
 			console.log("The feature is , aminoAcidRes " + twoPos.posStart + " " + twoPos.posEnd);
 			if (twoPos.posStart+1 == twoPos.posEnd){
 				consequentStr = consequentStr + 'between consecutive amino acids';
+				getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
 			}
 			else {
 				consequentStr = consequentStr + 'in-frame';
+				getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
 			}
 		}
 		addToObj(newResidues[resPos], 'newAas', 'X');
@@ -213,10 +216,10 @@ function getConsInfo(featStr){
 			consequentStr = consequentStr + 'single amino acid';
 		}
 		else if (featStr.match(/^[a-zA-Z]+[0-9]+\[[0-9]+\]\;\[[0-9]+\]$/)){
-			consequentStr = consequentStr + 'multiple amino acid';
+			consequentStr = consequentStr + 'multiple alleles';
 		}
 		else if (featStr.match(/^[a-zA-Z]+[0-9]+\[[0-9]+\_[0-9]+\]$/)){
-			consequentStr = consequentStr + 'repeated range';
+			consequentStr = consequentStr + 'estimated range of repeat';
 		}
 		addToObj(newResidues[resPos], 'newAas', 'X');
 		newResidues[resPos]['consStr'] = consequentStr;
@@ -356,6 +359,23 @@ function getConsInfo(featStr){
 }
 
 ///////////////////////////////////// AUX
+function getAndAddRange_newResAsX(featStr, newResidues, consStr){
+	let arr = featStr.split(/\_/);
+	arr[0] = arr[0].replace(/[^0-9]+/g, '');
+	arr[1] = arr[1].replace(/[^0-9]+/g, '');
+
+	console.log("The features are: " + arr[0] + "\t" + arr[1]);
+
+	for(let i= parseInt(arr[0]) +1; i<=parseInt(arr[1]); i++){
+		newResidues[i] = {};
+		newResidues[i]['consStr'] = consStr;
+		newResidues[i]['newAas'] = [];
+		newResidues[i]['newAas'].push('X');
+		console.log("The features are: yea");
+	}
+}
+
+
 function addToObj(newResidues, resPos, resAa){
 	if (!newResidues.hasOwnProperty(resPos)){
 		newResidues[resPos] = [];
