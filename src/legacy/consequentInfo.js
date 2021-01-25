@@ -5,7 +5,7 @@ exports.getConsInfo = getConsInfo;
 // module.exports = function (featStr){
 function getConsInfo(featStr){
 	let consequentStr = "";
-	let newResidues = {}; // {resPos} => {newAas} => [newAa1, newAa2, .. newAaN]; {consequent} => consequentStr;
+	let newResidues = {}; // {resPos (or resPos-seqLen)} => {newAas} => [newAa1, newAa2, .. newAaN]; {consequent} => consequentStr;
 	let isOne = true;
 
 	// Remove any spaces
@@ -41,10 +41,10 @@ function getConsInfo(featStr){
 		// Recursively get the sub-patterns for each allele
 		// consequentStr = consequentStr + "Allele ";
 
-		if (featStr.match(/^\[[a-zA-Z]+[0-9]+[a-zA-Z]+\;[a-zA-Z]+[0-9]+[a-zA-Z]+\]/)){
+		if (featStr.match(/^\[[a-zA-Z]+[0-9]+[a-zA-Z\_\*\?\^0-9]+\;[a-zA-Z]+[0-9]+[a-zA-Z\_\*\?\^0-9]+\]$/)){
 			consequentStr = consequentStr + "Same allele "
 		}
-		else if (featStr.match(/^\[[a-zA-Z]+[0-9]+[a-zA-Z]+\]\;\[[a-zA-Z]+[0-9]+[a-zA-Z]+\]$/)){
+		else if (featStr.match(/^\[[a-zA-Z]+[0-9]+[a-zA-Z\_\*\?\^0-9]+\]\;\[[a-zA-Z]+[0-9]+[a-zA-Z\_\*\?\^0-9]+\]$/)){
 			consequentStr = consequentStr + "Different allele";
 
 			let isHomoTisHetroF = isHomoOrHeteroZygous(featStr);
@@ -57,14 +57,14 @@ function getConsInfo(featStr){
 			}
 
 		}
-		else if (featStr.match(/^\[[a-zA-Z]+[0-9]+[a-zA-Z]+\,[a-zA-Z]+[0-9]+[a-zA-Z]+\]$/)){
+		else if (featStr.match(/^\[[a-zA-Z]+[0-9]+[a-zA-Z\_\*\?\^0-9]+\,[a-zA-Z]+[0-9]+[a-zA-Z\_\*\?\^0-9]+\]$/)){
 			consequentStr = consequentStr + "One allele encoding two proteins ";
 		}
 		else {
 			consequentStr = consequentStr + "Allele ";
 		}
 
-
+		// For each sub-pattern recursively get the sub-pattern consequentStr
 		featStr = featStr.replace(/[\[\]]+/g, '');
 		let sub_variants = featStr.split(/[\;\,]+/);
 
@@ -75,7 +75,6 @@ function getConsInfo(featStr){
 			for (let k =0; k<keys.length; k++){
 
 				if (!newResidues.hasOwnProperty(keys[k])){
-					console.log("The features is guys taken care of " + keys[k]);
 					newResidues[keys[k]] = {};
 					newResidues[keys[k]]['newAas'] = [];
 					newResidues[keys[k]]['consStr'] = consequentStr;
@@ -104,17 +103,19 @@ function getConsInfo(featStr){
 		let resPos = getResPos_simple(featStr);
 		newResidues[resPos] = {};
 
+		let range_deleted = {}; let range_inserted = [];
 		// resPositions.push(resPos);
 
 
 		consequentStr = consequentStr + 'Deletion-insertion ';
 		if (featStr.match(/^[a-zA-Z]+[0-9]+[dD][eE][lL][iI][nN][sS]/)){
 			// single amino acid deletion
-			consequentStr = consequentStr + 'single aa. deletion '
+			consequentStr = consequentStr + 'single deletion '
 		}
 		else if (featStr.match(/^[a-zA-Z]+[0-9]+\_[a-zA-Z]+[0-9]+[dD][eE][lL][iI][nN][sS]/)){
 			// muliple amino acid deletion
-			consequentStr = consequentStr + 'multiple aa. deletion '
+			consequentStr = consequentStr + 'multiple deletion '
+			range_deleted = getTheRange(featStr);
 		}
 
 		if (featStr.match(/[dD][eE][lL][iI][nN][sS][a-zA-Z]+$/)){
@@ -123,21 +124,26 @@ function getConsInfo(featStr){
 
 			if (res.isSingleAa) {
 				// single amino acid insertion
-				consequentStr = consequentStr + 'single aa. insertion ';
+				consequentStr = consequentStr + 'single insertion ';
 			}
 			else {
-				consequentStr = consequentStr + 'multiple aa. insertion ';
+				consequentStr = consequentStr + 'multiple insertion ';
 			}
+
+			range_inserted = getAllNewRes_delins(featStr, isOne);
+
 		}
 		else if (featStr.match(/[dD][eE][lL][iI][nN][sS][0-9\*]+$/)){
 			// Muliple amino acid insertion
-			consequentStr = consequentStr + 'multiple aa. insertion '
+			consequentStr = consequentStr + 'multiple insertion '
 			addToObj(newResidues[resPos], 'newAas', 'X');
 		}
 		else{
 			addToObj(newResidues[resPos], 'newAas', 'X');
 		}
-
+		console.log("The range deleted is ");
+		console.log(range_deleted);
+		getAndAddRange_newResAsX(range_deleted, range_inserted, newResidues, consequentStr, 'X');
 		newResidues[resPos]['consStr'] = consequentStr;
 	}
 
@@ -157,7 +163,9 @@ function getConsInfo(featStr){
 			consequentStr = consequentStr + 'multiple amino acids ';
 			// New translation initiation site (downstream);
 			// get second residue,
-			getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
+			// getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
+			let range_deleted = getTheRange_del(featStr);
+			getAndAddRange_newResAsX(range_deleted, [], newResidues, consequentStr, 'del');
 		}
 		addToObj(newResidues[resPos], 'newAas', 'del');
 		newResidues[resPos]['consStr'] = consequentStr;
@@ -175,7 +183,10 @@ function getConsInfo(featStr){
 			consequentStr = consequentStr + 'single amino acid '
 		}
 		else if(featStr.match(/^[a-zA-Z]+[0-9]+\_[a-zA-Z]+[0-9]+[dD][uU][pP]$/)){
-			consequentStr = consequentStr + 'multiple amino acid ';
+			consequentStr = consequentStr + 'multiple amino acids ';
+
+			let range_deleted = getTheRange_del(featStr);
+			getAndAddRange_newResAsX(range_deleted, [], newResidues, consequentStr, 'X');
 		}
 		addToObj(newResidues[resPos], 'newAas', 'X');
 		newResidues[resPos]['consStr'] = consequentStr;
@@ -195,12 +206,15 @@ function getConsInfo(featStr){
 			console.log("The feature is , aminoAcidRes " + twoPos.posStart + " " + twoPos.posEnd);
 			if (twoPos.posStart+1 == twoPos.posEnd){
 				consequentStr = consequentStr + 'between consecutive amino acids';
-				getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
+				// getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
 			}
 			else {
 				consequentStr = consequentStr + 'in-frame';
-				getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
+				// getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
 			}
+
+			let range_deleted = getTheRange_del(featStr);
+			getAndAddRange_newResAsX(range_deleted, [], newResidues, consequentStr, 'X');
 		}
 		addToObj(newResidues[resPos], 'newAas', 'X');
 		newResidues[resPos]['consStr'] = consequentStr;
@@ -268,14 +282,22 @@ function getConsInfo(featStr){
 	// Substitution
 
 	else if (featStr.match(/^[A-Za-z]+[0-9]+\*$/)|| featStr.match(/[A-Za-z]+[0-9]+[tT][eE][rR]$/)){
+
 		let resPos = getResPos_simple(featStr);
-		newResidues[resPos] = {};
+
+		let thePos = resPos + "-" + AQUARIA.showMatchingStructures.sequence.length;
+
+
+		newResidues[thePos] = {};
 		// resPositions.push(resPos);
 
 
 		consequentStr = consequentStr + "Nonsense ";
-		addToObj(newResidues[resPos], 'newAas', '*');
-		newResidues[resPos]['consStr'] = consequentStr;
+		addToObj(newResidues[thePos], 'newAas', '*');
+		newResidues[thePos]['consStr'] = consequentStr;
+
+		// console.log("The sequence length is " + AQUARIA.showMatchingStructures.sequence.length);
+
 	}
 	else if (featStr.match(/^[A-Za-z]+[0-9]+[A-Za-z]+$/)){
 		let resPos = getResPos_simple(featStr);
@@ -288,7 +310,7 @@ function getConsInfo(featStr){
 		addToObj(newResidues[resPos], 'newAas', newRes.newRes);
 
 		let granthamStr = grantham.getGranthamIsCons(newRes.oldRes, newRes.newRes);
-		newResidues[resPos]['consStr'] = consequentStr + "<br>" + granthamStr;
+		newResidues[resPos]['consStr'] = consequentStr + " " + granthamStr;
 	}
 
 	// Substitution - translation initiation codon
@@ -301,7 +323,7 @@ function getConsInfo(featStr){
 
 
 		consequentStr = consequentStr + 'Unknown consequence ';
-		addToObj(newResidues[resPos], 'newAas', res.firstRes);
+		addToObj(newResidues[resPos], 'newAas', 'X');
 		newResidues[resPos]['consStr'] = consequentStr;
 	}
 	// Substitution - uncertain
@@ -341,12 +363,16 @@ function getConsInfo(featStr){
 	}
 	else{
 		let resPos = getResPos_simple(featStr);
-		newResidues[resPos] = {};
+		console.log('The resPos is not recognized ' + resPos);
 
-		addToObj(newResidues[resPos], 'newAas', newRes);
+		if (!isNaN(resPos)){
+			newResidues[resPos] = {};
 
-		consequentStr = 'Variant is not recognized.';
-		newResidues[resPos]['consStr'] = consequentStr;
+			addToObj(newResidues[resPos], 'newAas', resPos);
+
+			consequentStr = 'Variant is not recognized.';
+			newResidues[resPos]['consStr'] = consequentStr;
+		}
 	}
 
 
@@ -363,22 +389,52 @@ function getConsInfo(featStr){
 }
 
 ///////////////////////////////////// AUX
-function getAndAddRange_newResAsX(featStr, newResidues, consStr){
-	let arr = featStr.split(/\_/);
+
+function getTheRange(featStr){
+	let tmpStr = featStr.replace(/[dD][eE][lL][iI][nN][sS].*$/, '');
+	let arr = tmpStr.split(/\_/);
 	arr[0] = arr[0].replace(/[^0-9]+/g, '');
 	arr[1] = arr[1].replace(/[^0-9]+/g, '');
+	console.log("Foetal surgeon " + arr[1]);
 
-	console.log("The features are: " + arr[0] + "\t" + arr[1]);
-
-	for(let i= parseInt(arr[0]) +1; i<=parseInt(arr[1]); i++){
-		newResidues[i] = {};
-		newResidues[i]['consStr'] = consStr;
-		newResidues[i]['newAas'] = [];
-		newResidues[i]['newAas'].push('X');
-		console.log("The features are: yea");
-	}
+	return {startPos: arr[0], endPos: arr[1]};
 }
 
+function getTheRange_del(featStr){
+	let tmpStr = featStr.replace(/[dD][eE][lL].*$/, '');
+	let arr = tmpStr.split(/\_/);
+	arr[0] = arr[0].replace(/[^0-9]+/g, '');
+	arr[1] = arr[1].replace(/[^0-9]+/g, '');
+	console.log("Foetal surgeon " + arr[1]);
+
+	return {startPos: arr[0], endPos: arr[1]}
+}
+
+
+function getAndAddRange_newResAsX(range_deleted, range_inserted, newResidues, consStr, defaultAa){
+	console.log("Comes in here 1");
+
+	let counter_ins = 1;
+	if (range_deleted.hasOwnProperty('startPos') && range_deleted.hasOwnProperty('endPos')){
+		console.log("Comes in here 2");
+
+		for(let i= parseInt(range_deleted.startPos) +1; i<=parseInt(range_deleted.endPos); i++){
+			newResidues[i] = {};
+			newResidues[i]['consStr'] = consStr;
+			newResidues[i]['newAas'] = [];
+
+			if (counter_ins < range_inserted.length){
+				newResidues[i]['newAas'].push(range_inserted[counter_ins]);
+			}
+			else{
+				newResidues[i]['newAas'].push(defaultAa);
+			}
+
+			counter_ins = counter_ins + 1;
+		}
+	}
+
+}
 
 function addToObj(newResidues, resPos, resAa){
 	if (!newResidues.hasOwnProperty(resPos)){
@@ -475,6 +531,21 @@ function getFirstNewRes_ext(featStr, isOne){
 	console.log("The feature is delins " + firstRes);
 
 	return {firstRes: firstRes, isSingleAa: isSingleAa};
+}
+
+function getAllNewRes_delins(featStr, isOne){
+	let arr = featStr.split(/[dD][eE][lL][iI][nN][sS]/);
+	arr[1] = arr[1].replace(/[^a-zA-Z]+/g, '');
+
+	let newResEachPos = [];
+	if (isOne){
+		newResEachPos = arr[1].split('');
+	}
+	else {
+		newResEachPos = arr[1].match(/.{1,3}/g);
+	}
+
+	return (newResEachPos);
 }
 
 function getAllNewRes(featStr){

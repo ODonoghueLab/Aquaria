@@ -13,8 +13,8 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 	extractUniqSfFfs(jsonObj1.data).then(function(ids_sfFfs){
 		sendTheFirstUrls(ids_sfFfs).then(function(promises_firstUrls){
 			Promise.all(promises_firstUrls).then(function(firstUrlData){
-				console.log("FunVar data is ");
-				console.log(firstUrlData);
+				//console.log("FunVar data is ");
+				//console.log(firstUrlData);
 
 				extractPosAndFurtherPromises(firstUrlData, ids_sfFfs, features).then(function(promises_nextPages){
 					return new Promise(function(resolve, reject){
@@ -37,8 +37,8 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 						let aquariaFeatObj = {};
 						let arr_feats = [];
 
-						console.log("FunVar features are ");
-						console.log(features);
+						//console.log("FunVar features are ");
+						//console.log(features);
 
 						// Convert to AquariaFeatObj format;
 
@@ -47,7 +47,7 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 								aFeature = {};
 								aFeature['Residue'] = parseInt(resNum);
 								aFeature['Name'] = aaChange.replace(/\//, '>');
-								console.log("Funvar a popup would be " + resNum + " " + aaChange);
+								//console.log("Funvar a popup would be " + resNum + " " + aaChange);
 								aFeature['Description'] = "<br><i>Variant type:</i> " + features[resNum][aaChange]['vartype'];
 								aFeature['Description'] = aFeature['Description'] + "<br><i>Variant class:</i> " + features[resNum][aaChange]['varClass'];
 								aFeature['Description'] = aFeature['Description'] + "<br><i>Diseases:</i> " + features[resNum][aaChange]['diseases'];
@@ -67,8 +67,8 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 					})
 				})
 				.then(function(aquariaFeatObj){
-						console.log("FunVar aquariaFeatObj is ");
-						console.log(aquariaFeatObj);
+						//console.log("FunVar aquariaFeatObj is ");
+						//console.log(aquariaFeatObj);
 						validateAgainstSchema(aquariaFeatObj, primary_accession, featureCallback, 'FunVar', null);
 				});
 
@@ -127,8 +127,8 @@ const CancerTypes = {
 function processNextPagesData(nextPagesData, featsAsDict){
 	return new Promise(function(resolve, reject){
 
-		console.log("FunVar nextPagesData is ");
-		console.log(nextPagesData);
+		//console.log("FunVar nextPagesData is ");
+		//console.log(nextPagesData);
 
 		nextPagesData.forEach(function(anUrlRes, anUrlRes_i){
 				if (anUrlRes.hasOwnProperty('data') && anUrlRes.data.hasOwnProperty('items')){
@@ -155,7 +155,7 @@ function extractPosAndFurtherPromises(firstUrlData, ids_sfFfs, features){
 				if (callsToMake > 0){
 					addNextPagesToUrl(callsToMake, ids_sfFfs[dataObj_i], promises_nextPages);
 				}
-				console.log("Funvar callsToMake " + callsToMake);
+				//console.log("Funvar callsToMake " + callsToMake);
 
 				// Process the resiudes;
 				if (dataObj.data.hasOwnProperty('items')){
@@ -175,7 +175,7 @@ function extractPosAndFurtherPromises(firstUrlData, ids_sfFfs, features){
 function addAnObjIfNotPresent(featsAsDict, anFunVarItem){
 
 	if (anFunVarItem.hasOwnProperty('vm_seq_no') && anFunVarItem.hasOwnProperty('vm_aa_change')){
-		console.log("FunVar extracted data is " + anFunVarItem.vm_seq_no + " " + anFunVarItem.vm_aa_change + " " + anFunVarItem['cancer_type'] + " " + anFunVarItem['diseases'] + " " + anFunVarItem['variant_type'] + " " + anFunVarItem['variant_class'] + " " + anFunVarItem['mutfam']);
+		//console.log("FunVar extracted data is " + anFunVarItem.vm_seq_no + " " + anFunVarItem.vm_aa_change + " " + anFunVarItem['cancer_type'] + " " + anFunVarItem['diseases'] + " " + anFunVarItem['variant_type'] + " " + anFunVarItem['variant_class'] + " " + anFunVarItem['mutfam']);
 
 		let resPos = parseInt(anFunVarItem['vm_seq_no']);
 

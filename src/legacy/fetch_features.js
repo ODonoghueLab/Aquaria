@@ -787,18 +787,18 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 
 		if (requestedFeature == 'PredictProtein'){
 			// convert feature first
-			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
+			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
 		}
 		if (requestedFeature == 'SNAP2'){
 			// console.log(response);
-			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
+			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
 			// console.log(response.data)
 			//console.log(getCurrentUrl());
 			//console.log(servers[3].URL_covid);
-			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
 
 
 		}
@@ -809,8 +809,8 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 
 		if (requestedFeature == 'FunVar'){
-			console.log("FunVar response is ");
-			console.log(response);
+			// console.log("FunVar response is ");
+			// console.log(response);
 			handleFunVar_cancer(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
 		}
 
@@ -993,7 +993,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 				// console.log("The serverAndFsName is " + serverAndFsName);
 				// document.getElementById('divVI_varInfo').innerHTML = '<toReplace>' + variantResidues[residue]['variantInfo'][serverAndFsName][0] + '</toReplace>';
 
-				description = description + '<toReplace_varInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+				description = description + "(" + variantResidues[residue].newResidue + ")" + '<toReplace_varInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
 				for (let i =0; i<variantResidues[residue]['variantInfo'][serverAndFsName].length; i++){
 					description = description +  variantResidues[residue]['variantInfo'][serverAndFsName][i] +". ";
 				}
@@ -1465,7 +1465,13 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 
 			for(let resNum in consInfo){
 				let aFeature = {};
-				aFeature['Residue'] = resNum;
+				if (resNum.match(/\-/)){
+					aFeature['Residues'] = resNum.split(/\-/);
+				}
+				else{
+					aFeature['Residue'] = resNum;
+				}
+
 				aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
 				aFeature['Name'] = featAndDesc.featStr;
 				aFeature['Color'] = "#F73C3C"
@@ -1475,70 +1481,14 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 
 				// Adding for filling up pop-up info.
 				variantResidues[resNum] = {};
-				variantResidues[resNum] = {'newResidue': consInfo[resNum]['newAas'][0]};
-				variantResidues[resNum] = {'defaultDesc': aFeature['Description']};
+				variantResidues[resNum]['newResidues'] = consInfo[resNum]['newAas'];
+				variantResidues[resNum]['defaultDesc'] = aFeature['Description'];
 
 			}
+		});
 
-
-
-			console.log("The consInfo is: ");
-			console.log(consInfo);
-
-			// handleVarAddedFeat()
-			/* if(featureRegex.test(feature)){
-
-				var featureAttributes = {}
-				var description = feature.split('=')[1]
-
-				if(description && description.includes('"')){
-					description = description.split('"')[1]
-
-				}
-				feature = feature.replace(/^p./, '');
-				feature = feature.split('=\"')[0]
-				residue = feature.replace(/[A-Za-z$-]/g, "")
-				residue = parseInt(residue)
-				featureAttributes.Color = "#F73C3C"
-
-				if(description){
-					if(description.includes('"')){
-						description = description.split('"')[1]
-					}
-					featureAttributes.Description = description.replace(/%22/g, "")
-				}
-				else{
-					featureAttributes.Description = feature
-				}
-
-				let featInfo = consequence.getConsInfo(feature);
-				// console.log("Feature is " + feature + "|" + consequentStr);
-				let newResidue = '';
-				featureAttributes.Name = feature; // + "<br>" + consequentStr;
-				if(feature.split(residue)[1].toLowerCase() == 'ter' || feature.split(residue)[1].toLowerCase() == 'x'){
-					featureAttributes.Residues = [residue, AQUARIA.showMatchingStructures.sequence.length]
-					newResidue = 'X';
-				}
-				else{
-					featureAttributes.Residue = residue;
-					let theUserRes = feature.split(residue)[1];
-					if (theUserRes.length > 1){
-						newResidue = checkIfInKey_ig(theUserRes);
-					}
-					else if (theUserRes.length == 1){
-						newResidue = checkIfInVal_ig(theUserRes);
-					}
-				}
-				data['AddedFeatures'].Features.push(featureAttributes)
-
-				variantResidues[featureAttributes.Residue] = {};
-				variantResidues[featureAttributes.Residue] = {'newResidue': newResidue};
-				if (description && featureAttributes.hasOwnProperty('Description')){
-					variantResidues[featureAttributes.Residue] = {'defaultDesc': featureAttributes.Description};
-				}
-
-			} */
-		})
+		console.log("The Variant residues 2 are: ");
+		console.log(variantResidues);
 
 
 		parseFeatures(primary_accession, server['Categories'], server['Server'], featureCallback, data, searchParam)
@@ -1692,7 +1642,7 @@ function extractVariantInfoFromUniprot(uniprotData){
 			if (uniprotData[featureType].hasOwnProperty('Features')){
 				for (let i =0; i< uniprotData[featureType]['Features'].length; i++){
 					if (uniprotData[featureType]['Features'][i].hasOwnProperty('Residue')){
-						checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
+						// checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
 					}
 				}
 			}
