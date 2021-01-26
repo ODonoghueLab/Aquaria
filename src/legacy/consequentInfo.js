@@ -34,10 +34,11 @@ function getConsInfo(featStr){
 	}
 	// Check if amino acid is specified as isOne (ret. True) or isThree (ret. False);
 	isOne = isOneTOrThreeF(featStr);
-
+	isAllele = false;
 
 	// Allele
 	if (featStr.match(/^\[.*\]$/)){
+		isAllele = true;
 		// Recursively get the sub-patterns for each allele
 		// consequentStr = consequentStr + "Allele ";
 
@@ -377,8 +378,8 @@ function getConsInfo(featStr){
 
 
 
-	// Convert new Aas to is One, and validate isOne.
-
+	// Convert new Aas to is One, and validate isOne (not doing the isOne validation - will do individ. validation during scraping).
+	// convertNewResTo1Letter(newResidues);
 
 
 
@@ -468,6 +469,16 @@ function isOneTOrThreeF(featStr){
 
 function getNewRes(featStr){
 	let newResStr = featStr.split(/[0-9\_]+/);
+
+	let oldAa = checkIfInKey_ig(newResStr[0]);
+	if (oldAa != '-'){
+		newResStr[0] = oldAa; 
+	}
+
+	let newAa = checkIfInKey_ig(newResStr[1]);
+	if (newAa != '-'){
+		newResStr[1] = newAa;
+	}
 
 	return {newRes: newResStr[1], oldRes: newResStr[0]};
 }
@@ -624,6 +635,22 @@ function checkIfInVal_ig(oneLetterCode){
 }
 
 
+
+
+
+function convertNewResTo1Letter(newResidues){
+
+	for (let resNum in newResidues){
+		for (let i=0; i<newResidues[resNum]['newAas'].length; i++){
+			let theAa = newResidues[resNum]['newAas'][i];
+			console.log("A new residue is " + theAa);
+			if (threeToOneResMap.hasOwnProperty(theAa)){
+				newResidues[resNum]['newAas'][i] = threeToOneResMap[theAa];
+			}
+		}
+	}
+}
+
 const threeToOneResMap = {
 	Gly: 'G',
 	Ala: 'A',
@@ -639,7 +666,7 @@ const threeToOneResMap = {
 	Val: 'V',
 	Ile: 'I',
 	Cys: 'C',
-	Try: 'Y',
+	Tyr: 'Y',
 	His: 'H',
 	Arg: 'R',
 	Asn: 'N',

@@ -787,11 +787,11 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 
 		if (requestedFeature == 'PredictProtein'){
 			// convert feature first
-			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
+			handlePredictProtein(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
 		}
 		if (requestedFeature == 'SNAP2'){
 			// console.log(response);
-			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
+			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
@@ -993,7 +993,9 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 				// console.log("The serverAndFsName is " + serverAndFsName);
 				// document.getElementById('divVI_varInfo').innerHTML = '<toReplace>' + variantResidues[residue]['variantInfo'][serverAndFsName][0] + '</toReplace>';
 
-				description = description + "(" + variantResidues[residue].newResidue + ")" + '<toReplace_varInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
+
+				// Removed: "(" + variantResidues[residue].newResidue + ")" 
+				description = description + '<toReplace_varInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
 				for (let i =0; i<variantResidues[residue]['variantInfo'][serverAndFsName].length; i++){
 					description = description +  variantResidues[residue]['variantInfo'][serverAndFsName][i] +". ";
 				}
@@ -1472,6 +1474,7 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 					aFeature['Residue'] = resNum;
 				}
 
+
 				aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
 				aFeature['Name'] = featAndDesc.featStr;
 				aFeature['Color'] = "#F73C3C"
@@ -1506,11 +1509,13 @@ function extractDescription(feature){
 
 	if (featStr.match(/\=\"/)){
 		let arr = feature.split(/\=\"/);
-		desc = arr[1];
+		if (arr[1]){
+				desc = arr[1];
+		}
 		desc = desc.replace(/\"$/, '');
 		featStr = arr[0];
 	}
-	console.log("The feature is featStr" + featStr);
+	console.log("The feature is featStr" + featStr + " " + desc);
 	return {featStr: featStr, description: desc};
 }
 

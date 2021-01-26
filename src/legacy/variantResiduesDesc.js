@@ -1,33 +1,25 @@
 var counter_complete = 0;
 
 module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType, description, serverName, variants_featTypesOfInt){
-
 	// console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
 
 	if (variants_featTypesOfInt.includes(featureType)){
 		Object.keys(variantResidues).forEach(function(resSnp, i){
 			// console.log("The new residue is " + variantResidues[resSnp].newResidue);
-
-			if (parseInt(resSnp) >= parseInt(resStart_pp) && parseInt(resSnp) <= parseInt(resEnd_pp)){
-
-				/* if (!variantResidues[resSnp].hasOwnProperty(serverName)){
-
-
-					variantResidues[resSnp][serverName] = [];
+			let pos_mut = resSnp;
+			if (resSnp.match(/\-/)){
+				pos_mut = resSnp.split(/\-/)[0];
+			}
 
 
-				} */
+			if (parseInt(pos_mut) >= parseInt(resStart_pp) && parseInt(pos_mut) <= parseInt(resEnd_pp)){
 
 				let obj_featType = {};
 				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
 					let varInfo = [];
 					cleanData_pp(description, varInfo);
-					// obj_featType[featureType] = obj_inFeatType;
-					// console.log(' does come in here ... ');
-					// console.log(obj_inFeatType);
 
-					// variantResidues[resSnp][serverName].push(obj_featType);
-					addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'PredictProtein Conservation');
+					addToVariantResidues(variantResidues, resSnp, [], varInfo, [], 'PredictProtein conservation');
 				}
 
 				else if (serverName == 'SNAP2'){
@@ -35,13 +27,16 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					let varInfo = []; let posInfo = []; let otherResInfo = []; // get from variant inof if it exists;
 
 					if (featureType == 'Mutational sensitivity (SNAP2 ratio of effect mutations)'){
-						cleanData_snap2_effects(description, variantResidues[resSnp].newResidue, varInfo, otherResInfo);
+						console.log("snap2 over here......")
+						cleanData_snap2_effects(description, variantResidues[resSnp].newResidues, posInfo, otherResInfo);
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, otherResInfo, 'SNAP2 prediction');
 					}
 					else if (featureType == 'Mutation score (average SNAP2 score)'){
-						cleanData_snap2_getAvgScore(description, posInfo);
+						cleanData_snap2_getAvgScore(description, varInfo, variantResidues[resSnp].newResidues);
+						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'SNAP2 prediction');
 					}
 
-					addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'SNAP2');
+
 
 				}
 				else if (serverName == 'CATH') {
@@ -307,30 +302,42 @@ function cleanData_uniprot_seqVar(desc, newAa, varInfo, otherResInfo){
 	*/
 }
 
-function cleanData_snap2_getAvgScore(desc, arr_posInfo){
-	// console.log ('snap2 desc is ' + desc);
-	desc = desc.replace(/^[^\;]+\;/, '');
-	desc = desc.replace(/\;.*$/, '');
+function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas){
 
-	let arr = desc.split(/\:/);
+	let arr = desc.split(/\;/);
 
-	arr_posInfo.push("Average score: " + arr[1]);
+	if (arr.length > 2){
+		//console.log('snap2 desc is ' + arr.length + " |" +  arr[2] + "|");
+		arr[2] = desc.replace('function changing are:', '');
+		arr[2] = desc.replace(/[\s]+/g, '');
+		arr_indivRes = arr[2].split(/\,/);
+		//console.log ('snap2 desc is 3 ' + arr_indivRes);
 
 
-	/*
-	if (!obj_featType.hasOwnProperty('Mutational sensitivity')) {
-		obj_featType['Mutational sensitivity'] = {};
+		newAas.forEach(function(newAa, newAa_i){
+				let isAddingToChange = false;
+				if (oneAaCodes.includes(newAa)){
+						let re = new RegExp("^" + newAa, 'i');
+						for (let i=0; i<arr_indivRes.length; i++){
+								// console.log('snap2 desc is 5 ' + arr[i]);
+								if (arr_indivRes[i].match(re)){
+										let score = arr_indivRes[i].split(/\:/);
+										arr_posInfo.push('Mutation (' + newAa + ') will change function (score=' + score[1] + ')');
+										//console.log("snap2 desc is 4 " + score[1] + " " + arr_indivRes[i]);
+										isAddingToChange = true;
+								}
+								// if (arr[i].toUpperCase().match(/^))
+						}
+						if (isAddingToChange == false){
+							arr_posInfo.push('Mutation (' + newAa + ') will not change function');
+						}
+				}
+
+
+		});
 	}
 
-	if (! obj_featType['Mutational sensitivity'].hasOwnProperty('mainToShow')){
-		obj_featType['Mutational sensitivity']['mainToShow'] = mainToShow;
-	}
-	else {
-		obj_featType['Mutational sensitivity']['mainToShow'] =  obj_featType['Mutational sensitivity']['mainToShow'] + "<br>" + mainToShow;
-	}
-	*/
-	// let obj_inFeatType = {mainToShow: "Average score: " + arr[1]};
-	// return obj_inFeatType;
+
 }
 
 
@@ -356,59 +363,58 @@ function cleanData_cath(desc, varInfo){
 	// return (obj_featType);
 }
 
-function cleanData_snap2_effects(desc, newAa, arr_varInfo, arr_otherResInfo){
-	console.log("now the snap2 desc is " + desc);
+function cleanData_snap2_effects(desc, newAas, arr_posInfo, arr_otherResInfo){
+	console.log("snap2 desc 1 " + desc);
+	let arr = desc.split(/\;/);
 
-	let arr = desc.split("\;");
-	let toAdd_varInfo = ''; let toAdd_otherResInfo = '';
+	let posInfoDesc = "";
+	if (arr.length >= 1){
+		posInfoDesc = arr[0] +". ";
+	}
 
-	console.log(arr[0]);
-	toAdd_varInfo = arr[0];
+	if (arr.length >= 2){
+		arr[1] = arr[1].replace(/[\s]+$/, '');
+		posInfoDesc = posInfoDesc + arr[1];
+	}
 
-	if (arr.length > 2){
-		// individual residue values are present
-		// Search for newResidue; // Data is in mainToHide, otherResidues;
+	if (arr.length >= 3){
+		arr[2] = arr[2].replace('function changing are:', '');
+		arr[2] = arr[2].replace(/[\s]+/g, '');
+		arr_indivRes = arr[2].split(/\,/);
 
-		arr[2] = arr[2].replace(/^[^\:]+:/, '');
-		let arr_1 = arr[2].split("\,");
-
-		toAdd_otherResInfo = arr_1.length + "/20 residues add to change. " + 'Additional residues adding to mutational sensitivity ';
-
-		let isNewResFound = false;
-
-		let regex = new RegExp("^[\\s]*" + newAa);
-		let foundIdx = -1;
-		console.log("regex is " + regex);
-		arr_1.forEach(function(item, i){
-			item = item.replace(/\s/g, '');
-			if (item.match(regex)){
-				// console.log("found ! " + item);
-				isNewResFound = true;
-				toAdd_varInfo =  toAdd_varInfo + ". Residue's specific score " + item;
-				foundIdx = i;
-
+		let posToRm = [];
+		for (let i =0; i<arr_indivRes.length; i++){
+			let aa = arr_indivRes[i].split("\:")[0];
+			if (newAas.includes(aa.toUpperCase())){
+				posToRm.push(i);
 			}
-			else {
-				toAdd_otherResInfo = toAdd_otherResInfo + " " + item;
-			}
-			// console.log(item + " " + newRes);
+		}
+		posToRm.sort(function(a, b){
+			return b - a;
 		});
 
-		if (isNewResFound == false){
-			// This residue does not add to change;
-			toAdd_varInfo = toAdd_varInfo + ". This residue does not add to mutational sensitivity";
+		posToRm.forEach(function(pos, pos_i){
+			arr_indivRes.splice(pos, 1);
+		});
+
+		if (arr_indivRes.length > 0){
+			let otherInfoDesc = "Additional residues changing function are:";
+
+			arr_indivRes.forEach(function(indivRes, indivRes_i){
+				otherInfoDesc = otherInfoDesc + " " + indivRes;
+			});
+
+			arr_otherResInfo.push(otherInfoDesc);
 		}
 
-		// console.log("Testing 123: " + toAdd_varInfo + "| " + toAdd_otherResInfo);
+		console.log("snap2 posToRm is " + posToRm);
 	}
 
-	if (toAdd_varInfo != ''){
-		arr_varInfo.push(toAdd_varInfo);
-	}
-	if (toAdd_otherResInfo != ''){
-		arr_otherResInfo.push(toAdd_otherResInfo);
-	}
 
+
+	if (posInfoDesc != ''){
+		arr_posInfo.push(posInfoDesc);
+	}
 
 }
 
@@ -483,3 +489,5 @@ function getSubstringOfInterest_cath(description){
 
 	return desc;
 }
+
+const oneAaCodes = ['A',	'R',	'N',	'D',	'C',	'Q',	'E',	'G',	'H',	'I',	'L',	'K',	'M',	'F',	'P',	'S',	'T',	'W',	'Y',	'V'];

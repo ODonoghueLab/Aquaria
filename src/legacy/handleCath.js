@@ -462,8 +462,8 @@ function handleResidues(res, featureName, description, variantResidues){
 	let re = new RegExp("\-");
 
 	if (!Array.isArray(res)){
-		console.log("HERE HERE HERE HERE HERE ");
-		console.log(res);
+		// console.log("HERE HERE HERE HERE HERE ");
+		// console.log(res);
 		if (re.test(res)){
 			let theResToDel = res.split(/\-/).map(Number)
 			features.push({'Name': featureName, 'Residues': theResToDel, 'Description': description});
@@ -478,8 +478,6 @@ function handleResidues(res, featureName, description, variantResidues){
 	}
 	else {
 		res.forEach(function(item, i){
-			console.log("HERE HERE HERE HERE HERE ");
-			console.log(item);
 			if (re.test(item)){
 				let theResToDel = item.split(/\-/).map(Number)
 				features.push({'Name': featureName, 'Residues': theResToDel, 'Description': description});
