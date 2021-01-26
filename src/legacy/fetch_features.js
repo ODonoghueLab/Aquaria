@@ -5,7 +5,7 @@ var handlePredictProtein = require('./handlePredictProtein');
 var handleSnap2 = require('./handleSnap2');
 var handleCath = require('./handleCath');
 var handleCath_covid = require('./handleCath_covid');
-var handleMyVariantInfo = require('./handleMyVariantInfo');
+var handleMyVariantInfo = require('./handleMyVariantInfo_v2');
 var handleFunVar_cancer = require('./handleFunVar_cancer');
 var consequence = require('./consequentInfo.js');
 
@@ -50,7 +50,7 @@ var servers = [
 		{
 			"id": "myVariant.info",
 			"Server": 'myVariant.info',
-			"URL_myVariant": 'https://http://myvariant.info/v1/query?q=', // p53&fetch_all=TRUE'
+			"URL_myVariant": 'https://myvariant.info/v1/query?q=', // p53&fetch_all=TRUE'
 			"URL_myGene": 'https://mygene.info/v3/query?species=human&q=', //P04637',
 		},
 		{
