@@ -51,8 +51,25 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 								aFeature['Description'] = "<br><i>Variant type:</i> " + features[resNum][aaChange]['vartype'];
 								aFeature['Description'] = aFeature['Description'] + "<br><i>Variant class:</i> " + features[resNum][aaChange]['varClass'];
 								aFeature['Description'] = aFeature['Description'] + "<br><i>Diseases:</i> " + features[resNum][aaChange]['diseases'];
-								aFeature['Description'] =  aFeature['Description'] + "<br><i>Mutation family:</i> " + features[resNum][aaChange]['mutfam'];
-									aFeature['Description'] =  aFeature['Description'] + "<br><i>Cancer types:</i> " + features[resNum][aaChange]['cancerType'];
+								// aFeature['Description'] =  aFeature['Description'] + "<br><i>Mutation family:</i> " + features[resNum][aaChange]['mutfam'];
+								aFeature['Description'] =  aFeature['Description'] + "<br><i>Cancer types (Is FunFam domain enriched):</i> ";
+
+								features[resNum][aaChange]['cancerType'].forEach(function(aCancerType, aCancerType_i){
+									aFeature['Description'] = aFeature['Description'] + aCancerType;
+
+									if (aCancerType_i < features[resNum][aaChange]['cancerType'].length -1){
+										aFeature['Description'] = aFeature['Description'] + ", ";
+									}
+								});
+								aFeature['Description'] = aFeature['Description'] + "<br><i> FunFams (v4_2_0):</i> ";
+								features[resNum][aaChange]['funfam_id'].forEach(function(afunfam, afunfam_i){
+									aFeature['Description'] = aFeature['Description'] + afunfam;
+
+									if (afunfam_i < features[resNum][aaChange]['funfam_id'].length -1){
+										aFeature['Description'] = aFeature['Description'] + ", ";
+									}
+								});
+
 
 								arr_feats.push(aFeature)
 							}
@@ -189,6 +206,7 @@ function addAnObjIfNotPresent(featsAsDict, anFunVarItem){
 			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['diseases'] = [];
 			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['mutfam'] = [];
 			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['cancerType'] = [];
+			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['funfam_id'] = [];
 		}
 
 		if (!featsAsDict[resPos][anFunVarItem['vm_aa_change']]['vartype'].includes(anFunVarItem['variant_type'])){
@@ -203,16 +221,28 @@ function addAnObjIfNotPresent(featsAsDict, anFunVarItem){
 			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['diseases'].push(anFunVarItem['diseases']);
 		}
 
+		/*
 		if (!featsAsDict[resPos][anFunVarItem['vm_aa_change']]['mutfam'].includes(anFunVarItem['mutfam'])){
 			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['mutfam'].push(anFunVarItem['mutfam']);
+		}
+		*/
+
+		if (!featsAsDict[resPos][anFunVarItem['vm_aa_change']]['funfam_id'].includes(anFunVarItem['funfam_id'])){
+			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['funfam_id'].push(anFunVarItem['funfam_id']);
 		}
 
 
 		let cancerTypeVal = anFunVarItem['cancer_type'];
 
+
 		if (CancerTypes.hasOwnProperty(anFunVarItem['cancer_type'])){
 			cancerTypeVal = CancerTypes[anFunVarItem['cancer_type']];
 		}
+
+		if (anFunVarItem.hasOwnProperty('mutfam')){
+			cancerTypeVal = cancerTypeVal + " (" + anFunVarItem['mutfam'] + ")";
+		}
+
 		if (!featsAsDict[resPos][anFunVarItem['vm_aa_change']]['cancerType'].includes(cancerTypeVal)){
 			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['cancerType'].push(cancerTypeVal);
 		}
