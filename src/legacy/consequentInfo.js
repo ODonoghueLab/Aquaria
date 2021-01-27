@@ -245,17 +245,26 @@ function getConsInfo(featStr){
 	// Frame shift
 	else if (featStr.match(/[fF][sS]/)){
 		let resPos = getResPos_simple(featStr);
-		newResidues[resPos] = {};
+		let thePos = resPos + "-" + AQUARIA.showMatchingStructures.sequence.length;
+		newResidues[thePos] = {};
 		// resPositions.push(resPos);
 
 
 		consequentStr = consequentStr + "Frame shift ";
-		if (featStr.match(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss]/)){ //[a-zA-Z0-9\*\?]+$/)){
+		if (featStr.match(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss]([Tt][eE][rR]|\*)[0-9]+$/)){ //[a-zA-Z0-9\*\?]+$/)){
 			// extract new amino acid;
+			let terPos = getTerminatingPos_fs(featStr);
+			consequentStr = consequentStr + " terminating at position " + terPos;
 			let res = getFirstNewRes_ext(featStr, isOne);
-			addToObj(newResidues[resPos], 'newAas', res.firstRes);
+			addToObj(newResidues[thePos], 'newAas', res.firstRes);
 		}
-		newResidues[resPos]['consStr'] = consequentStr;
+		else if (featStr.match(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss]\*\?/)){
+			consequentStr = consequentStr + " no terminating codon encountered."
+
+			let res = getFirstNewRes_ext(featStr, isOne);
+			addToObj(newResidues[thePos], 'newAas', res.firstRes);
+		}
+		newResidues[thePos]['consStr'] = consequentStr;
 	}
 
 	// Extension
@@ -390,6 +399,12 @@ function getConsInfo(featStr){
 }
 
 ///////////////////////////////////// AUX
+function getTerminatingPos_fs(featStr){
+	let terPos = featStr.replace(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss]([Tt][eE][rR]|\*)/, '');
+
+	return terPos;
+}
+
 
 function getTheRange(featStr){
 	let tmpStr = featStr.replace(/[dD][eE][lL][iI][nN][sS].*$/, '');

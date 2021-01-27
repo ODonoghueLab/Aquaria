@@ -72,8 +72,8 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 									}
 								});
 
-								checkIfValInSnpResAndAdd(resNum, resNum, variantResidues, 'All variants', aFeature['Name']+";"+aFeature['Description'], 'FunVar', variantResFeats);
-								
+								checkIfValInSnpResAndAdd(resNum, resNum, variantResidues, 'All variants', aFeature['Name']+"|"+aFeature['Description'], 'FunVar', variantResFeats);
+
 								arr_feats.push(aFeature)
 							}
 						}

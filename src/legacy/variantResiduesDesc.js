@@ -269,7 +269,7 @@ function cleanData_pp(desc, varInfo){
 
 function cleanData_funVar(desc, newAas, varInfo, otherResInfo){
 
-	let arr = desc.split(/\;/);
+	let arr = desc.split(/\|/);
 	let arr_aa = arr[0].split(/\>/);
 
 	if (arr_aa.length > 1){
@@ -277,18 +277,19 @@ function cleanData_funVar(desc, newAas, varInfo, otherResInfo){
 		let aaChange = arr[0].replace(/\>/, "&#8594;");
 		let arr_desc = arr[1].split("<br>");
 
-
+		console.log("The arr_desc is " + arr_desc);
 
 		let isFoundInNewAas = false;
 		newAas.forEach(function(newAa, newAa_i){
 			if (arr_aa[1] == newAa){
+				
 				varInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
 				isFoundInNewAas = true;
 			}
 		});
 
 		if (isFoundInNewAas == false){
-				otherResInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]); 
+				otherResInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
 		}
 
 	}
@@ -349,14 +350,16 @@ function cleanData_uniprot_seqVar(desc, newAas, varInfo, otherResInfo, posInfo){
 	let arr = desc.split(/[\s]+/);
 	if (arr[1] == '&#8594;'){
 			let isDescPushed = false;
-			newAas.forEach(function(newAa, newAa_i){
-					if (oneAaCodes.includes(newAa)){
-							if (arr[2] == newAas[0]){
-								varInfo.push(desc);
-								isDescPushed = true;
-							}
-					}
-			});
+			if (newAas){
+				newAas.forEach(function(newAa, newAa_i){
+						if (oneAaCodes.includes(newAa)){
+								if (arr[2] == newAas[0]){
+									varInfo.push(desc);
+									isDescPushed = true;
+								}
+						}
+				});
+			}
 			if (isDescPushed == false){
 				otherResInfo.push(desc);
 			}
@@ -393,27 +396,30 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas){
 		//console.log ('snap2 desc is 3 ' + arr_indivRes);
 
 
-		newAas.forEach(function(newAa, newAa_i){
-				let isAddingToChange = false;
-				if (oneAaCodes.includes(newAa)){
-						let re = new RegExp("^" + newAa, 'i');
-						for (let i=0; i<arr_indivRes.length; i++){
-								// console.log('snap2 desc is 5 ' + arr[i]);
-								if (arr_indivRes[i].match(re)){
-										let score = arr_indivRes[i].split(/\:/);
-										arr_posInfo.push('Mutation (' + newAa + ') will change function (score=' + score[1] + ')');
-										//console.log("snap2 desc is 4 " + score[1] + " " + arr_indivRes[i]);
-										isAddingToChange = true;
-								}
-								// if (arr[i].toUpperCase().match(/^))
-						}
-						if (isAddingToChange == false){
-							arr_posInfo.push('Mutation (' + newAa + ') will not change function');
-						}
-				}
+		if (newAas){
+			newAas.forEach(function(newAa, newAa_i){
+					let isAddingToChange = false;
+					if (oneAaCodes.includes(newAa)){
+							let re = new RegExp("^" + newAa, 'i');
+							for (let i=0; i<arr_indivRes.length; i++){
+									// console.log('snap2 desc is 5 ' + arr[i]);
+									if (arr_indivRes[i].match(re)){
+											let score = arr_indivRes[i].split(/\:/);
+											arr_posInfo.push('Mutation (' + newAa + ') will change function (score=' + score[1] + ')');
+											//console.log("snap2 desc is 4 " + score[1] + " " + arr_indivRes[i]);
+											isAddingToChange = true;
+									}
+									// if (arr[i].toUpperCase().match(/^))
+							}
+							if (isAddingToChange == false){
+								arr_posInfo.push('Mutation (' + newAa + ') will not change function');
+							}
+					}
 
 
-		});
+			});
+		}
+
 	}
 
 
