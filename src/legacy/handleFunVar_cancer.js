@@ -1,6 +1,8 @@
 var cathFunctions = require('./handleCath.js');
 var funVar_pageLimit = 20;
 
+var checkIfValInSnpResAndAdd = require('./variantResiduesDesc');
+var variantResFeats = ['All variants'];
 
 module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, primary_accession, featureCallback, variantResidues){
 
@@ -70,7 +72,8 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 									}
 								});
 
-
+								checkIfValInSnpResAndAdd(resNum, resNum, variantResidues, 'All variants', aFeature['Name']+";"+aFeature['Description'], 'FunVar', variantResFeats);
+								
 								arr_feats.push(aFeature)
 							}
 						}

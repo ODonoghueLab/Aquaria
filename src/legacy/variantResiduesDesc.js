@@ -111,7 +111,14 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					console.log("The cosmic description is " + description);
 				}
 
+				else if (serverName == 'FunVar'){
+					let varInfo = []; let otherResInfo = [];
 
+					console.log("The funVar description is 111 " + description);
+					cleanData_funVar(description, variantResidues[resSnp].newResidues, varInfo, otherResInfo);
+
+					addToVariantResidues(variantResidues, resSnp, varInfo, [], otherResInfo, 'FunVar')
+				}
 
 
 
@@ -259,6 +266,35 @@ function cleanData_pp(desc, varInfo){
 	// return obj_inFeatType;
 }
 
+
+function cleanData_funVar(desc, newAas, varInfo, otherResInfo){
+
+	let arr = desc.split(/\;/);
+	let arr_aa = arr[0].split(/\>/);
+
+	if (arr_aa.length > 1){
+
+		let aaChange = arr[0].replace(/\>/, "&#8594;");
+		let arr_desc = arr[1].split("<br>");
+
+
+
+		let isFoundInNewAas = false;
+		newAas.forEach(function(newAa, newAa_i){
+			if (arr_aa[1] == newAa){
+				varInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
+				isFoundInNewAas = true;
+			}
+		});
+
+		if (isFoundInNewAas == false){
+				otherResInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]); 
+		}
+
+	}
+}
+
+
 function cleanData_cosmic(desc, newAas, varInfo, posInfo, otherResInfo){
 	let arr = desc.split(/\|/);
 	arr[0] = arr[0].replace(/^p\./, '');
@@ -280,14 +316,17 @@ function cleanData_cosmic(desc, newAas, varInfo, posInfo, otherResInfo){
 		}
 
 		if (newAas){
+			let isFoundInNewAas = false;
 			newAas.forEach(function(newAa, newAa_i){
 				if (cosmic_newAa == newAa){
 					varInfo.push( cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
-				}
-				else {
-					otherResInfo.push(cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
+					isFoundInNewAas = true;
 				}
 			});
+
+			if (isFoundInNewAas == false){
+				otherResInfo.push(cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
+			}
 		}
 
 

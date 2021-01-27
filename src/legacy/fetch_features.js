@@ -811,7 +811,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		if (requestedFeature == 'FunVar'){
 			// console.log("FunVar response is ");
 			// console.log(response);
-			handleFunVar_cancer(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback);
+			handleFunVar_cancer(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
 		}
 
 		if (requestedFeature == 'myVariant.info'){
