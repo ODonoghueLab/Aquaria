@@ -815,7 +815,7 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 
 		if (requestedFeature == 'myVariant.info'){
-			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
+			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
 		}
 
 		// return featuresFromExtServer

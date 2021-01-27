@@ -250,7 +250,7 @@ function getConsInfo(featStr){
 
 
 		consequentStr = consequentStr + "Frame shift ";
-		if (featStr.match(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss][a-zA-Z0-9\*\?]+$/)){
+		if (featStr.match(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss]/)){ //[a-zA-Z0-9\*\?]+$/)){
 			// extract new amino acid;
 			let res = getFirstNewRes_ext(featStr, isOne);
 			addToObj(newResidues[resPos], 'newAas', res.firstRes);
@@ -324,7 +324,7 @@ function getConsInfo(featStr){
 
 
 		consequentStr = consequentStr + 'Unknown consequence ';
-		addToObj(newResidues[resPos], 'newAas', 'X');
+		addToObj(newResidues[resPos], 'newAas', '?');
 		newResidues[resPos]['consStr'] = consequentStr;
 	}
 	// Substitution - uncertain
@@ -472,7 +472,7 @@ function getNewRes(featStr){
 
 	let oldAa = checkIfInKey_ig(newResStr[0]);
 	if (oldAa != '-'){
-		newResStr[0] = oldAa; 
+		newResStr[0] = oldAa;
 	}
 
 	let newAa = checkIfInKey_ig(newResStr[1]);

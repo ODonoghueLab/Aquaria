@@ -1,8 +1,8 @@
 var checkIfValInSnpResAndAdd = require('./variantResiduesDesc');
-
+var variantResFeats = ['All variants'];
 module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, primary_accession, featureCallback, variantResidues){
-		console.log("The Cosmic geneInfoObj");
-		console.log(geneInfoObj);
+		//console.log("The Cosmic geneInfoObj");
+		//console.log(geneInfoObj);
 
 		let featuresObj = {};
 
@@ -57,8 +57,8 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 							});
 
 							Promise.all(promises_processing).then(function(){
-								console.log("Now the cosmicData is ");
-								console.log(cosmicData);
+								//console.log("Now the cosmicData is ");
+								//console.log(cosmicData);
 								resolve();
 							})
 
@@ -70,14 +70,14 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 					rmSyn(cosmicData);
 				})
 				.then(function(){
-					console.log("Cosmic now convert to featureObj and handle feature lengths");
-					convertToAquariaObj(cosmicData).then(function(features){
+					//console.log("Cosmic now convert to featureObj and handle feature lengths");
+					convertToAquariaObj(cosmicData, variantResidues).then(function(features){
 						featuresObj['All variants'] = {};
 						featuresObj['All variants']['Color'] = '#FF0000';
 						featuresObj['All variants']['Features'] = features;
 
-						console.log("COSMIC over here over here ");
-						console.log(featuresObj);
+						//console.log("COSMIC over here over here ");
+						//console.log(featuresObj);
 						validateAgainstSchema(featuresObj, primary_accession, featureCallback, 'COSMIC');
 					});
 				});
@@ -87,12 +87,13 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 		}
 }
 
-function convertToAquariaObj(cosmicData){
+function convertToAquariaObj(cosmicData, variantResidues){
 	return new Promise(function (resolve, reject){
 		let features = [];
 
 		for (let aMut in cosmicData){
 			for (let effect in cosmicData[aMut]){
+
 
 				let aFeature = {};
 				aFeature['Name'] = aMut;
@@ -100,16 +101,30 @@ function convertToAquariaObj(cosmicData){
 				let theResPos = aMut.replace(/^p\.[^0-9]+/, '');
 				theResPos = theResPos.replace(/[^0-9]+$/, '');
 
-				if (effect.match("stop_gained")){
+				if (effect.match("stop_gained") || effect.match('frameshift_variant') || effect.match('start_lost')){
 					aFeature['Residues'] = [parseInt(theResPos), parseInt(AQUARIA.showMatchingStructures.sequence.length)];
 				}
 				else{
 					aFeature['Residue'] = parseInt(theResPos);
 				}
 
-				aFeature['Description'] = "<i>Effect:</i> " + effect + "<br>" + "<i>Tumor_site(frequency; mut_nt):<i> " + cosmicData[aMut][effect];
+				aFeature['Description'] = "<br><i>Effect:</i> " + effect + "<br>" + "<i>Tumor_site(frequency; mut_nt):</i> ";
+
+				cosmicData[aMut][effect].forEach(function(item, i){
+					aFeature['Description'] = aFeature['Description'] + item
+
+					if (i < cosmicData[aMut][effect].length -1){
+						aFeature['Description'] = aFeature['Description'] + ', '
+					}
+					else {
+						aFeature['Description'] = aFeature['Description'] + '.'
+					}
+				});
+
 
 				features.push(aFeature);
+
+				checkIfValInSnpResAndAdd(parseInt(theResPos), parseInt(theResPos), variantResidues, 'All variants', (aMut+'|'+effect+'|'+cosmicData[aMut][effect]),'COSMIC', variantResFeats);
 			}
 		}
 
@@ -198,7 +213,7 @@ function getMutationPos(snpEffObj, cosmicData){
 			}
 			else {
 					if (snpEffObj['ann'][0].hasOwnProperty('effect')){
-							console.log("The no hgvs_p effect is " + snpEffObj['ann'][0]['effect']);
+							//console.log("The no hgvs_p effect is " + snpEffObj['ann'][0]['effect']);
 					}
 			}
 		}

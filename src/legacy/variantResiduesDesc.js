@@ -1,11 +1,17 @@
 var counter_complete = 0;
 
 module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType, description, serverName, variants_featTypesOfInt){
-	// console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
+
+
 
 	if (variants_featTypesOfInt.includes(featureType)){
+
+
 		Object.keys(variantResidues).forEach(function(resSnp, i){
 			// console.log("The new residue is " + variantResidues[resSnp].newResidue);
+
+
+
 			let pos_mut = resSnp;
 			if (resSnp.match(/\-/)){
 				pos_mut = resSnp.split(/\-/)[0];
@@ -13,6 +19,10 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 
 			if (parseInt(pos_mut) >= parseInt(resStart_pp) && parseInt(pos_mut) <= parseInt(resEnd_pp)){
+
+				if (serverName == 'COSMIC'){
+						console.log("cosmic 3 pass");
+				}
 
 				let obj_featType = {};
 				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
@@ -89,19 +99,21 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 
 				}
-				else if (serverName == 'COSMIC mutations'){
+				else if (serverName == 'COSMIC'){
+
+					let varInfo = []; let posInfo = []; let otherResInfo = [];
+
+					console.log("The newAas are ")
+					console.log(variantResidues[resSnp]);
+					cleanData_cosmic(description, variantResidues[resSnp].newResidues, varInfo, posInfo, otherResInfo);
+
+					addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'COSMIC')
 					console.log("The cosmic description is " + description);
 				}
 
 
 
 
-
-
-
-				console.log("over here! " + serverName);
-
-				console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
 
 
 				/*
@@ -161,6 +173,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 	}
 	*/
 }
+
 
 
 function addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, serverName){
@@ -246,7 +259,44 @@ function cleanData_pp(desc, varInfo){
 	// return obj_inFeatType;
 }
 
+function cleanData_cosmic(desc, newAas, varInfo, posInfo, otherResInfo){
+	let arr = desc.split(/\|/);
+	arr[0] = arr[0].replace(/^p\./, '');
+	arr_aas = arr[0].split(/[0-9]+/);
 
+	console.log("Cosmic 1 " + arr_aas[1]);
+	if (arr_aas.length >= 1 && arr_aas[1] != 'fs'){
+		let cosmic_newAa = arr_aas[1];
+		let cosmic_oldAa = arr_aas[0];
+
+		let val = checkIfInKey_ig(cosmic_newAa);
+		if (val != '-'){
+			cosmic_newAa = val;
+		}
+
+		let val_old= checkIfInKey_ig(cosmic_oldAa);
+		if (val_old != '-'){
+			cosmic_oldAa = val_old;
+		}
+
+		if (newAas){
+			newAas.forEach(function(newAa, newAa_i){
+				if (cosmic_newAa == newAa){
+					varInfo.push( cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
+				}
+				else {
+					otherResInfo.push(cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
+				}
+			});
+		}
+
+
+	}
+	else{
+		posInfo.push(arr[1] + " " + arr[2]);
+	}
+
+}
 
 function cleanData_uniprot_seqVar(desc, newAas, varInfo, otherResInfo, posInfo){
 	// main to show, other residues;
@@ -481,3 +531,56 @@ function getSubstringOfInterest_cath(description){
 }
 
 const oneAaCodes = ['A',	'R',	'N',	'D',	'C',	'Q',	'E',	'G',	'H',	'I',	'L',	'K',	'M',	'F',	'P',	'S',	'T',	'W',	'Y',	'V'];
+
+
+const threeToOneResMap = {
+	Gly: 'G',
+	Ala: 'A',
+	Leu: 'L',
+	Met: 'M',
+	Phe: 'F',
+	Trp: 'W',
+	Lys: 'K',
+	Gln: 'Q',
+	Glu: 'E',
+	Ser: 'S',
+	Pro: 'P',
+	Val: 'V',
+	Ile: 'I',
+	Cys: 'C',
+	Tyr: 'Y',
+	His: 'H',
+	Arg: 'R',
+	Asn: 'N',
+	Asp: 'D',
+	Thr: 'T',
+};
+
+function checkIfInKey_ig(threeLetterCode){
+	let key = Object.keys(threeToOneResMap).find(k => k.toLowerCase() === threeLetterCode.toLowerCase());
+	console.log("The key is " + key);
+	if (key){
+		return (threeToOneResMap[key]);
+	}
+	else {
+		return '-';
+	}
+}
+
+
+function checkIfInVal_ig(oneLetterCode){
+	// let isFound = false;
+	let newRes = '-';
+	Object.keys(threeToOneResMap).forEach(function(item, i){
+		if (threeToOneResMap[item].toLowerCase() === oneLetterCode.toLowerCase()){
+			newRes = oneLetterCode.toUpperCase();
+		}
+	});
+	return newRes;
+    /* for (var prop in threeToOneResMap) {
+        if (threeToOneResMap.hasOwnProperty(prop) && threeToOneResMap[prop].toLowerCase() === oneLetterCode.toLowerCase()) {
+            return threeToOneResMap[prop];
+        }
+    }
+    return '-'; */
+}
