@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - test
     paths-ignore:
       - README.md
       - .editorconfig
@@ -16,13 +17,24 @@ jobs:
     env:
       BUILD_OUTPUT_PATH: dist
       PUBLISH_REPO_PATH: publish
-      PUBLISH_REPO: aqclient/aqclient.github.io
       PUBLISH_BRANCH: gh-pages
-      VUE_APP_AQUARIA_BACKEND: https://aquaria.ws:8012
       VUE_APP_STATIC_SPA_MODE: true
-      AQUARIA_CLIENT_EMIT_CNAME: aquaria.app
+      # production specific settings
+      AQUARIA_CLIENT_EMIT_CNAME_PROD: aquaria.app
+      VUE_APP_AQUARIA_BACKEND_PROD: https://odonoghuelab.org:8011
+      PUBLISH_REPO_PROD: aqclient/aqclient.github.io
+      # test specific settings
+      AQUARIA_CLIENT_EMIT_CNAME_TEST: test.aquaria.app
+      VUE_APP_AQUARIA_BACKEND_TEST: https://odonoghuelab.org:8011
+      PUBLISH_REPO_TEST: aqclient/test.aqclient.github.io
 
     steps:
+    - name: Configure environment (production)
+      run: |
+        echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_PROD" >> $GITHUB_ENV
+        echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_PROD" >> $GITHUB_ENV
+        echo "PUBLISH_REPO=$PUBLISH_REPO_PROD" >> $GITHUB_ENV
+
     - name: Checkout source repo
       uses: actions/checkout@v2
 
@@ -40,7 +52,6 @@ jobs:
       run: |
         git rm -rf .
         git clean -fxd
-
     - name: Set up Node.js
       uses: actions/setup-node@v1
       with:
@@ -57,7 +68,6 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-
     - name: Install dependencies
       run: npm install
 
@@ -82,7 +92,6 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git commit -m "Deploy $GITHUB_SHA"
-
     - name: Deploy to Pages
       if: steps.check_changes.outputs.changed
       uses: ad-m/github-push-action@v0.6.0

@@ -1,20 +1,42 @@
 <template>
-  <span class="content toggled" id="vis"></span>
+  <!-- <span class="content toggled" id="vis"> -->
+  <span id="vis">
+    <div id='allclusters' data-intro='Visual summary of all structures in PDB matching the specified protein, grouped by region of match.' data-position='left'></div>
+  </span>
 </template>
 
 <script>
+// import * as ShowMatch from '../legacy/show_matching_structures'
 export default {
-  name: 'MatchingStructures'
+  name: 'MatchingStructures',
+  data () {
+    return {
+      clusters: window.AQUARIA.structures2match.clusters
+    }
+  }
+  // mounted () {
+  //   const ShowMatchingStructures = new ShowMatch()
+  //   ShowMatchingStructures.drawAxisRuler('vis')
+  // }
 }
 </script>
 
 <style>
- #vis {
+ /* #vis {
     min-height: 200px;
     padding: 2px;
     position: relative;
+  } */
+  #vis{
+    max-height: 40vh;
+    overflow: scroll;
+    /* margin-bottom: -54px; */
+    margin-bottom: -200px;
+    width: 100vw;
   }
-
+  div.ruler {
+    margin-left: 40px;
+  }
   .outer_container{
     display: inline-flex;
   }
@@ -279,8 +301,8 @@ export default {
   }
 
   div.expansion {
-    position: relative;
-    width: 400px;
+    position: absolute;
+    width: 0px;
     z-index: 102;
   }
 
@@ -309,7 +331,7 @@ export default {
     z-index: 90;
   }
 
-  div.dimmer {
+  /* div.dimmer {
     background: #5E5E5E ;
     height: 100%;
     position: fixed;
@@ -319,7 +341,7 @@ export default {
     -moz-opacity: 0.68;
     width: 100%;
     z-index: 3;
-  }
+  } */
 
   div.panel span.help {
     display: inline-block;

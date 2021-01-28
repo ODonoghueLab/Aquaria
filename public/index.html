@@ -22,29 +22,6 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet"> 
     <title>Aquaria: Simplifying insight from protein structures</title>
-    <script>
-      function getUrlParameter (sParam) {
-        if (window.location.search.length > 0) {
-          var sPageURL = window.location.search.substring(1) // no .toLowerCase() here (this affects the value!)
-          var sURLVariables = sPageURL.split('&')
-          sParam = sParam.toLowerCase()
-          for (var i = 0; i < sURLVariables.length; i++) {
-            var sParameterName = sURLVariables[i].split('=')
-            if (sParameterName[0].toLowerCase() === sParam) {
-              return decodeURIComponent(sParameterName[1]) // the value might have been encoded
-            }
-          }
-        }
-        return null
-      }
-      var persist = getUrlParameter('persist')
-      var viewer = getUrlParameter('viewer')
-      if (viewer && persist) {
-        localStorage.setItem('3DViewer', viewer)
-      }
-      window.threedViewer = (viewer || localStorage.getItem('3DViewer') || 'Jolecule')
-      window.threedViewer = window.threedViewer.toLowerCase()
-    </script>
   </head>
 
   <body id="home">

@@ -21,7 +21,6 @@ var show_expanded_cluster = require('./show_expanded_clusters');
 var d3 = require('d3');
 var axios = require('axios');
 var resize_app = require('./resize_app');
-var screenshot = require('./screenshot');
 
 require('./utilities');
 
@@ -36,6 +35,12 @@ var MAX_PROTEIN_HISTORY = 5;
     proteinSubmitListeners.push(listener);
   };
 
+  AQUARIA.overlay = function(){
+    var elemDiv = document.createElement('div')
+    elemDiv.className = 'dimmer'
+    document.body.append(elemDiv)
+  }
+
   AQUARIA.fireProteinSubmitListeners = function(proteinName, primary_accession, pdb_id) {
     proteinSubmitListeners.forEach(function(listener) {
       listener.submitFired(proteinName, primary_accession, pdb_id);
@@ -43,8 +48,8 @@ var MAX_PROTEIN_HISTORY = 5;
     });
   };
 
-  var proteinTopTen = new TopTen("protein_top_ten", MAX_PROTEIN_HISTORY);
-  addProteinSubmitListener(proteinTopTen);
+  AQUARIA.proteinTopTen = new TopTen("protein_top_ten", MAX_PROTEIN_HISTORY);
+  addProteinSubmitListener(AQUARIA.proteinTopTen);
 
 
   // Moved 2D structure rendering to separate file (show_matching_structures.js)
@@ -62,58 +67,6 @@ var MAX_PROTEIN_HISTORY = 5;
     console = {
       log: function() {}
     };
-/*
-  try {
-    function cache() {
-      var cache = {};
-      var last_access = {};
-      var value;
-      var size;
-      var maximum_cache_size = 10;
-      var oldest_key;
-      var oldest_date;
-
-      return function(key, callback) {
-        last_access[key] = Date();
-
-        if (key in cache && cache[key]) {
-          // use cached value if available
-          ///console.log('Read ' + key + ' from cache');
-          return cache[key];
-        } else {
-          // get new value if not in cache
-          value = callback(key);
-
-          // store in cache
-          cache[key] = value;
-          ///console.log('AQUARIA.constructor stored ' + key + ' in cache (size = ' + size + ')');
-
-          // if cache size is too large, remove oldest key
-          size = Object.keys(cache).length;
-          if (size > maximum_cache_size) {
-            // find and delete oldest key
-            oldest_date = last_access[key];
-            for (key in cache) {
-              ///console.log('AQUARIA.constructor checking key = ' + key);
-              if (last_access[key] <= oldest_date) {
-                ///console.log('AQUARIA.constructor key is older: ' + last_access[key]);
-                oldest_key = key;
-                oldest_date = last_access[key];
-              }
-            }
-            ///console.log('AQUARIA.constructor final oldest key = ' + oldest_key);
-            delete cache[oldest_key];
-            delete last_access[oldest_key];
-            ///console.log('AQUARIA.constructor deleted ' + oldest_key + ' from cache');
-          }
-          return value;
-        }
-      }
-    }
-  } catch (error) {
-    alert('AQUARIA.constructor error with cache(): ' + error.message);
-  }
-  */
 
   //
   // Display best structure (in 3D) and matching structures (in 2D)
@@ -122,7 +75,6 @@ var MAX_PROTEIN_HISTORY = 5;
   try {
     // Display 3D structure
     window.aquariaReady = function() {};
-
     var switcherText = '';
     if (window.threedViewer === 'applet') {
       switcherText = 'simple';
@@ -182,14 +134,16 @@ var MAX_PROTEIN_HISTORY = 5;
       var sequences = data.sequences;
       var transform = assert_orientation(data.transforms[0]);
       var common_names = data.common_names;
-      var biounits = data.biounits;
       var source_primary_accession = data.source_primary_accession;
       var conservations = data.conservations;
-      if (! biounits || biounits < 1) {
+      ///console.log("(biounits, currentBiounit) = (" + biounits + ", " + currentBiounit + ")");
+      if (! data.biounits || data.biounits < 1) {
         // if the database PDB table has biounit = 0 or undefined
         currentBiounit = 0
       }
-      ///console.log("(biounits, currentBiounit) = (" + biounits + ", " + currentBiounit + ")");
+      else{
+        currentBiounit = data.biounits
+      }
 
       if (pdb_id.match(/^\d\w\w\w$/)) {
         var threeDWidth = $("#threeD").width();
@@ -201,10 +155,6 @@ var MAX_PROTEIN_HISTORY = 5;
         // $("#threeD").html('');
         ///console.log('display_3D_structure: currentBiounit =' + currentBiounit + "\n" + 'And biounits =' + biounits)
 
-        var attributes = AQUARIA.panel3d.generateAttributes(threeDWidth, threeDHeight,
-          pdb_id, pdb_chain, currentBiounit, source_primary_accession,
-          sequences, common_names, alignment, '', transform, conservations, AQUARIA.structures2match.version_string);
-
         ///console.log('AQUARIA.display_3D_structure', AQUARIA.structures2match.Selected_PDB, pdb_id, pdb_chain[0], attributes)
 
         //ABOUT PDB PANEL
@@ -214,8 +164,20 @@ var MAX_PROTEIN_HISTORY = 5;
           url: url,
         })
         .then(function (response) {
+
           var pdbData = response.data[0]
-          if (biounits > 0 && typeof pdbData.Experimental_Method !== 'undefined' && pdbData.Experimental_Method !== null && pdbData.Experimental_Method.toLowerCase().indexOf('x-ray') > -1) {
+          var biounits = pdbData.Biounits;
+          if (! biounits || biounits < 1) {
+            // if the database PDB table has biounit = 0 or undefined
+            currentBiounit = 0
+            pdbData.Biounits = 0;
+          }
+
+          if (biounits > 0 && typeof pdbData.experimental_method !== 'undefined' && pdbData.experimental_method !== null && pdbData.experimental_method.toLowerCase().indexOf('x-ray') > -1) {
+            if(member){
+              currentBiounit = 1
+              textpanel.updatePDBPanel(pdbData, common_names[0], member.alignment_identity_score);
+            }
             if (currentBiounit > biounits) {
               currentBiounit = 0;
             } else if (currentBiounit < 0) {
@@ -225,8 +187,9 @@ var MAX_PROTEIN_HISTORY = 5;
               $('#biounitType').text('Asymmetric Unit');
               $('#biounitCount').hide();
             } else {
-              $('#biounitType').text('Biological Assembly');
+              $('#biounitType').text('Biological Assembly ');
               if (biounits > 1) {
+                $('#biounitCount').show();
               } else {
                 $('#biounitCount').hide();
               }
@@ -246,43 +209,35 @@ var MAX_PROTEIN_HISTORY = 5;
               $('#biounitLeft').hide();
             }
           } else {
+            if(pdbData){
+              textpanel.updatePDBPanel(pdbData, common_names[0], member.alignment_identity_score);
+            }
             $("#biounitDisplay").hide();
             currentBiounit = 0;
           }
           AQUARIA.pdb_data = pdbData;
-          if(pdbData){
-            textpanel.updatePDBPanel(pdbData, common_names[0], member.alignment_identity_score);
-          }
-          else { console.log("textpanels.updatePDBPanel error: PDBData not available"); }
+          // if(pdbData){
+          //   textpanel.updatePDBPanel(pdbData, common_names[0], member.alignment_identity_score);
+          // }
+          // else { console.log("textpanels.updatePDBPanel error: PDBData not available"); }
 
           //deselect feature tracks that may still be active
           d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
           d3.selectAll("svg.loaded").classed("loaded", false);
-        });
 
+        var attributes = AQUARIA.panel3d.generateAttributes(threeDWidth, threeDHeight,
+          pdb_id, pdb_chain, currentBiounit, source_primary_accession,
+          sequences, common_names, alignment, '', transform, conservations, AQUARIA.structures2match.version_string);
         $("#jnlp_app_attributes").val(JSON.stringify(attributes));
 
-        // $("#launchJalviewLink").click(function () {
-        // console.log("Jalview on click executed: " +
-        // top.frames['jalViewFrame'].loadJalviewApplet);
-        // top.frames['jalViewFrame'].loadJalviewApplet(primary_accession,
-        // attributes.pdb_id, uniprot_sequence, attributes.instanceId);
-        // });
         if (window.hide3DViewer) {
           AQUARIA.panel3d.blankApplet(true, "Applet is not enabled for this browser. Launch Application instead.");
-          // AQUARIA.remote.createAppJNLP(attributes, function(jnlpLink) {
-          //   $(".launchApplicationLink").attr('href', jnlpLink);
-          //   $("#waitingFrame").contents().find(".launchApplicationLink").attr('href', jnlpLink);
-          // });
 
         } else {
-          // AQUARIA.remote.createAppJNLP(attributes, function(jnlpLink) {
-          //   $(".launchApplicationLink").attr('href', jnlpLink);
-          // });
 
           var interactive = attributes['interactive'] ? '/' +
             attributes['interactive'] : '';
-          var urlParams = window.location.search;
+          var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length);
           history.pushState(null, sequences[0].primary_accession,
             window.location.protocol + '//' + window.location.host +
             "/" + sequences[0].primary_accession + "/" +
@@ -308,11 +263,10 @@ var MAX_PROTEIN_HISTORY = 5;
           //					});
           //					delete attributes['interactive'];
         }
-
+      });
       } else {
         console.log("AQUARIA.display_3D_structure Error: Invalid PDB identifier");
       }
-
     };
 
     AQUARIA.display_features = function(sequences) {
@@ -366,137 +320,6 @@ var MAX_PROTEIN_HISTORY = 5;
       featurelist.updateFeatureTabTitle(protein_name);
     };
 
-    //updates the 3D viewer title
-    // this is a hack and requires the function to be called once before the proper HTML code is being generated.
-    //TODO move html code to home_page.ejs?
-    AQUARIA.update3DTitle = function(accession, pdbId, chainId, molecule_name, score) {
-
-      if (chainId && molecule_name) {
-
-        var short_name = molecule_name;
-        if (short_name.indexOf("(") != -1) {
-          short_name = molecule_name.substring(0, molecule_name.indexOf("(")).trim();
-        }
-
-        AQUARIA.short_molecule_name = short_name;
-
-        if (accession && pdbId && score) {
-          $("#structureviewerexplanation").html("<a id='accession_link' href='https://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name +
-            "</a> sequence aligned onto <a href='/" + accession + "' title='View the structure for " + short_name + " in Aquaria'>" + short_name +
-            "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" + chainId + "</a> (" + score +
-            "% sequence identity)&nbsp;&nbsp;<a href='javascript:;'  data-intro='Model Quality' data-position='top'><span id='help3D' class='help roundButton'>&nbsp;</span></a>");
-
-          var evalue = AQUARIA.currentMember.E_value; // e-value from pssh2
-          $("#help3D").show().parent().attr("onmouseenter", "AQUARIA.explainTitle('" + accession + "','" + AQUARIA.preferred_protein_name + "','" + short_name + "','" + pdbId + "','" + chainId +
-            "','" + score + "','" + evalue + "');");
-        } else { // DNA or RNA (no accession)
-          $("#structureviewerexplanation").html(short_name + "</a> structure from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId + "' title='Go to PDB'>PDB " + pdbId + "-" +
-            chainId + "</a> (" + score + "% sequence identity)");
-        }
-
-      } else {
-
-        $("#accession_link").text(AQUARIA.preferred_protein_name);
-        //$("#help3D").hide();
-
-      }
-
-
-    };
-
-    AQUARIA.explainTitle = function(accession, uniprotName, pdbName, pdbId, chainId, score, evalue) {
-      var precisiontxt, quality, qualClass, Log10E, evalueString;
-      Log10E = -Math.log(evalue) / Math.LN10;
-      var precision = (BioScience_PlantDisease_Weibull_model(Log10E) * 100);
-      precision = Math.round(precision);
-      ///console.log("AQUARIA.explainTitle -Log10e: " + Log10E + " precision: " + precision);
-      evalueString = evalue.replace(/e(.*)$/, " &times <nobr>10<sup>$1</sup></nobr>");
-      if (evalue == 0 && precision == 1) {
-        precisiontxt = "close to 100";
-      } else {
-        precisiontxt = "&#8805; " + precision;
-      }
-      if (evalue > 10E-72) {
-        quality = "in the twilight zone";
-        qualClass = "twilight";
-      } else {
-        quality = "high quality";
-        qualClass = "high";
-      }
-      var msgTxt = "<p>What you see in the 3D viewer is the experimentally-determined structure of " + pdbName + " from <a href='http://www.rcsb.org/pdb/explore.do?structureId=" + pdbId +
-        "' target='_blank'>PDB entry " + pdbId + "</a>, chain " + chainId + ".</p>";
-      msgTxt += "<p>The full-length sequence of the protein you specified (" + uniprotName + ") has been aligned onto the sequence used to determine this PDB structure.</p>";
-      msgTxt += "Overall, the two sequences align with " + score + "% identity; any amino acid substitutions are indicated using dark coloring (see legend).</p>";
-      msgTxt += "<p class='quality " + qualClass + "'>This alignment has an HHblits E-value of " + evalueString + ", which is considered to be " + quality +
-        ". Based on cross-validation, the likelihood that your specified protein (" + uniprotName + ") adopts a structure similar to that shown is estimated to be " + precisiontxt + "%.</p>";
-      msgTxt += "<p>Note that the structure shown is taken directly from the PDB; it has not been derived by ab-initio or comparative modeling.</p>";
-      showBubble(msgTxt);
-    };
-
-    // To the best of my knowledge this code is correct.
-    // If you find any errors or problems please contact
-    // me directly using zunzun@zunzun.com.
-    //
-    //		      James
-
-    function BioScience_PlantDisease_Weibull_model(x_in) {
-      var temp;
-      temp = 0.0;
-
-      // coefficients
-      var a = -2.9039350989124828E+00;
-      var b = 7.9846661459228132E+00;
-      var c = 4.4780238831200248E-01;
-
-      temp = 1.0 - Math.exp(-1.0 * Math.pow((x_in - a) / b, c));
-      return temp;
-    }
-
-
-    function showBubble(msgHtml) {
-
-      $('body').append('<div class="dimmer" style="opacity: 0.08; -moz-opacity: 0.08;"></div>');
-      $("span#help3D.roundButton").css("background-position", "0 -21px");
-      $("div.dimmer").on("click", function() {
-        $("div.popup, div.dimmer").fadeOut().remove();
-        $("span#help3D.roundButton").css("background-position", "0 0");
-      });
-
-      var balloon = "<div class='balloon'><h3>3D View Explained<span class='x'>&nbsp;</span></h3>";
-
-      balloon = balloon + msgHtml + "</div>";
-      d3.select("body")
-        .append("div")
-        .attr("class", "popup top")
-        .html(balloon);
-
-      var popheight = $("div.popup").innerHeight();
-
-      var fpos = $("#help3D").offset();
-
-      var bleft = parseInt(fpos.left - 230);
-      var btop = parseInt(fpos.top + 30);
-
-      $("div.popup").css({
-        "left": bleft + "px",
-        "top": btop + "px"
-      }).draggable().fadeIn(600);
-
-
-      $("span.x").click(function() {
-        $("div.popup, div.dimmer").fadeOut().remove();
-        $("span#help3D.roundButton").css("background-position", "0 0");
-      });
-      /*
-      $("div.popup").hover(function() {
-      	clearTimeout(s);
-      }, function() {
-      	s = setTimeout(function() {
-      		$("div.popup").fadeOut();
-      	}, 500);
-      });
-      */
-    }
 
     AQUARIA.refresh = function() {
       if (typeof AQUARIA.showMatchingStructures !== 'undefined') {
@@ -525,15 +348,18 @@ var MAX_PROTEIN_HISTORY = 5;
       AQUARIA.blankPanel("#aboutPDB", true);
       //AQUARIA.blankPanel("#uniProtDesc", true);
       // member["sequence"] = sequence["sequence"];
-      var params = {
-        sequence: sequence,
-        member: this.member
-      }
+
+      var loadRequest = {
+        selector: [sequence.primary_accession],
+        selectPDB: this.member.pdb_id,
+        selectChain: this.member.pdb_chain[0]
+      };
+
       var url = `${window.BACKEND}/get_3D_alignment`;
         axios({
-          method: 'post',
+          method: 'get',
           url: url,
-          data: params
+          params: loadRequest
         })
         .then(function (response) {
           let newData = response.data
@@ -598,6 +424,7 @@ var MAX_PROTEIN_HISTORY = 5;
         ///console.log('AQUARIA.sequenceCallback update Uniprot')
         textpanel.updateUniprotInfo(sequences[0]);
         ///console.log('AQUARIA.sequenceCallback display features')
+        AQUARIA.addedFeature = false;
         AQUARIA.display_features(sequences);
       } else {
         ///console.log('AQUARIA.sequenceCallback error: received old data for sequence callback: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
@@ -618,6 +445,7 @@ var MAX_PROTEIN_HISTORY = 5;
       } else {
         ///console.log('AQUARIA.clusterCallback error: received old data for cluster callback: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
       }
+      // AQUARIA.showMatchingStructures.showMap(newClusters[0])
     };
 
 
@@ -647,13 +475,13 @@ var MAX_PROTEIN_HISTORY = 5;
       return show_expanded_cluster.expand_cluster(d, cluster, AQUARIA.structures2match.sequences[0]);
     };
 
-    var loadAndUpdateHistory = function() {
-      uniprot_accession = [];
-      uniprot_accession.push(accessionObject.Accession);
+    // var loadAndUpdateHistory = function() {
+    //   uniprot_accession = [];
+    //   uniprot_accession.push(accessionObject.Accession);
 
-      AQUARIA.loadAccession(uniprot_accession, null, null, false, uniprot_accession);
+    //   AQUARIA.loadAccession(uniprot_accession, null, null, false, uniprot_accession);
 
-    }
+    // }
 
     AQUARIA.loadAccession = function(primary_accession, autoSelectPDB,
       autoSelectChain, skip3DView, preferredProteinName) {
@@ -677,10 +505,16 @@ var MAX_PROTEIN_HISTORY = 5;
       ///console.log('AQUARIA.loadAccession load', primary_accession)
 
       pdbParam = autoSelectPDB ? "/" + autoSelectPDB : "";
-      var urlParams = window.location.search;
-      history.pushState(primary_accession, document.title, '/' +
+      chainParam = autoSelectChain ? "/" + autoSelectChain : "";
+      var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length);
+      if(AQUARIA.orgName){
+        history.pushState(primary_accession, document.title, '/' +
+        AQUARIA.orgName + '/' + AQUARIA.gene + pdbParam + chainParam + urlParams);
+      }
+      else{
+        history.pushState(primary_accession, document.title, '/' +
         primary_accession + pdbParam + urlParams);
-
+      }
 
       AQUARIA.blankPanel("#vis", true);
       AQUARIA.blankPanel("#uniProtDesc", true);
@@ -711,9 +545,9 @@ var MAX_PROTEIN_HISTORY = 5;
       // cache_matching_structures(primary_accession, function(primary_accession) {
         var url = `${window.BACKEND}/get_matching_structures`
           axios({
-            method: 'post',
+            method: 'get',
             url: url,
-            data: loadRequest
+            params: loadRequest
           })
           .then(function (response) {
             let matches = response.data
@@ -751,7 +585,6 @@ var MAX_PROTEIN_HISTORY = 5;
               var cluster = AQUARIA.structures2match.clusters[clusterNumber];
               AQUARIA.showMatchingStructures.selectCluster(cluster,
                 clusterNumber);
-
               if (!skip3DView) {
                 if (window.threedView === 'IDR') {
                   var threeDWidth = $("#threeD").width();
@@ -764,7 +597,7 @@ var MAX_PROTEIN_HISTORY = 5;
                 }
                 AQUARIA.display_member();
               }
-
+              AQUARIA.showMatchingStructures.drawCoverageMap(cluster)
             }
           } else {
             ///console.log('AQUARIA.loadAccession error: received old data for Best PDB: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
@@ -786,34 +619,34 @@ var MAX_PROTEIN_HISTORY = 5;
 
   AQUARIA.initialisePanels = function(hasUrl) {
 
-    hasUrl = (typeof hasUrl === 'undefined') ? false : hasUrl;
+    // hasUrl = (typeof hasUrl === 'undefined') ? false : hasUrl;
 
-    // expand and collapse UI panels
-    $("div.panel.collapsible h3").click(function() {
-      $(this).next("span").slideToggle(300);
-      $(this).parent().toggleClass("closed");
-    });
-    // search tabs
-    $("#tabs").tabs({
-      active: 0
-    }).buttonset();
+    // // expand and collapse UI panels
+    // $("div.panel.collapsible h3").click(function() {
+    //   $(this).next("span").slideToggle(300);
+    //   $(this).parent().toggleClass("closed");
+    // });
+    // // search tabs
+    // $("#tabs").tabs({
+    //   active: 0
+    // }).buttonset();
 
-    // structures/interactions/features
-    $("h3.sub").click(function() {
-      var panel = $(this).attr("rel"); // console.log("turning on
-      // "+panel);
-      $("h3.sub").addClass("inactive");
-      $(this).toggleClass("inactive");
-      $(".toggled").hide();
-      $("#" + panel + ".toggled").toggle();
-    });
-    // highlight percentage sequence identity when hovering over
-    // matching structure
-    $(".outer_container").hover(function() {
-      $(this).next("text").attr("fill", "#333");
-    }, function() {
-      $(this).next("text").attr("fill", "#777");
-    });
+    // // structures/interactions/features
+    // $("h3.sub").click(function() {
+    //   var panel = $(this).attr("rel"); // console.log("turning on
+    //   // "+panel);
+    //   $("h3.sub").addClass("inactive");
+    //   $(this).toggleClass("inactive");
+    //   $(".toggled").hide();
+    //   $("#" + panel + ".toggled").toggle();
+    // });
+    // // highlight percentage sequence identity when hovering over
+    // // matching structure
+    // $(".outer_container").hover(function() {
+    //   $(this).next("text").attr("fill", "#333");
+    // }, function() {
+    //   $(this).next("text").attr("fill", "#777");
+    // });
 
     // // expand and collapse UI panels
     // $("div.panel.collapsible h3").click(function() {
@@ -842,536 +675,14 @@ var MAX_PROTEIN_HISTORY = 5;
     //   $(this).next("text").attr("fill", "#777");
     // });
 
-    $(".resizable").resizable({
-      handles: "s",
-      distance: 30
-    });
-    //$("div#psyns").html("<p>(example: <a href=\"javascript:fillin('BLK');\">BLK</a> or <a href=\"javascript:fillin('P51451');\">P51451</a>)</p>");
+    // $(".resizable").resizable({
+    //   handles: "s",
+    //   distance: 30
+    // });
 
-    // set preferred organism and synonyms, default to human (9606)
-    // organism_id is used to get synonyms, preferred name is what the user
-    // typed in the search field (e.g. human vs. homo sapiens)
-
-    if (localStorage.organism_id == undefined) {
-      localStorage.organism_id = 9606; // default
-    }
-
-    if (localStorage.preferred_organism_name == undefined) {
-      localStorage.preferred_organism_name = "Human"; // default
-    }
-
-    if (!hasUrl) {
-      // let params = [{
-      //   "organism_id": localStorage.organism_id
-      // }]
-      let url = `${window.BACKEND}/getOrganismSynonyms`;
-        axios({
-          method: 'get',
-          url: url,
-          params: {
-            "organism_id": localStorage.organism_id
-          }
-        })
-        .then(function (response) {
-          let data = response.data
-          textpanel.displayOrgSynonyms(data)
-        })
-      // AQUARIA.remote.getOrganismSynonyms([{
-      //   "organism_id": localStorage.organism_id
-      // }], displayOrgSynonyms);
-    }
-
-    // set up autocomplete for organism names
-    var cache_organism_synonyms = {};
-    $("#organism_syn_input").autocomplete({
-      source: function(request, response) {
-        resize_app.startLogoSpin();
-        var labelValues;
-        var term = request.term;
-        if (term in cache_organism_synonyms) {
-          response(cache_organism_synonyms[term]);
-          return;
-        };
-
-        var url = `${window.BACKEND}/getQueryOrganism/${term}`
-				axios({
-				  method: 'get',
-				  url: url,
-				})
-				.then(function(res) {
-          let data = res.data
-          // AQUARIA.remote.queryOrganism(term,
-          // resize_appstopLogoSpin();
-          if (data.length > 0) {
-
-            labelValues = $.map(data, function(item) {
-              return {
-                label: item.Synonym,
-                value: item.Synonym,
-                id: item.Organism_ID
-              };
-            });
-
-            cache_organism_synonyms[term] = labelValues;
-          } else {
-            labelValues = {
-              label: "No organisms for: " + term,
-              value: 0
-            };
-          }
-          response(labelValues);
-        });
-      },
-      //focus : function() {
-      //AQUARIA.blankAll(true);
-      //},
-      close: function(event, ui) {
-        if (event.handleObj.type === 'menuselect') { // user selected an item
-          // handled in select()
-        } else if (event.handleObj.type === 'keydown' && event.keyCode === $.ui.keyCode.ESCAPE) { // user escaped
-          $(this).val("");
-          AQUARIA.blankAll(false);
-        }
-      },
-      minLength: 1,
-      delay: 100,
-      mustMatch: true,
-      autoFocus: true,
-      // still to add: an 'autoFill function - See
-      // http://www.pengoworks.com/workshop/jquery/autocomplete.htm
-      // focus: function autoFill(event, ui){
-      // if the last user key pressed was backspace, don't
-      // autofill
-      // if( lastKeyPressCode != 8 ){
-      // // fill in the value (keep the case the user has typed)
-      // $input.val($input.val() + sValue.substring(prev.length));
-      // // select the portion of the value not typed by the user
-      // (so the next character will erase)
-      // createSelection(prev.length, ui.item.value.length);
-      // }
-      // };
-      // should use syntax like below
-      // focus: function(event, ui) {
-      // var:
-      // $('#organism_syn_input').val(ui.item.value);
-      // },
-      select: function(event, ui) {
-        if (ui.item.value &&
-          ui.item.value.indexOf("No organisms for: ") !== 0) {
-          if (ui.item.id !== localStorage.organism_id) {
-            let url = `${window.BACKEND}/getOrganismSynonyms`;
-              axios({
-                method: 'get',
-                url: url,
-                params: {
-                  "organism_id": localStorage.organism_id
-                }
-              })
-              .then(function (response) {
-                let orgNames = response.data
-                  localStorage.organism_id = ui.item.id;
-                  localStorage.preferred_organism_name = ui.item.value;
-                  textpanel.displayOrgSynonyms(orgNames);
-              })
-
-            // AQUARIA.remote.getOrganismSynonyms([{
-            //   "organism_id": ui.item.id
-            // }],
-
-
-            AQUARIA.loadAccession(null);
-            $("#protein_syn_input").focus();
-          }
-        } else {
-          event.preventDefault();
-        }
-      }
-    }).on('focus', function() {
-      $("#organism_syn_input").val(localStorage.preferred_organism_name);
-      AQUARIA.blankAll(true, "Please specify an organism.");
-      //					$(this).autocomplete("search");
-      $(this).select();
-    }).on('input', function() {
-      AQUARIA.blankAll(true, "Please specify an organism.");
-    });
-
-    //		$("#organism_syn_input").autocomplete();
-    // set up autocomplete for protein names
-    var cache_protein_synonyms = {};
-
-    /*
-     * //History // get last input from localStorage $(
-     * "#protein_syn_input" ).focus( function(){
-     * $(this).autocomplete({ source: proteinTopTen.getTop(),
-     * minLength:0, delay:0 }) });
-     */
-
-    $.widget("custom.catcomplete", $.ui.autocomplete, {
-      _create: function() {
-        this._super();
-        this.widget().menu("option", "items", "> :not(.ui-autocomplete-category)");
-      },
-      _renderMenu: function(ul, items) {
-        var that = this,
-          currentCategory = "";
-        $.each(items, function(index, item) {
-          var li;
-          if (item.category && item.category != currentCategory) {
-            ul.append("<li class='ui-autocomplete-category'>" + item.category + "</li>");
-            currentCategory = item.category;
-          }
-          li = that._renderItemData(ul, item);
-          if (item.category) {
-            li.attr("aria-label", item.category + " : " + item.label);
-          }
-        });
-      },
-      _renderItem: function(ul, item) {
-        var label = item.label;
-        if (item.suffix) {
-          label += ' <span class="auto_complete_identifier">(' + item.suffix + ")</span>";
-        }
-        return $("<li>")
-          .append("<a>" + label + "</a>")
-          .appendTo(ul)
-      }
-    });
-
-
-    var proteinAutocomplete = $("#protein_syn_input");
-    proteinAutocomplete.catcomplete({
-      source: function(request, response) {
-        var term = request.term;
-        var getLRU = function() {
-          return proteinTopTen.getAll().map(function(item) {
-            return {
-              label: item.name,
-              suffix: item.primary_accession + ", " + item.pdb_id,
-              value: item.name,
-              type: 'LRU',
-              category: 'Recent',
-              id: item.primary_accession + "/" + item.pdb_id
-            }
-          })
-        }
-
-        var callbackData = {
-          names: [],
-          ids: [],
-          pdbIDs: [],
-          LRU: getLRU()
-        }
-
-        var collectResponse = function() {
-          var lruMatches = callbackData.LRU;
-          if (lruMatches.length > 0 && term && term.length > 0) {
-            lruMatches = lruMatches.filter(function(val) {
-              return val.label.toLowerCase().startsWith(term.toLowerCase());
-            });
-          }
-          var showPopup = true;
-          var allValues = lruMatches.concat(callbackData.names).concat(callbackData.ids).concat(callbackData.pdbIDs);
-          if (allValues.length === 0) {
-            if (term && term.length > 0) {
-
-              allValues = [{
-                label: "No structures for: " + term,
-                value: 0
-              }];
-            } else {
-              showPopup = false;
-            }
-          }
-          ///console.log('AQUARIA.proteinAutocomplete received', allValues)
-          cache_protein_synonyms[protein_synonym_plus_organism_id] = allValues;
-          if (showPopup) {
-            response(allValues);
-          }
-
-        }
-
-        ///console.log('AQUARIA.proteinAutocomplete searching "' + term + '"')
-
-        if (term == "") {
-          collectResponse();
-          // History
-          /*
-          		 console.log("focussed: "+proteinTopTen.getTop());
-          		 labelValues = $.map(proteinTopTen.getTop(),
-          		 function (item) { return { label: item.name,
-          		 value: item.name, id: item.primary_accession };
-          		 }); response(labelValues);
-           */
-          //AQUARIA.blankAll(true);
-        } else {
-          resize_app.startLogoSpin();
-          var protein_synonym_plus_organism_id = term + '%' +
-            localStorage.organism_id;
-          if (protein_synonym_plus_organism_id in cache_protein_synonyms) {
-            response(cache_protein_synonyms[protein_synonym_plus_organism_id]);
-            return;
-          };
-
-          var url = `${window.BACKEND}/queryProtein/${term}/${localStorage.organism_id}`;
-          axios({
-            method: 'get',
-            url: url,
-          })
-          .then(function (response) {
-            let data = response.data
-            if(!isNaN(parseInt(term.charAt(0)))){
-              pdbCallback(data)
-            }
-            else{
-              if(data.length > 0){
-                if(data[0].isID == 0){
-                  nameCallback(data)
-                }
-                else{
-                  idCallback(data)
-                }
-              }
-              else{
-                if(data.isID == 0){
-                  nameCallback(data)
-                }
-                else{
-                  idCallback(data)
-                }
-              }
-
-            }
-          //   })
-          })
-          // AQUARIA.remote.queryProtein(term,localStorage.organism_id,
-          var nameCallback = function(nameData) {
-                var labelValues;
-                labelValues = $.map(nameData,
-                  function(item) {
-                    return {
-                      label: item.Synonym,
-                      suffix: null,
-                      value: item.Synonym,
-                      type: 'Synonym',
-                      category: "Names",
-                      id: item.Primary_Accession
-                    };
-                  });
-                labelValues.sort(function(a, b) {
-                  return a.label > b.label ? 1 : -1;
-                });
-                labelValues.reduce(function(previous, current) {
-                  var a = previous;
-                  var b = current;
-                  if (a && a.value === b.value) {
-                    if (a.dup) {} else {
-                      a.suffix = a.id,
-
-                        a.dup = true;
-                    }
-                    if (b.dup) {} else {
-                      b.suffix = b.id,
-                        b.dup = true;
-                    }
-                  }
-                  return current;
-                }, null);
-                callbackData.names = labelValues;
-                collectResponse();
-                resize_app.stopLogoSpin();
-              }
-              var idCallback = function(idData) {
-                var labelValues;
-                labelValues = $.map(idData,
-                  function(item) {
-                    var suffix = item.Source_Field;
-                    if (suffix === 'AC' || suffix === 'ID') {
-                      suffix = 'UniProt';
-                    }
-                    return {
-                      label: item.Synonym,
-                      suffix: suffix,
-                      value: item.Synonym,
-                      type: suffix,
-                      category: "Identifiers",
-                      id: item.Primary_Accession
-                    };
-                  });
-                labelValues.sort(function(a, b) {
-                  return a.label > b.label ? 1 : -1;
-                });
-                //                    labelValues.reduce(function (previous, current) {
-                //                      var a = previous;
-                //                      var b = current;
-                //                      if (a && a.value === b.value) {
-                //                        if (a.dup) {} else {
-                //                          a.suffix = a.id,
-                //
-                //                          a.dup = true;
-                //                        }
-                //                        if (b.dup) {} else {
-                //                          b.suffix = b.id,
-                //                          b.dup = true;
-                //                        }
-                //                      }
-                //                      return current;
-                //                    }, null);
-                callbackData.ids = labelValues;
-                collectResponse();
-                resize_app.stopLogoSpin();
-              }
-              var pdbCallback = function(pdbData) {
-                var labelValues;
-                labelValues = $.map(pdbData,
-                  function(item) {
-                    return {
-                      label: item.Synonym,
-                      suffix: 'PDB',
-                      type: 'PDB',
-                      value: item.Synonym,
-                      category: item.Category,
-                      id: item.Synonym
-                    };
-                  });
-                callbackData.pdbIDs = labelValues;
-                collectResponse();
-                resize_app.stopLogoSpin();
-              };
-        }
-      },
-
-      close: function(event, ui) {
-        if (event.handleObj.type === 'menuselect') { // user selected an item
-          // handled in select()
-        } else if (event.handleObj.type === 'keydown' && event.keyCode === $.ui.keyCode.ESCAPE) { // user escaped
-          $("#organism_syn_input").val("");
-          if (typeof AQUARIA.structures2match.Selected_PDB === 'undefined') { // no structure loaded yet, keep panels blanked
-            AQUARIA.blankAll(true);
-          } else {
-            AQUARIA.blankAll(false);
-          }
-        }
-        $(this).val("");
-      },
-      //focus : function() {
-      //AQUARIA.blankAll(true);
-      //},
-      /*
-      		search : function(event, ui) {
-      			if ($(this).val().length > 0) {
-      				AQUARIA.blankAll(true);
-      			} else {
-      				AQUARIA.blankAll(false);
-      			}
-      		},
-       */
-      minLength: 0,
-      autoFocus: true,
-      delay: 300,
-      // user has selected an item from the autocomplete list
-      select: function(event, ui) {
-        if (ui.item.value &&
-          ui.item.value.indexOf("No structures for: ") !== 0) {
-          var primaryAccession = ui.item.id;
-          var pdb_id = null;
-          if (primaryAccession.indexOf('/') > -1) {
-            var parts = primaryAccession.split('/');
-            primaryAccession = parts[0];
-            pdb_id = parts[1];
-          }
-          if (ui.item.type === 'PDB') {
-            console.log('AQUARIA.proteinAutocomplete.select pdb', ui.item.value);
-            AQUARIA.blankAll(true, "Waiting for data...");
-            var chain = null;
-            var url = `${window.BACKEND}/getAccessionForPDB/${ui.item.value}/${chain}`;
-            axios({
-              method: 'get',
-              url: url,
-            })
-            .then(function (response) {
-              let accessionObject = response.data;
-              AQUARIA.loadAccession([accessionObject.Accession], ui.item.value, null, false, accessionObject.Accession);
-            })
-            // AQUARIA.remote.getAccessionForPDB(ui.item.value, chain, function(accessionObject) {
-            //   AQUARIA.loadAccession([accessionObject.Accession], ui.item.value, null, false, accessionObject.Accession);
-
-            // })
-          } else if (ui.item.id == AQUARIA.protein_primary_accession) {
-
-            if (ui.item.value == AQUARIA.preferred_protein_name) {
-              AQUARIA.blankAll(false);
-              // do nothing
-              return;
-            } else {
-              console.log('AQUARIA.proteinAutocomplete.select same protein, different name', ui.item.value);
-
-              AQUARIA.preferred_protein_name = ui.item.value;
-              // AQUARIA.remote.getProteinSynonyms(AQUARIA.protein_primary_accession, //localStorage.organism_id, displayProtSynonyms, null);
-              var url = `${window.BACKEND}/getProteinSynonyms/${AQUARIA.protein_primary_accession};`
-              axios({
-                method: 'get',
-                url: url,
-              })
-              .then(function (response) {
-                textpanel.displayProtSynonyms(response.data)
-              })
-              AQUARIA.update3DTitle(AQUARIA.structures2match.source_primary_accession,
-                currentData.pdb_id, AQUARIA.currentChain, AQUARIA.molecule_name, AQUARIA.currentMember.alignment_identity_score);
-              AQUARIA.updateDocumentTitle(AQUARIA.currentMember.alignment_identity_score, currentData.pdb_id, AQUARIA.currentChain);
-              featurelist.updateFeatureTabTitle(AQUARIA.preferred_protein_name);
-            }
-          } else {
-            ///console.log('AQUARIA.proteinAutocomplete.select new protein', ui.item.value);
-            AQUARIA.blankAll(true, "Waiting for data...");
-            AQUARIA.loadAccession([primaryAccession], pdb_id, null, false, ui.item.value);
-          }
-
-
-          $("#organism_syn_input").val("");
-          $(this).val("");
-
-
-
-        } else {
-          event.preventDefault();
-        }
-      }
-    }).on('input', function(event) {
-      if ($(this).val().length > 0 || typeof AQUARIA.structures2match.Selected_PDB === 'undefined') {
-        AQUARIA.blankAll(true);
-        $("#organism_syn_input").val(localStorage.preferred_organism_name);
-      } else {
-        AQUARIA.blankAll(false);
-      }
-
-    }).on('focus', function() { // blank on initial focus
-      if ($(this).val().length > 0 || typeof AQUARIA.structures2match.Selected_PDB === 'undefined') {
-        AQUARIA.blankAll(true);
-      }
-      $(this).data('customCatcomplete').search('');
-    });
-
-    //		proteinAutocomplete.on('focus', );
-    if (!hasUrl) {
-      $("#protein_syn_input").focus();
-    }
-
-    // Aquaria page view model
-    /* NOT USED ?
-    var ViewModel = function(protein_syn, organism_syn, organism) {
-    	this.protein_synonym = ko.observable('', {
-    		persist : 'protein_synonym'
-    	});
-    	this.organism_synonym = ko.observable('Human', {
-    		persist : 'organism_synonym'
-    	});
-    	this.organism_id = ko.observable('9606', {
-    		persist : 'organism_id'
-    	});
-    };
-    // ko.applyBindings(new ViewModel()); // This makes Knockout get
-    // to work
-     */
+    // if (!hasUrl) {
+    //   $("#protein_syn_input").focus();
+    // }
 
   }; /* AQUARIA.initialisePanels() */
 
@@ -1398,7 +709,7 @@ var MAX_PROTEIN_HISTORY = 5;
     var uniprot_accession;
     // when 'now' socket is ready, fetch structures if URL specifies
     // a Primary_Accession
-    var pathname = document.URL.split('?')[0];
+    var pathname = document.location.origin + document.location.pathname; // document.URL.split('?')[0];
     if (typeof window.initialParams !== 'undefined') {
       AQUARIA.initialisePanels(true);
       uniprot_accession = [];
@@ -1436,9 +747,47 @@ var MAX_PROTEIN_HISTORY = 5;
       ///console.log('AQUARIA.remoteSuccess inside chain selection');
       AQUARIA.initialisePanels(true);
       AQUARIA.blankAll(true, "Waiting for data...")
-      AQUARIA
-        .loadAccession(uniprot_accession, pdb, chain);
-    } else if (pathname.match(/\/([A-Za-z]+)/)) {
+      AQUARIA.loadAccession(uniprot_accession, pdb, chain);
+    }else if (window.location.pathname) {
+      var accession = [];
+      var orgID;
+      let attr = window.location.pathname.split('/')
+      organism_gene = attr[1] + '/' + attr[2]
+      var url =`${window.BACKEND}/getAccessionbyOrgNameandGene/${attr[1]}/${attr[2]}`
+      axios({
+        method: 'get',
+        url: url,
+      })
+      .then(function (response) {
+        AQUARIA.orgName = attr[1]
+        AQUARIA.gene = attr[2]
+        orgID = response.data[0].orgID
+        accession.push(response.data[0].Primary_Accession)
+        if(attr.length > 4){
+          if(attr[3].match(/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])/)){
+            pdb = attr[3]
+          }
+          if(attr[4].match(/([a-zA-Z,0-9])?$/)){
+            chain = attr[4]
+          }
+          AQUARIA.initialisePanels(true);
+          AQUARIA.loadAccession(accession, pdb, chain);
+        }
+        else if(attr.length > 3){
+          if(attr[3].match(/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])/)){
+            pdb = attr[3]
+          }
+          AQUARIA.initialisePanels(true);
+          AQUARIA.loadAccession(accession, pdb);
+
+        }
+        else{
+          AQUARIA.initialisePanels(true);
+          AQUARIA.loadAccession(accession);
+        }
+      })
+    }
+    else if (pathname.match(/\/([A-Za-z]+)/)) {
       //uniprot_accession = RegExp.$1;
       // History:
       // [JH] matches the URL and tries to load it as accession
@@ -1464,8 +813,8 @@ var MAX_PROTEIN_HISTORY = 5;
     } else {
       console.log('AQUARIA.domready cannot find viewer: ' + window.threedViewer);
     }
-    remoteSuccess();
     AQUARIA.gesture = new molecularControlToolkitJS.leap(AQUARIA.panel3d.gestures());
+    remoteSuccess();
   });
 
 })(jQuery);
@@ -1527,30 +876,13 @@ AQUARIA.blankPanel = function(panel, isOn, message) {
 
 AQUARIA.blankAll = function(isOn, message) {
   ///console.log("AQUARIA.blankAll", isOn, message);
-  var messageDisplay = message || "Please specify a " + localStorage.preferred_organism_name + " protein.<br><br>Or, specify a new default organism.";
-  AQUARIA.panel3d.blankApplet(isOn, messageDisplay);
+  // var messageDisplay = message || "Please specify a " + localStorage.preferred_organism_name + " protein.<br><br>Or, specify a new default organism.";
+  // AQUARIA.panel3d.blankApplet(isOn, messageDisplay);
   AQUARIA.blankPanel("#vis", isOn);
   AQUARIA.blankPanel("#aboutPDB", isOn);
   AQUARIA.blankPanel("#uniProtDesc", isOn);
   AQUARIA.blankPanel("#featurelist", isOn);
 };
-
-AQUARIA.screenshot = function() {
-  // construct a temporary anchor element with a download attribute and click it
-  // alternatively this could be wired up to a declared html element
-  var a = document.createElement('a');
-  screenshot(3840, 2160, 0, 0).then(function (href) {
-    a.href = href; // href is always a string. whether blob uri (Object URL) or data uri depends on browser support
-    a.download = 'aquaria-screenshot.png'; // @TODO consider a more meaningful filename here. maybe use protein name w/ a timestamp
-    a.click();
-  });
-};
-
-// hijack the old applet button for screenshot feature
-$(".launchApplicationLink").click(function (ev) {
-  ev.preventDefault(); // prevent default navigation
-  AQUARIA.screenshot(); // invoke screenshot feature
-});
 
 window.ATL_JQ_PAGE_PROPS = {
   //  window.ATL_JQ_PAGE_PROPS = $.extend(window.ATL_JQ_PAGE_PROPS, {

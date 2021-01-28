@@ -12,10 +12,9 @@
 	module.exports.expand_cluster = function expand_cluster(d,  cluster, sequence) {
 		console.log('show_expanded_cluster.expand_cluster')
 		// dim background
-		$('body').append('<div class="dimmer"></div>');
 		
 		//hide applet temporarily for Windows
-		if(browser.indexOf("Windows") != -1) { $("#threeD").css("visibility", "hidden"); }
+		// if(browser.indexOf("Windows") != -1) { $("#threeD").css("visibility", "hidden"); }
 		
 		var cluster_nbr = parseInt(d.attr("id").substr(15));
 				//console.log("expanding cluster "+ cluster_nbr);
@@ -68,6 +67,7 @@
 		
 		// append <div>
 		d3.select("div#c_"+pdbid+"_"+cluster_nbr).append("div").attr("class","expansion");
+		d3.select("div#c_"+pdbid+"_"+cluster_nbr).append('div').attr('class', 'dimmer2')
 		
 		
 		if (cluster._children) { //console.log(matching_structures.clusters[cluster_nbr]._children.length +" hidden c.");
@@ -95,17 +95,14 @@
 //				//console.log("The % complete = " + (val * 100));
 //			};
 			console.log('show_expanded_cluster.expand_cluster remote fetch secondary clusters', cluster.members, sequence.primary_accession, cluster_nbr)
-			var params = {
-				members: cluster.members,
-				primary_accession: sequence.primary_accession,
-				cluster_nbr: cluster_nbr
-			  }
-			  var url = `${window.BACKEND}/get_secondary_clusters`;
-				axios({
-				  method: 'post',
-				  url: url,
-				  data: params
-				})
+			
+			  var url = `${window.BACKEND}/get_secondary_clusters/`;
+			  url = url +  sequence.primary_accession + "/" + pdbid + "/" + AQUARIA.currentChain + "/" + cluster_nbr
+
+			  axios({
+				method: 'get',
+				url: url
+			  })
 				.then(function (response) {
 				  let newData = response.data
 				  secondaryClustersCallback(newData)
@@ -234,7 +231,7 @@
 	update(root);
 	}
 		//remove tree when background is clicked
-	$('div.dimmer').one('click', function() { //console.log("clicked background");
+	$('div.dimmer2').one('click', function() { //console.log("clicked background");
     nodeClick(root);
 //	  if (root.children && root.children[0]) {
 //	    if (root.children[0].children) {
@@ -246,7 +243,7 @@
 //	    }
 //	  }
 //    root.children = root._originalChildren;
-		$('div.expansion, div.dimmer, div#wait4tree').remove();
+		$('div.expansion, div.dimmer2, div#wait4tree').remove();
 		 // un-hide applet
 		$("#threeD").css("visibility", "visible");
 	});
@@ -333,7 +330,8 @@
 					var imgNm = " ";
 					if (d.pdb_id && typeof d._children === 'undefined') { imgNm = d.pdb_id.toUpperCase(); }
 					if (d._children && d._children[0].pdb_id) { imgNm = d._children[0].pdb_id.toUpperCase(); }
-					return (imgNm === " ") ? " " : "https://www.rcsb.org/pdb/images/"+imgNm+"_bio_r_65.jpg";
+					return (imgNm === " ") ? " " : "https://www.ebi.ac.uk/pdbe/static/entry/"+ imgNm.toLowerCase() + "_assembly_1_chain_front_image-200x200.png"
+					// return (imgNm === " ") ? " " : "https://www.rcsb.org/pdb/images/"+imgNm+"_bio_r_65.jpg";
 					});
 	
 	  nodeEnter.append("text")
@@ -544,6 +542,15 @@
 		return nukids;	
 	}
 
+	function waitForElement(){
+		AQUARIA.addedFeature = true;
+		if(document.getElementById("waitingFrame").style.display != 'none'){
+			setTimeout(waitForElement, 5);
+		}
+		else{
+			AQUARIA.passFeature(AQUARIA.customfeatureSet, AQUARIA.customfeatureSetioid)
+		}
+	}
 	
 	function load_structure(matching_structures, d, really) {	//console.log(really + " load "+d.id+" MS.c: "+matching_structures.clusters.length);
 		console.log('show_expanded_cluster.load_structure')
@@ -570,8 +577,15 @@
 			$("#threeD").css("visibility", "visible");
 			  
 			window.setTimeout(function() {
-				$('div.expansion, div.dimmer').remove(); 
+				$('div.expansion, div.dimmer2').remove(); 
 			  }, 600); 
+
+			var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
+			var searchParam = window.location.search.split('?')[1]
+			// searchParam = window.location.search.split('=')[0]
+			if(($(location).attr('href').includes("json") || featureRegex.test(searchParam))){
+				waitForElement()
+			}
 	  	} 
 	  	else {
 	  update(d);
@@ -581,7 +595,7 @@
 	  
 	  //remove layers once a leaf node was clicked
 	  window.setTimeout(function() {
-		$('div.expansion, div.dimmer').remove(); 
+		$('div.expansion, div.dimmer2').remove(); 
 	 	 }, 600); 
 		}		  
 	}
@@ -656,7 +670,7 @@ $(document).keyup(function(e) {
 	 // e.stopPropagation();
 	 // if( e.isDefaultPrevented() ) { console.log("Esc pressed and default prevented: "+ e.isDefaultPrevented());}
 	 // if( e.isPropagationStopped() ) { console.log("Esc pressed and bubbling up prevented: "+ e.isPropagationStopped());}
-	  $('div.expansion, div.dimmer, div#wait4tree').remove();
+	  $('div.expansion, div.dimmer2, div#wait4tree').remove();
 	  //un-hide applet
 	  $("#threeD").css("visibility", "visible");
   }   

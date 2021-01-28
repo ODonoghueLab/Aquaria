@@ -5,6 +5,9 @@ var featureCount;
 var groupCount;
 var Highcharts = require('./highstocks.js');
 var d3 = require('d3');
+var featureMap = require('../utils/featureMap')
+var Panels = require('../utils/matches_features_panels');
+
 
 function createFeatureUI() {
 	width = document.getElementById("structureviewer").offsetWidth
@@ -26,6 +29,7 @@ var updateFeatureUI = function(featureList) {
 	featureSet = featureList || featureSet;
 	// console.log("featurelist.updateFeatureUI");
 
+
 	$("#featurelist div").remove(); // remove old contents
 //	$("#featureExplanation").text(" Loading...");
 //	$("#featureCounter").html("<img src='/images/89.GIF'/>").show();
@@ -39,6 +43,7 @@ var updateFeatureUI = function(featureList) {
 	var clusters = [];
 	var addedFeatures = [];
 	var orderedFeatures = [];
+	AQUARIA.currentFeature = {}
 	//Group by feature source
 	  AQUARIA.groupedFeatures = _.groupBy(featureSet, function(feature) {
 		return feature.Server;
@@ -148,7 +153,7 @@ var updateFeatureUI = function(featureList) {
 		content.slideToggle('slow')
 
 		if(content.is(":visible")){
-		  $(this).addClass("active")
+		  $(this).addClass("actived")
 		}
 		if ($(this).children().eq(0).text() == '►') {
 			$(this).children().eq(0).text("▼")
@@ -158,12 +163,12 @@ var updateFeatureUI = function(featureList) {
 			$(this).children("button").css({"visibility": "hidden"})
 		}
 
-		var notThis = $('div[class*="active"]').not(this)
+		var notThis = $('div[class*="actived"]').not(this)
 
 		notThis.children().eq(0).text("►")
 		notThis.parent().children().eq(2).slideUp("slow");
 		notThis.children("button").css({"visibility": "hidden"})
-		notThis.removeClass("active")
+		notThis.removeClass("actived")
 
 		});
 	var timer;
@@ -217,80 +222,43 @@ var updateFeatureUI = function(featureList) {
 	  childList: true
 	  });
 
-	// d3.selectAll("#share").on("click", function() {
-	// 	var dummy = document.createElement('input'),
-	//   text = window.location.href;
-	//   document.body.appendChild(dummy);
-	//   dummy.value = text;
-	//   dummy.select();
-	//   document.execCommand('copy');
-	//   document.body.removeChild(dummy);
-	// })
 
-  //On external features scripts show features
-// 	if($("svg#s_0_0").parent().parent().parent().attr("id") === "Added Features"){
-//       	var custom_feature = $("svg#s_0_0")
-// 		var oid = custom_feature.attr("id").split("_")[2];
-// 		passFeature(clusters[0], oid);
-// 		d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-// 		d3.select("svg.loaded").classed("loaded", false);
-// 		custom_feature.attr("class", "loaded");
-//   }
 
-	var document_observer = new MutationObserver( function (mutations) {
-		// `mutations` is an array of mutations that occurred
-		// `me` is the MutationObserver instance
-		if($(location).attr('href').includes("json")){
-		  mutations.forEach(function(mutation) {
-			if (mutation.attributeName !== 'style') {
-			  return none;
+	function waitForElement(){
+    if(document.getElementById("waitingFrame").style.display != 'none'){
+		setTimeout(waitForElement, 50);
+		console.log("REPEATING")
+    }
+    else{
+		clusters.forEach(function(c){
+			if(c.Server == "Added Features"){
+				addedFeatures.push(c)
 			}
-			else{
-			  var currentValue = mutation.target.style.display;
-			  if (currentValue == "none") {
-				pdb_chain_observer.observe(document.getElementById("waitingFrame"), {
-				  attributes:    true,
-				  attributeFilter: ["style"]
-				})
-			  }
-			}
-			})
-		  }
 		})
-
-	  var pdb_chain_observer = new MutationObserver(function (m, me) {
-		m.forEach( function(mut) {
-		  if (mut.attributeName !== 'style') return;
-		  var currentValue = mut.target.style.display;
-		  if (currentValue == "none") {
-			clusters.forEach(function(c){
-				if(c.Server == "Added Features"){
-					addedFeatures.push(c)
-				}
-			})
-			var custom_feature = $('[id="Added Features"]').children().eq(2).children().eq(0).find("svg")
-			if(custom_feature.length > 0){
-				custom_feature.attr("class", "loaded");
-				var oid = custom_feature.attr("id").split("_")[2];
-				// AQUARIA.panel3d.blankApplet(true, "Loading feature...")
-				// AQUARIA.panel3d.blankApplet(false)
-				passFeature(addedFeatures[0], oid);
-				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-				d3.select("svg.loaded").classed("loaded", false);
-
-				me.disconnect();     // stop observing
+		var custom_feature = $('[id="Added Features"]').children().eq(2).children().eq(0).find("svg")
+		if(custom_feature.length > 0){
+			custom_feature.attr("class", "loaded");
+			var oid = custom_feature.attr("id").split("_")[2];
+			AQUARIA.customfeatureSet = addedFeatures[0]
+			AQUARIA.customfeatureSetioid = oid
+			AQUARIA.passFeature(addedFeatures[0], oid);
+			if(document.querySelector('#outerFeatureMap')){
+				document.querySelector('#outerFeatureMap').remove()
 			}
-		  }
-		})
-	  })
+			drawfeatureMap = featureMap.createFeatureMap(addedFeatures[0])
+			AQUARIA.addedFeature = true;
+			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+			d3.select("svg.loaded").classed("loaded", false);
+		}
+    }
+	}
 
-
-  //   start observing structure change
-	document_observer.observe(document.getElementById("loading-message"), {
-	  attributes:    true,
-	  attributeFilter: ["style"],
-	  characterDataOldValue: true
-	});
+	var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
+	var searchParam = window.location.search.split('?')[1]
+	// searchParam = window.location.search.split('=')[0]
+	if((AQUARIA.getUrlParameter("features")|| featureRegex.test(searchParam)) && !AQUARIA.addedFeature){
+		waitForElement()
+	}
 };
 
 
@@ -300,6 +268,7 @@ function drawTrack(datum, i) {
 
 	var features = datum.Tracks;
 
+	viewBoxwidth = document.getElementById('structureviewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left
 
 	if (datum.Server == 'UniProt'){
 		//console.log("========");
@@ -307,73 +276,87 @@ function drawTrack(datum, i) {
 		//console.log(AQUARIA.srw);
 	}
 	for ( var o in features) {
+		var outerdiv = d3.select(this)
+		var nusvg = featureMap.createSVGforFeature(outerdiv, width + AQUARIA.margin.left, 25, viewBoxwidth)
+		nusvg
+		.attr("id", "s_" + groupCount + "_" + o)
+		// .attr("title", "Click to load feature into 3D view; hover over features to see detailed info.")
 
-
-		d3
-				.select(this)
-				.append("svg")
-				.attr("width", width + AQUARIA.margin.left)
-				.attr("height", 25)
-				.attr("viewBox", "0 0 " + (width + AQUARIA.margin.left) + " 25")
-				.attr("preserveAspectRatio", "none")
-				.attr("id", "s_" + groupCount + "_" + o)
-				.attr("title",
-						"Click to load feature into 3D view; hover over features to see detailed info.")
-
-				.on("click", function() {
-					if(d3.select(this).attr("class") == "loaded") { // deselect feature (it's already displayed)
-						d3.select("svg.loaded").classed("loaded", false);
-						AQUARIA.panel3d.blankApplet(true, "Removing feature...")
-						AQUARIA.panel3d.blankApplet(false)
-
-            // Stu hack to detect feature changes
-						if (typeof AQUARIA.onFeatureChange === 'function') {
-							AQUARIA.onFeatureChange(null, 0);
-						  }
-
-						removeCurrentAnnotationFrom3DViewer();
+		.on("click", function() {
+			if(d3.select(this).attr("class") == "loaded") {// deselect feature (it's already displayed)
+				AQUARIA.currentFeature.oid = null
+				AQUARIA.currentFeature.data = null
+				document.querySelector(".featureHeader.actived").click()
+				d3.select("svg.loaded").classed("loaded", false);
+				AQUARIA.panel3d.blankApplet(true, "Removing feature...")
+				AQUARIA.panel3d.blankApplet(false)
+				// Stu hack to detect feature changes
+				if (typeof AQUARIA.onFeatureChange === 'function') {
+					AQUARIA.onFeatureChange(null, 0);
 					}
-					else { //console.log("clicked to display feature");
-						var oid = d3.select(this).attr("id").split("_")[2];
-						AQUARIA.panel3d.blankApplet(true, "Loading feature...")
-						AQUARIA.panel3d.blankApplet(false)
-						passFeature(datum, oid, this);
-						//console.log("Datum");
-						//console.log(datum);
-						// console.log(oid);
-						d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
-						d3.select("svg.loaded").classed("loaded", false);
-						d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
-						}
-					})
-				.on("mouseover", function() {
-							d3.select(this).selectAll("rect.feature").attr(
-									"fill", function() {
-										return d3.select(this).attr("color");
-									});
-						})
-				.on("mouseout", function() {
-							if(d3.select(this).attr("class") != "loaded"){
-								d3.select(this).selectAll("rect.feature")
-								.attr("fill", "#a4abdf");
-							}
-						})
-					// add background for highlighting
-				.append("rect")
-					.attr("width", width + AQUARIA.margin.left)
-					.attr("height", 25)
-					.attr("class", "bg")
-					.attr("fill", "none");
+				removeCurrentAnnotationFrom3DViewer();
+				document.querySelector('#outerFeatureMap').remove()
+				document.querySelector('#popup').style.display = 'none'
+				AQUARIA.showMatchingStructures.showMap(AQUARIA.showMatchingStructures.cluster)
+				// document.querySelector('#selectedCluster > .outer_container').remove()
+				Panels.hidePanels()
+			}
+			else { //console.log("clicked to display feature");
+				// document.querySelector(".featureHeader.actived").click()
+				if(document.querySelector('#outerFeatureMap')) {
+					document.querySelector('#outerFeatureMap').remove()
+				}
+				var oid = d3.select(this).attr("id").split("_")[2];
+				AQUARIA.currentFeature.oid = oid
+				AQUARIA.currentFeature.data = datum
+				AQUARIA.panel3d.blankApplet(true, "Loading feature...")
+				AQUARIA.panel3d.blankApplet(false)
+				if(datum.Server != "Added Features"){
+					AQUARIA.addedFeature = false
+				}
+				AQUARIA.passFeature(datum, oid, this);
+				// Stu hack to detect feature changes
+				if (typeof AQUARIA.onFeatureChange === 'function') {
+					AQUARIA.onFeatureChange(datum, oid);
+				}
+				//console.log("Datum");
+				//console.log(datum);
+				// console.log(oid);
+				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
+				d3.select("svg.loaded").classed("loaded", false);
+				d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
+				drawfeatureMap = featureMap.createFeatureMap(AQUARIA.currentFeature.data)
+				Panels.hidePanels()
+				}
+			})
+		.on("mouseover", function() {
+					d3.select(this).selectAll("rect.feature").attr(
+							"fill", function() {
+								return d3.select(this).attr("color");
+							});
+				})
+		.on("mouseout", function() {
+					if(d3.select(this).attr("class") != "loaded"){
+						d3.select(this).selectAll("rect.feature")
+						.attr("fill", "#a4abdf");
+					}
+				})
+			// add background for highlighting
+		.append("rect")
+			.attr("width", width + AQUARIA.margin.left)
+			.attr("height", 25)
+			.attr("class", "bg")
+			.attr("fill", "none");
 
-			d3.select("svg#s_" + groupCount + "_" + o)
-				.append("g")
-					.attr("transform", "translate(" + AQUARIA.margin.left + ",0)")
-					// add center line
-				.append("rect")
-					.attr("width", width)
-					.attr("height", 1)
-					.attr("transform", "translate(0,13)")
-					.attr("class", "insertion");
+	d3.select("svg#s_" + groupCount + "_" + o)
+		.append("g")
+			.attr("transform", "translate(" + AQUARIA.margin.left + ",0)")
+			// add center line
+		.append("rect")
+			.attr("width", width)
+			.attr("height", 1)
+			.attr("transform", "translate(0,13)")
+			.attr("class", "insertion");
 					// add features
 		for ( var p in features[o]) {
 			// console.log("p is ");
@@ -410,25 +393,20 @@ function drawTrack(datum, i) {
 	groupCount++;
 }
 
+AQUARIA.passFeature = function(trk, nr, elmt) {
+	if (typeof AQUARIA.onFeatureChange === 'function') {
+		AQUARIA.onFeatureChange(trk, nr);
+	}
+	//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
+	sentAnnotationTo3DViewer(trk, parseInt(nr));
+}
+
 function createMouseOverCallback(feature) {
 	return function() {
 		// console.log(">>>>>>>>>> over here ....???");
 		var ID = d3.select(this).attr("id");
 		d3.select(this).call(mouseoverFeature, feature, ID);
 	};
-}
-
-function passFeature(trk, nr, elmt) {
-
-		//console.log("featurelist.passFeature " + trk.Category + " " + trk.Type + ", Track " + nr, trk); //console.log(elmt);
-
-		// Stu hack to detect feature changes
-		if (typeof AQUARIA.onFeatureChange === 'function') {
-			AQUARIA.onFeatureChange(trk, nr);
-		}
-
-		sentAnnotationTo3DViewer(trk, parseInt(nr));
-
 }
 
 var t, s;
@@ -468,96 +446,124 @@ function mouseoutFeature(el, eid) {
 }
 
 function createANewDiv_hcNoData(divId){
-	let newDiv = document.createElement('div');
-	newDiv.id = divId;
-	newDiv.style = "width: 100px; height: 100px; margin: 0 auto; background-color: white;";
-	document.getElementById('superFamCharts').append(newDiv);
+	return new Promise(function(resolve, reject){
+		if (document.getElementById(divId)){
+				document.getElementById(divId).remove(); //  = '';
+		}
+		// if (!document.getElementById(divId)){
+			let newDiv = document.createElement('div');
+			document.getElementById('superFamCharts').append(newDiv);
+			newDiv.id = divId;
+			newDiv.style = "width: 100px; height: 100px; margin: 0 auto; background-color: white;";
+
+
+			// if (document.getElementById(divId)){
+				resolve();
+			// }
+		// }
+	});
 }
 
 function doThePlotting_v2(divId, theSeriesData_inner, theSeriesData_outer, theTitle, theSize_inner, labelCol_inner, labelDist_inner, innerSize_outer, name_inner, name_outer, labelCol_outer){
 	return new Promise(function(resolve, reject){
-		try{
-			let newDiv = document.createElement('div');
-			newDiv.id = divId;
-			newDiv.style = "width: 100px; height: 100px; margin: 0 auto";
-			document.getElementById('superFamCharts').append(newDiv);
+		//try{
+		//	let newDiv = document.createElement('div');
+		//	newDiv.id = divId;
+		//	newDiv.style = "width: 100px; height: 100px; margin: 0 auto";
+		//	document.getElementById('superFamCharts').append(newDiv);
 
-			// First add new Div.
-			Highcharts.chart(divId, {
-			    chart: {
-			        type: 'pie',
-					margin: 0
-			    },
-			    title: {
-			        text: theTitle
-			    }, /*
-			    subtitle: {
-			        text: 'Source: <a href="http://statcounter.com" target="_blank">statcounter.com</a>'
-			    },*/
-			    plotOptions: {
-			        pie: {
-			            shadow: false,
-			            center: ['50%', '50%']
-			        }
-			    },
-			    tooltip: {
-			        valueSuffix: '%'
-			    },
-			    series: [{
-			        name: name_inner,
-			        data: theSeriesData_inner,
-			        size: theSize_inner,
-			        dataLabels: {
-						enabled: false,
-			            formatter: function () {
-			                return this.y > 3 ? this.point.name : null;
-			            },
-			            color: labelCol_inner,
-			            distance: labelDist_inner
-			        }
-			    }, {
-			        name: name_outer,
-			        data: theSeriesData_outer,
-			        // size: '80%',
-			        innerSize: innerSize_outer,
-			        dataLabels: {
-						enabled: false,
-			            formatter: function () {
-			                // display only if larger than 1
-			                return this.y > 1 ? '<b>' + this.point.name + ':</b> ' +
-			                    this.y + '%' : null;
-			            },
-						color: labelCol_outer
-			        },
-			        id: 'versions'
-			    }],
-			    responsive: {
-			        rules: [{
-			            condition: {
-			                maxWidth: 100
-			            },
-			            chartOptions: {
-			                series: [{
-			                }, {
-			                    id: 'versions',
-			                    dataLabels: {
-			                        enabled: false
-			                    }
-			                }]
-			            }
-			        }]
-			    }
+		  createANewDiv_hcNoData(divId).then(function(){
+				// First add new Div.
+				try{
+					Highcharts.chart(divId, {
+					    chart: {
+					        type: 'pie',
+							margin: 0
+					    },
+					    title: {
+					        text: theTitle
+					    }, /*
+					    subtitle: {
+					        text: 'Source: <a href="http://statcounter.com" target="_blank">statcounter.com</a>'
+					    },*/
+					    plotOptions: {
+					        pie: {
+					            shadow: false,
+					            center: ['50%', '50%']
+					        }
+					    },
+					    tooltip: {
+					        valueSuffix: '%'
+					    },
+					    series: [{
+					        name: name_inner,
+					        data: theSeriesData_inner,
+					        size: theSize_inner,
+					        dataLabels: {
+								enabled: false,
+					            formatter: function () {
+					                return this.y > 3 ? this.point.name : null;
+					            },
+					            color: labelCol_inner,
+					            distance: labelDist_inner
+					        }
+					    }, {
+					        name: name_outer,
+					        data: theSeriesData_outer,
+					        // size: '80%',
+					        innerSize: innerSize_outer,
+					        dataLabels: {
+								enabled: false,
+					            formatter: function () {
+					                // display only if larger than 1
+					                return this.y > 1 ? '<b>' + this.point.name + ':</b> ' +
+					                    this.y + '%' : null;
+					            },
+								color: labelCol_outer
+					        },
+					        id: 'versions'
+					    }],
+					    responsive: {
+					        rules: [{
+					            condition: {
+					                maxWidth: 100
+					            },
+					            chartOptions: {
+					                series: [{
+					                }, {
+					                    id: 'versions',
+					                    dataLabels: {
+					                        enabled: false
+					                    }
+					                }]
+					            }
+					        }]
+					    }
+					});
+					resolve();
+					console.log("In the highcharts plotting function");
+				}
+				catch (error){
+					console.log("Highcharts error");
+					console.log(error);
+					resolve();
+					console.log("In the highcharts plotting function");
+				}
+
+
 			});
-			resolve();
-		}
+		/* }
 		catch(error){
 			console.log("Highcharts error");
 			console.log(error);
-		}
+		} */
 
 
 	});
 }
+
+
+var common = require('../utils/common');
 
 function showAnnotation(f, eid) {
 	// console.log(eid);
@@ -573,7 +579,7 @@ function showAnnotation(f, eid) {
 		urlhtml += "</p>";
 	}
 	$("div.popup").remove();
-	var balloon = "<div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
+	var balloon = "<div style='display: none;'><div id='divVI_varInfo'><br><b>Variant information</b></div> <div id='divVI_posInfo'><br><b>Position information</b></div> <div id='divVI_otherResInfo'><br><b>Other mutations information</b></div> </div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
 			+ f.label + " (";
 	if (f.start == f.end){
 		balloon = balloon + "Residue "+f.start;
@@ -593,77 +599,94 @@ function showAnnotation(f, eid) {
 
 
 
-	d3.select("body")
-		.append("div")
-			.attr("class", "popup")
-			.html(balloon);
+	// d3.select("body")
+	// 	.append("div")
+	// 		.attr("class", "popup")
+	// 		.html(balloon);
+
 			// .append(theSuperFam);
 
 	// document.getElementById('balloon').append(theSuperFam);
 
 	if (f.hasOwnProperty('hc_go') && f.hasOwnProperty('hc_ec') && f.hasOwnProperty('hc_species')){
+		console.log("CATH plot data");
+		console.log(f);
 		handleCathPopups(f).then(function(){
 			updateTheStyleOfHc();
 		});
 	}
+	else{
+		console.log("CATH plot no data");
+		console.log(f);
+	}
 
 
-	var popheight = $("div.popup").innerHeight();
+	// var popheight = $("div.popup").innerHeight();
 
-	var fpos = $("#" + eid).offset();
-	var fwidth = $("#" + eid).attr("width");
+	// var fpos = $("#" + eid).offset();
+	// var fwidth = $("#" + eid).attr("width");
+	var fpos = document.querySelector('#' + eid).getBoundingClientRect()
+	var svgdim = document.querySelector('#' + eid).getBBox()
+	var fwidth = svgdim.width
 
-	var bleft = parseInt(fpos.left + fwidth / 2 - 160);
-	var btop = parseInt(fpos.top - popheight);
+	common.appendPopup(balloon, fpos, fwidth, false)
+	// common.appendPopup(balloon, fpos, fwidth, s)
+	// var bleft = parseInt(fpos.left + fwidth / 2 - 160);
+	// var btop = parseInt(fpos.top - popheight);
 
-	$("div.popup").css({
-		"left" : bleft + "px",
-		"top" : btop + "px",
-		"width": "470px"
-	}).fadeIn(600);
+	// $("div.popup").css({
+	// 	"left" : bleft + "px",
+	// 	"top" : btop + "px",
+	// 	"width": "470px"
+	// }).fadeIn(600);
 
-	$("span.x").click(function() {
-		$("div.popup").fadeOut();
-	});
+	// $("span.x").click(function() {
+	// 	$("div.popup").fadeOut();
+	// });
 
-	$("div.popup").hover(function() {
-		clearTimeout(s);
-	}, function() {
-		s = setTimeout(function() {
-			$("div.popup").fadeOut();
-		}, 500);
-	});
+	// $("div.popup").hover(function() {
+	// 	clearTimeout(s);
+	// }, function() {
+	// 	s = setTimeout(function() {
+	// 		$("div.popup").fadeOut();
+	// 	}, 500);
+	// });
 
 }
 
 function handleCathPopups(f){
 	return new Promise(function(resolve, reject){
+		console.log("here...??");
 		// handle this one.
 		if (typeof f.hc_go !== 'undefined' && f.hc_go.hasOwnProperty('data') && f.hc_go.data.hasOwnProperty('series') && f.hc_go.data.series.length >= 2){
 			doThePlotting_v2('hc_go_div', f.hc_go.data.series[0].data, f.hc_go.data.series[1].data, '', f.hc_go.data.series[0].size, f.hc_go.data.series[0].dataLabels.color, f.hc_go.data.series[0].dataLabels.dist, f.hc_go.data.series[1].innerSize, f.hc_go.data.series[0].name, f.hc_go.data.series[1].name, f.hc_go.data.series[1].dataLabels.color).then(function(){
+				console.log("CATH plot: 1");
 				document.getElementById('hc_go').prepend(document.getElementById('hc_go_div'));
 			})
 			.catch(function(error){
-				if (!document.getElementById('hc_go_noData')){
+				console.log("CATH plot: 2");
+				// if (!document.getElementById('hc_go_noData')){
 					// create element
-					createANewDiv_hcNoData('hc_go_noData');
-				}
-
-				document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
-				document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <br> <center> No data</center>';
-				console.log('featureslist.showAnnotation ERROR ' + error);
+				createANewDiv_hcNoData('hc_go_noData').then(function(){
+					document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
+					document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+					console.log('featureslist.showAnnotation ERROR ' + error);
+				});
+				// }
 			});
 		}
 		else{
 			// no data.
 
-			if (!document.getElementById('hc_go_noData')){
+			// if (!document.getElementById('hc_go_noData')){
 				// create element
-				createANewDiv_hcNoData('hc_go_noData');
-			}
+			createANewDiv_hcNoData('hc_go_noData').then(function(){
+				document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
+				document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+			});
+			// }
+			console.log("CATH plot: 3");
 
-			document.getElementById('hc_go').prepend(document.getElementById('hc_go_noData'));
-			document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML  +  '<br> <br> <center> No data</center>';
 			// document.getElementById('hc_go_div').style['background-color'] = "white";
 		}
 
@@ -672,26 +695,33 @@ function handleCathPopups(f){
 				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_div'));
 			})
 			.catch(function(error){
-				if (!document.getElementById('hc_ec_noData')){
+				// if (!document.getElementById('hc_ec_noData')){
 					// create element
-					createANewDiv_hcNoData('hc_ec_noData');
-				}
+				createANewDiv_hcNoData('hc_ec_noData').then(function(){
+					document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
+					document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+					console.log('featureslist.showAnnotation ERROR ' + error);
+				});
+				// }
 
-				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
-				document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <br> <center> No data</center>';
-				console.log('featureslist.showAnnotation ERROR ' + error);
 			});
 		}
 		else{
 			// no data
 			// document.getElementById('hc_ec').innerHTML = document.getElementById('hc_ec').innerHTML + ' <br> No data';
-			if (!document.getElementById('hc_ec_noData')){
+			// if (!document.getElementById('hc_ec_noData')){
 				// create element
-				createANewDiv_hcNoData('hc_ec_noData');
-			}
+			createANewDiv_hcNoData('hc_ec_noData').then(function(){
 
-			document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
-			document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+				document.getElementById('hc_ec').prepend(document.getElementById('hc_ec_noData'));
+				document.getElementById('hc_ec_noData').innerHTML = document.getElementById('hc_ec_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+			})
+			.catch(function(){
+
+			});
+			// }
+
+
 		}
 
 		if (typeof f.hc_species !== 'undefined' &&  f.hc_species.hasOwnProperty('data') && f.hc_species.data.hasOwnProperty('series') && f.hc_species.data.series.length >= 2){
@@ -701,28 +731,31 @@ function handleCathPopups(f){
 			})
 			.catch(function(error){
 
-				if (!document.getElementById('hc_species_noData')){
+				// if (!document.getElementById('hc_species_noData')){
 					// create element
-					createANewDiv_hcNoData('hc_species_noData');
-				}
+				createANewDiv_hcNoData('hc_species_noData').then(function(){
 
-				document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
-				document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+					document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
+					document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <br> <center> No data</center>';
 
 
-				console.log('featureslist.showAnnotation ERROR ' + error);
+					console.log('featureslist.showAnnotation ERROR ' + error);
+				});
+				// }
+
+
 			});
 		}
 		else {
 			// no data
 			// document.getElementById('hc_species').innerHTML = document.getElementById('hc_species').innerHTML + ' <br> No data';
-			if (!document.getElementById('hc_species_noData')){
+		//	if (!document.getElementById('hc_species_noData')){
 				// create element
-				createANewDiv_hcNoData('hc_species_noData');
-			}
-
-			document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
-			document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+				createANewDiv_hcNoData('hc_species_noData').then(function(){
+					document.getElementById('hc_species').prepend(document.getElementById('hc_species_noData'));
+					document.getElementById('hc_species_noData').innerHTML = document.getElementById('hc_species_noData').innerHTML  +  '<br> <br> <center> No data</center>';
+				});
+		//	}
 		}
 
 		resolve();
@@ -765,20 +798,20 @@ function updateTheStyleOfHc(){
 
 // DAS annotation handling
 
-var currentAnnotationsIn3DViewer = new Array();
+AQUARIA.currentAnnotationsIn3DViewer = new Array();
 
 /**
  * removes the current annotation track from the 3D viewer
  */
 function removeCurrentAnnotationFrom3DViewer() {
 	// remove existing Annotation
-
+	let currentAnnotationsIn3DViewer = AQUARIA.currentAnnotationsIn3DViewer
 	if (currentAnnotationsIn3DViewer !== undefined) {
 		for ( var i in currentAnnotationsIn3DViewer) {
 
 			// API call
 			AQUARIA.panel3d.removeAnnotation(currentAnnotationsIn3DViewer[i].id,
-					currentAnnotationsIn3DViewer[i].annotationName);
+				currentAnnotationsIn3DViewer[i].annotationName);
 		}
 		currentAnnotationsIn3DViewer.length = 0;
 	}
@@ -872,7 +905,7 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 		"annotationName" : annotations.Category
 	};
 
-	currentAnnotationsIn3DViewer.push(annotationToAdd);
+	AQUARIA.currentAnnotationsIn3DViewer.push(annotationToAdd);
 	// API call
 	AQUARIA.panel3d.addAnnotation(annotationToAdd.id[0],
 					annotationToAdd.annotationName, featureColours,
@@ -880,6 +913,7 @@ function reformatAndAddFeatureTo3DViewer(annotations, trackNumber) {
 					featureURLs, featureURLtexts);
 	}
 }
+
 
 module.exports.updateFeatureUI = updateFeatureUI;
 module.exports.updateFeatureTabTitle = updateFeatureTabTitle;

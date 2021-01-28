@@ -315,7 +315,7 @@
     z-index: 10;
   }
 
-  #waitingFrame {
+  /* #waitingFrame {
     overflow: hidden;
     position: absolute;
     z-index: 101;
@@ -324,8 +324,9 @@
     padding: 0px;
     margin: 0px;
     width: 100%;
-    height: 100%;
-  }
+    height: 102vh;
+    bottom: 106vh;
+  } */
 
   #selectionText {
     overflow: hidden;
@@ -430,7 +431,7 @@
 	-webkit-border-radius: 1em;
 	-moz-border-radius: 1em;
 	border-radius: 1em;
-	
+
 	-webkit-transition: all .5s;
 	-moz-transition: all .5s;
 	transition: all .5s;
@@ -670,18 +671,6 @@ div.expansion svg > g {
     z-index: 90;
   }
 
-  div.dimmer {
-    background: black;
-    height: 100%;
-    position: fixed;
-    left: 0;
-    top: 0;
-    opacity: 0.68;
-    -moz-opacity: 0.68;
-    width: 100%;
-    z-index: 99;
-  }
-
   div.panel span.help {
     display: inline-block;
     width: 17px;
@@ -725,7 +714,7 @@ div.balloon p.quality.twilight { background: #455; color: #CC3; }
 
 div.balloon p.quality.high { background: #555; color: #DFF; }
 */
-  div.balloon h3 {
+  /* div.balloon h3 {
     background-color: #999;
     margin-bottom: 1em;
   }
@@ -760,7 +749,7 @@ div.balloon p.quality.high { background: #555; color: #DFF; }
 
   div.popup.top {
     background: transparent none;
-  }
+  } */
 
   div.large-ppi-diagram {
     position: absolute;
@@ -993,7 +982,7 @@ div.balloon p.quality.high { background: #555; color: #DFF; }
   }
 
   g.x path.domain {
-    /*fill: #FFF; 
+    /*fill: #FFF;
 	stroke: none;*/
     fill: none;
     stroke: black;
@@ -1129,15 +1118,15 @@ div.balloon p.quality.high { background: #555; color: #DFF; }
     padding: 2px 5px;
     cursor: default;
     display: block;
-    /* 
-	if width will be 100% horizontal scrollbar will apear 
+    /*
+	if width will be 100% horizontal scrollbar will apear
 	when scroll mode will be used
 	*/
     /*width: 100%;*/
     font: menu;
     font-size: 12px;
-    /* 
-	it is very important, if line-height not set 
+    /*
+	it is very important, if line-height not set
 	or in relative units scroll will be broken in firefox
 	*/
     line-height: 16px;
@@ -1357,4 +1346,6 @@ div.balloon p.quality.high { background: #555; color: #DFF; }
     height: 0;
     width: 0;
   }
+
+
 }

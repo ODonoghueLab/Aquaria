@@ -193,7 +193,8 @@ axios({
 		var chain = data;
 		if (chain.Type === 'Protein') {
 			if (chain.Source_DB === 'UniProt') {
-				var url = `${window.BACKEND}/getProteinSynonyms/${chain.Accession}`;
+				var url = `${window.BACKEND}/getProteinSynonyms/${AQUARIA.protein_primary_accession}`;
+				// var url = `${window.BACKEND}/getProteinSynonyms/${chain.Accession}`;
 				axios({
 					method: 'get',
 					url: url,
@@ -379,6 +380,15 @@ axios({
 
 var displayOrgSynonyms = function(orgNames) {
 console.log("textpanels.displayOrgSynonyms: " + orgNames.synonyms[0]);
+let entries = orgNames.synonyms.length
+AQUARIA.Organism = {}
+AQUARIA.Organism.Name = orgNames.synonyms[entries-1];
+if(orgNames.organism_id) {
+	AQUARIA.Organism.ID = orgNames.organism_id
+}
+else {
+	AQUARIA.Organism.ID =  orgNames.synonyms[0]
+}
 var onames = "<a href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="+orgNames.synonyms[0]+"' title='Go to NCBI' target='_blank' >" + orgNames.synonyms[1] + "</a>";
 for (var n=2; n < orgNames.synonyms.length; n++) { //omit first name (numeric ID)
 	onames += ", " + orgNames.synonyms[n];
@@ -403,7 +413,8 @@ $("div#osyns p").expander({
 
 var displayProtSynonyms = function(data) {
 //console.log(data);
-var pnames = "<b>Synonyms:</b>&nbsp;";
+var pnames = ''
+// </b>&nbsp;";
 var gnames = "<b>Genes:</b>&nbsp;";
 if (data.synonyms == "none") { 
 	AQUARIA.preferred_protein_name = "unknown"; 
@@ -439,6 +450,7 @@ if (data.synonyms == "none") {
 			gnames = "<b>Gene:</b>&nbsp;";
 		}
 		gnames += "<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession+"' title='Go to UniProt'>" + gns[0] + "</a>";
+		AQUARIA.Gene = gns[0]
 		for (var i = 1; i < gns.length; i++) {
 			gnames += ", " + gns[i];
 		}
@@ -487,7 +499,6 @@ if (data.synonyms == "none") {
 	$('#gene_name').css({
 		'margin-left': geneLeft
 	})
-
 	
 	//update ABOUT title
 	$("#about h3 span.explanation").html("<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + AQUARIA.preferred_protein_name + "</a>");

@@ -1,7 +1,11 @@
 const url = require('url');
+var checkIfValInSnpResAndAdd = require('./variantResiduesDesc');
+
+
+var variants_featTypesOfInt = ['Mutational sensitivity (SNAP2 ratio of effect mutations)', 'Mutation score (average SNAP2 score)'];
 
 /* Remove additionalProperties & convert string-numbers to numbers */
-module.exports = function (jsonObj, primary_accession, featureCallback, validateAgainstSchema){
+module.exports = function (jsonObj, primary_accession, featureCallback, validateAgainstSchema, variantResidues, requestedFeature){
 
 
 	// console.log("In the handleSnap2 function")
@@ -25,12 +29,22 @@ module.exports = function (jsonObj, primary_accession, featureCallback, validate
 
 				jsonObj[featureSet]['Features'][i]['Residue'] = parseInt(jsonObj[featureSet]['Features'][i]['Residue'])
 
+				// console.log('SNAP2: featureSet ' + featureSet + " description " + jsonObj[featureSet]['Features'][i]['Description']);
+
+				// console.log("SNAP2 description is " + jsonObj[featureSet]['Features'][i]['Description'] + " " + featureSet);
+
+				// let descToDisp = getSubstringOfInterest(, variantResidues);
+				checkIfValInSnpResAndAdd(jsonObj[featureSet]['Features'][i]['Residue'], jsonObj[featureSet]['Features'][i]['Residue'], variantResidues, featureSet, jsonObj[featureSet]['Features'][i]['Name'] + ";" + jsonObj[featureSet]['Features'][i]['Description'], requestedFeature, variants_featTypesOfInt);
+
+
 			}
 			if(jsonObj[featureSet]['Features'][i].hasOwnProperty('Residues')){
 				jsonObj[featureSet]['Features'][i]['Residues'] = jsonObj[featureSet]['Features'][i]['Residue'].map(function(x){
 					return parseInt(x)
 				});
-				console.log("Snap2 " + jsonObj[featureSet]['Features'][i]['Residues'])
+				// console.log("Snap2 " +  jsonObj[featureSet]['Features'][i]['Residues'])
+
+				// checkIfValInSnpResAndAdd(jsonObj[featureSet]['Features'][i]['Residue'], jsonObj[featureSet]['Features'][i]['Residue'], variantResidues, featureSet, descToDisp, requestedFeature, variants_featTypesOfInt);
 			}
 			/* if (jsonObj[featureSet]['Features'][i].hasOwnProperty('Residue')){
 				//jsonObj[featureSet]['Features'][i].Residue = parseInt(jsonObj[featureSet]['Features'][i].Residue)
@@ -41,5 +55,6 @@ module.exports = function (jsonObj, primary_accession, featureCallback, validate
 	validateAgainstSchema(jsonObj, primary_accession, featureCallback, 'SNAP2')
 	// return (jsonObj)
 }
+
 
 // module.exports = { handleSnap2 };

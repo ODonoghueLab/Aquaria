@@ -40,14 +40,19 @@ export function download (protein, pdb, format, featureTrackToBake) {
 }
 
 export function openInQuickLook (protein, pdb, featureTrackToBake) {
-  const uri = getExportUri(protein, pdb, { format: 'usdz', featureTrackToBake })
+  const uri = getExportUri(protein, pdb, { format: 'usdz', featureTrackToBake, merge: true, detail: 1 })
   openUriInQuickLook(uri)
 }
 
 export function openInSceneViewer (protein, pdb, featureTrackToBake) {
-  const uri = getExportUri(protein, pdb, { featureTrackToBake })
+  const uri = getExportUri(protein, pdb, { featureTrackToBake, merge: true, detail: 1 })
   const title = `${protein}.${pdb}` // title to be displayed
   openUriInSceneViewer(uri, title)
+}
+
+export function openInWindowsMixedReality (protein, pdb, featureTrackToBake) {
+  const uri = getExportUri(protein, pdb, { featureTrackToBake, merge: true, detail: 1 })
+  openUriInWindowsMixedReality(uri)
 }
 
 export async function openInPSVR (protein, pdb, collection) {
@@ -78,8 +83,8 @@ export async function updateHEVSFeature (platform, asset, collection, featureSet
   }
 }
 
-export async function updateHEVSView (platform, asset, pose, view) {
-  const payload = { hevsPlatform: platform, assetId: asset, pose, view }
+export async function updateHEVSView (platform, asset, pose) {
+  const payload = { hevsPlatform: platform, assetId: asset, pose }
   const response = await axios.post(`${process.env.VUE_APP_AQUARIA_BACKEND}/xr/setHEVSView`, payload)
   if (response.status >= 400) throw new Error(response.data)
 }
@@ -96,41 +101,42 @@ export function openInAdvancedViewer (protein, pdb) {
  * @param {String} pdb PDB ID
  * @param {Object} options
  * @param {String} options.format 'glb', 'gltf', or 'usdz' (default 'glb')
+ * @param {String} options.encodedFeatureTrack pre-encoded feature track (default none)
  * @param {Object} options.featureTrackToBake feature track (default none)
  * @param {Boolean} options.rescale resize model for XR (default true)
+ * @param {Boolean} options.merge merge model nodes to minimise node count at the cost of losing metadata (default false)
+ * @param {Boolean} options.detail ribbon detail level (default server decides - typically 4)
  */
 export function getExportUri (protein, pdb, options = {}) {
-  const defaults = { format: 'glb', featureTrackToBake: null, rescale: true }
+  const defaults = { format: 'glb', encodedFeatureTrack: null, featureTrackToBake: null, rescale: true, detail: null }
   const opts = Object.assign(defaults, options)
-  const base = `${process.env.VUE_APP_AQUARIA_EXPORT_URL}/${protein}/${pdb}.${opts.format}`
+  const base = `${process.env.VUE_APP_AQUARIA_EXPORT_URL}/model/${protein}/${pdb}.${opts.format}`
   const query = new URLSearchParams()
   if (options.rescale === false) query.append('rescale', 'false')
-  if (options.featureTrackToBake) {
-    const featureQuery = options.featureTrackToBake.map(feature => {
-      let encodedFeature = `${feature.color.replace('#', '')}-${feature.start}`
-      if (feature.start !== feature.end) encodedFeature = `${encodedFeature}-${feature.end}`
-      return encodedFeature
-    })
-    query.append('f', featureQuery.join(','))
-  }
+  if (options.merge === true) query.append('merge', 'true')
+  if (options.detail) query.append('detail', options.detail)
+  if (options.encodedFeatureTrack) query.append('f', options.encodedFeatureTrack)
+  else if (options.featureTrackToBake) query.append('f', encodeFeatureTrack(options.featureTrackToBake))
   const queryString = query.toString()
   if (queryString) return `${base}?${query}`
   return base
 }
 
 /**
- * Prepare the data required to invoke auto-xr later
+ * Prepare the data payload required to invoke auto-xr later
  * @returns {string}
  */
 export function prepareAutoXR (protein, pdb, featureTrackToBake = null) {
-  // data is currently just a URI with a special token to be replaced by the appropriate format
-  // NOTE: too many features will break the QR code. Truncate to avoid
+  // payload is currently: PROTEIN|PDB|ENCODEDFEATURES (ENCODEDFEATURES can be empty string if no active features)
+  // enough info to reconstruct the export URL immediately without waiting for the whole page to initialise
+  // @TODO could protein/pdb just be grabbed out of the URL pathname?
+  // @NOTE: too many features will break the QR code. Truncate to avoid
   const features = (featureTrackToBake && featureTrackToBake.length > MAX_QR_FEATURES)
     ? featureTrackToBake.slice(0, MAX_QR_FEATURES)
     : featureTrackToBake
 
-  const uri = getExportUri(protein, pdb, { format: '$FORMAT', featureTrackToBake: features })
-  return uri
+  const payload = `${protein}|${pdb}|${features ? encodeFeatureTrack(features) : ''}`
+  return payload
 }
 
 /**
@@ -139,11 +145,17 @@ export function prepareAutoXR (protein, pdb, featureTrackToBake = null) {
  */
 export function invokeAutoXR (data) {
   // data is currently just a URI with a special token to be replaced by the appropriate format
+  console.info(`Auto-XR invoked with payload: ${data}`)
+  const [protein, pdb, encodedFeatureTrack] = data.split('|')
   if (featureDetection.supportsQuickLook) {
-    openUriInQuickLook(data.replace('$FORMAT', 'usdz'))
+    const uri = getExportUri(protein, pdb, { format: 'usdz', detail: 1, merge: true, encodedFeatureTrack })
+    openUriInQuickLook(uri)
   } else if (featureDetection.supportsSceneViewer) {
-    // @TODO: better title required here
-    openUriInSceneViewer(data.replace('$FORMAT', 'glb'), 'Aquaria Auto-XR')
+    const uri = getExportUri(protein, pdb, { format: 'glb', detail: 1, merge: true, encodedFeatureTrack })
+    openUriInSceneViewer(uri, 'Aquaria Auto-XR') // @TODO: better title required here
+  } else if (featureDetection.supportsMixedReality) {
+    const uri = getExportUri(protein, pdb, { format: 'glb', detail: 1, merge: true, encodedFeatureTrack })
+    openUriInWindowsMixedReality(uri)
   }
 }
 
@@ -169,8 +181,34 @@ export function getRawCameraPose (convertToLHS = true) {
  * Grab high level view data
  */
 export function getView () {
-  // @TODO implement
-  return {}
+  return window.AQUARIA.panel3d.embededJolecule.soupView
+}
+
+export function countPolygons (object) {
+  let count = 0
+  object.traverse(obj => {
+    if (obj.geometry) {
+      const index = obj.geometry.getIndex()
+      if (index) {
+        count += index.count / 3
+      } else {
+        count += obj.geometry.getAttribute('position').count / 3
+      }
+    }
+  })
+  return count
+}
+
+/**
+ * Encode a feature track for use with Aquaria Export service
+ * @param {*} featureTrack
+ */
+function encodeFeatureTrack (featureTrack) {
+  return featureTrack.map(feature => {
+    let encodedFeature = `${feature.color.replace('#', '')}-${feature.start}`
+    if (feature.start !== feature.end) encodedFeature = `${encodedFeature}-${feature.end}`
+    return encodedFeature
+  }).join(',')
 }
 
 function openUriInSceneViewer (uri, title) {
@@ -180,7 +218,15 @@ function openUriInSceneViewer (uri, title) {
   const action = 'android.intent.action.VIEW'
   const mode = 'ar_preferred' // default to AR view if available, fall back to a 3D model view if AR not supported or Google Play Services for AR not installed
   const fallback = 'https://developers.google.com/ar' // this will only be visited if Google Search pkg is out of date or unavailable
-  const fullUri = `intent://arvr.google.com/scene-viewer/1.0?file=${uri}&mode=${mode}&title=${title}#Intent;scheme=https;package=${pkg};action=${action};S.browser_fallback_url=${fallback};end;`
+
+  // need to encode just the query part of the model URI or scene viewer won't respect it correctly
+  const [uriBase, uriQuery] = uri.split('?')
+  // const encodedQuery = uriQuery ? encodeURIComponent(`?${uriQuery}`) : ''
+  const encodedQuery = uriQuery ? ('?' + uriQuery.replace(/&/g, '%26')) : ''
+  const encodedUri = uriBase + encodedQuery
+  console.log(encodedUri)
+
+  const fullUri = `intent://arvr.google.com/scene-viewer/1.0?file=${encodedUri}&mode=${mode}&title=${title}#Intent;scheme=https;package=${pkg};action=${action};S.browser_fallback_url=${fallback};end;`
   const link = document.createElement('a')
   link.href = fullUri
   link.click()
@@ -192,5 +238,11 @@ function openUriInQuickLook (uri) {
   link.href = uri
   link.rel = 'ar'
   link.appendChild(document.createElement('img')) // this is required
+  link.click()
+}
+
+function openUriInWindowsMixedReality (uri) {
+  const link = document.createElement('a')
+  link.href = `ms-mixedreality:addModel?uri=${encodeURIComponent(uri)}`
   link.click()
 }

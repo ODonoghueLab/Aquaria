@@ -86,7 +86,7 @@ module.exports = function(jsonObj1, getFeatures, validateAgainstSchema, primary_
 
 function handleData_ff(funFamData, dataArr_hc, hcDataObj, residues_, superFamFeatureSet, funFamFeatureSet, convertedFeatures){
 	return new Promise(function(resolve, reject){
-		let keyFunFam = "Functional families (CATH-FunFams)";
+		let keyFunFam = "Functional families";
 
 		funFamData.forEach(function(funFam_id, i){
 
