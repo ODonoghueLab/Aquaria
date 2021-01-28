@@ -2,32 +2,34 @@ var counter_complete = 0;
 
 module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType, description, serverName, variants_featTypesOfInt){
 
-	// console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
+
 
 	if (variants_featTypesOfInt.includes(featureType)){
+
+
 		Object.keys(variantResidues).forEach(function(resSnp, i){
 			// console.log("The new residue is " + variantResidues[resSnp].newResidue);
 
-			if (parseInt(resSnp) >= parseInt(resStart_pp) && parseInt(resSnp) <= parseInt(resEnd_pp)){
-
-				/* if (!variantResidues[resSnp].hasOwnProperty(serverName)){
 
 
-					variantResidues[resSnp][serverName] = [];
+			let pos_mut = resSnp;
+			if (resSnp.match(/\-/)){
+				pos_mut = resSnp.split(/\-/)[0];
+			}
 
 
-				} */
+			if (parseInt(pos_mut) >= parseInt(resStart_pp) && parseInt(pos_mut) <= parseInt(resEnd_pp)){
+
+				if (serverName == 'COSMIC'){
+						console.log("cosmic 3 pass");
+				}
 
 				let obj_featType = {};
 				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
 					let varInfo = [];
 					cleanData_pp(description, varInfo);
-					// obj_featType[featureType] = obj_inFeatType;
-					// console.log(' does come in here ... ');
-					// console.log(obj_inFeatType);
 
-					// variantResidues[resSnp][serverName].push(obj_featType);
-					addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'PredictProtein Conservation');
+					addToVariantResidues(variantResidues, resSnp, [], varInfo, [], 'PredictProtein conservation');
 				}
 
 				else if (serverName == 'SNAP2'){
@@ -35,20 +37,23 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					let varInfo = []; let posInfo = []; let otherResInfo = []; // get from variant inof if it exists;
 
 					if (featureType == 'Mutational sensitivity (SNAP2 ratio of effect mutations)'){
-						cleanData_snap2_effects(description, variantResidues[resSnp].newResidue, varInfo, otherResInfo);
+						console.log("snap2 over here......")
+						cleanData_snap2_effects(description, variantResidues[resSnp].newResidues, posInfo, otherResInfo);
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, otherResInfo, 'SNAP2 prediction');
 					}
 					else if (featureType == 'Mutation score (average SNAP2 score)'){
-						cleanData_snap2_getAvgScore(description, posInfo);
+						cleanData_snap2_getAvgScore(description, varInfo, variantResidues[resSnp].newResidues);
+						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'SNAP2 prediction');
 					}
 
-					addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'SNAP2');
+
 
 				}
 				else if (serverName == 'CATH') {
-					let varInfo = [];
-					cleanData_cath(description, varInfo);
+					let posInfo = [];
+					cleanData_cath(description, posInfo);
 
-					addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'CATH ' + featureType);
+					addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'CATH ' + featureType);
 					// variantResidues[resSnp][serverName].push(obj_featType);
 				}
 
@@ -59,76 +64,63 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					description = description.replace(/[\s]+$/, '');
 					if (featureType == 'Metal ion-binding site' ){
 
-						let varInfo = [];
-						varInfo.push(description);
-						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'UniProt metal ion-binding site');
+						let posInfo = [];
+						posInfo.push(description);
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt metal ion-binding site');
 
 					}
 					else if (featureType == 'Site'){
-						let varInfo = [];
-						varInfo.push(description);
-						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'UniProt site');
+						let posInfo = [];
+						posInfo.push(description);
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt site');
 					}
 
 					else if (featureType == 'Modified residue'){
-						let varInfo = [];
-						varInfo.push(description);
-						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'UniProt modified residue');
+						let posInfo = [];
+						posInfo.push(description);
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt modified residue');
 					}
 
 					else if (featureType == 'Cross-link'){
-						let varInfo = [];
-						varInfo.push(description);
-						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'UniProt cross-link');
+						let posInfo = [];
+						posInfo.push(description);
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt cross-link');
 					}
 
 					else if (featureType == 'Sequence variant' || featureType == 'Mutagenesis site'){
-						let varInfo = []; let otherResInfo = [];
+						let varInfo = []; let otherResInfo = []; let posInfo = [];
+
 						// check for the right residue;
-						cleanData_uniprot_seqVar(description, variantResidues[resSnp].newResidue, varInfo, otherResInfo);
+						cleanData_uniprot_seqVar(description, variantResidues[resSnp].newResidues, varInfo, otherResInfo, posInfo);
 
-						addToVariantResidues(variantResidues, resSnp, varInfo, [], otherResInfo, 'UniProt ' + featureType);
+						addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'UniProt ' + featureType);
 
-						// let idx = checkAndRetIdx(variantResidues[resSnp][serverName], featureType);
-						/*
-						if (idx == -1){
-							obj_featType[featureType] = {};
-							if (objWithInfo.hasOwnProperty('mainToShow')){
-								obj_featType[featureType]['mainToShow'] = objWithInfo.mainToShow;
-							}
-							if (objWithInfo.hasOwnProperty('otherResidues')){
-								obj_featType[featureType]['otherResidues'] = "<li>" + objWithInfo.otherResidues + "</li>";
-							}
-							// obj_featType[featureType]['mainToShow'] = objWithInfo.mainToShow;
-							variantResidues[resSnp][serverName].push(obj_featType);
-						}
-						else { // already exists, hence append;
-
-							if (objWithInfo.hasOwnProperty('mainToShow')){
-								variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] + objWithInfo.mainToShow;
-							}
-							if (objWithInfo.hasOwnProperty('otherResidues')){
-								variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] = variantResidues[resSnp][serverName][idx][featureType]['otherResidues'] + "<li>" + objWithInfo.otherResidues + "</li>";
-							}
-							// variantResidues[resSnp][serverName][idx][featureType]['mainToShow'] = variantResidues[resSnp][serverName][idx][featureType]['mainToShow']  + '. ' + description;
-						}*/
 					}
 
 
 				}
-				else if (serverName == 'COSMIC mutations'){
+				else if (serverName == 'COSMIC'){
+
+					let varInfo = []; let posInfo = []; let otherResInfo = [];
+
+					console.log("The newAas are ")
+					console.log(variantResidues[resSnp]);
+					cleanData_cosmic(description, variantResidues[resSnp].newResidues, varInfo, posInfo, otherResInfo);
+
+					addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'COSMIC')
 					console.log("The cosmic description is " + description);
 				}
 
+				else if (serverName == 'FunVar'){
+					let varInfo = []; let otherResInfo = [];
+
+					console.log("The funVar description is 111 " + description);
+					cleanData_funVar(description, variantResidues[resSnp].newResidues, varInfo, otherResInfo);
+
+					addToVariantResidues(variantResidues, resSnp, varInfo, [], otherResInfo, 'FunVar')
+				}
 
 
-
-
-
-
-				console.log("over here! " + serverName);
-
-				console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
 
 
 				/*
@@ -188,6 +180,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 	}
 	*/
 }
+
 
 
 function addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, serverName){
@@ -274,25 +267,109 @@ function cleanData_pp(desc, varInfo){
 }
 
 
+function cleanData_funVar(desc, newAas, varInfo, otherResInfo){
 
-function cleanData_uniprot_seqVar(desc, newAa, varInfo, otherResInfo){
+	let arr = desc.split(/\|/);
+	let arr_aa = arr[0].split(/\>/);
+
+	if (arr_aa.length > 1){
+
+		let aaChange = arr[0].replace(/\>/, "&#8594;");
+		let arr_desc = arr[1].split("<br>");
+
+		console.log("The arr_desc is " + arr_desc);
+
+		let isFoundInNewAas = false;
+		newAas.forEach(function(newAa, newAa_i){
+			if (arr_aa[1] == newAa){
+				
+				varInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
+				isFoundInNewAas = true;
+			}
+		});
+
+		if (isFoundInNewAas == false){
+				otherResInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
+		}
+
+	}
+}
+
+
+function cleanData_cosmic(desc, newAas, varInfo, posInfo, otherResInfo){
+	let arr = desc.split(/\|/);
+	arr[0] = arr[0].replace(/^p\./, '');
+	arr_aas = arr[0].split(/[0-9]+/);
+
+	console.log("Cosmic 1 " + arr_aas[1]);
+	if (arr_aas.length >= 1 && arr_aas[1] != 'fs'){
+		let cosmic_newAa = arr_aas[1];
+		let cosmic_oldAa = arr_aas[0];
+
+		let val = checkIfInKey_ig(cosmic_newAa);
+		if (val != '-'){
+			cosmic_newAa = val;
+		}
+
+		let val_old= checkIfInKey_ig(cosmic_oldAa);
+		if (val_old != '-'){
+			cosmic_oldAa = val_old;
+		}
+
+		if (newAas){
+			let isFoundInNewAas = false;
+			newAas.forEach(function(newAa, newAa_i){
+				if (cosmic_newAa == newAa){
+					varInfo.push( cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
+					isFoundInNewAas = true;
+				}
+			});
+
+			if (isFoundInNewAas == false){
+				otherResInfo.push(cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
+			}
+		}
+
+
+	}
+	else{
+		posInfo.push(arr[1] + " " + arr[2]);
+	}
+
+}
+
+function cleanData_uniprot_seqVar(desc, newAas, varInfo, otherResInfo, posInfo){
 	// main to show, other residues;
+
+	console.log("The Uniprot seqVar desc are " + desc);
+
 
 	desc = desc.replace(/^[\s]+/, "");
 	desc = desc.replace(/\.$/, '');
 	desc = desc.replace(/\>/, '&#8594;')
 	let arr = desc.split(/[\s]+/);
 	if (arr[1] == '&#8594;'){
-		if (arr[2] == newAa){
-			varInfo.push(desc);
-		}
-		else {
-			otherResInfo.push(desc);
-		}
+			let isDescPushed = false;
+			if (newAas){
+				newAas.forEach(function(newAa, newAa_i){
+						if (oneAaCodes.includes(newAa)){
+								if (arr[2] == newAas[0]){
+									varInfo.push(desc);
+									isDescPushed = true;
+								}
+						}
+				});
+			}
+			if (isDescPushed == false){
+				otherResInfo.push(desc);
+			}
 	}
 	else {
-		varInfo.push(desc);
+		// add to posInfo
+		posInfo.push(desc);
 	}
+
+
 	/*
 	let objToReturn = {};
 
@@ -307,30 +384,45 @@ function cleanData_uniprot_seqVar(desc, newAa, varInfo, otherResInfo){
 	*/
 }
 
-function cleanData_snap2_getAvgScore(desc, arr_posInfo){
-	// console.log ('snap2 desc is ' + desc);
-	desc = desc.replace(/^[^\;]+\;/, '');
-	desc = desc.replace(/\;.*$/, '');
+function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas){
 
-	let arr = desc.split(/\:/);
+	let arr = desc.split(/\;/);
 
-	arr_posInfo.push("Average score: " + arr[1]);
+	if (arr.length > 2){
+		//console.log('snap2 desc is ' + arr.length + " |" +  arr[2] + "|");
+		arr[2] = desc.replace('function changing are:', '');
+		arr[2] = desc.replace(/[\s]+/g, '');
+		arr_indivRes = arr[2].split(/\,/);
+		//console.log ('snap2 desc is 3 ' + arr_indivRes);
 
 
-	/*
-	if (!obj_featType.hasOwnProperty('Mutational sensitivity')) {
-		obj_featType['Mutational sensitivity'] = {};
+		if (newAas){
+			newAas.forEach(function(newAa, newAa_i){
+					let isAddingToChange = false;
+					if (oneAaCodes.includes(newAa)){
+							let re = new RegExp("^" + newAa, 'i');
+							for (let i=0; i<arr_indivRes.length; i++){
+									// console.log('snap2 desc is 5 ' + arr[i]);
+									if (arr_indivRes[i].match(re)){
+											let score = arr_indivRes[i].split(/\:/);
+											arr_posInfo.push('Mutation (' + newAa + ') will change function (score=' + score[1] + ')');
+											//console.log("snap2 desc is 4 " + score[1] + " " + arr_indivRes[i]);
+											isAddingToChange = true;
+									}
+									// if (arr[i].toUpperCase().match(/^))
+							}
+							if (isAddingToChange == false){
+								arr_posInfo.push('Mutation (' + newAa + ') will not change function');
+							}
+					}
+
+
+			});
+		}
+
 	}
 
-	if (! obj_featType['Mutational sensitivity'].hasOwnProperty('mainToShow')){
-		obj_featType['Mutational sensitivity']['mainToShow'] = mainToShow;
-	}
-	else {
-		obj_featType['Mutational sensitivity']['mainToShow'] =  obj_featType['Mutational sensitivity']['mainToShow'] + "<br>" + mainToShow;
-	}
-	*/
-	// let obj_inFeatType = {mainToShow: "Average score: " + arr[1]};
-	// return obj_inFeatType;
+
 }
 
 
@@ -356,59 +448,58 @@ function cleanData_cath(desc, varInfo){
 	// return (obj_featType);
 }
 
-function cleanData_snap2_effects(desc, newAa, arr_varInfo, arr_otherResInfo){
-	console.log("now the snap2 desc is " + desc);
+function cleanData_snap2_effects(desc, newAas, arr_posInfo, arr_otherResInfo){
+	console.log("snap2 desc 1 " + desc);
+	let arr = desc.split(/\;/);
 
-	let arr = desc.split("\;");
-	let toAdd_varInfo = ''; let toAdd_otherResInfo = '';
+	let posInfoDesc = "";
+	if (arr.length >= 1){
+		posInfoDesc = arr[0] +". ";
+	}
 
-	console.log(arr[0]);
-	toAdd_varInfo = arr[0];
+	if (arr.length >= 2){
+		arr[1] = arr[1].replace(/[\s]+$/, '');
+		posInfoDesc = posInfoDesc + arr[1];
+	}
 
-	if (arr.length > 2){
-		// individual residue values are present
-		// Search for newResidue; // Data is in mainToHide, otherResidues;
+	if (arr.length >= 3){
+		arr[2] = arr[2].replace('function changing are:', '');
+		arr[2] = arr[2].replace(/[\s]+/g, '');
+		arr_indivRes = arr[2].split(/\,/);
 
-		arr[2] = arr[2].replace(/^[^\:]+:/, '');
-		let arr_1 = arr[2].split("\,");
-
-		toAdd_otherResInfo = arr_1.length + "/20 residues add to change. " + 'Additional residues adding to mutational sensitivity ';
-
-		let isNewResFound = false;
-
-		let regex = new RegExp("^[\\s]*" + newAa);
-		let foundIdx = -1;
-		console.log("regex is " + regex);
-		arr_1.forEach(function(item, i){
-			item = item.replace(/\s/g, '');
-			if (item.match(regex)){
-				// console.log("found ! " + item);
-				isNewResFound = true;
-				toAdd_varInfo =  toAdd_varInfo + ". Residue's specific score " + item;
-				foundIdx = i;
-
+		let posToRm = [];
+		for (let i =0; i<arr_indivRes.length; i++){
+			let aa = arr_indivRes[i].split("\:")[0];
+			if (newAas.includes(aa.toUpperCase())){
+				posToRm.push(i);
 			}
-			else {
-				toAdd_otherResInfo = toAdd_otherResInfo + " " + item;
-			}
-			// console.log(item + " " + newRes);
+		}
+		posToRm.sort(function(a, b){
+			return b - a;
 		});
 
-		if (isNewResFound == false){
-			// This residue does not add to change;
-			toAdd_varInfo = toAdd_varInfo + "This residue does not add to mutational sensitivity";
+		posToRm.forEach(function(pos, pos_i){
+			arr_indivRes.splice(pos, 1);
+		});
+
+		if (arr_indivRes.length > 0){
+			let otherInfoDesc = "Additional residues changing function are:";
+
+			arr_indivRes.forEach(function(indivRes, indivRes_i){
+				otherInfoDesc = otherInfoDesc + " " + indivRes;
+			});
+
+			arr_otherResInfo.push(otherInfoDesc);
 		}
 
-		// console.log("Testing 123: " + toAdd_varInfo + "| " + toAdd_otherResInfo);
+		console.log("snap2 posToRm is " + posToRm);
 	}
 
-	if (toAdd_varInfo != ''){
-		arr_varInfo.push(toAdd_varInfo);
-	}
-	if (toAdd_otherResInfo != ''){
-		arr_otherResInfo.push(toAdd_otherResInfo);
-	}
 
+
+	if (posInfoDesc != ''){
+		arr_posInfo.push(posInfoDesc);
+	}
 
 }
 
@@ -482,4 +573,59 @@ function getSubstringOfInterest_cath(description){
 	desc = desc.replace(/^.+\:/, '');
 
 	return desc;
+}
+
+const oneAaCodes = ['A',	'R',	'N',	'D',	'C',	'Q',	'E',	'G',	'H',	'I',	'L',	'K',	'M',	'F',	'P',	'S',	'T',	'W',	'Y',	'V'];
+
+
+const threeToOneResMap = {
+	Gly: 'G',
+	Ala: 'A',
+	Leu: 'L',
+	Met: 'M',
+	Phe: 'F',
+	Trp: 'W',
+	Lys: 'K',
+	Gln: 'Q',
+	Glu: 'E',
+	Ser: 'S',
+	Pro: 'P',
+	Val: 'V',
+	Ile: 'I',
+	Cys: 'C',
+	Tyr: 'Y',
+	His: 'H',
+	Arg: 'R',
+	Asn: 'N',
+	Asp: 'D',
+	Thr: 'T',
+};
+
+function checkIfInKey_ig(threeLetterCode){
+	let key = Object.keys(threeToOneResMap).find(k => k.toLowerCase() === threeLetterCode.toLowerCase());
+	console.log("The key is " + key);
+	if (key){
+		return (threeToOneResMap[key]);
+	}
+	else {
+		return '-';
+	}
+}
+
+
+function checkIfInVal_ig(oneLetterCode){
+	// let isFound = false;
+	let newRes = '-';
+	Object.keys(threeToOneResMap).forEach(function(item, i){
+		if (threeToOneResMap[item].toLowerCase() === oneLetterCode.toLowerCase()){
+			newRes = oneLetterCode.toUpperCase();
+		}
+	});
+	return newRes;
+    /* for (var prop in threeToOneResMap) {
+        if (threeToOneResMap.hasOwnProperty(prop) && threeToOneResMap[prop].toLowerCase() === oneLetterCode.toLowerCase()) {
+            return threeToOneResMap[prop];
+        }
+    }
+    return '-'; */
 }
