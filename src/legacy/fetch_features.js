@@ -32,8 +32,8 @@ var servers = [
 		{
 			"id": 'PredictProtein',
 			"Server": 'PredictProtein',
-			"URL": 'https://api.predictprotein.org/v1/results/molart/',
-			'description': 'This is the precict protein description',
+			// "URL": 'https://api.predictprotein.org/v1/results/molart/',
+			"URL": `${window.BACKEND}/singleReqRedis/PredictProtein_`,
 		},
 		{
 			"id": 'SNAP2',
@@ -43,7 +43,8 @@ var servers = [
 		{
 			"id": 'CATH',
 			"Server": 'CATH',
-			"URL": window.location.protocol + '//www.cathdb.info/version/v4_3_0/api/rest/uniprot_to_funfam/',
+			"URL": `${window.BACKEND}/singleReqRedis/CATH_`,
+			// "URL": window.location.protocol + '//www.cathdb.info/version/v4_3_0/api/rest/uniprot_to_funfam/',
 			"URL_covid": `${window.BACKEND}/covid19cath/`,
 			// ?content-type=application/json
 		},
