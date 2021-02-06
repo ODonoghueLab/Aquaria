@@ -14,9 +14,9 @@ import 'jquery-ui-dist/jquery-ui.css'
 // note that anything here ends up in the main bundle (will be loaded for every route)
 import 'jquery-ui-dist/jquery-ui'
 import 'jquery-expander'
-import './legacy/javascripts/chardinjs.mod'
+// import './legacy/javascripts/chardinjs.mod'
 
-// load other globals (some may depend on jquery/plugins above)
+// // load other globals (some may depend on jquery/plugins above)
 import './legacy/javascripts/browser_check'
 
 // Import all styles

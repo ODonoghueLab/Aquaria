@@ -26,8 +26,8 @@
 
 <script>
 import axios from 'axios'
-import MatrixHeader from '../components/MatrixHeader'
-import LoadingPage from '../components/LoadingPage'
+import MatrixHeader from '../components/COVID/MatrixHeader'
+import LoadingPage from '../components/COVID/LoadingPage'
 import VLazyImage from 'v-lazy-image'
 import store from '@/store/index'
 
@@ -60,8 +60,6 @@ export default {
       document.querySelector('#graph').style.display = 'block'
       document.querySelector('#container').style.display = 'none'
     }
-    // var numStructures = [0, 2, 2, 2, 0, 0, 0, 0, 0, 25, 357, 495, 117, 0]
-    // var numStructures = [2, 0, 35, 0, 0, 0, 0, 3, 0, 0, 4, 678, 528, 134]
     let allStructures
     var matchingStructures, purl
 
@@ -154,10 +152,6 @@ export default {
     redirect: function (primaryAccession) {
       // THIS GOES BACK TO AQUARIA.WS
       let redirectionPort = '/'
-      // if (window.location.hostname === 'aquaria.ws') {
-      //   // Only on AWS production server, use the default port
-      //   redirectionPort = '/'
-      // }
       if (window.location.hostname === 'localhost') {
         // Only on local dev server
         redirectionPort = ':8009/'
@@ -168,26 +162,15 @@ export default {
   },
   updated () {
     const isPhone = this.checkPhone()
-
-    // var isPhone = this.checkPhone()
     var hDiff = (window.outerHeight - window.innerHeight)
-    // document.getElementById('res').innerHTML = 'updated! '
-    // document.getElementById('hd').innerHTML = ' hDiff: ' + hDiff
     if (isPhone && window.innerHeight > 315) {
       if (Math.abs(hDiff) >= 114) {
-        // document.getElementById('hd').innerHTML = ' hDiff:  ' + hDiff
-        // document.getElementById('header').style.backgroundColor = 'Hotpink'
         document.querySelector('#matrix').style.height = '88vh'
         document.getElementById('about_overlay').style.maxHeight = '80vh'
         document.getElementById('container').style.maxHeight = '80vh'
         window.scrollTo(0, 0)
       } else {
-        // document.getElementById('hd').innerHTML = ' hDiff:  ' + hDiff
-        // document.getElementById('header').setAttribute('style', '')
         document.querySelector('#matrix').style = ''
-        // document.getElementById('about_overlay').setAttribute('style', '')
-        // document.getElementById('container').setAttribute('style', '')
-        // window.scrollTo(0, 9)
       }
     }
   },

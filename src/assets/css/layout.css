@@ -37,14 +37,6 @@ main {
     height: 98vh;
 }  
 
-#header {
-  display: flex;
-  flex-flow: row nowrap;
-  /* Then we define how to distribute the remaining space */
-  justify-content: space-between; 
-  margin-top: 0.5rem;
-  /* order: 2; */
-}
 .item {
     flex-grow: 0;
     flex-basis: 3rem;
