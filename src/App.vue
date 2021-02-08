@@ -13,7 +13,6 @@
 </template>
 
 <script>
-// import axios from 'axios'
 import { screenshot } from './utils/Screenshot'
 import store from './store/index'
 
@@ -47,62 +46,6 @@ export default {
       }
     }
   },
-  // beforeMount () {
-  //   // var regex = /(^\d+\/*$)/
-  //   if (window.location.pathname === '/') {
-  //     if (sessionStorage.getItem('link') == null) {
-  //       window.location.pathname = '/O15350/2xwc/A'
-  //     } else {
-  //       window.location.pathname = sessionStorage.getItem('link')
-  //     }
-  //   }
-  //   var url = ''
-  //   // var hostname = window.location.protocol + '//' + window.location.hostname
-  //   if (window.location.pathname.split('/')[1] === 'covid19') {
-  //     url = `${process.env.VUE_APP_AQUARIA_BACKEND}/SARS-CoV-2`
-  //   } else {
-  //     url = `${process.env.VUE_APP_AQUARIA_BACKEND}${window.location.pathname}`
-  //   }
-  //   axios({
-  //     method: 'get',
-  //     url: url
-  //   })
-  //     .then(function (response) {
-  //       if (response.data.initialParams) {
-  //         window.location.pathname = JSON.parse(response.data.initialParams).primary_accession + '/' + JSON.parse(response.data.initialParams).pdb_id
-  //       }
-  //       if (response.data.primary_accessions) {
-  //         window.localStorage.setItem('OrgID', response.data.OrganismID)
-  //         if (response.data.OrganismID === '2697049') {
-  //           window.location.pathname = 'SARS-CoV-2'
-  //         } else {
-  //           window.location.pathname = '/orgID/' + response.data.OrganismID
-  //         }
-  //         this.primary_accession = response
-  //       }
-  //     }
-  //     )
-  // },
-  // mounted () {
-  //   setTimeout(function () {
-  //     const pdf = window.BACKEND + '/COVID-Structural-Coverage-Map.pdf'
-  //     const js1 = window.BACKEND + '/javascripts/aquaria.js'
-  //     const js2 = window.BACKEND + '/javascripts/jolecule.js'
-  //     axios({
-  //       method: 'get',
-  //       url: pdf
-  //     })
-  //     axios({
-  //       method: 'get',
-  //       url: js1
-  //     })
-
-  //     axios({
-  //       method: 'get',
-  //       url: js2
-  //     })
-  //   }, 15000)
-  // },
   updated () {
     sessionStorage.setItem('link', window.location.pathname)
   }

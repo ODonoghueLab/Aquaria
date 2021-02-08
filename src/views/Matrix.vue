@@ -83,10 +83,10 @@ export default {
       if (window.location.hostname === 'aquaria.ws') {
         url = 'https://' + window.location.hostname + ':8010/2697049'
       } else {
-        url = window.location.protocol + '//' + window.location.hostname + ':8010/2697049'
+        url = `${window.BACKEND}/2697049`
       }
     } else {
-      url = window.location.protocol + '//' + window.location.hostname + ':8010/' + window.location.pathname.split('/')[2]
+      url = `${window.BACKEND}/2697049/` + window.location.pathname.split('/')[2]
     }
 
     document.querySelector('#graph > img').addEventListener('load', () => {
