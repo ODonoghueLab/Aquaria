@@ -106,11 +106,12 @@ export default {
           for (let index = 0; index < allStructures.length; index++) {
             allStructures[index].count = 0
             if (allStructures[index].PDB_chain_hash != null) {
-              if (window.location.hostname === 'aquaria.ws') {
-                purl = 'https://aquaria.ws' + ':8010/' + allStructures[index].primary_accession + '.csv'
-              } else {
-                purl = this.hostname + ':8010/' + allStructures[index].primary_accession + '.csv'
-              }
+              purl = `${window.BACKEND}/${allStructures[index].primary_accession}.csv`
+              // if (window.location.hostname === 'aquaria.ws') {
+              //   purl = 'https://aquaria.ws' + ':8010/' + allStructures[index].primary_accession + '.csv'
+              // } else {
+              //   purl = this.hostname + ':8010/' + allStructures[index].primary_accession + '.csv'
+              // }
               axios({
                 method: 'get',
                 url: purl
