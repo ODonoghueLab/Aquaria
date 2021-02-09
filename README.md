@@ -1,4 +1,4 @@
-# aquaria-vuerouter
+# Refactoring user interface using Vue-routing
 
 ## Project setup
 ```
