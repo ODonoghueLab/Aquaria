@@ -1,0 +1,108 @@
+name: Deploy Production Client to Github Pages
+
+on:
+  push:
+    branches:
+      - master
+      - refactored2
+    paths-ignore:
+      - README.md
+      - .editorconfig
+      - .gitignore
+      - .eslintrc.js
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_OUTPUT_PATH: dist
+      PUBLISH_REPO_PATH: publish
+      PUBLISH_BRANCH: gh-pages
+      VUE_APP_STATIC_SPA_MODE: true
+      # production specific settings
+      AQUARIA_CLIENT_EMIT_CNAME_PROD: aquaria.app
+      VUE_APP_AQUARIA_BACKEND_PROD: https://odonoghuelab.org:8011
+      PUBLISH_REPO_PROD: aqclient/aqclient.github.io
+      # test specific settings
+      AQUARIA_CLIENT_EMIT_CNAME_TEST: test.aquaria.app
+      VUE_APP_AQUARIA_BACKEND_TEST: https://odonoghuelab.org:8011
+      PUBLISH_REPO_TEST: aqclient/test.aqclient.github.io
+
+    steps:
+    - name: Configure environment (production)
+      if: github.ref == 'refs/heads/refactored2'
+      run: |
+        echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_PROD" >> $GITHUB_ENV
+        echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_PROD" >> $GITHUB_ENV
+        echo "PUBLISH_REPO=$PUBLISH_REPO_PROD" >> $GITHUB_ENV
+    - name: Configure environment (test)
+      if: github.ref == 'refs/heads/refactored2'
+      run: |
+        echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_TEST" >> $GITHUB_ENV
+        echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_TEST" >> $GITHUB_ENV
+        echo "PUBLISH_REPO=$PUBLISH_REPO_TEST" >> $GITHUB_ENV
+    - name: Checkout source repo
+      uses: actions/checkout@v2
+
+    - name: Checkout publish repo
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ env.PUBLISH_REPO }}
+        ref: ${{ env.PUBLISH_BRANCH }}
+        path: '${{ env.PUBLISH_REPO_PATH }}'
+        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
+
+    - name: Clean publish repo
+      working-directory: ${{ env.PUBLISH_REPO_PATH }}
+      run: |
+        git rm -rf .
+        git clean -fxd
+    - name: Set up Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build client
+      run: npm run build --fix
+
+    - name: Copy build
+      run: 'cp -r ${{ env.BUILD_OUTPUT_PATH }}/* ${{ env.PUBLISH_REPO_PATH }}'
+
+    - name: Check for changes
+      working-directory: ${{ env.PUBLISH_REPO_PATH }}
+      run: |
+        git add .
+        git status
+        [[ -z $(git status --porcelain) ]] || echo "::set-output name=changed::true"
+      id: check_changes
+
+    - name: Update publish repo
+      if: steps.check_changes.outputs.changed
+      working-directory: ${{ env.PUBLISH_REPO_PATH }}
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "Deploy $GITHUB_SHA"
+    - name: Deploy to Pages
+      if: steps.check_changes.outputs.changed
+      uses: ad-m/github-push-action@v0.6.0
+      with:
+        directory: ${{ env.PUBLISH_REPO_PATH }}
+        repository: ${{ env.PUBLISH_REPO }}
+        branch: ${{ env.PUBLISH_BRANCH }}
+        github_token: ${{ secrets.PUBLISH_ACCESS_TOKEN }}

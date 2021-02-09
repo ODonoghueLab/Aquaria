@@ -1,0 +1,309 @@
+@media screen, print
+{
+	body{
+	    margin:0 auto;
+/* 	    position: relative; */
+	}
+	
+	#footer {
+	    clear:both;
+	    width:100%;
+	    height:20px;
+	    }
+	
+	#content {
+	    /*float: left;*/
+	    min-height:100%;
+	    width: 100%;
+	    /*overflow: hidden;*/
+	}
+
+	#gallery {
+	    width: 250px;
+		min-height: 100px;
+		position: absolute;
+		top: 9px;
+		right: 2%;
+	}
+	
+	#center {
+		margin: 0 254px;
+	}
+	
+	#controls {
+		position: absolute;
+		top: 9px;
+		left: 2%;
+	    width: 250px;
+	    min-height:100%;
+	}
+	
+	#controls div, #gallery div { 
+		margin: 2px 0; 
+		width: 240px;
+	}
+	#wrapper {
+		width:96%;
+		margin:0 auto;
+	}
+	
+	div.outer_container {
+		position: relative;	
+		left: -40px;
+		height: 42px;
+	}
+	
+	div#featureContainer {
+		position: static;
+		height: fit-content;
+		max-height: 200px;
+		overflow: scroll;
+	}
+	div#featureContainer.noscroll {
+		height: fit-content;
+		max-height: none;
+	}
+	div.container {
+		position: absolute;
+		top:0px;
+		left:40px;
+		/*float:left;
+		margin-left: 40px;*/
+		width: 100%;
+	}
+	
+	#description span.content {
+		height: 600px;
+		overflow: hidden;
+	}
+	div#uniProtDesc {
+		height: 300px;
+		overflow: hidden;
+	}
+
+	#groupedFeatures{
+		margin-left: 6px;
+	}
+
+	div.featureHeader{
+		display: inline-flex;
+		width: 100%;
+		background: rgb(204, 204, 204);
+		padding-bottom: 6px;
+		height: fit-content;
+		max-height: 25px;
+	}
+
+	div.featureHeader p{
+		cursor: pointer;
+	}
+
+	.featureName{
+		font-size: calc(15px + 0.2vw);
+		padding: 8px;
+		color: #5a5959;
+	}
+
+	div.featureHeader .info{
+		font-size: calc(10px + 0.2vw);
+		padding: 0px 5px 8px 5px;
+		color: #5a5959;
+		background-color: white;
+		border-radius: 12px;
+		height: 8px;
+		margin-top: 10px;
+		position: relative;
+	}
+
+	/* Tooltip text */
+	span.tooltiptext {
+		visibility: hidden;
+		width: fit-content;
+		max-width: 38vw;
+		min-width: 25vw;
+		background-color: #fff;
+		color: black;
+		text-align: left;
+		padding: 5px 10px;
+		border-radius: 6px;
+		/* Position the tooltip text - see examples below! */
+		position: absolute;
+		z-index: 1;
+		overflow-wrap: break-word;
+		margin-top: -5px;
+	}
+	  
+	/* Show the tooltip text when you mouse over the tooltip container */
+	/* .info:hover span.tooltiptext {
+		visibility: visible;
+	  } */
+	
+	h3.infoHeader{
+		background-color: white;
+		color: black;
+	}
+
+	#remove{
+		margin-left: auto; 
+		margin-right: 4px;
+		height: 19px;
+		margin-right: 10px;
+	}
+
+	/* #share{
+		height: 19px;
+		margin-right: 10px;
+	} */
+
+	.featureButtons{
+		margin-top: 10px;
+		background: #777777;
+		color: #e8e2e2;
+		border-radius: 10px;
+		padding-top: 0px;
+		cursor: pointer;
+	}
+
+	.featureButtons{
+		visibility: hidden;
+	}
+
+  	div.featureTrack{
+		display: none;
+		background: none;
+		height: fit-content;
+	}
+
+	/* ABOUT PDB PANEL CSS */
+
+	#classification a{
+		color: #9a9999;
+		font-size: 14px;
+	}
+
+	#classification:hover > a{
+		color: #08C;
+		font-size: 14px;
+	}
+
+	div.panel p#molecule, p#method, #classification{
+		padding: 2px 8px;
+    	margin: 20px 0px 0px 0px;
+	}
+
+	h4#reference_title{
+		padding: 0px 8px;
+		margin: 14px 0px 0px 0px;
+	}
+
+	p#reference_link, p#organism, p#pdb, p#resolution, p#small_molecules{
+		margin: 2px 0px 0px 0px;
+		padding: 2px 8px;
+	}
+
+
+	/* #reference_title #reference_link{
+		hyphens: auto;
+	}
+
+	#aboutPDBHider{
+		font-size: 10px;
+	} */
+}
+
+/**
+ * iPads
+ **/
+@media only screen
+and (min-width : 600px)
+and (max-width : 1024px) {
+	#wrapper {
+		width:100%;
+		margin:0 auto;
+	}
+	#center {
+	    min-height:100%;
+		float:right;
+	    width: calc(100vw - 330px);
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		margin-right: 65px;
+	}
+	#structure-viewer,
+	#structurematches {
+		margin-left: 40px;
+	}
+	#gallery {
+		float:left;
+		width:134px;
+		min-height:100%;
+		position: static;
+		clear: both;
+		margin-left: 10px;
+	}
+	#controls {
+		float:left;
+	    width:250px;
+	    min-height:100%;
+		position: static;
+		margin: 10px auto 2px 10px;
+	}
+	#controls div#logo {
+		width: 240px;
+		margin-left: 10px;
+	}
+	#controls div#wait {
+		position: absolute;
+		top: -2px;
+		left: 15px;
+		z-index: 101;
+	}
+}
+
+/**
+ * Smartphones (portrait and landscape) -----------
+ **/
+@media only screen
+and (min-width : 320px)
+and (max-width : 600px) {
+	/* Styles */
+	#content, #gallery, #center, #controls,
+	#gallery div, #controls div {
+		float: none;
+		position: static;
+		display: block;
+		width: 100%;
+		margin: 0px;
+		box-sizing: border-box;
+	}
+	#controls {
+		margin: 0px;
+	}
+	#controls div#logo {
+		width: 240px;
+		margin-left: 10px;
+	}
+	#controls div#wait {
+		position: absolute;
+		top: 9px;
+		left: 35px;
+		z-index: 101;
+	}
+	#center {
+		margin: 4px;
+		margin-right: auto;
+		width: calc(100vw - 80px)
+	}
+	div.panel span#threeD {
+		min-height: 500px;
+		width: 100%;
+	}
+	#structure-viewer {
+		margin-left: 27px;
+	}
+	#structurematches {
+		margin-left: 27px;
+	}
+}
+
