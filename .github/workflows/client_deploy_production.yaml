@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - refactored2
+      - test
     paths-ignore:
       - README.md
       - .editorconfig
@@ -30,13 +30,13 @@ jobs:
 
     steps:
     - name: Configure environment (production)
-      if: github.ref == 'refs/heads/refactored2'
+      if: github.ref == 'refs/heads/test'
       run: |
         echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_PROD" >> $GITHUB_ENV
         echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_PROD" >> $GITHUB_ENV
         echo "PUBLISH_REPO=$PUBLISH_REPO_PROD" >> $GITHUB_ENV
     - name: Configure environment (test)
-      if: github.ref == 'refs/heads/refactored2'
+      if: github.ref == 'refs/heads/test'
       run: |
         echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_TEST" >> $GITHUB_ENV
         echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_TEST" >> $GITHUB_ENV
