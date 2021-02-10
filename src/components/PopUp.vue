@@ -88,7 +88,6 @@ export default {
             moveAndShowClickedDivAa(oneAaCodes[k])
           })
         }
-        handleInitVar()
       }
       for (let i = 0, len = b2.length; i !== len; ++i) {
         b2[0].parentNode.removeChild(b2[0])
@@ -103,7 +102,7 @@ export default {
             const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: anAaToReplace[j].innerHTML } }, propsData: { useClick: true } })
             componentinstance.$mount()
             componentinstance.$el.innerHTML = anAaToReplace[j].innerHTML
-            console.log('anAaToReplace[j] ' + anAaToReplace[j].innerHTML)
+            // console.log('anAaToReplace[j] ' + anAaToReplace[j].innerHTML)
             varInfoDivAnAa.appendChild(componentinstance.$el)
             this.expandTextLine.push(componentinstance)
           }
@@ -112,6 +111,7 @@ export default {
           for (let l = 0, len = anAaToReplace.length; l !== len; ++l) {
             anAaToReplace[0].parentNode.removeChild(anAaToReplace[0])
           }
+          handleInitVar()
         }
       }
 
@@ -128,6 +128,7 @@ export default {
       function moveAndShowClickedDivAa (selAa) {
         for (let i = 0; i < oneAaCodes.length; i++) {
           if (selAa === oneAaCodes[i]) {
+            console.log('It comes down here!')
             document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + selAa))
           } else {
             document.getElementById('divVI_varInfo').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[i]))
@@ -136,16 +137,17 @@ export default {
       }
 
       function handleInitVar () {
-        let a = document.getElementById('span_missenseHeading').innerHTML
-        a = a.replace(/[()]+/g, '')
-        const arr = a.split('→')
+        if (document.getElementById('span_missenseHeading')) {
+          let a = document.getElementById('span_missenseHeading').innerHTML
+          a = a.replace(/[()]+/g, '')
+          const arr = a.split('→')
 
-        if (arr.length > 1) {
-          console.log('The cleaned up heading is wtf 3 ' + arr[1])
-          hideClickedUnhideOthrs(arr[1])
-          moveAndShowClickedDivAa(arr[1])
+          if (arr.length > 1) {
+            console.log('The cleaned up heading is wtf 3 |' + arr[1] + '|')
+            hideClickedUnhideOthrs(arr[1])
+            moveAndShowClickedDivAa(arr[1])
+          }
         }
-
         // document.getElementById('span_missenseHeading').innerHTML = a
       }
     },
