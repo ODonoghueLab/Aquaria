@@ -1500,10 +1500,10 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 				aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
 				aFeature['Name'] = featAndDesc.featStr;
 				if (consInfo[resNum].hasOwnProperty('oldRes')){
-						aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading'> (" + consInfo[resNum]['oldRes'] + '&#8594;' + consInfo[resNum]['newAas'][0] + ")</span>"
+						aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum]['oldRes'] + '&#8594;' + consInfo[resNum]['newAas'][0] + ")</span>"
 				}
 				else {
-					aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading'> </span>"
+					aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading' class='btnAaBold'> </span>"
 				}
 				// aFeature['Name'] = featAndDesc.featStr;
 				aFeature['Color'] = "#F73C3C"
@@ -1535,7 +1535,6 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 }
 
 function addNewResAndGrantham(varinatResidues_resNum, consInfo_resNum){
-	console.log("Pawnee 1 ");
 
 	consInfo_resNum['newAas'].forEach(function(newAa, newAa_i){
 		if (!varinatResidues_resNum.hasOwnProperty(newAa)){

@@ -66,10 +66,11 @@ export default {
           posInfoDiv.appendChild(componentinstance.$el)
           this.expandTextLine.push(componentinstance)
         }
+        document.getElementById('balloon').appendChild(document.getElementById('divVariantInfo'))
         // Add the chosen VarInfo div.
-        document.getElementById('balloon').appendChild(document.getElementById('divVI_chosen'))
+        document.getElementById('divVariantInfo').appendChild(document.getElementById('divVI_chosen'))
         // Add the posInfo div.
-        document.getElementById('balloon').appendChild(document.getElementById('divVI_posInfo'))
+        document.getElementById('divVariantInfo').appendChild(document.getElementById('divVI_posInfo'))
 
         // Add btns.
         document.getElementById('balloon').appendChild(document.getElementById('buttons_eachAa'))
@@ -143,7 +144,6 @@ export default {
           const arr = a.split('→')
 
           if (arr.length > 1) {
-            console.log('The cleaned up heading is wtf 3 |' + arr[1] + '|')
             hideClickedUnhideOthrs(arr[1])
             moveAndShowClickedDivAa(arr[1])
           }
@@ -265,4 +265,36 @@ export default {
     #popupTail {
         margin-top: -6px;
     }
+    /* Add this via class to link.
+    a:link {
+      color: #d5d4d5;
+      text-decoration: underline;
+    }
+    */
+</style>
+
+<style>
+  hr {
+    border-top: 0.5px solid #929192;
+  }
+  .btnAaBold {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+    color: #929192 !important;
+    padding-left: 3.5px;
+    padding-right: 3.5px;
+    display: inline;
+  }
+  .pAaColor {
+    display: inline;
+    color: #929192 !important;
+  }
+  .aaLightBg {
+    background-color: #7f7e7f;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 </style>

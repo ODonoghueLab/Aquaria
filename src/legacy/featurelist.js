@@ -580,13 +580,13 @@ function showAnnotation(f, eid) {
 		urlhtml += "</p>";
 	}
 	$("div.popup").remove();
-	var balloon = "<div style='display: none;'> <div id='divVI_chosen'></div> <div id='divVI_posInfo'><br><b>Residue " + f.start + "</b></div> ";
+	var balloon = "<div style='display: none;'> <div id='divVariantInfo' class='aaLightBg'></div><div id='divVI_chosen'></div> <div id='divVI_posInfo'><hr><b>Residue " + f.start + "</b></div> ";
 
-	let btnsDiv = "<div id='buttons_eachAa'>";
+	let btnsDiv = "<div id='buttons_eachAa'> <b>See also:</b><p class='pAaColor'> &rarr;</p>";
 	balloon = balloon + "<div id='divVI_varInfo'>"
 	oneAaCodes.forEach(function (anAa, _i) {
 		balloon = balloon + "<div id='divVI_varInfo_" + anAa + "'></div>"
-		btnsDiv = btnsDiv + "<button id='btnVI_" + anAa  + "' > " + anAa + "</button>"
+		btnsDiv = btnsDiv + "<button id='btnVI_" + anAa  + "' class='btnAaBold'> " + anAa + "</button>"
 	})
 	balloon = balloon + "</div>";
 	btnsDiv = btnsDiv + "</div>";
