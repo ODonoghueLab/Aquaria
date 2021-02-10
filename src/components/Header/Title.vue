@@ -226,7 +226,7 @@ span#org_prot a, span#uniprotpanel a  {
   transition: all 0.7s ease;
 }
 span#org_prot img, span#uniprotpanel img  {
-height: calc(10px + .6vw);
+height: calc(10px + .4vw);
 }
 span#pdb_id a, span#no_pdb_id a {
   padding-right: 1rem;

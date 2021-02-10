@@ -51,7 +51,7 @@ const XRButtonComponent = {
       hevsUploadedCollections: [],
       psvrEnabled: !!search.get('PSVR'),
       advancedViewerEnabled: !!search.get('dev'),
-      ar: require('../../assets/img/ar-button.png')
+      ar: require('../../assets/img/AR-quaria.png')
     }
   },
   mounted: function () {
@@ -526,7 +526,7 @@ export default XRButtonComponent
     font-weight: 500;
   }
   .QRCodeMobile img.xr-qr{
-      width: 180px;
+      width: 100%;
   }
   #QRCodeLaptop {
     background: #c2c2c2;
@@ -543,8 +543,8 @@ export default XRButtonComponent
     background: #c2c2c2;
     padding: 1.4% 1.4%;
     border-radius: 20px;
-    width: 50%;
-    margin: 0px 1px;
+    width: 46%;
+    margin: auto;
   }
   .QRCodeMobile  > div {
     display: inline-flex;
@@ -560,7 +560,7 @@ export default XRButtonComponent
     color: #707070;
   }
   #QRCodeLaptop > p:nth-child(1), #QRCodeLaptop > div > p:nth-child(1){
-    font-variant: small-caps;
+    /* font-variant: small-caps; */
     line-height: 2rem;
     font-size: 1.2rem;
     /* font-family: Helvetica; */
@@ -570,7 +570,7 @@ export default XRButtonComponent
    .QRCodeMobile > p:nth-child(1) {
     margin: 0.2em 0em 0em 1em;
     font-size: 1em;
-    font-variant: small-caps;
+    /* font-variant: small-caps; */
     /* font-family: Helvetica; */
     color: #707070;
     font-weight: 600;

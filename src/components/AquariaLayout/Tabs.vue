@@ -84,7 +84,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 .tabs {
     display: flex;
     flex-flow: row wrap;
