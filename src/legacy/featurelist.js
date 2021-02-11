@@ -568,7 +568,7 @@ const oneAaCodes = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 
 
 function showAnnotation(f, eid) {
 	// console.log(eid);
-	// console.log("Hovered "+f.name+" "+f.start+"-"+f.end+": "+f.desc);
+	console.log("Hovered "+f.name+" "+f.start+"-"+f.end+": "+f.desc);
 	var urlhtml = "";
 	if (f.urls.length > 0) {
 		// var lnx = f.urls.split(";");
@@ -580,14 +580,23 @@ function showAnnotation(f, eid) {
 		urlhtml += "</p>";
 	}
 	$("div.popup").remove();
-	var balloon = "<div style='display: none;'> <div id='divVariantInfo' class='aaLightBg'></div><div id='divVI_chosen'></div> <div id='divVI_posInfo'><hr><b>Residue " + f.start + "</b></div> ";
+	var balloon = "<div style='display: none;'> <div id='divVariantInfo' class='aaLightBg'></div><div id='divVI_chosen'></div> <div id='divVI_posInfo'><hr class='anAaHr'><b>Residue " + f.start + "</b></div> ";
 
 	let btnsDiv = "<div id='buttons_eachAa'> <b>See also:</b><p class='pAaColor'> &rarr;</p>";
 	balloon = balloon + "<div id='divVI_varInfo'>"
 	oneAaCodes.forEach(function (anAa, _i) {
 		balloon = balloon + "<div id='divVI_varInfo_" + anAa + "'></div>"
-		btnsDiv = btnsDiv + "<button id='btnVI_" + anAa  + "' class='btnAaBold'> " + anAa + "</button>"
+		let isUniCosOrFun = isUniCosOrFunPresent(anAa, f.desc);
+		btnsDiv = btnsDiv + "<button id='btnVI_" + anAa  + "'";
+		if (isUniCosOrFun == true) {
+			btnsDiv = btnsDiv + "class='btnAaBold_b'> <b>" + anAa + "</b> "
+		}
+		else{
+			btnsDiv = btnsDiv +  " class='btnAaBold'> " + anAa
+		}
+		btnsDiv = btnsDiv + "</button>"
 	})
+
 	balloon = balloon + "</div>";
 	btnsDiv = btnsDiv + "</div>";
 	balloon = balloon + btnsDiv;
@@ -664,6 +673,21 @@ function showAnnotation(f, eid) {
 	// 	}, 500);
 	// });
 
+}
+
+function isUniCosOrFunPresent(anAa, desc){
+	let tag_open = '<toReplace_varInfo_' + anAa + ">";
+	let tag_close = '</toReplace_varInfo_' + anAa + ">";
+
+	let	firstOpenPos = desc.indexOf(tag_open);
+	let lastClosePos = desc.lastIndexOf(tag_close);
+
+	let description = desc.substring(firstOpenPos, lastClosePos);
+
+	if (description.match("UniProt") || description.match("FunVar") || description.match("COSMIC")){
+		return true;
+	}
+	return false;
 }
 
 function handleCathPopups(f){

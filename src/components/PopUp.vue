@@ -265,16 +265,11 @@ export default {
     #popupTail {
         margin-top: -6px;
     }
-    /* Add this via class to link.
-    a:link {
-      color: #d5d4d5;
-      text-decoration: underline;
-    }
-    */
+
 </style>
 
 <style>
-  hr {
+  .anAaHr {
     border-top: 0.5px solid #929192;
   }
   .btnAaBold {
@@ -282,6 +277,15 @@ export default {
     background-color: inherit;
     cursor: pointer;
     color: #929192 !important;
+    padding-left: 3.5px;
+    padding-right: 3.5px;
+    display: inline;
+  }
+  .btnAaBold_b {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+    color: #a6a5a6 !important;
     padding-left: 3.5px;
     padding-right: 3.5px;
     display: inline;
@@ -297,4 +301,10 @@ export default {
     padding-left: 10px;
     padding-right: 10px;
   }
+  /* Add this via class to link.
+  a:link {
+    color: #d5d4d5;
+    text-decoration: underline;
+  }
+  */
 </style>

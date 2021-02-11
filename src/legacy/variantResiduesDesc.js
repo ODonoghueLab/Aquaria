@@ -115,7 +115,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 					console.log("The newAas are ")
 					console.log(variantResidues[resSnp]);
-					cleanData_cosmic(description, variantResidues[resSnp].newResidues, varInfo, posInfo, otherResInfo);
+					cleanData_cosmic(description, variantResidues[resSnp], posInfo);
 
 					addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'COSMIC')
 					console.log("The cosmic description is " + description);
@@ -330,7 +330,7 @@ function cleanData_funVar(desc, variantResidues_res){
 }
 
 
-function cleanData_cosmic(desc, newAas, varInfo, posInfo, otherResInfo){
+function cleanData_cosmic(desc, variantResidues_res, posInfo){
 	let arr = desc.split(/\|/);
 	arr[0] = arr[0].replace(/^p\./, '');
 	arr_aas = arr[0].split(/[0-9]+/);
@@ -350,18 +350,8 @@ function cleanData_cosmic(desc, newAas, varInfo, posInfo, otherResInfo){
 			cosmic_oldAa = val_old;
 		}
 
-		if (newAas){
-			let isFoundInNewAas = false;
-			newAas.forEach(function(newAa, newAa_i){
-				if (cosmic_newAa == newAa){
-					varInfo.push( cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
-					isFoundInNewAas = true;
-				}
-			});
-
-			if (isFoundInNewAas == false){
-				otherResInfo.push(cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
-			}
+		if (oneAaCodes.includes(cosmic_newAa)){
+			variantResidues_res[cosmic_newAa].push('<i>COSMIC:</i> In ' + arr[2]);
 		}
 
 

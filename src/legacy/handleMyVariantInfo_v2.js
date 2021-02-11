@@ -27,7 +27,6 @@ module.exports = function (geneInfoObj, getJsonFromUrl, validateAgainstSchema, p
 									resolve({response: response, promises_: promises_});
 								}
 							}
-
 						}
 						else{
 							resolve({response: response, promises_: promises_});
