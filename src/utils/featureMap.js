@@ -163,25 +163,35 @@ function showAnnotation (f, eid) {
     }
     urlhtml += '</p>'
   }
-
   // $('div.popup').remove()
-  var balloon = "<div style='display: none;'><div id='divVI_posInfo'><br><b>Position information</b></div> "
-  let btnsDiv = "<div id='buttons_eachAa'>"
+  var balloon = '<div style="display: none;"> <div id="divVariantInfo" class="aaLightBg"></div><div id="divVI_chosen"></div> <div id="divVI_posInfo"><hr class="anAaHr"><b>Residue ' + f.start + '</b></div> '
+
+  let btnsDiv = "<div id='buttons_eachAa'> <b>See also:</b><p class='pAaColor'> &rarr;</p>"
+  balloon = balloon + "<div id='divVI_varInfo'>"
   oneAaCodes.forEach(function (anAa, _i) {
     balloon = balloon + "<div id='divVI_varInfo_" + anAa + "'></div>"
-    btnsDiv = btnsDiv + '<button>' + anAa + '</button>'
+    const isUniCosOrFun = isUniCosOrFunPresent(anAa, f.desc)
+    btnsDiv = btnsDiv + "<button id='btnVI_" + anAa + "'"
+    if (isUniCosOrFun === true) {
+      btnsDiv = btnsDiv + ' class="btnAaBold_b"> <b>' + anAa + '</b> '
+    } else {
+      btnsDiv = btnsDiv + ' class="btnAaBold"> ' + anAa
+    }
+    btnsDiv = btnsDiv + '</button>'
   })
+
+  balloon = balloon + '</div>'
   btnsDiv = btnsDiv + '</div>'
   balloon = balloon + btnsDiv
-  balloon = balloon + "</div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>" + f.label + ' ('
+  balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p>' + f.label + ' ('
   if (f.start === f.end) {
     balloon = balloon + 'Residue ' + f.start
   } else {
     balloon = balloon + 'Residues ' + f.start + '-' + f.end
   }
 
-  balloon = balloon + ')<br/>' + f.desc + '</p>' + urlhtml + '</div>'
-
+  // balloon = balloon.append(f.desc);
+  balloon = balloon + ') <br/>' + f.desc + '</p>' + urlhtml + '</div>'
   // d3.select('#popuptext')
   //   // .append('div')
   //   // .attr('class', 'popup')
@@ -270,6 +280,21 @@ export function moveTheDiv () {
     const aSuperFamFeature = document.getElementById('superFamCharts_0_go')
     document.getElementById('superFamCharts').append(aSuperFamFeature)
   })
+}
+
+function isUniCosOrFunPresent (anAa, desc) {
+  const tagOpen = '<toReplace_varInfo_' + anAa + '>'
+  const tagClose = '</toReplace_varInfo_' + anAa + '>'
+
+  const firstOpenPos = desc.indexOf(tagOpen)
+  const lastClosePos = desc.lastIndexOf(tagClose)
+
+  const description = desc.substring(firstOpenPos, lastClosePos)
+
+  if (description.match('UniProt') || description.match('FunVar') || description.match('COSMIC')) {
+    return true
+  }
+  return false
 }
 
 // DAS annotation handling

@@ -103,7 +103,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 						//cleanData_uniprot_seqVar(description, variantResidues[resSnp].newResidues, varInfo, otherResInfo, posInfo);
 						cleanData_uniprot_seqVar_v2(description, variantResidues[resSnp], posInfo, featureType);
 
-						addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'UniProt ' + featureType);
+						// addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'UniProt ' + featureType);
 
 					}
 
@@ -331,6 +331,8 @@ function cleanData_funVar(desc, variantResidues_res){
 
 
 function cleanData_cosmic(desc, variantResidues_res, posInfo){
+	console.log("Nelson mendella - did i stutter ");
+	console.log(variantResidues_res);
 	let arr = desc.split(/\|/);
 	arr[0] = arr[0].replace(/^p\./, '');
 	arr_aas = arr[0].split(/[0-9]+/);
@@ -351,6 +353,9 @@ function cleanData_cosmic(desc, variantResidues_res, posInfo){
 		}
 
 		if (oneAaCodes.includes(cosmic_newAa)){
+			if (!variantResidues_res.hasOwnProperty(cosmic_newAa)){
+				variantResidues_res[cosmic_newAa] = [];
+			}
 			variantResidues_res[cosmic_newAa].push('<i>COSMIC:</i> In ' + arr[2]);
 		}
 
