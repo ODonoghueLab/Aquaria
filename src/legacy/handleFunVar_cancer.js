@@ -11,7 +11,7 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 		validateAgainstSchema(convertedFeatures, primary_accession, featureCallback, 'CATH');
 	}
 
-	let features = {};
+	let features = {}; // {resPos} => {Mutation} =>
 	extractUniqSfFfs(jsonObj1.data).then(function(ids_sfFfs){
 		sendTheFirstUrls(ids_sfFfs).then(function(promises_firstUrls){
 			Promise.all(promises_firstUrls).then(function(firstUrlData){
@@ -39,8 +39,8 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 						let aquariaFeatObj = {};
 						let arr_feats = [];
 
-						//console.log("FunVar features are ");
-						//console.log(features);
+						console.log("FunVar features are ");
+						console.log(features);
 
 						// Convert to AquariaFeatObj format;
 
@@ -87,8 +87,8 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
 					})
 				})
 				.then(function(aquariaFeatObj){
-						//console.log("FunVar aquariaFeatObj is ");
-						//console.log(aquariaFeatObj);
+						console.log("FunVar aquariaFeatObj is - blah blah ");
+						console.log(aquariaFeatObj);
 						validateAgainstSchema(aquariaFeatObj, primary_accession, featureCallback, 'FunVar', null);
 				});
 
@@ -229,9 +229,22 @@ function addAnObjIfNotPresent(featsAsDict, anFunVarItem){
 			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['mutfam'].push(anFunVarItem['mutfam']);
 		}
 		*/
+		let asLink = "<a href='http://funvar.cathdb.info/funfam/uid/" + anFunVarItem['funfam_uid'] + "' target='_blank'>";
+		if (anFunVarItem.hasOwnProperty('funfam') && anFunVarItem['funfam'].hasOwnProperty('name')){
+			// console.log("nnnnnnnnnoooooooooooooooooooooo "+anFunVarItem['funfam']['name']);
 
-		if (!featsAsDict[resPos][anFunVarItem['vm_aa_change']]['funfam_id'].includes(anFunVarItem['funfam_id'])){
-			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['funfam_id'].push(anFunVarItem['funfam_id']);
+			asLink = asLink + anFunVarItem['funfam']['name'];
+		}
+		else{
+			asLink = asLink + anFunVarItem['funfam_id'];
+		}
+		asLink = asLink + "</a>";
+
+		if (!featsAsDict[resPos][anFunVarItem['vm_aa_change']]['funfam_id'].includes(asLink)){
+
+
+			console.log("Funvar as link is " + asLink);
+			featsAsDict[resPos][anFunVarItem['vm_aa_change']]['funfam_id'].push(asLink);
 		}
 
 

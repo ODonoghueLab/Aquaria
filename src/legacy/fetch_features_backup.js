@@ -601,21 +601,21 @@ function clusterRegions(sequence_annotations, categories, aboutFeaturesource, hc
 
 				if(typeof hcDataObj != "undefined" &&  hcDataObj != null &&  hcDataObj.hasOwnProperty(clusters[i].Tracks[0][0].name)){
 					// console.log(hcDataObj[clusters[i].Tracks[0][0].name]);
-					if (hcDataObj.hasOwnProperty(clusters[i].Tracks[0][j].name) ){
-						clusters[i].Tracks[0][j]['hc_go'] = hcDataObj[clusters[i].Tracks[0][j].name].go;
 
-						clusters[i].Tracks[0][j]['hc_ec'] = hcDataObj[clusters[i].Tracks[0][j].name].ec;
-
-						clusters[i].Tracks[0][j]['hc_species'] = hcDataObj[clusters[i].Tracks[0][j].name].species;
-
-
-						clusters[i].Tracks[0][j].label = clusters[i].Tracks[0][j].label.split(/\$\$/)[0];
-
-						// clusters[i].Tracks[0][j].name = 'Testing';
-					}
 				}
 
+				if (hcDataObj.hasOwnProperty(clusters[i].Tracks[0][j].name) ){
+					clusters[i].Tracks[0][j]['hc_go'] = hcDataObj[clusters[i].Tracks[0][j].name].go;
 
+					clusters[i].Tracks[0][j]['hc_ec'] = hcDataObj[clusters[i].Tracks[0][j].name].ec;
+
+					clusters[i].Tracks[0][j]['hc_species'] = hcDataObj[clusters[i].Tracks[0][j].name].species;
+
+
+					clusters[i].Tracks[0][j].label = clusters[i].Tracks[0][j].label.split(/\$\$/)[0];
+
+					// clusters[i].Tracks[0][j].name = 'Testing';
+				}
 
 
 
@@ -792,14 +792,14 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		}
 		if (requestedFeature == 'SNAP2'){
 			// console.log(response);
-			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, variantResidues, requestedFeature);
+			handleSnap2(response.data, primary_accession, featureCallback, validateAquariaFeatureSet, {}, requestedFeature);
 		}
 		if (requestedFeature == 'CATH'){
 			// console.log("####################### Cath features obtained successfully! ")
 			// console.log(response.data)
 			//console.log(getCurrentUrl());
 			//console.log(servers[3].URL_covid);
-			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
+			handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
 
 
 		}
@@ -812,11 +812,11 @@ function getJsonFromUrl(requestedFeature, url, primary_accession, featureCallbac
 		if (requestedFeature == 'FunVar'){
 			// console.log("FunVar response is ");
 			// console.log(response);
-			handleFunVar_cancer(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
+			handleFunVar_cancer(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
 		}
 
 		if (requestedFeature == 'myVariant.info'){
-			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues);
+			handleMyVariantInfo(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, {});
 		}
 
 		// return featuresFromExtServer
@@ -988,7 +988,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 			description = "<br> " + variantResidues[residue].defaultDesc;
 		}
 
-		/*
+
 		if (variantResidues[residue].hasOwnProperty('variantInfo')){
 			for (let serverAndFsName in variantResidues[residue].variantInfo){
 				// console.log("The serverAndFsName is " + serverAndFsName);
@@ -996,7 +996,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 
 
 				// Removed: "(" + variantResidues[residue].newResidue + ")"
-				description = description + '<toReplace_varInfo>' + "<i>" + serverAndFsName + ":</i> ";
+				description = description + '<toReplace_varInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
 				for (let i =0; i<variantResidues[residue]['variantInfo'][serverAndFsName].length; i++){
 					description = description +  variantResidues[residue]['variantInfo'][serverAndFsName][i] +". ";
 				}
@@ -1005,9 +1005,9 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 
 			}
 		}
-		*/
+
 		// description = description + "<hr>";
-		//
+
 		if (variantResidues[residue].hasOwnProperty('positionInfo')){
 			for (let serverAndFsName in variantResidues[residue].positionInfo){
 				// console.log("The serverAndFsName is " + serverAndFsName);
@@ -1016,7 +1016,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 				// description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace> <br>';
 
 
-				description = description + '<toReplace_posInfo>' + "<i>" + serverAndFsName + ":</i> ";
+				description = description + '<toReplace_posInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
 				for (let i =0; i<variantResidues[residue]['positionInfo'][serverAndFsName].length; i++){
 					description = description +  variantResidues[residue]['positionInfo'][serverAndFsName][i] +". ";
 				}
@@ -1025,28 +1025,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 			}
 		}
 
-		Object.values(threeToOneResMap).forEach(function(anAa, anAa_i){
-			// console.log("An extraordinary life " + anAa);
 
-			if (variantResidues[residue].hasOwnProperty(anAa)){
-				for (let i=0; i<variantResidues[residue][anAa].length; i++){
-					description = description + '<toReplace_varInfo_' + anAa +'>'
-					description = description + variantResidues[residue][anAa][i] + ". ";
-					description = description + '</toReplace_varInfo_' + anAa +'>'
-				}
-			}
-			else {
-				//if (variantResidues[residue][anAa].length == 0){
-					description = description + '<toReplace_varInfo_' + anAa +'>'
-					description = description + "No data to show. ";
-					description = description + '</toReplace_varInfo_' + anAa +'>'
-				//}
-			}
-
-		});
-
-
-		/*
 		if (variantResidues[residue].hasOwnProperty('otherResInfo')){
 			for (let serverAndFsName in variantResidues[residue].otherResInfo){
 				// console.log("The serverAndFsName is " + serverAndFsName);
@@ -1062,7 +1041,7 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 
 			}
 		}
-		*/
+
 
 		for (let dataType in variantResidues[residue]){ // dataType == variantInfo | positionInfo | otherResInfo
 
@@ -1499,13 +1478,6 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 
 				aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
 				aFeature['Name'] = featAndDesc.featStr;
-				if (consInfo[resNum].hasOwnProperty('oldRes')){
-						aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum]['oldRes'] + '&#8594;' + consInfo[resNum]['newAas'][0] + ")</span>"
-				}
-				else {
-					aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading' class='btnAaBold'> </span>"
-				}
-				// aFeature['Name'] = featAndDesc.featStr;
 				aFeature['Color'] = "#F73C3C"
 
 				// Adding for display
@@ -1535,6 +1507,7 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 }
 
 function addNewResAndGrantham(varinatResidues_resNum, consInfo_resNum){
+	console.log("Pawnee 1 ");
 
 	consInfo_resNum['newAas'].forEach(function(newAa, newAa_i){
 		if (!varinatResidues_resNum.hasOwnProperty(newAa)){
@@ -1695,7 +1668,7 @@ function extractVariantInfoFromUniprot(uniprotData){
 			resolve();
 		}
 		// console.log("extractVariantInfoFromUniprot");
-		let variants_featTypesOfInt = ['Modified residue', 'Mutagenesis site', 'Sequence conflict', 'Sequence variant', 'Cross-link', 'Site', 'Metal ion-binding site', 'Binding site'];
+		let variants_featTypesOfInt = ['Modified residue', 'Mutagenesis site', 'Sequence conflict', 'Sequence variant', 'Cross-link', 'Site', 'Metal ion-binding site'];
 
 		let counter = 0;
 		for (let featureType in uniprotData){
@@ -1703,7 +1676,7 @@ function extractVariantInfoFromUniprot(uniprotData){
 			if (uniprotData[featureType].hasOwnProperty('Features')){
 				for (let i =0; i< uniprotData[featureType]['Features'].length; i++){
 					if (uniprotData[featureType]['Features'][i].hasOwnProperty('Residue')){
-						checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
+						 // checkIfValInSnpResAndAdd(uniprotData[featureType]['Features'][i]['Residue'][0], uniprotData[featureType]['Features'][i]['Residue'][0], variantResidues, featureType, uniprotData[featureType]['Features'][i]['Name'] + " " + uniprotData[featureType]['Features'][i]['Description'], 'UniProt', variants_featTypesOfInt);
 					}
 				}
 			}

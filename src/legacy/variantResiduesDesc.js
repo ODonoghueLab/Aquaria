@@ -3,20 +3,15 @@ var counter_complete = 0;
 module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType, description, serverName, variants_featTypesOfInt){
 
 
-
 	if (variants_featTypesOfInt.includes(featureType)){
-
 
 		Object.keys(variantResidues).forEach(function(resSnp, i){
 			// console.log("The new residue is " + variantResidues[resSnp].newResidue);
-
-
 
 			let pos_mut = resSnp;
 			if (resSnp.match(/\-/)){
 				pos_mut = resSnp.split(/\-/)[0];
 			}
-
 
 			if (parseInt(pos_mut) >= parseInt(resStart_pp) && parseInt(pos_mut) <= parseInt(resEnd_pp)){
 
@@ -29,7 +24,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					let varInfo = [];
 					cleanData_pp(description, varInfo);
 
-					addToVariantResidues(variantResidues, resSnp, [], varInfo, [], 'PredictProtein conservation');
+					addToVariantResidues(variantResidues, resSnp, [], varInfo, [], 'PredictProtein');
 				}
 
 				else if (serverName == 'SNAP2'){
@@ -37,13 +32,13 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					let varInfo = []; let posInfo = []; let otherResInfo = []; // get from variant inof if it exists;
 
 					if (featureType == 'Mutational sensitivity (SNAP2 ratio of effect mutations)'){
-						console.log("snap2 over here......")
+
 						cleanData_snap2_effects(description, variantResidues[resSnp].newResidues, posInfo, otherResInfo);
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, otherResInfo, 'SNAP2 prediction');
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, otherResInfo, 'SNAP2');
 					}
 					else if (featureType == 'Mutation score (average SNAP2 score)'){
-						cleanData_snap2_getAvgScore(description, varInfo, variantResidues[resSnp].newResidues);
-						addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'SNAP2 prediction');
+						cleanData_snap2_getAvgScore(description, varInfo, variantResidues[resSnp].newResidues, variantResidues[resSnp]);
+						// addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'SNAP2 prediction');
 					}
 
 
@@ -51,9 +46,16 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 				}
 				else if (serverName == 'CATH') {
 					let posInfo = [];
-					cleanData_cath(description, posInfo);
 
-					addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'CATH ' + featureType);
+					if (featureType == 'Functional domain'){
+						cleanData_cath(description, posInfo, 'functional family');
+					}
+					else if (featureType == 'Structural domain'){
+						cleanData_cath(description, posInfo, 'domain')
+					}
+
+
+					addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'CATH');
 					// variantResidues[resSnp][serverName].push(obj_featType);
 				}
 
@@ -65,35 +67,43 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					if (featureType == 'Metal ion-binding site' ){
 
 						let posInfo = [];
-						posInfo.push(description);
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt metal ion-binding site');
+						posInfo.push(description + " metal ion-binding site");
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
+
+					}
+					if (featureType == 'Binding site' ){
+
+						let posInfo = [];
+						posInfo.push(description + " binding site");
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
 
 					}
 					else if (featureType == 'Site'){
 						let posInfo = [];
-						posInfo.push(description);
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt site');
+						posInfo.push(description + ' site');
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
 					}
 
 					else if (featureType == 'Modified residue'){
 						let posInfo = [];
-						posInfo.push(description);
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt modified residue');
+						posInfo.push("Modified residue " + description);
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
 					}
 
 					else if (featureType == 'Cross-link'){
 						let posInfo = [];
-						posInfo.push(description);
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt cross-link');
+						posInfo.push("Cross-link " + description);
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
 					}
 
 					else if (featureType == 'Sequence variant' || featureType == 'Mutagenesis site'){
 						let varInfo = []; let otherResInfo = []; let posInfo = [];
 
 						// check for the right residue;
-						cleanData_uniprot_seqVar(description, variantResidues[resSnp].newResidues, varInfo, otherResInfo, posInfo);
+						//cleanData_uniprot_seqVar(description, variantResidues[resSnp].newResidues, varInfo, otherResInfo, posInfo);
+						cleanData_uniprot_seqVar_v2(description, variantResidues[resSnp], posInfo, featureType);
 
-						addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'UniProt ' + featureType);
+						// addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'UniProt ' + featureType);
 
 					}
 
@@ -105,7 +115,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 					console.log("The newAas are ")
 					console.log(variantResidues[resSnp]);
-					cleanData_cosmic(description, variantResidues[resSnp].newResidues, varInfo, posInfo, otherResInfo);
+					cleanData_cosmic(description, variantResidues[resSnp], posInfo);
 
 					addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'COSMIC')
 					console.log("The cosmic description is " + description);
@@ -115,9 +125,9 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					let varInfo = []; let otherResInfo = [];
 
 					console.log("The funVar description is 111 " + description);
-					cleanData_funVar(description, variantResidues[resSnp].newResidues, varInfo, otherResInfo);
+					cleanData_funVar(description, variantResidues[resSnp]);
 
-					addToVariantResidues(variantResidues, resSnp, varInfo, [], otherResInfo, 'FunVar')
+					// addToVariantResidues(variantResidues, resSnp, varInfo, [], otherResInfo, 'FunVar')
 				}
 
 
@@ -202,7 +212,6 @@ function addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherRe
 		console.log("The VAR INFO IS " + varInfo);
 		console.log(varInfo);
 		if (!variantResidues[resSnp]['variantInfo'].hasOwnProperty(serverName)){
-			console.log(' IF YOU WANT MORE ' + serverName + " here1");
 			variantResidues[resSnp]['variantInfo'][serverName] = varInfo;
 		}
 		else {
@@ -211,8 +220,8 @@ function addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherRe
 		}
 	}
 
-
 	if (posInfo.length > 0){
+		console.log("snap2 the positionInfo is " + posInfo);
 		if (!variantResidues[resSnp]['positionInfo'].hasOwnProperty(serverName)){
 			variantResidues[resSnp]['positionInfo'][serverName] = posInfo;
 		}
@@ -259,7 +268,7 @@ function cleanData_pp(desc, varInfo){
 	arr_1[1] = arr_1[1].replace(/\)/, '');
 
 	// let obj_inFeatType = {mainToShow: arr_1[1], mainToHide: "Score: " + arr_1[0]};
-	varInfo.push(arr_1[1] + " (score:" + arr_1[0] + ")")
+	varInfo.push(arr_1[1] + " conservation (score = " + arr_1[0] + ")")
 
 	console.log("The pridict protein value is: " + arr_1[1] + " (score:" + arr_1[0] + ")")
 
@@ -267,22 +276,45 @@ function cleanData_pp(desc, varInfo){
 }
 
 
-function cleanData_funVar(desc, newAas, varInfo, otherResInfo){
+function cleanData_funVar(desc, variantResidues_res){
+
 
 	let arr = desc.split(/\|/);
 	let arr_aa = arr[0].split(/\>/);
 
 	if (arr_aa.length > 1){
 
-		let aaChange = arr[0].replace(/\>/, "&#8594;");
+		let arr_aa = arr[0].split(/\>/); //.replace(/\>/, "&#8594;");
 		let arr_desc = arr[1].split("<br>");
 
-		console.log("The arr_desc is " + arr_desc);
+		let toAdd = "<i>FunVar: </i>";
+		if (arr_desc.length >= 5){
+			arr_desc[5] = arr_desc[5].replace("<i> FunFams (v4_2_0):</i> ", '');
+			console.log("The funvar desc newAa is " + arr_aa[1] + " " + arr_desc[5]);
+			toAdd = toAdd + "Disrupts " + arr_desc[5] + '. ';
+		}
 
+		if (arr_desc.length >= 4){
+			arr_desc[4] = arr_desc[4].replace("<i>Cancer types (Is FunFam domain enriched):</i>", "");
+
+			toAdd = toAdd + "In " + arr_desc[4];
+		}
+
+
+
+
+		variantResidues_res[arr_aa[1]].push(toAdd);
+
+
+		// console.log("The arr_desc is " + arr_desc);
+
+
+		// variantResidues_res[arr_aa[1]].push("<i>FunVar: </i>");
+		/*
 		let isFoundInNewAas = false;
 		newAas.forEach(function(newAa, newAa_i){
 			if (arr_aa[1] == newAa){
-				
+
 				varInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
 				isFoundInNewAas = true;
 			}
@@ -291,12 +323,16 @@ function cleanData_funVar(desc, newAas, varInfo, otherResInfo){
 		if (isFoundInNewAas == false){
 				otherResInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
 		}
+		*/
 
 	}
+
 }
 
 
-function cleanData_cosmic(desc, newAas, varInfo, posInfo, otherResInfo){
+function cleanData_cosmic(desc, variantResidues_res, posInfo){
+	console.log("Nelson mendella - did i stutter ");
+	console.log(variantResidues_res);
 	let arr = desc.split(/\|/);
 	arr[0] = arr[0].replace(/^p\./, '');
 	arr_aas = arr[0].split(/[0-9]+/);
@@ -316,18 +352,11 @@ function cleanData_cosmic(desc, newAas, varInfo, posInfo, otherResInfo){
 			cosmic_oldAa = val_old;
 		}
 
-		if (newAas){
-			let isFoundInNewAas = false;
-			newAas.forEach(function(newAa, newAa_i){
-				if (cosmic_newAa == newAa){
-					varInfo.push( cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
-					isFoundInNewAas = true;
-				}
-			});
-
-			if (isFoundInNewAas == false){
-				otherResInfo.push(cosmic_oldAa + "&#8594;" +  cosmic_newAa + " " + arr[1] + " " + arr[2]);
+		if (oneAaCodes.includes(cosmic_newAa)){
+			if (!variantResidues_res.hasOwnProperty(cosmic_newAa)){
+				variantResidues_res[cosmic_newAa] = [];
 			}
+			variantResidues_res[cosmic_newAa].push('<i>COSMIC:</i> In ' + arr[2]);
 		}
 
 
@@ -337,6 +366,56 @@ function cleanData_cosmic(desc, newAas, varInfo, posInfo, otherResInfo){
 	}
 
 }
+
+function cleanData_uniprot_seqVar_v2(desc, variantResidues_res, posInfo, featureType){
+	// main to show, other residues;
+
+	console.log("The Uniprot seqVar desc are " + desc);
+
+
+	desc = desc.replace(/^[\s]+/, "");
+	desc = desc.replace(/\.$/, '');
+	desc = desc.replace(/\>/, '&#8594;')
+	let arr = desc.split(/[\s]+/);
+
+	console.log("The Uniprot seqVar desc 2 are " + arr);
+
+	if (arr[1] == '&#8594;'){
+		if (oneAaCodes.includes(arr[2])){
+			let newAa = arr[2];
+			if (!variantResidues_res.hasOwnProperty(newAa)){
+				variantResidues_res[newAa] = [];
+			}
+			arr = arr.slice(3, arr.length);
+
+			variantResidues_res[newAa].push('<i>UniProt:</i> ' + featureType + " "  + arr.join(" "));
+		}
+		else{
+			posInfo.push(featureType + " " + desc);
+		}
+			/* let isDescPushed = false;
+			if (newAas){
+				newAas.forEach(function(newAa, newAa_i){
+						if (oneAaCodes.includes(newAa)){
+								if (arr[2] == newAas[0]){
+									varInfo.push(desc);
+									isDescPushed = true;
+								}
+						}
+				});
+			}
+			if (isDescPushed == false){
+				otherResInfo.push(desc);
+			} */
+	}
+	else {
+		// add to posInfo
+		posInfo.push(featureType + " " + desc);
+	}
+
+}
+
+
 
 function cleanData_uniprot_seqVar(desc, newAas, varInfo, otherResInfo, posInfo){
 	// main to show, other residues;
@@ -384,7 +463,9 @@ function cleanData_uniprot_seqVar(desc, newAas, varInfo, otherResInfo, posInfo){
 	*/
 }
 
-function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas){
+function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_pos){
+
+	console.log("snap2 desc 2 is " + desc);
 
 	let arr = desc.split(/\;/);
 
@@ -393,32 +474,51 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas){
 		arr[2] = desc.replace('function changing are:', '');
 		arr[2] = desc.replace(/[\s]+/g, '');
 		arr_indivRes = arr[2].split(/\,/);
-		//console.log ('snap2 desc is 3 ' + arr_indivRes);
+		// console.log ('snap2 desc is 3 ' + arr_indivRes);
+
+		arr_indivRes.forEach(function(anAaAndScore, anAaAndScore_i){
+			let arr_aaScore = anAaAndScore.split(/\:/);
+			if (oneAaCodes.includes(arr_aaScore[0].toUpperCase())){
+				if (!variantResidues_pos.hasOwnProperty(arr_aaScore[0])){
+					variantResidues_pos[arr_aaScore[0]] = [];
+				}
+				variantResidues_pos[arr_aaScore[0]].push('<i>SNAP2:</i> ' + "Predicted to change function (score = " + arr_aaScore[1] + ")")
+			}
+			// console.log("snap2 desc 4 is " + anAaAndScore);
+		});
 
 
+		/*
 		if (newAas){
 			newAas.forEach(function(newAa, newAa_i){
 					let isAddingToChange = false;
 					if (oneAaCodes.includes(newAa)){
-							let re = new RegExp("^" + newAa, 'i');
-							for (let i=0; i<arr_indivRes.length; i++){
-									// console.log('snap2 desc is 5 ' + arr[i]);
-									if (arr_indivRes[i].match(re)){
-											let score = arr_indivRes[i].split(/\:/);
-											arr_posInfo.push('Mutation (' + newAa + ') will change function (score=' + score[1] + ')');
-											//console.log("snap2 desc is 4 " + score[1] + " " + arr_indivRes[i]);
-											isAddingToChange = true;
-									}
-									// if (arr[i].toUpperCase().match(/^))
-							}
-							if (isAddingToChange == false){
-								arr_posInfo.push('Mutation (' + newAa + ') will not change function');
-							}
+						if (!variantResidues_pos.hasOwnProperty(newAa)){
+							variantResidues_pos[newAa] = [];
+							variantResidues_pos[newAa].push('<i>SNAP2:<i> ' + "Predicted to change function (score = " + +")");
+						}
+
+						/*
+						let re = new RegExp("^" + newAa, 'i');
+						for (let i=0; i<arr_indivRes.length; i++){
+								// console.log('snap2 desc is 5 ' + arr[i]);
+								if (arr_indivRes[i].match(re)){
+										let score = arr_indivRes[i].split(/\:/);
+										arr_posInfo.push('Mutation (' + newAa + ') will change function (score=' + score[1] + ')');
+										//console.log("snap2 desc is 4 " + score[1] + " " + arr_indivRes[i]);
+										isAddingToChange = true;
+								}
+								// if (arr[i].toUpperCase().match(/^))
+						}
+						if (isAddingToChange == false){
+							arr_posInfo.push('Mutation (' + newAa + ') will not change function');
+						}
+
 					}
 
 
 			});
-		}
+		} */
 
 	}
 
@@ -426,7 +526,7 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas){
 }
 
 
-function cleanData_cath(desc, varInfo){
+function cleanData_cath(desc, varInfo, partOf){
 	desc = desc.replace(/\<span[^\>]*\>/, '');
 	desc = desc.replace(/\<i\>/, '');
 	desc = desc.replace(/\<\/i\>/, '');
@@ -436,8 +536,8 @@ function cleanData_cath(desc, varInfo){
 	let arr = desc.split(/\:\s/);
 	arr[0] = arr[0].replace(/CATH/, '');
 
-
-	varInfo.push(arr[1]);
+	console.log("The cath arr thingo is " + arr[1]);
+	varInfo.push("Part of " + partOf + " '" + arr[1] + "'");
 
 	// let obj_featType = {};
 
@@ -454,7 +554,7 @@ function cleanData_snap2_effects(desc, newAas, arr_posInfo, arr_otherResInfo){
 
 	let posInfoDesc = "";
 	if (arr.length >= 1){
-		posInfoDesc = arr[0] +". ";
+		posInfoDesc = arr[0] +" to mutation. ";
 	}
 
 	if (arr.length >= 2){
@@ -462,6 +562,12 @@ function cleanData_snap2_effects(desc, newAas, arr_posInfo, arr_otherResInfo){
 		posInfoDesc = posInfoDesc + arr[1];
 	}
 
+	if (posInfoDesc != ''){
+		arr_posInfo.push(posInfoDesc);
+		// console.log("snap2 desc ..... why not here???? " + posInfoDesc);
+	}
+
+	/*
 	if (arr.length >= 3){
 		arr[2] = arr[2].replace('function changing are:', '');
 		arr[2] = arr[2].replace(/[\s]+/g, '');
@@ -494,12 +600,10 @@ function cleanData_snap2_effects(desc, newAas, arr_posInfo, arr_otherResInfo){
 
 		console.log("snap2 posToRm is " + posToRm);
 	}
+	*/
 
 
 
-	if (posInfoDesc != ''){
-		arr_posInfo.push(posInfoDesc);
-	}
 
 }
 

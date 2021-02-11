@@ -43,30 +43,17 @@ export default {
     // console.log('WHERN WHEN WHEN WHEN WHEN WHEN WHEN WHEN !!!!! ')
   },
   methods: {
+    showNewAaInfo: function (btnId) {
+      console.log('Yes comes to this function :) ' + btnId)
+      // targetId = event.currentTarget.id;
+      // console.log(targetId); // returns 'foo'
+    },
     handler: function () {
       const ExpandableTextLineCtor = Vue.extend(ExpandableTextLine)
-
+      const oneAaCodes = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
       const b = document.getElementsByTagName('toReplace_varInfo')
       console.log('The number of nodes to remove are: ' + b.length)
 
-      if (b.length > 0) {
-        var varInfoDiv = document.getElementById('divVI_varInfo')
-        for (let j = 0; j < b.length; j++) {
-          const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b[j].innerHTML } }, propsData: { useClick: true } })
-          // console.log(componentinstance)
-
-          componentinstance.$mount()
-          componentinstance.$el.innerHTML = b[j].innerHTML
-          varInfoDiv.appendChild(componentinstance.$el)
-          this.expandTextLine.push(componentinstance)
-        }
-        document.getElementById('balloon').appendChild(document.getElementById('divVI_varInfo'))
-      }
-      for (let i = 0, len = b.length; i !== len; ++i) {
-        b[0].parentNode.removeChild(b[0])
-      }
-
-      // const a2 = document.getElementById('divVI_otherResInfo')
       const b2 = document.getElementsByTagName('toReplace_posInfo')
       if (b2.length > 0) {
         var posInfoDiv = document.getElementById('divVI_posInfo')
@@ -79,33 +66,90 @@ export default {
           posInfoDiv.appendChild(componentinstance.$el)
           this.expandTextLine.push(componentinstance)
         }
-        document.getElementById('balloon').appendChild(document.getElementById('divVI_posInfo'))
+        document.getElementById('balloon').appendChild(document.getElementById('divVariantInfo'))
+        // Add the chosen VarInfo div.
+        document.getElementById('divVariantInfo').appendChild(document.getElementById('divVI_chosen'))
+        // Add the posInfo div.
+        document.getElementById('divVariantInfo').appendChild(document.getElementById('divVI_posInfo'))
+
+        // Add btns.
+        document.getElementById('balloon').appendChild(document.getElementById('buttons_eachAa'))
+        // Attach events to btns.
+        for (let k = 0; k < oneAaCodes.length; k++) {
+          document.getElementById('btnVI_' + oneAaCodes[k]).addEventListener('click', function () {
+            // Change heading amino acid.
+            let a = document.getElementById('span_missenseHeading').innerHTML
+            a = a.replace(/[a-zA-Z]+\)/, oneAaCodes[k] + ')')
+            document.getElementById('span_missenseHeading').innerHTML = a
+
+            // Hide clicked button, and unhide any other button
+            hideClickedUnhideOthrs(oneAaCodes[k])
+            // document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[k]))
+            // Move clicked aa div to chosen, and move any other div already in chosen back down
+            moveAndShowClickedDivAa(oneAaCodes[k])
+          })
+        }
       }
       for (let i = 0, len = b2.length; i !== len; ++i) {
         b2[0].parentNode.removeChild(b2[0])
       }
+      for (let i = 0; i < oneAaCodes.length; i++) {
+        const anAaToReplace = document.getElementsByTagName('toReplace_varInfo_' + oneAaCodes[i])
+        if (anAaToReplace.length > 0) {
+          var varInfoDivAnAa = document.getElementById('divVI_varInfo_' + oneAaCodes[i])
+          // console.log('Popup vue anAaDiv ')
+          // console.log(varInfoDivAnAa)
+          for (let j = 0; j < anAaToReplace.length; j++) {
+            const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: anAaToReplace[j].innerHTML } }, propsData: { useClick: true } })
+            componentinstance.$mount()
+            componentinstance.$el.innerHTML = anAaToReplace[j].innerHTML
+            // console.log('anAaToReplace[j] ' + anAaToReplace[j].innerHTML)
+            varInfoDivAnAa.appendChild(componentinstance.$el)
+            this.expandTextLine.push(componentinstance)
+          }
+          document.getElementById('divVI_varInfo').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[i]))
 
-      const b3 = document.getElementsByTagName('toReplace_otherResInfo')
-      if (b3.length > 0) {
-        var otherResInfo = document.getElementById('divVI_otherResInfo')
-        for (let j = 0; j < b3.length; j++) {
-          const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: b3[j].innerHTML } }, propsData: { useClick: true } })
-          // console.log(componentinstance)
-
-          // console.log('Nice day: ' + b3[j].innerHTML)
-          componentinstance.$mount()
-          componentinstance.$el.innerHTML = b3[j].innerHTML
-          otherResInfo.appendChild(componentinstance.$el)
-          this.expandTextLine.push(componentinstance)
+          for (let l = 0, len = anAaToReplace.length; l !== len; ++l) {
+            anAaToReplace[0].parentNode.removeChild(anAaToReplace[0])
+          }
+          handleInitVar()
         }
-        document.getElementById('balloon').appendChild(document.getElementById('divVI_otherResInfo'))
-      }
-      for (let i = 0, len = b3.length; i !== len; ++i) {
-        b3[0].parentNode.removeChild(b3[0])
       }
 
-      // const divVarInfo = document.getElementById('divVariantInfo')
-      // document.getElementById('balloon').appendChild(divVarInfo)
+      function hideClickedUnhideOthrs (clickedAa) {
+        for (let i = 0; i < oneAaCodes.length; i++) {
+          if (clickedAa === oneAaCodes[i]) {
+            document.getElementById('btnVI_' + clickedAa).style.display = 'none'
+          } else {
+            document.getElementById('btnVI_' + oneAaCodes[i]).style.display = 'inline'
+          }
+        }
+      }
+
+      function moveAndShowClickedDivAa (selAa) {
+        for (let i = 0; i < oneAaCodes.length; i++) {
+          if (selAa === oneAaCodes[i]) {
+            console.log('It comes down here!')
+            document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + selAa))
+          } else {
+            document.getElementById('divVI_varInfo').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[i]))
+          }
+        }
+      }
+
+      function handleInitVar () {
+        if (document.getElementById('span_missenseHeading')) {
+          let a = document.getElementById('span_missenseHeading').innerHTML
+          a = a.replace(/[()]+/g, '')
+          const arr = a.split('→')
+
+          if (arr.length > 1) {
+            hideClickedUnhideOthrs(arr[1])
+            moveAndShowClickedDivAa(arr[1])
+          }
+        }
+        // document.getElementById('span_missenseHeading').innerHTML = a
+      }
     },
     // appendPopup: function (text, position, width) {
     //   var s, tailLeft
@@ -125,7 +169,6 @@ export default {
     //     top: btop + 'px',
     //     width: '400px'
     //   }).fadeIn(600)
-
     //   if (bleft < 0) {
     //     tailLeft = 107 + bleft + 3
     //     document.querySelector('#popupTail').style.marginLeft = tailLeft + 'px'
@@ -136,7 +179,6 @@ export default {
     //     tailLeft = 107 + (400 - (document.querySelector('#structureviewer').clientWidth - bleft) - 11)
     //     document.querySelector('#popupTail').style.marginLeft = tailLeft + 'px'
     //   }
-
     //   // Click on X to close popup
     //   $('span.x').on('click', function () {
     //     $('div#popup').fadeOut()
@@ -223,4 +265,46 @@ export default {
     #popupTail {
         margin-top: -6px;
     }
+
+</style>
+
+<style>
+  .anAaHr {
+    border-top: 0.5px solid #929192;
+  }
+  .btnAaBold {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+    color: #929192 !important;
+    padding-left: 3.5px;
+    padding-right: 3.5px;
+    display: inline;
+  }
+  .btnAaBold_b {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+    color: #a6a5a6 !important;
+    padding-left: 3.5px;
+    padding-right: 3.5px;
+    display: inline;
+  }
+  .pAaColor {
+    display: inline;
+    color: #929192 !important;
+  }
+  .aaLightBg {
+    background-color: #7f7e7f;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  /* Add this via class to link.
+  a:link {
+    color: #d5d4d5;
+    text-decoration: underline;
+  }
+  */
 </style>

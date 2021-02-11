@@ -564,10 +564,11 @@ function doThePlotting_v2(divId, theSeriesData_inner, theSeriesData_outer, theTi
 
 
 var common = require('../utils/common');
+const oneAaCodes = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
 
 function showAnnotation(f, eid) {
 	// console.log(eid);
-	// console.log("Hovered "+f.name+" "+f.start+"-"+f.end+": "+f.desc);
+	console.log("Hovered "+f.name+" "+f.start+"-"+f.end+": "+f.desc);
 	var urlhtml = "";
 	if (f.urls.length > 0) {
 		// var lnx = f.urls.split(";");
@@ -579,7 +580,27 @@ function showAnnotation(f, eid) {
 		urlhtml += "</p>";
 	}
 	$("div.popup").remove();
-	var balloon = "<div style='display: none;'><div id='divVI_varInfo'><br><b>Variant information</b></div> <div id='divVI_posInfo'><br><b>Position information</b></div> <div id='divVI_otherResInfo'><br><b>Other mutations information</b></div> </div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
+	var balloon = "<div style='display: none;'> <div id='divVariantInfo' class='aaLightBg'></div><div id='divVI_chosen'></div> <div id='divVI_posInfo'><hr class='anAaHr'><b>Residue " + f.start + "</b></div> ";
+
+	let btnsDiv = "<div id='buttons_eachAa'> <b>See also:</b><p class='pAaColor'> &rarr;</p>";
+	balloon = balloon + "<div id='divVI_varInfo'>"
+	oneAaCodes.forEach(function (anAa, _i) {
+		balloon = balloon + "<div id='divVI_varInfo_" + anAa + "'></div>"
+		let isUniCosOrFun = isUniCosOrFunPresent(anAa, f.desc);
+		btnsDiv = btnsDiv + "<button id='btnVI_" + anAa  + "'";
+		if (isUniCosOrFun == true) {
+			btnsDiv = btnsDiv + "class='btnAaBold_b'> <b>" + anAa + "</b> "
+		}
+		else{
+			btnsDiv = btnsDiv +  " class='btnAaBold'> " + anAa
+		}
+		btnsDiv = btnsDiv + "</button>"
+	})
+
+	balloon = balloon + "</div>";
+	btnsDiv = btnsDiv + "</div>";
+	balloon = balloon + btnsDiv;
+	balloon = balloon + "</div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
 			+ f.label + " (";
 	if (f.start == f.end){
 		balloon = balloon + "Residue "+f.start;
@@ -588,7 +609,7 @@ function showAnnotation(f, eid) {
 	}
 
 	// balloon = balloon.append(f.desc);
-	balloon = balloon + ")<br/>" // "</div>"
+	balloon = balloon + ") <br/>" // "</div>"
 		 	+ f.desc + "</p>"
 			+ urlhtml + "</div>";
 		/* 	console.log("The urlhtml is " + urlhtml);
@@ -654,13 +675,27 @@ function showAnnotation(f, eid) {
 
 }
 
+function isUniCosOrFunPresent(anAa, desc){
+	let tag_open = '<toReplace_varInfo_' + anAa + ">";
+	let tag_close = '</toReplace_varInfo_' + anAa + ">";
+
+	let	firstOpenPos = desc.indexOf(tag_open);
+	let lastClosePos = desc.lastIndexOf(tag_close);
+
+	let description = desc.substring(firstOpenPos, lastClosePos);
+
+	if (description.match("UniProt") || description.match("FunVar") || description.match("COSMIC")){
+		return true;
+	}
+	return false;
+}
+
 function handleCathPopups(f){
 	return new Promise(function(resolve, reject){
-		console.log("here...??");
 		// handle this one.
 		if (typeof f.hc_go !== 'undefined' && f.hc_go.hasOwnProperty('data') && f.hc_go.data.hasOwnProperty('series') && f.hc_go.data.series.length >= 2){
 			doThePlotting_v2('hc_go_div', f.hc_go.data.series[0].data, f.hc_go.data.series[1].data, '', f.hc_go.data.series[0].size, f.hc_go.data.series[0].dataLabels.color, f.hc_go.data.series[0].dataLabels.dist, f.hc_go.data.series[1].innerSize, f.hc_go.data.series[0].name, f.hc_go.data.series[1].name, f.hc_go.data.series[1].dataLabels.color).then(function(){
-				console.log("CATH plot: 1");
+				// console.log("CATH plot: 1");
 				document.getElementById('hc_go').prepend(document.getElementById('hc_go_div'));
 			})
 			.catch(function(error){
