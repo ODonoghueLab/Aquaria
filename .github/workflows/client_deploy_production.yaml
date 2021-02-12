@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - test_AquariaExport
+      - dev
     paths-ignore:
       - README.md
       - .editorconfig
@@ -24,19 +24,19 @@ jobs:
       VUE_APP_AQUARIA_BACKEND_PROD: https://odonoghuelab.org:8011
       PUBLISH_REPO_PROD: aqclient/aqclient.github.io
       # test specific settings
-      AQUARIA_CLIENT_EMIT_CNAME_TEST: test.aquaria.app
+      AQUARIA_CLIENT_EMIT_CNAME_TEST: dev.aquaria.app
       VUE_APP_AQUARIA_BACKEND_TEST: https://odonoghuelab.org:8011
-      PUBLISH_REPO_TEST: aqclient/test.aqclient.github.io
+      PUBLISH_REPO_TEST: aqclient/dev.aqclient.github.io
 
     steps:
     - name: Configure environment (production)
-      if: github.ref == 'refs/heads/test_AquariaExport'
+      if: github.ref == 'refs/heads/dev'
       run: |
         echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_PROD" >> $GITHUB_ENV
         echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_PROD" >> $GITHUB_ENV
         echo "PUBLISH_REPO=$PUBLISH_REPO_PROD" >> $GITHUB_ENV
-    - name: Configure environment (test)
-      if: github.ref == 'refs/heads/test_AquariaExport'
+    - name: Configure environment (dev)
+      if: github.ref == 'refs/heads/dev'
       run: |
         echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_TEST" >> $GITHUB_ENV
         echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_TEST" >> $GITHUB_ENV
