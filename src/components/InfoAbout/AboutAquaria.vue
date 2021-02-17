@@ -6,12 +6,8 @@
       <p class="intro1">Aquaria helps biologists use 3D structures to gain insight into function. For all <a href="https://www.uniprot.org/help/about" title="Visit their website">SwissProt sequences</a>,
                 Aquaria has >100 million <a href="https://doi.org/10.5281/zenodo.4279164" title="View the article about our methods">pre-calculated 3D models</a> that can be mapped with sequence features (pre-defined or user-defined).</p>
       <p>To learn more, watch the<a href="https://www.youtube.com/watch?v=FAQ3yVGYSzY&t=306s" title="Watch on Youtube"> introductory video</a> or read the <a href="https://www.nature.com/articles/nmeth.3258">Nature Methods paper</a>.<br>
-      To improve Aquaria, we encourage you to <a href="https://github.com/ODonoghueLab/Aquaria_Client/issues" title="Go to Github">report issues, propose code changes</a>, or <a href="mailto:contact@aquaria.app" title="Email us">contact us</a> regarding suggestions or collaboration.
+      To improve Aquaria, we encourage you to <a v-bind:href="issues" target="_blank" title="Go to Github">report issues</a>, <a :href="changes" title="Go to Github">propose code changes</a>, or <a href="mailto:contact@aquaria.app" title="Email us">contact us</a> regarding suggestions or collaboration.
       </p>
-     <!-- p id="starter"><img v-bind:src="data.logo"
-                   width="50%"
-                   alt="Aquaria" />
-      </p -->
       <div id="XRcontent">
         <XRButton />
       </div>
@@ -51,15 +47,34 @@ export default {
   components: {
     XRButton
   },
+  data () {
+    return {
+      issues: '',
+      title: '',
+      changes: 'https://github.com/aqclient/dev.aqclient.github.io/issues/new?labels=enhancement',
+      logo: require('../../assets/img/logo-large.png')
+    }
+  },
+  mounted () {
+    this.waitForElement()
+  },
   computed: {
     data () {
       return {
-        message: store.state.message,
-        logo: require('../../assets/img/logo-large.png')
+        message: store.state.message
       }
     }
   },
   methods: {
+    waitForElement: function () {
+      var _this = this
+      if (!window.AQUARIA.currentMember) {
+        setTimeout(_this.waitForElement, 50)
+      } else {
+        _this.title = window.AQUARIA.Organism.Name + ' ' + window.AQUARIA.Gene + ' aligned onto ' + window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain
+        _this.issues = 'https://github.com/aqclient/dev.aqclient.github.io/issues/new?title=Problem with this page&labels=bug&body=<a href="' + encodeURIComponent(window.location.href) + '">' + _this.title + '</a>'
+      }
+    },
     hideScrim: function () {
       document.querySelector('#scrim').className = 'hide'
     }

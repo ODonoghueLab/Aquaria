@@ -18,12 +18,6 @@ var TopTen = function (id, MAX_SIZE) {
 		  that.cache.set(entry.key, entry.value);
 		});
 	}
-	
-	
-	
-	
-
-
 };
 
 

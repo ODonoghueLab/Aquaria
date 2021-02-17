@@ -1,19 +1,17 @@
 <template>
   <div id="structure-viewer">
-    <div id="threeDSpan">
-    </div>
-      <iframe src="/html/waiting.html" frameBorder="0" name="waitingFrame" id="waitingFrame" scrolling="no" allowtransparency="true">
-      <p>Your browser does not support iframes.</p>
-    </iframe>
-      <iframe src="/html/selectionText.html" frameBorder="0" name="selectionText" id="selectionText" scrolling="no" allowtransparency="true" style="bottom: 20px; left: 20px;">
-      <p>Your browser does not support iframes.</p>
-    </iframe>
+    <span id="threeDSpan"></span>
+    <Loader/>
   </div>
 </template>
 
 <script>
+import Loader from '../AquariaLayout/Loader'
 export default {
   name: 'StructureViewer',
+  components: {
+    Loader
+  },
   mounted () {
     function checkPhone () {
       var iDevices = [

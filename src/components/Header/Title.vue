@@ -104,52 +104,6 @@ export default {
         el.style.display = 'none'
       })
     },
-    showUniprotPanel: function (ev) {
-      if (document.getElementsByClassName('dimmer').length === 0) {
-        window.AQUARIA.overlay()
-      }
-      this.resetSelection()
-      ev.target.className = 'titlepanel active'
-      document.querySelector('#contentPanel').style.display = 'flex'
-      document.querySelector('#panel1').style.display = 'block'
-      document.querySelector('#uniprot').style.display = 'block'
-      document.querySelector('#searchByName').style.display = 'block'
-      document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
-        document.querySelector('#uniprot').style.display = 'none'
-        document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('#structureviewerexplanation').style.display = 'flex'
-        document.querySelector('div.dimmer').remove()
-      })
-    },
-    showPdbPanel: function (ev) {
-      if (document.getElementsByClassName('dimmer').length === 0) {
-        window.AQUARIA.overlay()
-      }
-      this.resetSelection()
-      ev.target.className = 'titlepanel active'
-      document.querySelector('#gallery').style.display = 'block'
-      document.querySelector('#contentPanel').style.display = 'flex'
-      document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
-        document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('div.dimmer').remove()
-      })
-    },
-    showResidueExplanation: function (ev) {
-      if (document.getElementsByClassName('dimmer').length === 0) {
-        window.AQUARIA.overlay()
-      }
-      this.resetSelection()
-      ev.target.className = 'titlepanel active'
-      document.querySelector('#explanation').style.display = 'block'
-      document.querySelector('#contentPanel').style.display = 'flex'
-      document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelectorAll('#titlebar span').forEach(el => { el.className = 'titlepanel' })
-        document.querySelector('#contentPanel').style.display = 'none'
-        document.querySelector('div.dimmer').remove()
-      })
-    },
     release: function () {
       document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display = 'none'
       this.resetSelection()
@@ -160,7 +114,6 @@ export default {
   },
   updated () {
     var _this = this
-    // this.$children[0].placeholderText(window.AQUARIA.Organism.Name, window.AQUARIA.preferred_protein_name)
     var selectedRes = new MutationObserver(function () {
       if (document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display === 'none') {
         _this.seqRes = null

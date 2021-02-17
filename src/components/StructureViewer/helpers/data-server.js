@@ -17,7 +17,10 @@ export default class DataServer {
 		  }).then(function(response){
             const pdbText = pako.inflate(response.data, {to:"string"});
             callback({ pdbId: window.AQUARIA.currentMember.pdb_id , pdbText })
-			})
+			}).catch(function (error){
+                window.AQUARIA.panel3d.blankApplet(true, 'PDB not available. Try the next <a href="' +  window.location.href + '">matching structure </a>')
+                console.log("PDB not found")
+            })
     }
 
     getViews (callback) {

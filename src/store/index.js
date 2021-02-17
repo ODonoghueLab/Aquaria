@@ -7,7 +7,8 @@ export default new Vuex.Store({
   state: {
     message: 'May, 2020',
     url: window.location.protocol + '//' + window.location.hostname,
-    alignment: ''
+    alignment: '',
+    organism: ''
   },
   mutations: {
   },
