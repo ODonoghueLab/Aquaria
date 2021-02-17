@@ -76,6 +76,9 @@ export default {
 </script>
 
 <style>
+a {
+  color: #5d5d5d;
+}
 #searchByName {
   width: 100%;
 }

@@ -90,10 +90,10 @@ export default {
 
 }
 
-a, p#psyns a, p#osyns a, .simulatelink {
+/* a, p#psyns a, p#osyns a, .simulatelink {
     color: #08C;
     text-decoration: none;
-}
+} */
 
 /* span>a{
   color: rgb(104, 199, 247);

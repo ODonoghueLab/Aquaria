@@ -247,13 +247,6 @@ export default {
     /* background: url(../../public/images/popupTail.png) no-repeat  center  bottom; */
     }
 
-    /* #mydivheader {
-    padding: 10px;
-    cursor: move;
-    z-index: 10;
-    background-color: #666666;
-    color: #fff;
-    } */
     #popuptext{
     /* padding: 0px 20px 20px 20px; */
     background-color: #666666;
@@ -269,6 +262,10 @@ export default {
 </style>
 
 <style>
+  #popuptext a{
+    color: var(--background);
+    text-decoration: none;
+  }
   .anAaHr {
     border-top: 0.5px solid #929192;
   }
