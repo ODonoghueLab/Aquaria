@@ -1,3 +1,12 @@
+//  A collection of functions for Aquaria.ws - page initialisation functions are at the end of this file.
+//  These functions try to follow code conventions specified in http://javascript.crockford.com/code.html
+//
+//  Copyright (c) Garvan Institue of Medical Research and CSIRO
+//
+//  Authors:
+//  Stuart Anderson <Stuart.Anderson@data61.csiro.au>
+//
+// This work is licensed under the terms of the GNU GPL version 2.
 export function screenshot (resX, resY, bgColor, bgAlpha) {
   // ugly hack since jolecule hides three.js?
   const WebGLRenderer = window.AQUARIA.panel3d.embededJolecule.soupWidget.renderer.constructor

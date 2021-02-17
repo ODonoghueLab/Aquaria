@@ -1,6 +1,24 @@
 /* eslint-disable camelcase */
-// A collection of functions for Aquaria.ws - page initialisation functions are at the end of this file.
-// These functions try to follow code conventions specified in http://javascript.crockford.com/code.html
+
+//  Main client script that defines the AQUARIA namespace and primary functions.
+//  Page initialisation functions are at the end of this file.
+//  These functions try to follow code conventions specified in http://javascript.crockford.com/code.html
+//
+//  Copyright (c) Garvan Institue of Medical Research and CSIRO
+//
+//  Authors:
+//  Stuart Anderson <Stuart.Anderson@data61.csiro.au>
+//  Julian Heinrich <julian.heinrich@gmail.com>
+//  Sean O'Donoghue <sean@odonoghuelab.org>
+//  Kenny Sabir <traksewt@gmail.com>
+//  Neblina Sikta <n.sikta@garvan.org.au>
+//  Christian Stolte <christian.stolte@gmail.com>
+//
+//  Jenny Vuong <vuong.jenny@gmail.com>
+//  Michael Joss <michael.joss@gmail.com>
+//  Vivian Ho <veeveearnh@gmail.com>
+//
+// This work is licensed under the terms of the GNU GPL version 2.
 
 window.AQUARIA = {}
 var AQUARIA = window.AQUARIA
@@ -10,8 +28,6 @@ var Applet3DPanel = require('../../StructureViewer/helpers/applet3DPanel')
 var PV3DPanel = require('../../StructureViewer/helpers/pv3DPanel')
 var JoleculePanel = require('../../StructureViewer/helpers/joleculePanel')
 var IDRPanel = require('../../StructureViewer/helpers/IDRPanel')
-// var molecularControlToolkitJS = require('./molecular-control-toolkit-js')
-// var leapConnector = require('./leapConnector');
 var ShowMatchingStructures = require('../../MatchingStructures/helpers/show_matching_structures')
 var show_expanded_cluster = require('../../MatchingStructures/helpers/show_expanded_clusters')
 var featurelist = require('../../Features/helpers/featurelist')
@@ -28,7 +44,6 @@ require('./utilities')
 
 var MAX_PROTEIN_HISTORY = 5;
 
-// show_matching_structures.set(AQUARIA);
 (function ($) {
   // History
 
@@ -580,7 +595,7 @@ var MAX_PROTEIN_HISTORY = 5;
   //
   // Functions to run immediately after home page DOM first finishes loading.
   //
-  // Authors: Sean O'Donoghue, Kenny Sabir, Christian Stolte, Nelson Pereira, Julian Heinrich
+  // Authors: Sean O'Donoghue, Kenny Sabir, Christian Stolte, Julian Heinrich
   //
   AQUARIA.initialisePanels = function (hasUrl) {
     hasUrl = (typeof hasUrl === 'undefined') ? false : hasUrl
