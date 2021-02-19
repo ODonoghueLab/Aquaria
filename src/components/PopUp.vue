@@ -264,7 +264,6 @@ export default {
 <style>
   #popuptext a{
     color: var(--background);
-    text-decoration: none;
   }
   .anAaHr {
     border-top: 0.5px solid #929192;
