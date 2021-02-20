@@ -50,7 +50,7 @@ export default {
     },
     handler: function () {
       const ExpandableTextLineCtor = Vue.extend(ExpandableTextLine)
-      const oneAaCodes = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
+      const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
       const b = document.getElementsByTagName('toReplace_varInfo')
       console.log('The number of nodes to remove are: ' + b.length)
 
