@@ -278,6 +278,7 @@ function cleanData_pp(desc, varInfo){
 
 function cleanData_funVar(desc, variantResidues_res){
 
+	console.log("Leader and follower " + desc);
 
 	let arr = desc.split(/\|/);
 	let arr_aa = arr[0].split(/\>/);
@@ -289,50 +290,65 @@ function cleanData_funVar(desc, variantResidues_res){
 
 		let toAdd = "<i>FunVar: </i>";
 		if (arr_desc.length >= 5){
-			arr_desc[5] = arr_desc[5].replace("<i> FunFams (v4_2_0):</i> ", '');
-			console.log("The funvar desc newAa is " + arr_aa[1] + " " + arr_desc[5]);
-			toAdd = toAdd + "Disrupts " + arr_desc[5] + '. ';
+
+				arr_desc[5] = arr_desc[5].replace("<i> FunFams (v4_2_0):</i> ", '');
+				console.log("The funvar desc newAa is " + arr_aa[1] + " " + arr_desc[5]);
+
+				let yesAndNoObjs = getCancerTypesSplit(arr_desc[4]);
+				if (yesAndNoObjs.yes.length > 0){
+					toAdd = toAdd + " Predicted to disrupt '" + arr_desc[5] + "'"
+					toAdd = toAdd + getToAddStr_funVar(yesAndNoObjs.yes);
+
+					if (yesAndNoObjs.no.length > 0){
+						toAdd = toAdd + ". But not"
+						toAdd = toAdd + getToAddStr_funVar(yesAndNoObjs.no);
+					}
+
+				}
+				else{
+					toAdd = toAdd + " Predicted not to disrupt '" + arr_desc[5] + "'"
+					toAdd = toAdd + getToAddStr_funVar(yesAndNoObjs.no);
+				}
+				variantResidues_res[arr_aa[1]].push(toAdd);
+
+
 		}
 
-		if (arr_desc.length >= 4){
-			arr_desc[4] = arr_desc[4].replace("<i>Cancer types (Is FunFam domain enriched):</i>", "");
 
-			toAdd = toAdd + "In " + arr_desc[4];
-		}
-
-
-
-
-		variantResidues_res[arr_aa[1]].push(toAdd);
-
-
-		// console.log("The arr_desc is " + arr_desc);
-
-
-		// variantResidues_res[arr_aa[1]].push("<i>FunVar: </i>");
-		/*
-		let isFoundInNewAas = false;
-		newAas.forEach(function(newAa, newAa_i){
-			if (arr_aa[1] == newAa){
-
-				varInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
-				isFoundInNewAas = true;
-			}
-		});
-
-		if (isFoundInNewAas == false){
-				otherResInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
-		}
-		*/
 
 	}
 
 }
 
+function getCancerTypesSplit(cTypeDesc){
+	cTypeDesc = cTypeDesc.replace("<i>Cancer types (Is FunFam domain enriched):</i>", "");
+
+
+	let arr_yes = [];
+	let arr_no = [];
+
+
+	let arr = cTypeDesc.split(",")
+	for (let i =0; i<arr.length; i++){
+		let arr_indiv = arr[i].split("(")
+		arr_indiv[1] = arr_indiv[1].replace(/[\)\s\t]+/g, '');
+		console.log ("Funvar desc here is |" + arr_indiv[1] + "| " + arr_indiv[0]);
+
+		arr_indiv[0] = arr_indiv[0].replace(/^[\s]+/, '');
+		arr_indiv[0] = arr_indiv[0].replace(/[\s]+$/, '');
+
+		if (arr_indiv[1] == 'Y'){
+			arr_yes.push(arr_indiv[0].toLowerCase());
+		}
+		else{
+			arr_no.push(arr_indiv[0].toLowerCase())
+		}
+	}
+
+	return {'yes': arr_yes, 'no': arr_no}
+}
 
 function cleanData_cosmic(desc, variantResidues_res, posInfo){
-	console.log("Nelson mendella - did i stutter ");
-	console.log(variantResidues_res);
 	let arr = desc.split(/\|/);
 	arr[0] = arr[0].replace(/^p\./, '');
 	arr_aas = arr[0].split(/[0-9]+/);
@@ -642,6 +658,27 @@ $('.more').toggle(function(){
 });
 
 
+
+function getToAddStr_funVar(yesOrNoArr){
+		let toAddStr = '';
+
+		for (let i =0; i<yesOrNoArr.length; i++){
+			if (i == 0){
+				toAddStr = toAddStr + ' in ';
+			}
+			else if (i == yesOrNoArr.length - 1){
+				toAddStr = toAddStr + ', and ';
+			}
+			else {
+				toAddStr = toAddStr + ', '
+			}
+			toAddStr = toAddStr + " " + yesOrNoArr[i];
+
+
+
+		}
+		return toAddStr
+}
 
 
 function getSubstringOfInterest(description, newResidue){
