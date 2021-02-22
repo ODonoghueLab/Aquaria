@@ -512,6 +512,7 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_
 		arr[2] = desc.replace(/[\s]+/g, '');
 		arr_indivRes = arr[2].split(/\,/);
 		// console.log ('snap2 desc is 3 ' + arr_indivRes);
+		let aasAddingToFn = []; 
 
 		arr_indivRes.forEach(function(anAaAndScore, anAaAndScore_i){
 			let arr_aaScore = anAaAndScore.split(/\:/);
@@ -520,9 +521,22 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_
 					variantResidues_pos[arr_aaScore[0]] = [];
 				}
 				variantResidues_pos[arr_aaScore[0]].push('<i>SNAP2:</i> ' + "Predicted to change function (score = " + arr_aaScore[1] + ")")
+
+				aasAddingToFn.push(arr_aaScore[0].toUpperCase());
+				// scores[arr_aaScore[0]] = arr_aaScore[1];
 			}
 			// console.log("snap2 desc 4 is " + anAaAndScore);
 		});
+
+		oneAaCodes.forEach(function(item, i){
+			if (!aasAddingToFn.includes(item)){
+				if (!variantResidues_pos.hasOwnProperty(item)){
+					variantResidues_pos[item] = [];
+				}
+				variantResidues_pos[item].push('<i>SNAP2:</i> ' + "Predicted not to change function")
+			}
+		});
+
 
 
 		/*
