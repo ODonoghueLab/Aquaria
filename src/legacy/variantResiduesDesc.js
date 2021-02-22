@@ -15,10 +15,6 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 			if (parseInt(pos_mut) >= parseInt(resStart_pp) && parseInt(pos_mut) <= parseInt(resEnd_pp)){
 
-				if (serverName == 'COSMIC'){
-						console.log("cosmic 3 pass");
-				}
-
 				let obj_featType = {};
 				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
 					let varInfo = [];
@@ -51,7 +47,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 						cleanData_cath(description, posInfo, 'functional family');
 					}
 					else if (featureType == 'Structural domain'){
-						cleanData_cath(description, posInfo, 'domain')
+						cleanData_cath(description, posInfo, 'superfamily')
 					}
 
 
@@ -372,7 +368,32 @@ function cleanData_cosmic(desc, variantResidues_res, posInfo){
 			if (!variantResidues_res.hasOwnProperty(cosmic_newAa)){
 				variantResidues_res[cosmic_newAa] = [];
 			}
-			variantResidues_res[cosmic_newAa].push('<i>COSMIC:</i> In ' + arr[2]);
+			arr[2] = arr[2].replace(/\_/g, ' ');
+
+			let toAddStr = "<i>COSMIC:</i> In tumors from ";
+			arr_tissue = arr[2].split(",");
+
+			for (let i =0; i< arr_tissue.length; i++){
+				if (i == 0){
+					// toAddStr = toAddStr + ', '; // + arr_tissue
+				}
+				else if (i == arr_tissue.length - 1){
+					toAddStr = toAddStr + ', and ';
+				}
+				else {
+					toAddStr = toAddStr + ', ';
+				}
+
+				arr_tissue[i] = arr_tissue[i].replace(';', '; freq = ')
+				toAddStr = toAddStr + arr_tissue[i];
+
+			}
+
+			// variantResidues_res[cosmic_newAa].push('<i>COSMIC:</i> In tumors from ' + arr[2]);
+			variantResidues_res[cosmic_newAa].push(toAddStr);
+
+			console.log("The cosmic arr[2] is " + arr[2]);
+
 		}
 
 
@@ -553,7 +574,7 @@ function cleanData_cath(desc, varInfo, partOf){
 	arr[0] = arr[0].replace(/CATH/, '');
 
 	console.log("The cath arr thingo is " + arr[1]);
-	varInfo.push("Part of " + partOf + " '" + arr[1] + "'");
+	varInfo.push("Part of '" + arr[1] + "' " + partOf);
 
 	// let obj_featType = {};
 
