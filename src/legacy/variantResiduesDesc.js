@@ -15,10 +15,6 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 			if (parseInt(pos_mut) >= parseInt(resStart_pp) && parseInt(pos_mut) <= parseInt(resEnd_pp)){
 
-				if (serverName == 'COSMIC'){
-						console.log("cosmic 3 pass");
-				}
-
 				let obj_featType = {};
 				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
 					let varInfo = [];
@@ -51,7 +47,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 						cleanData_cath(description, posInfo, 'functional family');
 					}
 					else if (featureType == 'Structural domain'){
-						cleanData_cath(description, posInfo, 'domain')
+						cleanData_cath(description, posInfo, 'superfamily')
 					}
 
 
@@ -278,6 +274,7 @@ function cleanData_pp(desc, varInfo){
 
 function cleanData_funVar(desc, variantResidues_res){
 
+	console.log("Leader and follower " + desc);
 
 	let arr = desc.split(/\|/);
 	let arr_aa = arr[0].split(/\>/);
@@ -289,50 +286,65 @@ function cleanData_funVar(desc, variantResidues_res){
 
 		let toAdd = "<i>FunVar: </i>";
 		if (arr_desc.length >= 5){
-			arr_desc[5] = arr_desc[5].replace("<i> FunFams (v4_2_0):</i> ", '');
-			console.log("The funvar desc newAa is " + arr_aa[1] + " " + arr_desc[5]);
-			toAdd = toAdd + "Disrupts " + arr_desc[5] + '. ';
+
+				arr_desc[5] = arr_desc[5].replace("<i> FunFams (v4_2_0):</i> ", '');
+				console.log("The funvar desc newAa is " + arr_aa[1] + " " + arr_desc[5]);
+
+				let yesAndNoObjs = getCancerTypesSplit(arr_desc[4]);
+				if (yesAndNoObjs.yes.length > 0){
+					toAdd = toAdd + " Predicted to disrupt '" + arr_desc[5] + "'"
+					toAdd = toAdd + getToAddStr_funVar(yesAndNoObjs.yes);
+
+					if (yesAndNoObjs.no.length > 0){
+						toAdd = toAdd + ". But not"
+						toAdd = toAdd + getToAddStr_funVar(yesAndNoObjs.no);
+					}
+
+				}
+				else{
+					toAdd = toAdd + " Predicted not to disrupt '" + arr_desc[5] + "'"
+					toAdd = toAdd + getToAddStr_funVar(yesAndNoObjs.no);
+				}
+				variantResidues_res[arr_aa[1]].push(toAdd);
+
+
 		}
 
-		if (arr_desc.length >= 4){
-			arr_desc[4] = arr_desc[4].replace("<i>Cancer types (Is FunFam domain enriched):</i>", "");
 
-			toAdd = toAdd + "In " + arr_desc[4];
-		}
-
-
-
-
-		variantResidues_res[arr_aa[1]].push(toAdd);
-
-
-		// console.log("The arr_desc is " + arr_desc);
-
-
-		// variantResidues_res[arr_aa[1]].push("<i>FunVar: </i>");
-		/*
-		let isFoundInNewAas = false;
-		newAas.forEach(function(newAa, newAa_i){
-			if (arr_aa[1] == newAa){
-
-				varInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
-				isFoundInNewAas = true;
-			}
-		});
-
-		if (isFoundInNewAas == false){
-				otherResInfo.push(aaChange + " " + arr_desc[4] + " " + arr_desc[5]);
-		}
-		*/
 
 	}
 
 }
 
+function getCancerTypesSplit(cTypeDesc){
+	cTypeDesc = cTypeDesc.replace("<i>Cancer types (Is FunFam domain enriched):</i>", "");
+
+
+	let arr_yes = [];
+	let arr_no = [];
+
+
+	let arr = cTypeDesc.split(",")
+	for (let i =0; i<arr.length; i++){
+		let arr_indiv = arr[i].split("(")
+		arr_indiv[1] = arr_indiv[1].replace(/[\)\s\t]+/g, '');
+		console.log ("Funvar desc here is |" + arr_indiv[1] + "| " + arr_indiv[0]);
+
+		arr_indiv[0] = arr_indiv[0].replace(/^[\s]+/, '');
+		arr_indiv[0] = arr_indiv[0].replace(/[\s]+$/, '');
+
+		if (arr_indiv[1] == 'Y'){
+			arr_yes.push(arr_indiv[0].toLowerCase());
+		}
+		else{
+			arr_no.push(arr_indiv[0].toLowerCase())
+		}
+	}
+
+	return {'yes': arr_yes, 'no': arr_no}
+}
 
 function cleanData_cosmic(desc, variantResidues_res, posInfo){
-	console.log("Nelson mendella - did i stutter ");
-	console.log(variantResidues_res);
 	let arr = desc.split(/\|/);
 	arr[0] = arr[0].replace(/^p\./, '');
 	arr_aas = arr[0].split(/[0-9]+/);
@@ -356,7 +368,32 @@ function cleanData_cosmic(desc, variantResidues_res, posInfo){
 			if (!variantResidues_res.hasOwnProperty(cosmic_newAa)){
 				variantResidues_res[cosmic_newAa] = [];
 			}
-			variantResidues_res[cosmic_newAa].push('<i>COSMIC:</i> In ' + arr[2]);
+			arr[2] = arr[2].replace(/\_/g, ' ');
+
+			let toAddStr = "<i>COSMIC:</i> In tumors from ";
+			arr_tissue = arr[2].split(",");
+
+			for (let i =0; i< arr_tissue.length; i++){
+				if (i == 0){
+					// toAddStr = toAddStr + ', '; // + arr_tissue
+				}
+				else if (i == arr_tissue.length - 1){
+					toAddStr = toAddStr + ', and ';
+				}
+				else {
+					toAddStr = toAddStr + ', ';
+				}
+
+				arr_tissue[i] = arr_tissue[i].replace(';', '; freq = ')
+				toAddStr = toAddStr + arr_tissue[i];
+
+			}
+
+			// variantResidues_res[cosmic_newAa].push('<i>COSMIC:</i> In tumors from ' + arr[2]);
+			variantResidues_res[cosmic_newAa].push(toAddStr);
+
+			console.log("The cosmic arr[2] is " + arr[2]);
+
 		}
 
 
@@ -475,6 +512,7 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_
 		arr[2] = desc.replace(/[\s]+/g, '');
 		arr_indivRes = arr[2].split(/\,/);
 		// console.log ('snap2 desc is 3 ' + arr_indivRes);
+		let aasAddingToFn = []; 
 
 		arr_indivRes.forEach(function(anAaAndScore, anAaAndScore_i){
 			let arr_aaScore = anAaAndScore.split(/\:/);
@@ -483,9 +521,22 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_
 					variantResidues_pos[arr_aaScore[0]] = [];
 				}
 				variantResidues_pos[arr_aaScore[0]].push('<i>SNAP2:</i> ' + "Predicted to change function (score = " + arr_aaScore[1] + ")")
+
+				aasAddingToFn.push(arr_aaScore[0].toUpperCase());
+				// scores[arr_aaScore[0]] = arr_aaScore[1];
 			}
 			// console.log("snap2 desc 4 is " + anAaAndScore);
 		});
+
+		oneAaCodes.forEach(function(item, i){
+			if (!aasAddingToFn.includes(item)){
+				if (!variantResidues_pos.hasOwnProperty(item)){
+					variantResidues_pos[item] = [];
+				}
+				variantResidues_pos[item].push('<i>SNAP2:</i> ' + "Predicted not to change function")
+			}
+		});
+
 
 
 		/*
@@ -537,7 +588,7 @@ function cleanData_cath(desc, varInfo, partOf){
 	arr[0] = arr[0].replace(/CATH/, '');
 
 	console.log("The cath arr thingo is " + arr[1]);
-	varInfo.push("Part of " + partOf + " '" + arr[1] + "'");
+	varInfo.push("Part of '" + arr[1] + "' " + partOf);
 
 	// let obj_featType = {};
 
@@ -643,6 +694,27 @@ $('.more').toggle(function(){
 
 
 
+function getToAddStr_funVar(yesOrNoArr){
+		let toAddStr = '';
+
+		for (let i =0; i<yesOrNoArr.length; i++){
+			if (i == 0){
+				toAddStr = toAddStr + ' in ';
+			}
+			else if (i == yesOrNoArr.length - 1){
+				toAddStr = toAddStr + ', and ';
+			}
+			else {
+				toAddStr = toAddStr + ', '
+			}
+			toAddStr = toAddStr + " " + yesOrNoArr[i];
+
+
+
+		}
+		return toAddStr
+}
+
 
 function getSubstringOfInterest(description, newResidue){
 
@@ -679,7 +751,7 @@ function getSubstringOfInterest_cath(description){
 	return desc;
 }
 
-const oneAaCodes = ['A',	'R',	'N',	'D',	'C',	'Q',	'E',	'G',	'H',	'I',	'L',	'K',	'M',	'F',	'P',	'S',	'T',	'W',	'Y',	'V'];
+const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
 
 const threeToOneResMap = {

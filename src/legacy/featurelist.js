@@ -564,7 +564,7 @@ function doThePlotting_v2(divId, theSeriesData_inner, theSeriesData_outer, theTi
 
 
 var common = require('../utils/common');
-const oneAaCodes = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
+const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
 function showAnnotation(f, eid) {
 	// console.log(eid);
