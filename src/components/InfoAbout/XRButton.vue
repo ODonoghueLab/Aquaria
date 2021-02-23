@@ -515,7 +515,10 @@ export default XRButtonComponent
 
 <style scoped>
   #mobileView{
-    display: inline-flex;
+    display: flex;
+    flex-direction: row;
+    flex-flow: nowrap;
+    align-items: stretch;
   }
   #QRCodeLaptop .xr-qr {
     max-width: 200px;
@@ -527,6 +530,7 @@ export default XRButtonComponent
   }
   .QRCodeMobile img.xr-qr{
       width: 100%;
+      max-width: 176px;
   }
   #QRCodeLaptop {
     background: #c2c2c2;
@@ -545,6 +549,8 @@ export default XRButtonComponent
     border-radius: 20px;
     width: 46%;
     margin: auto;
+    height: 18rem;
+    text-align: center;
   }
   .QRCodeMobile  > div {
     display: inline-flex;
@@ -568,7 +574,7 @@ export default XRButtonComponent
     color: #707070;
   }
    .QRCodeMobile > p:nth-child(1) {
-    margin: 0.2em 0em 0em 1em;
+    /* margin: 0.2em 0em 0em 1em; */
     font-size: 1em;
     /* font-variant: small-caps; */
     /* font-family: Helvetica; */
