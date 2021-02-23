@@ -33,19 +33,18 @@ var show_expanded_cluster = require('../../MatchingStructures/helpers/show_expan
 var featurelist = require('../../Features/helpers/featurelist')
 var fetch_das_annotations = require('../../Features/helpers/fetch_features')
 var textpanel = require('../../InfoAbout/helpers/textpanels')
-// History
 var TopTen = require('./topten')
-// var cache = require('../common/cache');
 var d3 = require('d3')
 var axios = require('axios')
-var resize_app = require('./resize_app')
+// var resize_app = require('./resize_app')
+var aquariaRemote = require('../../../utils/url')
+import * as LoadAQUARIA from '../../../utils/loadData'
 
 require('./utilities')
 
 var MAX_PROTEIN_HISTORY = 5;
 
 (function ($) {
-  // History
 
   var proteinSubmitListeners = []
   var addProteinSubmitListener = function (listener) {
@@ -162,13 +161,9 @@ var MAX_PROTEIN_HISTORY = 5;
         if (threeDHeight < 570) {
           threeDHeight = 570
         }
-        // $("#threeD").html('');
-        /// console.log('display_3D_structure: currentBiounit =' + currentBiounit + "\n" + 'And biounits =' + biounits)
-
-        /// console.log('AQUARIA.display_3D_structure', AQUARIA.structures2match.Selected_PDB, pdb_id, pdb_chain[0], attributes)
 
         // ABOUT PDB PANEL
-        var url = `${window.BACKEND}/getPubMedForPDB/${pdb_id}/${pdb_chain[0]}`
+        var url = `${window.BACKEND}/getPubMedForPDB/${pdb_id}/${(window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0])}`
         axios({
           method: 'get',
           url: url
@@ -225,10 +220,6 @@ var MAX_PROTEIN_HISTORY = 5;
               currentBiounit = 0
             }
             AQUARIA.pdb_data = pdbData
-            // if(pdbData){
-            //   textpanel.updatePDBPanel(pdbData, common_names[0], member.alignment_identity_score);
-            // }
-            // else { console.log("textpanels.updatePDBPanel error: PDBData not available"); }
 
             // deselect feature tracks that may still be active
             d3.selectAll('svg.loaded rect.feature').attr('fill', '#a4abdf')
@@ -247,7 +238,8 @@ var MAX_PROTEIN_HISTORY = 5;
               history.pushState(null, sequences[0].primary_accession,
                 window.location.protocol + '//' + window.location.host +
             '/' + sequences[0].primary_accession + '/' +
-            pdb_id + '/' + pdb_chain[0] + urlParams)
+            pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
+
               if (AQUARIA.panel3d.initialised) {
                 // intiaties the refresh of the 3D panel
                 AQUARIA.panel3d.reload(attributes)
@@ -325,12 +317,12 @@ var MAX_PROTEIN_HISTORY = 5;
     }
 
     AQUARIA.load3DAlignment = function (member, sequence) {
-      resize_app.startLogoSpin()
+      // resize_app.startLogoSpin()
       // AQUARIA.e_value = member.E_value;
       AQUARIA.currentMember = member
       AQUARIA.updateDocumentTitle(AQUARIA.preferred_protein_name,
         member.alignment_identity_score, member.pdb_id,
-        member.pdb_chain[0])
+        (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : member.pdb_chain[0]))
 
       //      History
       AQUARIA.fireProteinSubmitListeners(AQUARIA.preferred_protein_name, sequence.primary_accession, member.pdb_id)
@@ -347,7 +339,7 @@ var MAX_PROTEIN_HISTORY = 5;
       var loadRequest = {
         selector: [sequence.primary_accession],
         selectPDB: this.member.pdb_id,
-        selectChain: this.member.pdb_chain[0]
+        selectChain: window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : this.member.pdb_chain[0]
       }
 
       var url = `${window.BACKEND}/get_3D_alignment`
@@ -369,7 +361,7 @@ var MAX_PROTEIN_HISTORY = 5;
           AQUARIA.blankPanel('#uniProtDesc', false)
           AQUARIA.blankPanel('#featurelist', false)
         })
-      resize_app.stopLogoSpin()
+      // resize_app.stopLogoSpin()
     }
 
     // Retrieve matching structures from server or local cache
@@ -398,196 +390,6 @@ var MAX_PROTEIN_HISTORY = 5;
         /// console.log("AQUARIA.display_member error: cannot find matching structures.");
       }
     }
-    var sequenceCallback = function (loadRequest, sequences) {
-      // matching structures added found the sequence! This is the first
-      // callback
-      // console.log('got sequences:' + sequences);
-      if (loadRequest.primary_accession === AQUARIA.structures2match.initialLoadRequest.primary_accession) {
-        AQUARIA.structures2match.sequences = sequences
-        // Somewhere here, we inappropriately clear the
-        // matching structures before they are loaded
-        /// console.log('AQUARIA.sequenceCallback initialise matching structures')
-        AQUARIA.showMatchingStructures.initialise(sequences[0])
-        AQUARIA.blankPanel('#vis', true, 'Loading clusters...')
-        /// console.log('AQUARIA.sequenceCallback update Uniprot')
-        textpanel.updateUniprotInfo(sequences[0])
-        /// console.log('AQUARIA.sequenceCallback display features')
-        AQUARIA.addedFeature = false
-        AQUARIA.display_features(sequences)
-      } else {
-        /// console.log('AQUARIA.sequenceCallback error: received old data for sequence callback: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
-      }
-    }
-
-    var clusterCallback = function (loadRequest, newClusters) {
-      AQUARIA.structures2match.clusters = AQUARIA.structures2match.clusters.concat(newClusters)
-      // console.log('got newcluster:' + newCluster);
-      // matching structures added a new cluster, lets draw it!
-      // for each doesn't work on these wierd dnode arrays
-      var i
-      if (loadRequest.primary_accession === AQUARIA.structures2match.initialLoadRequest.primary_accession) {
-        for (i = 0; i < newClusters.length; i++) {
-          AQUARIA.showMatchingStructures.addCluster(newClusters[i])
-        }
-      } else {
-        /// console.log('AQUARIA.clusterCallback error: received old data for cluster callback: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
-      }
-      // AQUARIA.showMatchingStructures.showMap(newClusters[0])
-    }
-
-    var isLoadRequestsEqual = function (primary_accession) {
-      var isEqual = false
-
-      if (typeof AQUARIA.structures2match !== 'undefined' && typeof AQUARIA.structures2match.initialLoadRequest !== 'undefined') {
-        if (primary_accession instanceof Array && AQUARIA.structures2match.initialLoadRequest.selector instanceof Array) {
-          if (primary_accession.length === AQUARIA.structures2match.initialLoadRequest.selector.length) {
-            var i
-            isEqual = true
-            for (i = 0; i < primary_accession.length; i++) {
-              if (primary_accession[i] !== AQUARIA.structures2match.initialLoadRequest.selector[i]) {
-                isEqual = false
-                break
-              }
-            }
-          }
-        }
-      }
-      return isEqual
-    }
-
-    var onTextClick = function (d, cluster) {
-      return show_expanded_cluster.expand_cluster(d, cluster, AQUARIA.structures2match.sequences[0])
-    }
-
-    // var loadAndUpdateHistory = function() {
-    //   uniprot_accession = [];
-    //   uniprot_accession.push(accessionObject.Accession);
-
-    //   AQUARIA.loadAccession(uniprot_accession, null, null, false, uniprot_accession);
-
-    // }
-
-    AQUARIA.loadAccession = function (primary_accession, autoSelectPDB,
-      autoSelectChain, skip3DView, preferredProteinName) {
-      preferredProteinName = preferredProteinName || 'unknown'
-      skip3DView = skip3DView || false
-
-      if (primary_accession === null) {
-        // TODO here we want to revert to the initial state, e.g. no structure in the viewer
-        AQUARIA.blankAll(true)
-        AQUARIA.structures2match = {}
-        AQUARIA.blankCount = {}
-        delete AQUARIA.preferred_protein_name
-        return
-      }
-
-      if (isLoadRequestsEqual(primary_accession)) {
-        AQUARIA.blankAll(false)
-        /// console.log('AQUARIA.loadAccession skipping: already loaded', primary_accession)
-        return
-      }
-      /// console.log('AQUARIA.loadAccession load', primary_accession)
-
-      const pdbParam = autoSelectPDB ? '/' + autoSelectPDB : ''
-      const chainParam = autoSelectChain ? '/' + autoSelectChain : ''
-      var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length)
-      if (AQUARIA.orgName) {
-        history.pushState(primary_accession, document.title, '/' +
-        AQUARIA.orgName + '/' + AQUARIA.gene + pdbParam + chainParam + urlParams)
-      } else {
-        history.pushState(primary_accession, document.title, '/' +
-        primary_accession + pdbParam + urlParams)
-      }
-
-      AQUARIA.blankPanel('#vis', true)
-      AQUARIA.blankPanel('#uniProtDesc', true)
-
-      AQUARIA.preferred_protein_name = preferredProteinName
-      AQUARIA.protein_primary_accession = primary_accession
-
-      // TODO this is currently being called again once the
-      // structures come back (in updateUniprotInfo), but
-      // is required to be called now in order to make sure
-      // that AQUARIA.preferred_protein_name is being set.
-      textpanel.fetchSynonyms(primary_accession)
-
-      AQUARIA.showMatchingStructures = new ShowMatchingStructures(onTextClick)
-
-      var loadRequest = {
-        selector: primary_accession,
-        selectPDB: autoSelectPDB,
-        selectChain: autoSelectChain
-      }
-      AQUARIA.structures2match = {
-        initialLoadRequest: loadRequest,
-        clusters: [],
-        sequences: [],
-        source_primary_accession: primary_accession
-      }
-
-      // cache_matching_structures(primary_accession, function(primary_accession) {
-      var url = `${window.BACKEND}/get_matching_structures`
-      axios({
-        method: 'get',
-        url: url,
-        params: loadRequest
-      })
-        .then(function (response) {
-          const matches = response.data
-          sequenceCallback(loadRequest, matches.sequences)
-          clusterCallback(loadRequest, matches.clusters)
-          // })
-          // AQUARIA.remote.get_matching_structures(loadRequest, sequenceCallback, clusterCallback, function(err, loadRequest, Selected_PDB, finalClusters, cachedHit, version_string) {
-          if (loadRequest.primary_accession === AQUARIA.structures2match.initialLoadRequest.primary_accession) {
-            // AQUARIA.updateIssueEnvironment();
-            const err = matches.err
-            if (err !== undefined && err !== null) {
-              if (skip3DView && err.name === 'MatchingStructuresError') {
-                AQUARIA.blankPanel('#vis', true, err.message)
-              } else {
-                AQUARIA.blankAll(true, err.message, false)
-              }
-            } else {
-              if (matches.clusters) {
-                // if (matches.cachedHit) {
-                //   // cached hit doesn't call the callback (to avoid packet out of order), so call it manually
-                //   clusterCallback(loadRequest, matches.clusters);
-                // } else {
-                AQUARIA.structures2match.clusters = matches.clusters
-                // }
-              }
-
-              AQUARIA.showMatchingStructures.updateSizes(AQUARIA.structures2match.clusters)
-              AQUARIA.blankPanel('#vis', false)
-
-              AQUARIA.structures2match.Selected_PDB = matches.Selected_PDB
-              /// console.log('AQUARIA.cache_matching_structures applet version: ' + version_string, Selected_PDB);
-
-              AQUARIA.structures2match.version_string = matches.viewer
-              var clusterNumber = matches.Selected_PDB.cluster_number
-              var cluster = AQUARIA.structures2match.clusters[clusterNumber]
-              AQUARIA.showMatchingStructures.selectCluster(cluster,
-                clusterNumber)
-              if (!skip3DView) {
-                if (window.threedView === 'IDR') {
-                  var threeDWidth = $('#threeD').width()
-                  var threeDHeight = threeDWidth
-                  threeDHeight = $('#threeDSpan').innerHeight()
-                  if (threeDHeight < 570) {
-                    threeDHeight = 570
-                  }
-                  AQUARIA.panel3d.display_cluster(cluster, threeDWidth, threeDHeight)
-                }
-                AQUARIA.display_member()
-              }
-              AQUARIA.showMatchingStructures.drawCoverageMap(cluster)
-            }
-          } else {
-            /// console.log('AQUARIA.loadAccession error: received old data for Best PDB: ' + loadRequest.primary_accession + ', which does not match requested: ' + AQUARIA.structures2match.initialLoadRequest.primary_accession);
-          }
-        })
-      // });
-    }
   } catch (error) {
     alert('Error with displaying structures: ' + error.message)
   }
@@ -601,136 +403,12 @@ var MAX_PROTEIN_HISTORY = 5;
     hasUrl = (typeof hasUrl === 'undefined') ? false : hasUrl
     // the rest was commented out
   }
-  //
-  // Functions to run the first time the nowjs socket connection is ready.
-  //
-
-  var remoteSuccess = function () {
-    if (initialised) {
-      console.debug('domready.ready called again!')
-      return
-    }
-
-    /// console.log("AQUARIA.remoteSuccess socket connection is ready");
-
-    initialised = true;
-
-    // Avoid `console` errors in browsers that lack a console.
-    (function () {
-      var method
-      var noop = function () {}
-      var methods = [
-        'assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error',
-        'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log',
-        'markTimeline', 'profile', 'profileEnd', 'table', 'time', 'timeEnd',
-        'timeline', 'timelineEnd', 'timeStamp', 'trace', 'warn'
-      ]
-      var length = methods.length
-      var console = (window.console = window.console || {})
-
-      while (length--) {
-        method = methods[length]
-
-        // Only stub undefined methods.
-        if (!console[method]) {
-          console[method] = noop
-        }
-      }
-    }())
-
-    var uniprot_accession
-    // when 'now' socket is ready, fetch structures if URL specifies
-    // a Primary_Accession
-    var pathname = document.location.origin + document.location.pathname // document.URL.split('?')[0];
-    if (typeof window.initialParams !== 'undefined') {
-      AQUARIA.initialisePanels(true)
-      uniprot_accession = []
-      uniprot_accession.push(window.initialParams.primary_accession)
-      AQUARIA.loadAccession(uniprot_accession, window.initialParams.pdb_id, window.initialParams.pdb_chain)
-    } else if (pathname
-      .match(/\/(?:leap\/)?([A-Z a-z][0-9][A-Z a-z,0-9][A-Z a-z,0-9][A-Z a-z,0-9][0-9])\/?$/)) {
-      uniprot_accession = []
-      uniprot_accession.push(RegExp.$1.toUpperCase())
-      AQUARIA.initialisePanels(true)
-      AQUARIA.blankAll(true, 'Waiting for data...')
-      AQUARIA.loadAccession(uniprot_accession)
-    } else if (pathname
-      .match(/\/(?:leap\/)?([a-zA-Z0-9]{30,})\/?$/)) {
-      uniprot_accession = RegExp.$1.toUpperCase()
-      AQUARIA.initialisePanels(true)
-      AQUARIA.blankAll(true, 'Waiting for data...')
-      AQUARIA.loadAccession(uniprot_accession)
-      // primary accession and pdb
-    } else if (pathname
-      .match(/\/(?:leap\/)?([A-Z a-z][0-9][A-Z a-z,0-9][A-Z a-z,0-9][A-Z a-z,0-9][0-9])\/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])\/?$/)) {
-      uniprot_accession = []
-      uniprot_accession.push(RegExp.$1.toUpperCase())
-      var pdb = RegExp.$2.toLowerCase()
-      AQUARIA.initialisePanels(true)
-      AQUARIA.blankAll(true, 'Waiting for data...')
-      AQUARIA.loadAccession(uniprot_accession, pdb)
-      // primary accession and pdb and chain
-    } else if (pathname
-      .match(/\/(?:leap\/)?([A-Z a-z][0-9][A-Z a-z,0-9][A-Z a-z,0-9][A-Z a-z,0-9][0-9])\/([0-9]([A-Z a-z,0-9][A-Z a-z,0-9])[A-Z a-z,0-9])\/([a-zA-Z,0-9])?$/)) {
-      uniprot_accession = []
-      uniprot_accession.push(RegExp.$1.toUpperCase())
-      pdb = RegExp.$2.toLowerCase()
-      var chain = RegExp.$4.toUpperCase()
-      /// console.log('AQUARIA.remoteSuccess inside chain selection');
-      AQUARIA.initialisePanels(true)
-      AQUARIA.blankAll(true, 'Waiting for data...')
-      AQUARIA.loadAccession(uniprot_accession, pdb, chain)
-    } else if (window.location.pathname) {
-      var accession = []
-      const attr = window.location.pathname.split('/')
-      // const organism_gene = attr[1] + '/' + attr[2]
-      var url = `${window.BACKEND}/getAccessionbyOrgNameandGene/${attr[1]}/${attr[2]}`
-      axios({
-        method: 'get',
-        url: url
-      })
-        .then(function (response) {
-          AQUARIA.orgName = attr[1]
-          AQUARIA.gene = attr[2]
-          // const orgID = response.data[0].orgID
-          accession.push(response.data[0].Primary_Accession)
-          if (attr.length > 4) {
-            if (attr[3].match(/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])/)) {
-              pdb = attr[3]
-            }
-            if (attr[4].match(/([a-zA-Z,0-9])?$/)) {
-              chain = attr[4]
-            }
-            AQUARIA.initialisePanels(true)
-            AQUARIA.loadAccession(accession, pdb, chain)
-          } else if (attr.length > 3) {
-            if (attr[3].match(/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])/)) {
-              pdb = attr[3]
-            }
-            AQUARIA.initialisePanels(true)
-            AQUARIA.loadAccession(accession, pdb)
-          } else {
-            AQUARIA.initialisePanels(true)
-            AQUARIA.loadAccession(accession)
-          }
-        })
-    } else if (pathname.match(/\/([A-Za-z]+)/)) {
-      // uniprot_accession = RegExp.$1;
-      // History:
-      // [JH] matches the URL and tries to load it as accession
-      // not sure if we need this for the history in the search box?
-      // AQUARIA.loadAccession(uniprot_accession);
-      AQUARIA.initialisePanels(false)
-    } else {
-      AQUARIA.initialisePanels(false)
-    }
-  }
 
   domready(function () {
     if (window.threedViewer === 'applet') {
       AQUARIA.panel3d = new Applet3DPanel('#threeDSpan')
     } else if (window.threedViewer === 'jolecule') {
-      AQUARIA.panel3d = new JoleculePanel('#threeDSpan', AQUARIA.chainSelected)
+      AQUARIA.panel3d = new JoleculePanel('#threeDSpan', LoadAQUARIA.chainSelected)
     } else if (window.threedViewer === 'webgl') {
       AQUARIA.panel3d = new PV3DPanel('#threeDSpan')
     } else if (window.threedViewer === 'idr') {
@@ -739,7 +417,8 @@ var MAX_PROTEIN_HISTORY = 5;
       console.log('AQUARIA.domready cannot find viewer: ' + window.threedViewer)
     }
     // AQUARIA.gesture = new molecularControlToolkitJS.Leap(AQUARIA.panel3d.gestures())
-    remoteSuccess()
+    // remoteSuccess()
+    aquariaRemote.remoteSuccess()
   })
 })(jQuery)
 
@@ -754,20 +433,21 @@ AQUARIA.launchURL = function (url) {
   window.open(url, '_blank')
 }
 
-AQUARIA.chainSelected = function (primaryAccession, pdbId, chainId) {
-  /// console.log('AQUARIA.chainSelected ' + primaryAccession + ', for pdb chain: ' + pdbId + ":" + chainId);
-  const uniprot_accession = []
-  uniprot_accession.push(primaryAccession)
-  AQUARIA.currentChain = chainId
+AQUARIA.chainSelected = LoadAQUARIA.chainSelected
+// AQUARIA.chainSelected = function (primaryAccession, pdbId, chainId) {
+//   /// console.log('AQUARIA.chainSelected ' + primaryAccession + ', for pdb chain: ' + pdbId + ":" + chainId);
+//   const uniprot_accession = []
+//   uniprot_accession.push(primaryAccession)
+//   AQUARIA.currentChain = chainId
 
-  // TODO THis shouldn't call load Accession because that loads everything as if it is the first time.
-  // in this case, we just want to load matching structures and the protein, and leave the 3d context.
-  AQUARIA.loadAccession(uniprot_accession, pdbId, chainId, true)
+//   // TODO THis shouldn't call load Accession because that loads everything as if it is the first time.
+//   // in this case, we just want to load matching structures and the protein, and leave the 3d context.
+//   LoadAQUARIA.loadAccession(uniprot_accession, pdbId, chainId, true)
 
-  if ('pdb_data' in AQUARIA) {
-    textpanel.updatePDBChain(pdbId, chainId, AQUARIA.currentMember.alignment_identity_score, AQUARIA.pdb_data.Organism[primaryAccession])
-  }
-}
+//   if ('pdb_data' in AQUARIA) {
+//     textpanel.updatePDBChain(pdbId, chainId, AQUARIA.currentMember.alignment_identity_score, AQUARIA.pdb_data.Organism[primaryAccession])
+//   }
+// }
 
 AQUARIA.structures2match = {}
 AQUARIA.blankCount = {}

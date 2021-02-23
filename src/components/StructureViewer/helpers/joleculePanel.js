@@ -180,7 +180,7 @@ JoleculePanel.prototype.reload = function(attributes) {
 //for generating attributes use location+pdb_id
 JoleculePanel.prototype.generateAttributes = function(threeDWidth, threeDHeight, pdb_id, pdb_chain, biounit, source_primary_accession, sequences, common_names, pssh_alignment, links, transform,
   conservations) {
-  var instanceId = sequences[0].primary_accession + '-' + pdb_id + '-' + pdb_chain[0];
+  var instanceId = sequences[0].primary_accession + '-' + pdb_id + '-' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]);
   return {
     width: threeDWidth,
     height: threeDHeight,

@@ -376,6 +376,9 @@ axios({
 	displayProtSynonyms(response.data)
 	displayOrgSynonyms(response.data.OrganismInfo)
   })
+  .catch(function (err) {
+	window.AQUARIA.panel3d.blankApplet(true, err)
+  })
 }
 
 var displayOrgSynonyms = function(orgNames) {
@@ -412,21 +415,17 @@ $("div#osyns p").expander({
 };
 
 var displayProtSynonyms = function(data) {
-//console.log(data);
-var pnames = ''
-// </b>&nbsp;";
-var gnames = "<b>Genes:</b>&nbsp;";
-if (data.synonyms == "none") { 
-	AQUARIA.preferred_protein_name = "unknown"; 
-	pnames = " ";
-	gnames = " ";
-} else {
+	var pnames = ''
+	var gnames = "<b>Genes:</b>&nbsp;";
+	if (data.synonyms == "none") { 
+		AQUARIA.preferred_protein_name = "unknown"; 
+		pnames = " ";
+		gnames = " ";
+	} else {
+		if (AQUARIA.preferred_protein_name === "unknown") {
+			AQUARIA.preferred_protein_name = data.Synonym;
+		}
 	
-	if (AQUARIA.preferred_protein_name === "unknown") {
-		AQUARIA.preferred_protein_name = data.Synonym;
-	}
-	
-
 	var gns = data.genes;
 	var syns = data.synonyms;
 			
@@ -512,18 +511,6 @@ if (data.synonyms == "none") {
 if ($("#protein_syn_input")[0].value != "") { $("#protein_syn_input")[0].value = ""; }
 
 };
-
-function showAll() {
-$("p.hidden").css("display","block");
-$("#morelink").hide();
-$("div#uniProtDesc").after('<p id="fewerlink"><a href="javascript:hideAll();">fewer details</a></p>');
-}
-
-function hideAll() {
-$("p.hidden").hide();
-$("#fewerlink").remove();
-$("#morelink").show();
-}
 
 $(document).on("updateEvent","p.reference_abstract", function(){
 $(this).expander({ 

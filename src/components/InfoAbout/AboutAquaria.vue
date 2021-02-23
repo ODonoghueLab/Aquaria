@@ -61,7 +61,8 @@ export default {
   computed: {
     data () {
       return {
-        message: store.state.message
+        message: store.state.message,
+        error: store.state.error
       }
     }
   },
@@ -73,6 +74,7 @@ export default {
       } else {
         _this.title = window.AQUARIA.Organism.Name + ' ' + window.AQUARIA.Gene + ' aligned onto ' + window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain
         _this.issues = 'https://github.com/aqclient/dev.aqclient.github.io/issues/new?title=Problem with this page&labels=bug&body=<a href="' + encodeURIComponent(window.location.href) + '">' + _this.title + '</a>'
+      // proposed code change
       }
     },
     hideScrim: function () {
