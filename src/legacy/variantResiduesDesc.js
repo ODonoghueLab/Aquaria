@@ -18,9 +18,13 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 				let obj_featType = {};
 				if (serverName == 'PredictProtein' && featureType == 'Conservation'){
 					let varInfo = [];
-					cleanData_pp(description, varInfo);
+					let pp_urlInfo = cleanData_pp(description, varInfo);
 
-					addToVariantResidues(variantResidues, resSnp, [], varInfo, [], 'PredictProtein');
+					let pp_urlInfo_complete = "PredictProtein";
+					if (pp_urlInfo != ""){
+						pp_urlInfo_complete = "<a href='" + pp_urlInfo + "' target='blank'>PredictProtein</a>";
+					}
+					addToVariantResidues(variantResidues, resSnp, [], varInfo, [], pp_urlInfo_complete);
 				}
 
 				else if (serverName == 'SNAP2'){
@@ -257,18 +261,26 @@ function addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherRe
 
 /// Cleaning descriptions;
 function cleanData_pp(desc, varInfo){
-	desc = desc.replace(/\s+/g, '');
+	let arr_pre = desc.split("|")
+	arr_pre[0] = arr_pre[0].replace(/\s+/g, '');
 
-	let arr = desc.split(/\:/);
+	let arr = arr_pre[0].split(/\:/);
 	let arr_1 = arr[1].split(/\(/);
 	arr_1[1] = arr_1[1].replace(/\)/, '');
 
 	// let obj_inFeatType = {mainToShow: arr_1[1], mainToHide: "Score: " + arr_1[0]};
 	varInfo.push(arr_1[1] + " conservation (score = " + arr_1[0] + ")")
 
-	console.log("The pridict protein value is: " + arr_1[1] + " (score:" + arr_1[0] + ")")
+	// console.log("The pridict protein value is: " + arr_1[1] + " (score:" + arr_1[0] + ")")
 
 	// return obj_inFeatType;
+
+	if (arr_pre.length > 1){
+		return (arr_pre[1])
+	}
+	else {
+		return "";
+	}
 }
 
 
@@ -528,7 +540,7 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_
 					variantResidues_pos[arr_aaScore[0]].push(snap2_infoUrl + " Predicted to change function (score = " + arr_aaScore[1] + ")")
 				}
 				else if (parseInt(arr_aaScore[1]) < -40){
-					variantResidues_pos[arr_aaScore[0]].push(snap2_infoUrl + " Predicted not to change function (score = " + arr_aaScore[1] + ")")					
+					variantResidues_pos[arr_aaScore[0]].push(snap2_infoUrl + " Predicted not to change function (score = " + arr_aaScore[1] + ")")
 				}
 				// variantResidues_pos[arr_aaScore[0]].push(snap2_infoUrl + " Predicted to change function (score = " + arr_aaScore[1] + ")")
 

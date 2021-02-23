@@ -1501,7 +1501,7 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 
 				aFeature['Description'] = featAndDesc.description;
 				// aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
-				aFeature['Name'] = featAndDesc.featStr;
+				aFeature['Name'] = addThinSpaces(featAndDesc.featStr);
 				if (consInfo[resNum].hasOwnProperty('oldRes')){
 						aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum]['oldRes'] + '&#8201;&#8594;&#8201;' + consInfo[resNum]['newAas'][0] + ")</span>"
 
@@ -1569,6 +1569,18 @@ function addNewResAndGrantham(varinatResidues_resNum, consInfo_resNum){
 	} */
 }
 
+function addThinSpaces(featStr){
+
+
+		let aa_old = featStr.replace(/[0-9].*$/, '')
+		let aa_new = featStr.replace(/^[a-zA-Z\.]+[0-9]+/, '')
+		let aa_pos = featStr.replace(/^[^0-9]+/, '')
+		aa_pos = aa_pos.replace(/[^0-9].*$/, '')
+		console.log("The feature is featStr " + featStr + " " + " oldAa: " + aa_old + " newAa: " + aa_new + " posAa: " + aa_pos );
+
+		return (aa_old + "&#8201;" + aa_pos + "&#8201;" + aa_new);
+}
+
 function extractDescription(feature){
 	let desc = ''; let featStr = feature;
 
@@ -1578,11 +1590,13 @@ function extractDescription(feature){
 				desc = arr[1];
 		}
 		desc = desc.replace(/\"$/, '');
+
 		featStr = arr[0];
 	}
-	console.log("The feature is featStr" + featStr + " " + desc);
+
 	return {featStr: featStr, description: desc};
 }
+
 
 function getTheTwoPositions(featStr){
 	let arr = featStr.split(/\_/);
