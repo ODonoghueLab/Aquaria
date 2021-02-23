@@ -1560,9 +1560,7 @@ function addNewResAndGrantham(varinatResidues_resNum, consInfo_resNum){
 
 	});
 
-	console.log("over here.......................................");
-	console.log(varinatResidues_resNum);
-	console.log(AQUARIA.showMatchingStructures.sequence.sequence);
+
 	/* for (let newAa in arr_newAas){
 		if (!variantResidues_res.hasOwnProperty(newAa)){
 			variantResidues_res[newAa] = {};

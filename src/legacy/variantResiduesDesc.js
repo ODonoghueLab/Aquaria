@@ -30,7 +30,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					if (featureType == 'Mutational sensitivity (SNAP2 ratio of effect mutations)'){
 
 						cleanData_snap2_effects(description, variantResidues[resSnp].newResidues, posInfo, otherResInfo);
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, otherResInfo, 'SNAP2');
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, otherResInfo, '<a href="https://rostlab.org/owiki/index.php/Snap2" target="blank"> SNAP2</a>');
 					}
 					else if (featureType == 'Mutation score (average SNAP2 score)'){
 						cleanData_snap2_getAvgScore(description, varInfo, variantResidues[resSnp].newResidues, variantResidues[resSnp]);
@@ -58,38 +58,38 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 				else if (serverName == 'UniProt'){
 					console.log('uniprot featuretype is ' + featureType);
 					console.log("uniprot feature description is "  + description);
-
+					let uniprot_infourl = "<a href='https://www.uniprot.org/help/about' target='blank'>UniProt</a>"
 					description = description.replace(/[\s]+$/, '');
 					if (featureType == 'Metal ion-binding site' ){
 
 						let posInfo = [];
 						posInfo.push(description + " metal ion-binding site");
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], uniprot_infourl);
 
 					}
 					if (featureType == 'Binding site' ){
 
 						let posInfo = [];
 						posInfo.push(description + " binding site");
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], uniprot_infourl);
 
 					}
 					else if (featureType == 'Site'){
 						let posInfo = [];
 						posInfo.push(description + ' site');
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], uniprot_infourl);
 					}
 
 					else if (featureType == 'Modified residue'){
 						let posInfo = [];
 						posInfo.push("Modified residue " + description);
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], uniprot_infourl);
 					}
 
 					else if (featureType == 'Cross-link'){
 						let posInfo = [];
 						posInfo.push("Cross-link " + description);
-						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'UniProt');
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], uniprot_infourl);
 					}
 
 					else if (featureType == 'Sequence variant' || featureType == 'Mutagenesis site'){
@@ -97,7 +97,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 
 						// check for the right residue;
 						//cleanData_uniprot_seqVar(description, variantResidues[resSnp].newResidues, varInfo, otherResInfo, posInfo);
-						cleanData_uniprot_seqVar_v2(description, variantResidues[resSnp], posInfo, featureType);
+						cleanData_uniprot_seqVar_v2(description, variantResidues[resSnp], posInfo, featureType, uniprot_infourl);
 
 						// addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'UniProt ' + featureType);
 
@@ -108,12 +108,12 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 				else if (serverName == 'COSMIC'){
 
 					let varInfo = []; let posInfo = []; let otherResInfo = [];
-
+					let cosmic_infoUrl = "<a href='https://cancer.sanger.ac.uk/cosmic/help/mutation/overview' target='blank'>COSMIC</a>"
 					console.log("The newAas are ")
 					console.log(variantResidues[resSnp]);
-					cleanData_cosmic(description, variantResidues[resSnp], posInfo);
+					cleanData_cosmic(description, variantResidues[resSnp], posInfo, cosmic_infoUrl);
 
-					addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, 'COSMIC')
+					addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, cosmic_infoUrl)
 					console.log("The cosmic description is " + description);
 				}
 
@@ -279,6 +279,8 @@ function cleanData_funVar(desc, variantResidues_res){
 	let arr = desc.split(/\|/);
 	let arr_aa = arr[0].split(/\>/);
 
+	let funvar_infoUrl = "<a href='https://funvar.cathdb.info/help' target='blank'>FunFams (v4_2_0):</a>";
+
 	if (arr_aa.length > 1){
 
 		let arr_aa = arr[0].split(/\>/); //.replace(/\>/, "&#8594;");
@@ -287,7 +289,7 @@ function cleanData_funVar(desc, variantResidues_res){
 		let toAdd = "<i>FunVar: </i>";
 		if (arr_desc.length >= 5){
 
-				arr_desc[5] = arr_desc[5].replace("<i> FunFams (v4_2_0):</i> ", '');
+				arr_desc[5] = arr_desc[5].replace("<i> " + funvar_infoUrl + ":</i> ", '');
 				console.log("The funvar desc newAa is " + arr_aa[1] + " " + arr_desc[5]);
 
 				let yesAndNoObjs = getCancerTypesSplit(arr_desc[4]);
@@ -344,7 +346,7 @@ function getCancerTypesSplit(cTypeDesc){
 	return {'yes': arr_yes, 'no': arr_no}
 }
 
-function cleanData_cosmic(desc, variantResidues_res, posInfo){
+function cleanData_cosmic(desc, variantResidues_res, posInfo, cleanData_cosmic){
 	let arr = desc.split(/\|/);
 	arr[0] = arr[0].replace(/^p\./, '');
 	arr_aas = arr[0].split(/[0-9]+/);
@@ -370,7 +372,7 @@ function cleanData_cosmic(desc, variantResidues_res, posInfo){
 			}
 			arr[2] = arr[2].replace(/\_/g, ' ');
 
-			let toAddStr = "<i>COSMIC:</i> In tumors from ";
+			let toAddStr = "<i>" + cleanData_cosmic + ":</i> In tumors from ";
 			arr_tissue = arr[2].split(",");
 
 			for (let i =0; i< arr_tissue.length; i++){
@@ -404,7 +406,7 @@ function cleanData_cosmic(desc, variantResidues_res, posInfo){
 
 }
 
-function cleanData_uniprot_seqVar_v2(desc, variantResidues_res, posInfo, featureType){
+function cleanData_uniprot_seqVar_v2(desc, variantResidues_res, posInfo, featureType, uniprot_infourl){
 	// main to show, other residues;
 
 	console.log("The Uniprot seqVar desc are " + desc);
@@ -425,7 +427,7 @@ function cleanData_uniprot_seqVar_v2(desc, variantResidues_res, posInfo, feature
 			}
 			arr = arr.slice(3, arr.length);
 
-			variantResidues_res[newAa].push('<i>UniProt:</i> ' + featureType + " "  + arr.join(" "));
+			variantResidues_res[newAa].push('<i>' + uniprot_infourl + ':</i> ' + featureType + " "  + arr.join(" "));
 		}
 		else{
 			posInfo.push(featureType + " " + desc);
@@ -501,6 +503,7 @@ function cleanData_uniprot_seqVar(desc, newAas, varInfo, otherResInfo, posInfo){
 }
 
 function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_pos){
+	let snap2_infoUrl = "<a href='https://rostlab.org/owiki/index.php/Snap2' target='blank'><i>SNAP2:</i></a>"
 
 	console.log("snap2 desc 2 is " + desc);
 
@@ -512,7 +515,7 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_
 		arr[2] = desc.replace(/[\s]+/g, '');
 		arr_indivRes = arr[2].split(/\,/);
 		// console.log ('snap2 desc is 3 ' + arr_indivRes);
-		let aasAddingToFn = []; 
+		let aasAddingToFn = [];
 
 		arr_indivRes.forEach(function(anAaAndScore, anAaAndScore_i){
 			let arr_aaScore = anAaAndScore.split(/\:/);
@@ -520,7 +523,14 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_
 				if (!variantResidues_pos.hasOwnProperty(arr_aaScore[0])){
 					variantResidues_pos[arr_aaScore[0]] = [];
 				}
-				variantResidues_pos[arr_aaScore[0]].push('<i>SNAP2:</i> ' + "Predicted to change function (score = " + arr_aaScore[1] + ")")
+
+				if (parseInt(arr_aaScore[1]) > 40){
+					variantResidues_pos[arr_aaScore[0]].push(snap2_infoUrl + " Predicted to change function (score = " + arr_aaScore[1] + ")")
+				}
+				else if (parseInt(arr_aaScore[1]) < -40){
+					variantResidues_pos[arr_aaScore[0]].push(snap2_infoUrl + " Predicted not to change function (score = " + arr_aaScore[1] + ")")					
+				}
+				// variantResidues_pos[arr_aaScore[0]].push(snap2_infoUrl + " Predicted to change function (score = " + arr_aaScore[1] + ")")
 
 				aasAddingToFn.push(arr_aaScore[0].toUpperCase());
 				// scores[arr_aaScore[0]] = arr_aaScore[1];
@@ -533,7 +543,7 @@ function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_
 				if (!variantResidues_pos.hasOwnProperty(item)){
 					variantResidues_pos[item] = [];
 				}
-				variantResidues_pos[item].push('<i>SNAP2:</i> ' + "Predicted not to change function")
+				variantResidues_pos[item].push(snap2_infoUrl + " Not predicted to change function")
 			}
 		});
 

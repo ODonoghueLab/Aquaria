@@ -172,7 +172,7 @@ function showAnnotation (f, eid) {
     // eslint-disable-next-line
     oldAa = oldAa.replace(/\&.*$/, '')
   }
-  let btnsDiv = "<div id='buttons_eachAa'> <b>See also:</b><p class='pAaColor'> &rarr;</p>"
+  let btnsDiv = '<div id="buttons_eachAa"> <b>See also:</b><p class="pAaColor"> ' + oldAa + ' &rarr;</p>'
   balloon = balloon + "<div id='divVI_varInfo'>"
   oneAaCodes.forEach(function (anAa, _i) {
     if (anAa !== oldAa) {

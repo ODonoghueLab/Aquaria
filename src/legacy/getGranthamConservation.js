@@ -2,7 +2,7 @@ exports.getGranthamIsCons = getGranthamIsCons;
 
 function getGranthamIsCons(oldRes, newRes){
 	let granthamVal = -1;
-
+	let granthamUrlAndName = "<a href='https://en.wikipedia.org/wiki/Amino_acid_replacement#Grantham\'s_distance' target='blank'> <i>Grantham:</i></a>";
 	if (rows.includes(oldRes) && cols.includes(newRes)){
 
 
@@ -28,10 +28,10 @@ function getGranthamIsCons(oldRes, newRes){
 	}
 
 	if (granthamVal >= 0 && granthamVal <= 100){
-		return "<i>Grantham:</i> Conserved substitution (score = " + granthamVal + ")";
+		return granthamUrlAndName + " Conserved substitution (score = " + granthamVal + ")";
 	}
 	else if (granthamVal > 100 ) {
-		return "<i>Grantham:</i> Non-conserved substitution (score = " + granthamVal + ")";
+		return granthamUrlAndName + " Non-conserved substitution (score = " + granthamVal + ")";
 	}
 	else {
 		return "";
