@@ -1027,20 +1027,23 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 
 		Object.values(threeToOneResMap).forEach(function(anAa, anAa_i){
 			// console.log("An extraordinary life " + anAa);
+			if (anAa != variantResidues[residue]['oldAa']){
 
-			if (variantResidues[residue].hasOwnProperty(anAa)){
-				for (let i=0; i<variantResidues[residue][anAa].length; i++){
-					description = description + '<toReplace_varInfo_' + anAa +'>'
-					description = description + variantResidues[residue][anAa][i] + ". ";
-					description = description + '</toReplace_varInfo_' + anAa +'>'
+				if (variantResidues[residue].hasOwnProperty(anAa)){
+					for (let i=0; i<variantResidues[residue][anAa].length; i++){
+						description = description + '<toReplace_varInfo_' + anAa +'>'
+						description = description + variantResidues[residue][anAa][i] + ". ";
+						description = description + '</toReplace_varInfo_' + anAa +'>'
+					}
 				}
-			}
-			else {
-				//if (variantResidues[residue][anAa].length == 0){
-					description = description + '<toReplace_varInfo_' + anAa +'>'
-					description = description + "No data to show. ";
-					description = description + '</toReplace_varInfo_' + anAa +'>'
-				//}
+				else {
+					//if (variantResidues[residue][anAa].length == 0){
+						description = description + '<toReplace_varInfo_' + anAa +'>'
+						description = description + "No data to show. ";
+						description = description + '</toReplace_varInfo_' + anAa +'>'
+					//}
+				}
+				// console.log("We almost always kick full " + anAa);
 			}
 
 		});
@@ -1496,15 +1499,19 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 					aFeature['Residue'] = resNum;
 				}
 
-
-				aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
+				aFeature['Description'] = featAndDesc.description;
+				// aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
 				aFeature['Name'] = featAndDesc.featStr;
 				if (consInfo[resNum].hasOwnProperty('oldRes')){
-						aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum]['oldRes'] + '&#8594;' + consInfo[resNum]['newAas'][0] + ")</span>"
+						aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum]['oldRes'] + '&#8201;&#8594;&#8201;' + consInfo[resNum]['newAas'][0] + ")</span>"
+
 				}
 				else {
 					aFeature['Name'] = aFeature['Name'] + " <span id='span_missenseHeading' class='btnAaBold'> </span>"
 				}
+
+				aFeature['Name'] = aFeature['Name'] + "<span class='pAaColor'>" + consInfo[resNum]['consStr'] + "</span>";
+
 				// aFeature['Name'] = featAndDesc.featStr;
 				aFeature['Color'] = "#F73C3C"
 
@@ -1513,6 +1520,9 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 
 				// Adding for filling up pop-up info.
 				variantResidues[resNum] = {};
+				if (consInfo[resNum].hasOwnProperty('oldRes')){
+					variantResidues[resNum]['oldAa'] = consInfo[resNum]['oldRes']
+				}
 
 				// variantResidues[resNum]['newResidues'] = consInfo[resNum]['newAas'];
 				variantResidues[resNum]['defaultDesc'] = aFeature['Description'];
@@ -1552,6 +1562,7 @@ function addNewResAndGrantham(varinatResidues_resNum, consInfo_resNum){
 
 	console.log("over here.......................................");
 	console.log(varinatResidues_resNum);
+	console.log(AQUARIA.showMatchingStructures.sequence.sequence);
 	/* for (let newAa in arr_newAas){
 		if (!variantResidues_res.hasOwnProperty(newAa)){
 			variantResidues_res[newAa] = {};

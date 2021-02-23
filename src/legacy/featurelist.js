@@ -568,7 +568,7 @@ const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 
 
 function showAnnotation(f, eid) {
 	// console.log(eid);
-	console.log("Hovered "+f.name+" "+f.start+"-"+f.end+": "+f.desc);
+	console.log("Hovered "+f.name);
 	var urlhtml = "";
 	if (f.urls.length > 0) {
 		// var lnx = f.urls.split(";");
@@ -582,34 +582,50 @@ function showAnnotation(f, eid) {
 	$("div.popup").remove();
 	var balloon = "<div style='display: none;'> <div id='divVariantInfo' class='aaLightBg'></div><div id='divVI_chosen'></div> <div id='divVI_posInfo'><hr class='anAaHr'><b>Residue " + f.start + "</b></div> ";
 
-	let btnsDiv = "<div id='buttons_eachAa'> <b>See also:</b><p class='pAaColor'> &rarr;</p>";
+	let oldAa = '';
+	if (f.name.includes("&#8201;&#8594;&#8201;")){
+		oldAa = f.name.replace(/^.*\(/, '');
+		oldAa = oldAa.replace(/\&.*$/, '');
+	}
+	let btnsDiv = "<div id='buttons_eachAa'> <b>See also:</b><p class='pAaColor'> " + oldAa + " &rarr;</p>";
 	balloon = balloon + "<div id='divVI_varInfo'>"
 	oneAaCodes.forEach(function (anAa, _i) {
-		balloon = balloon + "<div id='divVI_varInfo_" + anAa + "'></div>"
-		let isUniCosOrFun = isUniCosOrFunPresent(anAa, f.desc);
-		btnsDiv = btnsDiv + "<button id='btnVI_" + anAa  + "'";
-		if (isUniCosOrFun == true) {
-			btnsDiv = btnsDiv + "class='btnAaBold_b'> <b>" + anAa + "</b> "
+		if (anAa != oldAa){
+			balloon = balloon + "<div id='divVI_varInfo_" + anAa + "'></div>"
+			let isUniCosOrFun = isUniCosOrFunPresent(anAa, f.desc);
+			btnsDiv = btnsDiv + "<button id='btnVI_" + anAa  + "'";
+			if (isUniCosOrFun == true) {
+				btnsDiv = btnsDiv + "class='btnAaBold_b'> <b>" + anAa + "</b> "
+			}
+			else{
+				btnsDiv = btnsDiv +  " class='btnAaBold'> " + anAa
+			}
+			btnsDiv = btnsDiv + "</button>"
 		}
-		else{
-			btnsDiv = btnsDiv +  " class='btnAaBold'> " + anAa
-		}
-		btnsDiv = btnsDiv + "</button>"
 	})
 
 	balloon = balloon + "</div>";
 	btnsDiv = btnsDiv + "</div>";
 	balloon = balloon + btnsDiv;
-	balloon = balloon + "</div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
-			+ f.label + " (";
-	if (f.start == f.end){
-		balloon = balloon + "Residue "+f.start;
-	} else {
-		balloon = balloon + "Residues "+f.start+"-"+f.end;
+	balloon = balloon + "</div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"	+ f.label;
+
+	if (!f.name.includes("span_missenseHeading")){
+		balloon = balloon + " (";
+		if (f.start == f.end){
+			balloon = balloon + "Residue "+f.start;
+		} else {
+			balloon = balloon + "Residues "+f.start+"-"+f.end;
+		}
+		balloon = balloon + ") "
 	}
 
-	// balloon = balloon.append(f.desc);
-	balloon = balloon + ") <br/>" // "</div>"
+	/// END.
+
+	if (!f.name.includes("span_missenseHeading")){
+		balloon = balloon + "<br/>"
+	}
+
+	balloon = balloon  // "</div>"
 		 	+ f.desc + "</p>"
 			+ urlhtml + "</div>";
 		/* 	console.log("The urlhtml is " + urlhtml);

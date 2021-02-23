@@ -76,52 +76,62 @@ export default {
         document.getElementById('balloon').appendChild(document.getElementById('buttons_eachAa'))
         // Attach events to btns.
         for (let k = 0; k < oneAaCodes.length; k++) {
-          document.getElementById('btnVI_' + oneAaCodes[k]).addEventListener('click', function () {
-            // Change heading amino acid.
-            let a = document.getElementById('span_missenseHeading').innerHTML
-            a = a.replace(/[a-zA-Z]+\)/, oneAaCodes[k] + ')')
-            document.getElementById('span_missenseHeading').innerHTML = a
+          if (document.getElementById('btnVI_' + oneAaCodes[k])) {
+            document.getElementById('btnVI_' + oneAaCodes[k]).addEventListener('click', function () {
+              // Change heading amino acid.
+              let a = document.getElementById('span_missenseHeading').innerHTML
+              a = a.replace(/[a-zA-Z]+\)/, oneAaCodes[k] + ')')
+              document.getElementById('span_missenseHeading').innerHTML = a
 
-            // Hide clicked button, and unhide any other button
-            hideClickedUnhideOthrs(oneAaCodes[k])
-            // document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[k]))
-            // Move clicked aa div to chosen, and move any other div already in chosen back down
-            moveAndShowClickedDivAa(oneAaCodes[k])
-          })
+              // Hide clicked button, and unhide any other button
+              hideClickedUnhideOthrs(oneAaCodes[k])
+              // document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[k]))
+              // Move clicked aa div to chosen, and move any other div already in chosen back down
+              moveAndShowClickedDivAa(oneAaCodes[k])
+            })
+          }
         }
       }
       for (let i = 0, len = b2.length; i !== len; ++i) {
         b2[0].parentNode.removeChild(b2[0])
       }
       for (let i = 0; i < oneAaCodes.length; i++) {
-        const anAaToReplace = document.getElementsByTagName('toReplace_varInfo_' + oneAaCodes[i])
-        if (anAaToReplace.length > 0) {
-          var varInfoDivAnAa = document.getElementById('divVI_varInfo_' + oneAaCodes[i])
-          // console.log('Popup vue anAaDiv ')
-          // console.log(varInfoDivAnAa)
-          for (let j = 0; j < anAaToReplace.length; j++) {
-            const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: anAaToReplace[j].innerHTML } }, propsData: { useClick: true } })
-            componentinstance.$mount()
-            componentinstance.$el.innerHTML = anAaToReplace[j].innerHTML
-            // console.log('anAaToReplace[j] ' + anAaToReplace[j].innerHTML)
-            varInfoDivAnAa.appendChild(componentinstance.$el)
-            this.expandTextLine.push(componentinstance)
-          }
-          document.getElementById('divVI_varInfo').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[i]))
+        if (document.getElementsByTagName('toReplace_varInfo_' + oneAaCodes[i])) {
+          const anAaToReplace = document.getElementsByTagName('toReplace_varInfo_' + oneAaCodes[i])
+          if (anAaToReplace.length > 0) {
+            if (document.getElementById('divVI_varInfo_' + oneAaCodes[i])) {
+              var varInfoDivAnAa = document.getElementById('divVI_varInfo_' + oneAaCodes[i])
+              // console.log('Popup vue anAaDiv ')
+              // console.log(varInfoDivAnAa)
+              for (let j = 0; j < anAaToReplace.length; j++) {
+                const componentinstance = new ExpandableTextLineCtor({ data: function () { return { p: anAaToReplace[j].innerHTML } }, propsData: { useClick: true } })
+                componentinstance.$mount()
+                componentinstance.$el.innerHTML = anAaToReplace[j].innerHTML
+                // console.log('anAaToReplace[j] ' + anAaToReplace[j].innerHTML)
+                varInfoDivAnAa.appendChild(componentinstance.$el)
+                this.expandTextLine.push(componentinstance)
+              }
+              document.getElementById('divVI_varInfo').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[i]))
 
-          for (let l = 0, len = anAaToReplace.length; l !== len; ++l) {
-            anAaToReplace[0].parentNode.removeChild(anAaToReplace[0])
+              for (let l = 0, len = anAaToReplace.length; l !== len; ++l) {
+                anAaToReplace[0].parentNode.removeChild(anAaToReplace[0])
+              }
+              handleInitVar()
+            }
           }
-          handleInitVar()
         }
       }
 
       function hideClickedUnhideOthrs (clickedAa) {
         for (let i = 0; i < oneAaCodes.length; i++) {
           if (clickedAa === oneAaCodes[i]) {
-            document.getElementById('btnVI_' + clickedAa).style.display = 'none'
+            if (document.getElementById('btnVI_' + clickedAa)) {
+              document.getElementById('btnVI_' + clickedAa).style.display = 'none'
+            }
           } else {
-            document.getElementById('btnVI_' + oneAaCodes[i]).style.display = 'inline'
+            if (document.getElementById('btnVI_' + oneAaCodes[i])) {
+              document.getElementById('btnVI_' + oneAaCodes[i]).style.display = 'inline'
+            }
           }
         }
       }
@@ -130,9 +140,13 @@ export default {
         for (let i = 0; i < oneAaCodes.length; i++) {
           if (selAa === oneAaCodes[i]) {
             console.log('It comes down here!')
-            document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + selAa))
+            if (document.getElementById('divVI_varInfo_' + selAa)) {
+              document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + selAa))
+            }
           } else {
-            document.getElementById('divVI_varInfo').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[i]))
+            if (document.getElementById('divVI_varInfo_' + oneAaCodes[i])) {
+              document.getElementById('divVI_varInfo').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[i]))
+            }
           }
         }
       }
@@ -141,7 +155,7 @@ export default {
         if (document.getElementById('span_missenseHeading')) {
           let a = document.getElementById('span_missenseHeading').innerHTML
           a = a.replace(/[()]+/g, '')
-          const arr = a.split('→')
+          const arr = a.split(' → ')
 
           if (arr.length > 1) {
             hideClickedUnhideOthrs(arr[1])

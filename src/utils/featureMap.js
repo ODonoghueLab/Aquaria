@@ -166,32 +166,48 @@ function showAnnotation (f, eid) {
   // $('div.popup').remove()
   var balloon = '<div style="display: none;"> <div id="divVariantInfo" class="aaLightBg"></div><div id="divVI_chosen"></div> <div id="divVI_posInfo"><hr class="anAaHr"><b>Residue ' + f.start + '</b></div> '
 
+  let oldAa = ''
+  if (f.name.includes('&#8201;&#8594;&#8201;')) {
+    oldAa = f.name.replace(/^.*\(/, '')
+    // eslint-disable-next-line
+    oldAa = oldAa.replace(/\&.*$/, '')
+  }
   let btnsDiv = "<div id='buttons_eachAa'> <b>See also:</b><p class='pAaColor'> &rarr;</p>"
   balloon = balloon + "<div id='divVI_varInfo'>"
   oneAaCodes.forEach(function (anAa, _i) {
-    balloon = balloon + "<div id='divVI_varInfo_" + anAa + "'></div>"
-    const isUniCosOrFun = isUniCosOrFunPresent(anAa, f.desc)
-    btnsDiv = btnsDiv + "<button id='btnVI_" + anAa + "'"
-    if (isUniCosOrFun === true) {
-      btnsDiv = btnsDiv + ' class="btnAaBold_b"> <b>' + anAa + '</b> '
-    } else {
-      btnsDiv = btnsDiv + ' class="btnAaBold"> ' + anAa
+    if (anAa !== oldAa) {
+      balloon = balloon + "<div id='divVI_varInfo_" + anAa + "'></div>"
+      const isUniCosOrFun = isUniCosOrFunPresent(anAa, f.desc)
+      btnsDiv = btnsDiv + "<button id='btnVI_" + anAa + "'"
+      if (isUniCosOrFun === true) {
+        btnsDiv = btnsDiv + ' class="btnAaBold_b"> <b>' + anAa + '</b> '
+      } else {
+        btnsDiv = btnsDiv + ' class="btnAaBold"> ' + anAa
+      }
+      btnsDiv = btnsDiv + '</button>'
     }
-    btnsDiv = btnsDiv + '</button>'
   })
 
   balloon = balloon + '</div>'
   btnsDiv = btnsDiv + '</div>'
   balloon = balloon + btnsDiv
-  balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p>' + f.label + ' ('
-  if (f.start === f.end) {
-    balloon = balloon + 'Residue ' + f.start
-  } else {
-    balloon = balloon + 'Residues ' + f.start + '-' + f.end
+  balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p>' + f.label
+  if (!f.name.includes('span_missenseHeading')) {
+    balloon = balloon + ' ('
+    if (f.start === f.end) {
+      balloon = balloon + 'Residue ' + f.start
+    } else {
+      balloon = balloon + 'Residues ' + f.start + '-' + f.end
+    }
+    balloon = balloon + ') '
+  }
+
+  if (!f.name.includes('span_missenseHeading')) {
+    balloon = balloon + '<br/>'
   }
 
   // balloon = balloon.append(f.desc);
-  balloon = balloon + ') <br/>' + f.desc + '</p>' + urlhtml + '</div>'
+  balloon = balloon + f.desc + '</p>' + urlhtml + '</div>'
   // d3.select('#popuptext')
   //   // .append('div')
   //   // .attr('class', 'popup')

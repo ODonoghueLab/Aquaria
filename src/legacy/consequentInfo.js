@@ -34,6 +34,8 @@ function getConsInfo(featStr){
 	}
 	// Check if amino acid is specified as isOne (ret. True) or isThree (ret. False);
 	isOne = isOneTOrThreeF(featStr);
+
+
 	isAllele = false;
 
 	// Allele
@@ -318,6 +320,7 @@ function getConsInfo(featStr){
 		newResidues[resPos] = {};
 		// resPositions.push(resPos);
 
+		let oldAa_rightOne = checkAndGetRightAa(featStr, isOne);
 		consequentStr = consequentStr + "Missense ";
 		let newRes = getNewRes(featStr);
 
@@ -326,7 +329,7 @@ function getConsInfo(featStr){
 		// GRANTHAM
 		// let granthamStr = grantham.getGranthamIsCons(newRes.oldRes, newRes.newRes);
 		newResidues[resPos]['consStr'] = consequentStr; // + " " + granthamStr;
-		newResidues[resPos]['oldRes'] = newRes.oldRes;
+		newResidues[resPos]['oldRes'] = oldAa_rightOne;
 	}
 
 	// Substitution - translation initiation codon
@@ -405,6 +408,32 @@ function getConsInfo(featStr){
 }
 
 ///////////////////////////////////// AUX
+function checkAndGetRightAa(featStr, isOne){
+		let arr = featStr.split(/[0-9]+/);
+		let oldAa = arr[0];
+
+		let resPos = featStr.replace(/^[^\d]+/, '');
+		resPos = resPos.replace(/[^\d].*$/, '');
+
+		let theRightAa = '';
+		if (AQUARIA.hasOwnProperty('showMatchingStructures') && AQUARIA.showMatchingStructures.hasOwnProperty('sequence') && AQUARIA.showMatchingStructures.sequence.hasOwnProperty('sequence')){
+			theRightAa = AQUARIA.showMatchingStructures.sequence.sequence[parseInt(resPos)-1]
+		}
+
+		/*
+		if (isOne){
+			return theRightAa
+		}
+		else {
+			theRightAa = Object.keys(threeToOneResMap).find(key => threeToOneResMap[key] === theRightAa);
+		}
+		*/ 
+		console.log("The old Aa and resPos are " + oldAa + " " + resPos + " " + theRightAa);
+
+		return theRightAa;
+}
+
+
 function getTerminatingPos_fs(featStr){
 	let terPos = featStr.replace(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss]([Tt][eE][rR]|\*)/, '');
 
