@@ -26,12 +26,11 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
     /// console.log('AQUARIA.loadAccession skipping: already loaded', primaryAccession)
     return
   }
-  /// console.log('AQUARIA.loadAccession load', primaryAccession)
 
   const pdbParam = autoSelectPDB ? '/' + autoSelectPDB : ''
   const chainParam = autoSelectChain ? '/' + autoSelectChain : ''
-  window.AQUARIA.prefferedChain = []
-  window.AQUARIA.prefferedChain.push(autoSelectChain || '')
+  window.AQUARIA.prefferedChain = [] // Set preferred Chain
+  // window.AQUARIA.prefferedChain.push(autoSelectChain || '')
   var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length)
   if (window.AQUARIA.orgName) {
     history.pushState(primaryAccession, document.title, '/' +
@@ -87,9 +86,8 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
           if (skip3DView && err.name === 'MatchingStructuresError') {
             window.AQUARIA.blankPanel('#vis', true, err.message)
           } else {
-            window.AQUARIA.panel3d.blankApplet(true, err.message)
+            // window.AQUARIA.panel3d.blankApplet(true, err.message)
             Store.commit('setErrorMsg', err.message)
-            // window.AQUARIA.blankAll(true, err.message, false)
           }
         } else {
           if (matches.clusters) {
@@ -125,7 +123,8 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
       }
     })
     .catch(function (err) {
-      window.AQUARIA.panel3d.blankApplet(true, err)
+      // window.AQUARIA.panel3d.blankApplet(true, err)
+      Store.commit('setErrorMsg', err)
     })
     // });
 }

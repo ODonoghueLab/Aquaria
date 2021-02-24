@@ -22,6 +22,7 @@ export function remoteSuccess () {
     .match(/\/(?:leap\/)?([A-Z a-z][0-9][A-Z a-z,0-9][A-Z a-z,0-9][A-Z a-z,0-9][0-9])\/?$/)) {
     uniprotAccession.push(RegExp.$1.toUpperCase())
     AQUARIA.initialisePanels(true)
+    window.AQUARIA.panel3d.blankApplet(true)
     AQUARIA.blankAll(true, 'Waiting for data...')
     LoadAQUARIA.loadAccession(uniprotAccession)
   } else if (pathname // primary accession and pdb
@@ -29,6 +30,7 @@ export function remoteSuccess () {
     uniprotAccession.push(RegExp.$1.toUpperCase())
     pdb = RegExp.$2.toLowerCase()
     AQUARIA.initialisePanels(true)
+    window.AQUARIA.panel3d.blankApplet(true)
     AQUARIA.blankAll(true, 'Waiting for data...')
     LoadAQUARIA.loadAccession(uniprotAccession, pdb)
   } else if (pathname // primary accession and pdb and chain
@@ -38,6 +40,7 @@ export function remoteSuccess () {
     pdb = RegExp.$2.toLowerCase()
     chain = RegExp.$4.toUpperCase()
     AQUARIA.initialisePanels(true)
+    window.AQUARIA.panel3d.blankApplet(true)
     AQUARIA.blankAll(true, 'Waiting for data...')
     LoadAQUARIA.loadAccession(uniprotAccession, pdb, chain, false)
   } else if (pathname
@@ -52,6 +55,7 @@ export function remoteSuccess () {
         uniprotAccession.push(response.data.Accession)
         chain = response.data.Chain
         AQUARIA.initialisePanels(true)
+        window.AQUARIA.panel3d.blankApplet(true)
         AQUARIA.blankAll(true, 'Waiting for data...')
         LoadAQUARIA.loadAccession(uniprotAccession, pdb)
       })
@@ -77,15 +81,18 @@ export function remoteSuccess () {
             chain = attr[4]
           }
           AQUARIA.initialisePanels(true)
+          window.AQUARIA.panel3d.blankApplet(true)
           LoadAQUARIA.loadAccession(accession, pdb, chain)
         } else if (attr.length > 3) {
           if (attr[3].match(/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])/)) {
             pdb = attr[3]
           }
           AQUARIA.initialisePanels(true)
+          window.AQUARIA.panel3d.blankApplet(true)
           LoadAQUARIA.loadAccession(accession, pdb)
         } else {
           AQUARIA.initialisePanels(true)
+          window.AQUARIA.panel3d.blankApplet(true)
           LoadAQUARIA.loadAccession(accession)
         }
       })

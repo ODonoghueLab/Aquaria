@@ -2,6 +2,7 @@
 ///////// sidebar information panels ////////////
 var axios = require('axios');
 var d3 = require('d3');
+var Store = require('../../../store/index')
 
 function updatePDBPanel(PDBData, commonName, score) {
 	var molecule_name, pdbid, chain, acc;
@@ -377,7 +378,8 @@ axios({
 	displayOrgSynonyms(response.data.OrganismInfo)
   })
   .catch(function (err) {
-	window.AQUARIA.panel3d.blankApplet(true, err)
+	Store.commit('setErrorMsg', err)
+	// window.AQUARIA.panel3d.blankApplet(true, err)
   })
 }
 

@@ -40,15 +40,12 @@ export default {
   beforeCreate () {
     // var regex = /(^\d+\/*$)/
     if (window.location.pathname === '/') {
-      if (sessionStorage.getItem('link') == null) {
+      if (localStorage.getItem('LastSuccess') == null) {
         window.location.pathname = '/P04637/3kmd'
       } else {
-        window.location.pathname = sessionStorage.getItem('link')
+        window.location.pathname = localStorage.getItem('LastSuccess')
       }
     }
-  },
-  updated () {
-    sessionStorage.setItem('link', window.location.pathname)
   }
 }
 </script>

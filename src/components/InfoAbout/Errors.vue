@@ -1,6 +1,6 @@
 <template>
-  <div id="AboutError" v-if="data.error">
-    <a href="#" class="close" @click="hideScrim"></a>
+  <div id="AboutError" v-if="data.error" class='ErrorPanel overlay level7'>
+    <a href="#" class="close" @click="loadLastSuccess"></a>
     <div>
       <p class="thetitle">Error</p>
       <p class="intro1">{{data.error}}</p>
@@ -35,16 +35,11 @@ export default {
   methods: {
     waitForElement: function () {
       var _this = this
-      //   if (!window.AQUARIA.currentMember) {
-      //     setTimeout(_this.waitForElement, 50)
-      //   } else {
       _this.title = window.AQUARIA.Organism.Name + ' ' + window.AQUARIA.Gene + ' aligned onto ' + window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain
       _this.issues = 'https://github.com/aqclient/dev.aqclient.github.io/issues/new?title=Problem with this page&labels=bug&body=<a href="' + encodeURIComponent(window.location.href) + '">' + _this.title + '</a>'
-      // proposed code change
-    //   }
     },
-    hideScrim: function () {
-      document.querySelector('#scrim').className = 'hide'
+    loadLastSuccess: function () {
+      window.location.pathname = localStorage.getItem('LastSuccess')
     }
   }
 }
@@ -55,7 +50,7 @@ export default {
     position: absolute;
     z-index: 9999999999999;
     top: 1vh;
-    left: 25%;
+    left: 50%;
     background: var(--primary-tab);
     padding: 0.5rem 0.75rem;
     border-radius: 1rem;
@@ -72,7 +67,7 @@ p.thetitle {
     border-radius: 1.5rem;
     margin: auto;
 }
-  #AboutError:target.panel {
+  #AboutError:target.ErrorPanel {
       display: flex;
       font-size: 90%;
       max-width: 40rem;
@@ -99,8 +94,45 @@ p.thetitle {
   .affiliations span {
       margin-right: 1.2em;
   }
-  .panel .close::after {
+  .ErrorPanel .close::after {
     width: 1.5rem;
     height: 1.5rem;
+  }
+
+  .ErrorPanel .close {
+    position: relative;
+    display: block;
+  }
+  .ErrorPanel .close::after {
+    right: 0.25rem;
+    top: 0.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: absolute;
+    display: flex;
+    z-index: 11;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,.5);
+    border-radius: 50%;
+    color: white;
+    content: "×";
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .ErrorPanel .close:hover::after {
+      background-color: var(--primary-highlight);
+  }
+ .ErrorPanel.overlay {
+    border-radius: 1rem;
+    /* box-shadow: 0 0 0 9999px rgba(0,0,0,0.6); /* dark background overlay */
+    /* -webkit-box-shadow: 0 0 0 999px rgba(0,0,0,0.6); */
+    padding: 0.5rem 0.75rem;
+    position: absolute;
+    top: 1vh;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    width: 90vw;
+    max-width: 30rem;
   }
  </style>
