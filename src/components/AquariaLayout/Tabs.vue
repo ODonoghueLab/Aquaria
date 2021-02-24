@@ -89,23 +89,34 @@ export default {
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
-    top: 3em;
+    top: 3rem;
 }
 .tab {
-    flex: 0 3 auto;
+    flex: 0 0 auto;
     height: 2rem;
     padding: 0.25rem 0.5rem 0 0.5rem;
     transition: All 0.5s ease;
-    min-width: 7rem;
+    min-width: 8.5rem;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
+@media screen and (min-width: 550px) {
+  .tab {  min-width: 9.5rem; }
+}
+@media screen and (min-width: 950px) {
+  .tab {  min-width: 11.5rem; }
+}
+@media screen and (min-width: 1850px) {
+  .tab {
+    min-width: 14.5rem;
+  }
+}
 .tab#Structures {
     order: 1;
+    text-align: right;
 }
 .tab#Features {
     order: 2;
-    flex-basis: calc(9rem + 1vw);
 }
 span.icon {
     display: inline-block;
@@ -144,27 +155,7 @@ span.icon {
     transition: All 0.5s ease;
 }
 .tab.inactive a { color: #dedede; }
-/* .tab a:hover span.icon {
-    background-color: #eee;
-    transition: All 0.5s ease;
-}
-:target a span.icon {
-    background-color: transparent;
-}
-.icon img {
-    height:  calc(1rem + 1vh);
-    margin: .15rem;
-}
 
-.tab a {
-    color: var(--background);
-    text-decoration: none;
-    transition: All 0.5s ease;
-}
-.tab a:hover {
-    color: #FFF;
-    transition: All 0.5s ease;
-} */
 :target a {
     color: var(--dark-text);
 }

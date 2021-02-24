@@ -490,7 +490,7 @@ export default XRButtonComponent
         <button class="xr-item default-button" @click="close(); downloadUsd()">Download USDZ</button>
 
         <!-- Scene Viewer -->
-        <button v-if="sceneViewer" class="xr-item default-button" @click="close(); openInSceneViewer()">Open in Scene Viewer</button>
+        <!-- <button v-if="sceneViewer" class="xr-item default-button" @click="close(); openInSceneViewer()">Open in Scene Viewer</button> -->
 
         <!-- AR Quick Look (iOS) -->
         <button v-if="quickLook" class="xr-item default-button" @click="close(); openInQuickLook()">Open in AR Quick Look</button>
