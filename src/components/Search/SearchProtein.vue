@@ -10,9 +10,10 @@
 <script>
 import axios from 'axios'
 import * as textpanel from '../InfoAbout/helpers/textpanels'
-import * as resizeApp from '../AquariaLayout/helpers/resize_app'
+// import * as resizeApp from '../AquariaLayout/helpers/resize_app'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import '@trevoreyre/autocomplete-vue/dist/style.css'
+import * as LoadAQUARIA from '../../utils/loadData'
 
 export default {
   name: 'SearchProtein',
@@ -63,11 +64,9 @@ export default {
           })
             .then(function (response) {
               const accessionObject = response.data
-              AQUARIA.loadAccession([accessionObject.Accession], result.value, null, false, accessionObject.Accession)
+              LoadAQUARIA.loadAccession([accessionObject.Accession], result.value, null, false, accessionObject.Accession)
             })
             // AQUARIA.remote.getAccessionForPDB(ui.item.value, chain, function(accessionObject) {
-            //   AQUARIA.loadAccession([accessionObject.Accession], ui.item.value, null, false, accessionObject.Accession);
-
           // })
         } else if (result.id === AQUARIA.protein_primary_accession) {
           if (result.value === AQUARIA.preferred_protein_name) {
@@ -97,7 +96,7 @@ export default {
           document.querySelector('#protein_syn_input').placeholder = result.value
           document.querySelector('#protein_syn_input').value = ''
           AQUARIA.blankAll(true, 'Waiting for data...')
-          AQUARIA.loadAccession([primaryAccession], _this.pdbId, null, false, result.value)
+          LoadAQUARIA.loadAccession([primaryAccession], _this.pdbId, null, false, result.value)
         }
       } else {
         event.preventDefault()
@@ -115,7 +114,7 @@ export default {
             resolve(_this.collectResponsevalues)
           }
         } else {
-          resizeApp.startLogoSpin()
+          // resizeApp.startLogoSpin()
           _this.proteinSynonymOrgId = _this.term + '%' + AQUARIA.Organism.ID
           if (_this.proteinSynonymOrgId in _this.cacheProteinSynonyms) {
             resolve(_this.cacheProteinSynonyms[_this.proteinSynonymOrgId])
@@ -237,7 +236,7 @@ export default {
       }, null)
       _this.callbackData.names = labelValues
       _this.collectResponse()
-      resizeApp.stopLogoSpin()
+      // resizeApp.stopLogoSpin()
     },
     // Autocomplete for Primary Accession
     idCallback: function (idData) {
@@ -262,7 +261,7 @@ export default {
       })
       _this.callbackData.ids = labelValues
       _this.collectResponse()
-      resizeApp.stopLogoSpin()
+      // resizeApp.stopLogoSpin()
     },
     // Autocomplete for PDB
     pdbCallback: function (pdbData) {
@@ -280,7 +279,7 @@ export default {
       })
       _this.callbackData.pdbIDs = labelValues
       _this.collectResponse()
-      resizeApp.stopLogoSpin()
+      // resizeApp.stopLogoSpin()
     }
   }
 }

@@ -12,7 +12,7 @@
 <script>
 import axios from 'axios'
 import * as textpanel from '../InfoAbout/helpers/textpanels'
-import * as resizeApp from '../AquariaLayout/helpers/resize_app'
+// import * as resizeApp from '../AquariaLayout/helpers/resize_app'
 // import $ from 'jquery'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import '@trevoreyre/autocomplete-vue/dist/style.css'
@@ -60,7 +60,7 @@ export default {
     },
     search (input) {
       var OrganismSynonyms = this.OrganismSynonyms
-      resizeApp.startLogoSpin()
+      // resizeApp.startLogoSpin()
       var labelValues
       var term = input
       this.value = input

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import pako from './pako'
+import Store from '../../../store/index'
 export default class DataServer {
 
     constructor(url, id) {
@@ -17,8 +18,13 @@ export default class DataServer {
 		  }).then(function(response){
             const pdbText = pako.inflate(response.data, {to:"string"});
             callback({ pdbId: window.AQUARIA.currentMember.pdb_id , pdbText })
+            localStorage.setItem('LastSuccess', window.location.pathname)
 			}).catch(function (error){
-                window.AQUARIA.panel3d.blankApplet(true, 'PDB not available. Try the next <a href="' +  window.location.href + '">matching structure </a>')
+                Store.commit('setErrorMsg', 'PDB not available. Try the next matching structure')
+                // window.AQUARIA.panel3d.blankApplet(true, 'PDB not available. Try the next <a href="' +  window.location.href + '">matching structure </a>')
+                window.AQUARIA.panel3d.blankApplet(false)
+                document.querySelector("#Structures > a > span").click()
+                // history.pushState({}, "page x",  location.protocol + '//' + location.host + location.pathname + '#Structures');
                 console.log("PDB not found")
             })
     }

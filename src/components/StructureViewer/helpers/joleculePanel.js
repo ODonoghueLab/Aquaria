@@ -10,7 +10,7 @@ var JoleculePanel = function (attachToDiv, chainSelected) {
   newDiv.setAttribute('id', newDivId)
   newDiv.setAttribute('style', 'padding-bottom: 2px; box-sizing: border-box; width: 100%; height: 98.6%%')
   currentDiv.appendChild(newDiv)
-  this.chainSelected = chainSelected
+  this.chainSelected = window.AQUARIA.chainSelected
   this.embededJolecule = jolecule.initEmbedJolecule({
     divTag: newAttachToDiv,
     isLoop: false,
@@ -180,7 +180,7 @@ JoleculePanel.prototype.reload = function(attributes) {
 //for generating attributes use location+pdb_id
 JoleculePanel.prototype.generateAttributes = function(threeDWidth, threeDHeight, pdb_id, pdb_chain, biounit, source_primary_accession, sequences, common_names, pssh_alignment, links, transform,
   conservations) {
-  var instanceId = sequences[0].primary_accession + '-' + pdb_id + '-' + pdb_chain[0];
+  var instanceId = sequences[0].primary_accession + '-' + pdb_id + '-' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]);
   return {
     width: threeDWidth,
     height: threeDHeight,

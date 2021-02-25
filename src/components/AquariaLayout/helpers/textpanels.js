@@ -1,4 +1,4 @@
-//Authors: Christian Stolte, Vivian Ho, Julian Heinrich
+//Authors: Christian Stolte, Vivian Ho, Julian Heinrich, Neblina Sikta
 ///////// sidebar information panels ////////////
 var axios = require('axios');
 var d3 = require('d3');
@@ -512,18 +512,6 @@ if (data.synonyms == "none") {
 if ($("#protein_syn_input")[0].value != "") { $("#protein_syn_input")[0].value = ""; }
 
 };
-
-function showAll() {
-$("p.hidden").css("display","block");
-$("#morelink").hide();
-$("div#uniProtDesc").after('<p id="fewerlink"><a href="javascript:hideAll();">fewer details</a></p>');
-}
-
-function hideAll() {
-$("p.hidden").hide();
-$("#fewerlink").remove();
-$("#morelink").show();
-}
 
 $(document).on("updateEvent","p.reference_abstract", function(){
 $(this).expander({ 

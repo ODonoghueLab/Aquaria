@@ -9,7 +9,7 @@ var radius = 16
 var $ = require('jquery')
 var memberIndexCounter = 0
 var d3 = require('d3')
-var resize_app = require('../../AquariaLayout/helpers/resize_app')
+// var resize_app = require('../../AquariaLayout/helpers/resize_app')
 var axios = require('axios')
 
 module.exports.expand_cluster = function expand_cluster (d, cluster, sequence) {
@@ -544,7 +544,7 @@ function show_expanded_cluster (selectedCluster, id, number) {
     if (really == true) {
       console.log('about to load cluster ' + cluster_nr + ', ' + d.pdb_id + ', chain ' + d.pdb_chain[0] + ', repeats: ' + d.Repeat_domains[0])
 
-      resize_app.startLogoSpin()
+      // resize_app.startLogoSpin()
       AQUARIA.panel3d.blankApplet(true)
       AQUARIA.blankPanel('#aboutPDB', true)
       AQUARIA.display_member(matching_structures.clusters[cluster_nr].members[member_nr]); console.info(matching_structures.clusters[cluster_nr].members[member_nr])

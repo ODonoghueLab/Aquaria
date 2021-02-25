@@ -12,6 +12,7 @@
     </div>
     <div>
       <AboutAquaria />
+      <Errors />
     </div>
     <!-- StructureViewer -->
     <StructureViewer />
@@ -33,6 +34,7 @@ import StructureViewer from '../components/StructureViewer/StructureViewer'
 import Tabs from '../components/AquariaLayout/Tabs'
 import PopUp from '../components/AquariaLayout/PopUp'
 import AboutAquaria from '../components/InfoAbout/AboutAquaria'
+import Errors from '../components/InfoAbout/Errors'
 
 export default {
   name: 'Wrapper',
@@ -44,7 +46,8 @@ export default {
     StructureViewer,
     Tabs,
     PopUp,
-    AboutAquaria
+    AboutAquaria,
+    Errors
   },
   methods: {
     // load: function () {
