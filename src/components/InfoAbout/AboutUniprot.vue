@@ -1,17 +1,17 @@
 <template>
     <!-- About Uniprot -->
-    <div data-intro="UniProt summary of the specified protein's function." data-position="right">
-              <div style="display:none;"
-                    id='gsyns'>
-                <p>Genes: &nbsp;</p>
-              </div>
-        <div id="uniProtDesc" v-if="uniprotDesc"></div>
-          <div v-for="(description, i) in descriptions" :key="i" class='expandable'>
-          <expandable-text-line>
-            <p><strong>{{description[0]}}</strong> : {{description[1]}}</p>
-          </expandable-text-line>
-          </div>
-        </div>
+    <div data-intro="UniProt summary of the specified protein's function." data-position="right" class="scrollable">
+      <div style="display:none;"
+            id='gsyns'>
+        <p>Genes: &nbsp;</p>
+      </div>
+      <div id="uniProtDesc" v-if="uniprotDesc"></div>
+        <div v-for="(description, i) in descriptions" :key="i" class='expandable'>
+        <expandable-text-line>
+          <p><strong>{{description[0]}}</strong> : {{description[1]}}</p>
+        </expandable-text-line>
+      </div>
+    </div>
 </template>
 
 <script>
