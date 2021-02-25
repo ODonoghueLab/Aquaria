@@ -433,7 +433,7 @@ AQUARIA.launchURL = function (url) {
   window.open(url, '_blank')
 }
 
-AQUARIA.chainSelected = LoadAQUARIA.chainSelected
+window.AQUARIA.chainSelected = LoadAQUARIA.chainSelected
 // AQUARIA.chainSelected = function (primaryAccession, pdbId, chainId) {
 //   /// console.log('AQUARIA.chainSelected ' + primaryAccession + ', for pdb chain: ' + pdbId + ":" + chainId);
 //   const uniprot_accession = []

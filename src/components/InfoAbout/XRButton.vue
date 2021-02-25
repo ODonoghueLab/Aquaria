@@ -55,12 +55,13 @@ const XRButtonComponent = {
     }
   },
   mounted: function () {
+    var _this = this
     this.hevsViewUpdateDebounced = debounce(() => this.hevsViewUpdate(), HEVS_UPDATE_INTERVAL, { leading: true, maxWait: HEVS_UPDATE_INTERVAL })
     // shim the chainSelected function to detect changes
     let chainSelectionOriginal
     const chainSelectionProxy = (accession, pdb, chain) => {
       chainSelectionOriginal(accession, pdb, chain)
-      this.dataReceived = true
+      _this.dataReceived = true
       // clear feature state
       this.featuresActive = false
       this.featureSet = null
