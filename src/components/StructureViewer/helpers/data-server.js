@@ -20,8 +20,11 @@ export default class DataServer {
             callback({ pdbId: window.AQUARIA.currentMember.pdb_id , pdbText })
             localStorage.setItem('LastSuccess', window.location.pathname)
 			}).catch(function (error){
-                Store.commit('setErrorMsg', 'PDB not available. Try the next <a href="' +  window.location.href + '">matching structure </a>')
+                Store.commit('setErrorMsg', 'PDB not available. Try the next matching structure')
                 // window.AQUARIA.panel3d.blankApplet(true, 'PDB not available. Try the next <a href="' +  window.location.href + '">matching structure </a>')
+                window.AQUARIA.panel3d.blankApplet(false)
+                document.querySelector("#Structures > a > span").click()
+                // history.pushState({}, "page x",  location.protocol + '//' + location.host + location.pathname + '#Structures');
                 console.log("PDB not found")
             })
     }

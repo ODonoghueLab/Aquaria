@@ -6,6 +6,11 @@ import App from './App'
 import VueMq from 'vue-mq'
 import ToggleSwitch from 'vuejs-toggle-switch'
 
+// import vue material resources
+import VueMaterial from 'vue-material'
+import 'vue-material/dist/vue-material.min.css'
+import 'vue-material/dist/theme/default.css'
+
 // import styles (would be cleaner to do this through a top-level main.css)
 // import 'vue-material/dist/vue-material.min.css'
 import 'jquery-ui-dist/jquery-ui.css'
@@ -27,6 +32,7 @@ require('../src/assets/css/normalize.css')
 require('../src/assets/css/main.css')
 
 Vue.use(ToggleSwitch)
+Vue.use(VueMaterial)
 // Vue.use(MdButton)
 // Vue.use(MdContent)
 // Vue.use(MdTabs)

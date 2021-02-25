@@ -1,7 +1,5 @@
 
-//  Main client script that defines the AQUARIA namespace and primary functions.
-//  Page initialisation functions are at the end of this file.
-//
+//  Main client script that defines the AQUARIA namespace and initiates page load.
 //  Copyright (c) Garvan Institue of Medical Research and CSIRO
 //
 //  Authors:
@@ -11,6 +9,7 @@
 
 import axios from 'axios'
 import * as LoadAQUARIA from './loadData'
+import Store from '../store/index'
 var AQUARIA = window.AQUARIA
 var uniprotAccession = []
 var pdb, chain
@@ -96,7 +95,14 @@ export function remoteSuccess () {
           LoadAQUARIA.loadAccession(accession)
         }
       })
+      .catch(function (error) {
+        AQUARIA.initialisePanels(false)
+        window.AQUARIA.panel3d.blankApplet(true)
+        Store.commit('setErrorMsg', error)
+      })
   } else {
     AQUARIA.initialisePanels(false)
+    window.AQUARIA.panel3d.blankApplet(true)
+    Store.commit('setErrorMsg', 'PDB not available.')
   }
 }

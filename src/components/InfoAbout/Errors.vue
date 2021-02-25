@@ -4,7 +4,11 @@
     <div>
       <p class="thetitle">Error</p>
       <p class="intro1">{{data.error}}</p>
-      <p>We encourage you to <a v-bind:href="issues" target="_blank" title="Go to Github">report issues</a>, <a :href="changes" target="_blank" title="Go to Github">propose code changes</a>, or <a href="mailto:contact@aquaria.app" title="Email us">contact us</a> regarding suggestions.</p>
+      <div>
+        <md-button class="md-raised md-primary" :href='lastURL'>Cancel</md-button>
+        <md-button class="md-raised md-primary" :href='issuesURL' target='_blank'>Report</md-button>
+      </div>
+      <!-- <p>We encourage you to <a v-bind:href="issues" target="_blank" title="Go to Github">report issues</a>, <a :href="changes" target="_blank" title="Go to Github">propose code changes</a>, or <a href="mailto:contact@aquaria.app" title="Email us">contact us</a> regarding suggestions.</p> -->
       <!-- <p><i>Last updated May, 2020. PDB entries released since then are not yet available in Aquaria.</i><p> -->
     </div>
   </div>
@@ -21,30 +25,39 @@ export default {
       logo: require('../../assets/img/logo-large.png')
     }
   },
-  mounted () {
-    this.waitForElement()
-  },
   computed: {
     data () {
       return {
         message: store.state.message,
         error: store.state.error
       }
+    },
+    issuesURL () {
+      return 'https://github.com/aqclient/dev.aqclient.github.io/issues/new?title=Problem with this page&labels=bug&body=<a href="' + encodeURIComponent(window.location.href) + '">' + this.data.error + '</a>'
+    },
+    pageUrl () {
+      return window.location.href
+    },
+    lastURL () {
+      return window.location.origin
+      // + (localStorage.getItem('LastSuccess') ? localStorage.getItem('LastSuccess') : '/P04637')
     }
   },
   methods: {
-    waitForElement: function () {
-      var _this = this
-      _this.title = window.AQUARIA.Organism.Name + ' ' + window.AQUARIA.Gene + ' aligned onto ' + window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain
-      _this.issues = 'https://github.com/aqclient/dev.aqclient.github.io/issues/new?title=Problem with this page&labels=bug&body=<a href="' + encodeURIComponent(window.location.href) + '">' + _this.title + '</a>'
-    },
     loadLastSuccess: function () {
-      window.location.pathname = localStorage.getItem('LastSuccess')
+      window.location.pathname = localStorage.getItem('LastSuccess') ? localStorage.getItem('LastSuccess') : '/P04637'
     }
   }
 }
 </script>
 <style scoped>
+.md-button.md-theme-default.md-raised:not([disabled]).md-primary{
+  background: #707070;
+  float: right;
+}
+.intro1{
+  padding-left: 10px;
+}
 #AboutError{
     display: flex;
     position: absolute;
