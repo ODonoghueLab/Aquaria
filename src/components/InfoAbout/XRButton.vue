@@ -528,9 +528,14 @@ export default XRButtonComponent
     margin-left: 35px;
     font-weight: 500;
   }
-  .QRCodeMobile img.xr-qr{
+  .QRCodeMobile img.xr-qr {
       width: 100%;
-      max-width: 176px;
+      max-width: 130px;
+  }
+  @media screen and (min-width: 600px) {
+    .QRCodeMobile img.xr-qr {
+      max-width: 180px;
+    }
   }
   #QRCodeLaptop {
     background: #c2c2c2;
