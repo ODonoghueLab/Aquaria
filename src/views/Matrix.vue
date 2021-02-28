@@ -234,7 +234,7 @@ export default {
 }
 
 /* Christian's work */
-@media (min-width: 550px){
+@media screen and (min-width: 550px){
   #matrix{
     height: 99vh;
     background: #c0c0c0 url('../assets/img/Resource-banner.svg') no-repeat calc(6px + 0.4vw) calc(8px + 0.1vh);

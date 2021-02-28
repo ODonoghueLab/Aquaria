@@ -4,7 +4,7 @@
 //  Page initialisation functions are at the end of this file.
 //  These functions try to follow code conventions specified in http://javascript.crockford.com/code.html
 //
-//  Copyright (c) Garvan Institue of Medical Research and CSIRO
+//  Copyright (c) CSIRO (2010-2017) and Garvan Institute of Medical Research (2010-)
 //
 //  Authors:
 //  Stuart Anderson <Stuart.Anderson@data61.csiro.au>

@@ -5,7 +5,7 @@ var selectRes = new MutationObserver(function () {
     document.querySelector('#threeDSpan-inner').style.height = '100%'
     document.querySelector('#selectedCluster').style.display = 'block'
     document.querySelector('#selectedFeature').style.display = 'block'
-    document.querySelector('div.tabs').style.top = '2.8em'
+    document.querySelector('div.tabs').style = ''
   } else {
     document.querySelector('.jolecule-embed-footer').style.display = 'flex'
     document.querySelector('.jolecule-embed-footer').style.visibility = 'visible'
@@ -14,7 +14,7 @@ var selectRes = new MutationObserver(function () {
     document.querySelector('#threeDSpan-inner').style.height = '100%'
     document.querySelector('#selectedCluster').style.display = 'none'
     document.querySelector('#selectedFeature').style.display = 'none'
-    document.querySelector('div.tabs').style.top = '0.2em'
+    document.querySelector('div.tabs').style.top = '-1.1rem'
     document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.bottom = '105px'
   }
 })

@@ -1,7 +1,7 @@
 <template>
     <!-- About PDB -->
     <div id="Structure" class="panel overlay about level4">
-        <div id="description" data-intro="PDB summary for the shown structure." data-position="bottom">
+      <div class="scrollable"  id="description" data-intro="PDB summary for the shown structure." data-position="bottom">
         <span class="content" id="description" data-intro="PDB summary for the shown structure." data-position="bottom">
             <span id="biounitDisplay" style="display: none;">
                 <span id="biounitLeft" style="display: inline-block;" title="Navigate to other assemblies">&lt;</span>
