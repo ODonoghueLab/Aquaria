@@ -13,8 +13,17 @@ export default {
 
 <style scoped>
 #map {
-  bottom: -2em;
-  height: 3em;
+  top: 2.5rem;
+  height: 3rem;
+}
+@media screen and (min-width: 550px) {
+  #map { top: 3rem; }
+}
+@media screen and (min-width: 950px) {
+  #map { top: 3.5rem; }
+}
+@media screen and (min-width: 1850px) {
+  #map { top: 4.5rem; }
 }
 #selectedCluster{
   position: absolute;

@@ -126,8 +126,13 @@ body {
 }
 .panel.overlay.about {
   padding-top: 3em;
+  max-height: 85vh;
 }
 .about p {
   margin: 0.25em 0;
+}
+.scrollable {
+  overflow-y: scroll;
+  max-height: 80vh;
 }
 </style>

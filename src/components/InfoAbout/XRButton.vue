@@ -491,7 +491,7 @@ export default XRButtonComponent
         <button class="xr-item default-button" @click="close(); downloadUsd()">Download USDZ</button>
 
         <!-- Scene Viewer -->
-        <button v-if="sceneViewer" class="xr-item default-button" @click="close(); openInSceneViewer()">Open in Scene Viewer</button>
+        <!-- <button v-if="sceneViewer" class="xr-item default-button" @click="close(); openInSceneViewer()">Open in Scene Viewer</button> -->
 
         <!-- AR Quick Look (iOS) -->
         <button v-if="quickLook" class="xr-item default-button" @click="close(); openInQuickLook()">Open in AR Quick Look</button>
@@ -516,7 +516,10 @@ export default XRButtonComponent
 
 <style scoped>
   #mobileView{
-    display: inline-flex;
+    display: flex;
+    flex-direction: row;
+    flex-flow: nowrap;
+    align-items: stretch;
   }
   #QRCodeLaptop .xr-qr {
     max-width: 200px;
@@ -526,8 +529,14 @@ export default XRButtonComponent
     margin-left: 35px;
     font-weight: 500;
   }
-  .QRCodeMobile img.xr-qr{
+  .QRCodeMobile img.xr-qr {
       width: 100%;
+      max-width: 130px;
+  }
+  @media screen and (min-width: 600px) {
+    .QRCodeMobile img.xr-qr {
+      max-width: 180px;
+    }
   }
   #QRCodeLaptop {
     background: #c2c2c2;
@@ -546,6 +555,8 @@ export default XRButtonComponent
     border-radius: 20px;
     width: 46%;
     margin: auto;
+    height: 18rem;
+    text-align: center;
   }
   .QRCodeMobile  > div {
     display: inline-flex;
@@ -569,7 +580,7 @@ export default XRButtonComponent
     color: #707070;
   }
    .QRCodeMobile > p:nth-child(1) {
-    margin: 0.2em 0em 0em 1em;
+    /* margin: 0.2em 0em 0em 1em; */
     font-size: 1em;
     /* font-variant: small-caps; */
     /* font-family: Helvetica; */
