@@ -2,11 +2,11 @@
   <div>
     <div class="tabs rel level3">
       <div class="tab"  id="Structures">
-        <a href="#Structures">Matching Structures&nbsp;<span class="icon"><img v-bind:src="MS" /></span></a>
+        <a href="#Structures"> Matching Structures&nbsp;<span class="counter"></span><span class="icon"><img v-bind:src="MS" /></span></a>
       </div>
       <MatchingStructures />
       <div class="tab" id="Features">
-        <a href="#Features"><span class="icon"><img v-bind:src="FT" /></span> Features</a>
+        <a href="#Features"><span class="icon"><img v-bind:src="FT" /></span> Features <span class="counter" id="featureCounter"></span></a>
       </div>
       <Features />
     </div>
@@ -121,6 +121,12 @@ span.icon {
 }
 .tab.active, .tab.active:hover {
     background-color: var(--bg-highlite);
+}
+span.counter{
+    background: #707070;
+    color: #fff;
+    border-radius: 10px;
+    padding: 0 6px;
 }
 .tab:hover, .tab.inactive  {
     background-color: rgba(180, 180, 180, 0.7);
