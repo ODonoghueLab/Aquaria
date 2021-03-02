@@ -9,11 +9,15 @@ export default new Vuex.Store({
     url: window.location.protocol + '//' + window.location.hostname,
     alignment: '',
     organism: '',
-    error: ''
+    error: '',
+    errorMsg: ''
   },
   mutations: {
-    setErrorMsg (state, value) {
+    setErrorTitle (state, value) {
       state.error = value
+    },
+    setErrorMsg (state, value) {
+      state.errorMsg = value
     }
   },
   actions: {

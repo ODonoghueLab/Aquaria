@@ -19,13 +19,27 @@ export default class DataServer {
             const pdbText = pako.inflate(response.data, {to:"string"});
             callback({ pdbId: window.AQUARIA.currentMember.pdb_id , pdbText })
             localStorage.setItem('LastSuccess', window.location.pathname)
-			}).catch(function (error){
-                Store.commit('setErrorMsg', 'PDB not available')
-                // window.AQUARIA.panel3d.blankApplet(true, 'PDB not available. Try the next <a href="' +  window.location.href + '">matching structure </a>')
-                window.AQUARIA.panel3d.blankApplet(false)
-                document.querySelector("#Structures > a > span").click()
-                // history.pushState({}, "page x",  location.protocol + '//' + location.host + location.pathname + '#Structures');
-                console.log("PDB not found")
+			}).catch(function (){
+                //Load next structure
+                if (window.AQUARIA.structures2match.clusters[window.AQUARIA.PDBIndex.cluster].members.length <= window.AQUARIA.PDBIndex.member) {
+                    if (window.AQUARIA.structures2match.clusters.length < window.AQUARIA.PDBIndex.cluster) {
+                        window.AQUARIA.PDBIndex.cluster = window.AQUARIA.PDBIndex.cluster + 1
+                        window.AQUARIA.PDBIndex.member = 0
+                    }
+                    else{
+                        Store.commit('setErrorTitle', 'PDB not available')
+                        window.AQUARIA.panel3d.blankApplet(false)
+                        document.querySelector("#Structures > a > span").click()
+                        console.log("PDB not found")
+                    }
+                }
+                else {
+                    window.AQUARIA.PDBIndex.member = window.AQUARIA.PDBIndex.member + 1
+                }
+                var selectedMember = window.AQUARIA.structures2match.clusters[window.AQUARIA.PDBIndex.cluster].members[window.AQUARIA.PDBIndex.member]
+                AQUARIA.blankAll(true, 'Waiting for data...')
+                window.location.pathname = window.AQUARIA.protein_primaryAccession[0] + "/" + selectedMember.pdb_id               
+                
             })
     }
 

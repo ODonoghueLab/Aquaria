@@ -239,7 +239,21 @@ var MAX_PROTEIN_HISTORY = 5;
                 window.location.protocol + '//' + window.location.host +
             '/' + sequences[0].primary_accession + '/' +
             pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
+            
+            function findPDBMember (pdbid, chain) {
+              var pdbMember = []
+              for (var clusterID in window.AQUARIA.structures2match.clusters) {
+                for (var memberID in window.AQUARIA.structures2match.clusters[clusterID].members) {
+                  if (window.AQUARIA.structures2match.clusters[clusterID].members[memberID].pdb_chain[0].includes(chain) && window.AQUARIA.structures2match.clusters[clusterID].members[memberID].pdb_id.includes(pdbid)) {
+                    pdbMember.cluster = parseInt(clusterID)
+                    pdbMember.member = parseInt(memberID)
+                    return pdbMember
+                  }
+                }
+              }
+            }
 
+            window.AQUARIA.PDBIndex = findPDBMember(window.AQUARIA.currentMember.pdb_id, window.AQUARIA.currentMember.pdb_chain)
               if (AQUARIA.panel3d.initialised) {
                 // intiaties the refresh of the 3D panel
                 AQUARIA.panel3d.reload(attributes)
@@ -384,6 +398,7 @@ var MAX_PROTEIN_HISTORY = 5;
           AQUARIA.showMatchingStructures.removeAll()
         } else {
           AQUARIA.blankAll(true, 'Cannot find protein.')
+          Store.commit('setErrorTitle', 'Cannot find protein.')
           textpanel.updateUniprotInfo(null)
           AQUARIA.showMatchingStructures.removeAll()
         }

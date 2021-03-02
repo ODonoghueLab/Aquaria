@@ -451,16 +451,16 @@ export default XRButtonComponent
 <div>
       <!-- <a v-if="dataReceived && !isOpen" @click="open()" class="xr-menu-button" id='XRbutton'></a> -->
       <div @click="open()" v-if="dataReceived" id='xr-button'>
-        <div id="QRCodeLaptop" v-if="$mq === 'laptop'">
+        <div id="QRCodeLaptop" v-if="$mq === 'laptop' && isOpen">
             <p>See this structure in Extended Reality (XR)* </p>
             <div>
             <!-- QR Code (Auto XR) -->
-            <p v-if="$mq === 'laptop'">Scan to open on iOS, Android, HoloLens, or Windows Mixed Reality devices.*</p>
-            <canvas class="xr-qr" ref="qr" v-if="$mq === 'laptop'"></canvas>
+            <p v-if="$mq === 'laptop' && isOpen">Scan to open on iOS, Android, HoloLens, or Windows Mixed Reality devices.*</p>
+            <canvas class="xr-qr" ref="qr" v-if="$mq === 'laptop' && isOpen"></canvas>
             </div>
           <p id="footnote">*On most devices, XR mode is currently limited to proteins with ~1,000 amino acids or less.</p>
         </div>
-        <div id="mobileView" v-if="$mq === 'mobile'|| $mq === 'tablet'">
+        <div id="mobileView" v-if="$mq === 'mobile'|| $mq === 'tablet' && isOpen">
           <div class="QRCodeMobile">
             <!-- QR Code (Auto XR) -->
               <p>Tap to see structure in Extended Reality (XR)*</p>
@@ -483,7 +483,7 @@ export default XRButtonComponent
           </div>
         </div>
 
-        <div id='xrDev'>
+        <div id='xrDev' v-if="isOpen">
         <!-- Download (GLTF) -->
         <button class="xr-item default-button" @click="close(); downloadGltf()">Download GLB</button>
 

@@ -95,14 +95,14 @@ export function remoteSuccess () {
           LoadAQUARIA.loadAccession(accession)
         }
       })
-      .catch(function (error) {
+      .catch(function () {
         AQUARIA.initialisePanels(false)
         window.AQUARIA.panel3d.blankApplet(true)
-        Store.commit('setErrorMsg', error)
+        Store.commit('setErrorTitle', 'Cannot find PDB.')
       })
   } else {
     AQUARIA.initialisePanels(false)
     window.AQUARIA.panel3d.blankApplet(true)
-    Store.commit('setErrorMsg', 'PDB not available.')
+    Store.commit('setErrorTitle', 'PDB not available.')
   }
 }

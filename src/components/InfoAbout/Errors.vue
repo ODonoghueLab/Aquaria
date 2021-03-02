@@ -3,7 +3,7 @@
     <a href="#" class="close" @click="loadLastSuccess"></a>
     <div>
       <p class="thetitle">{{data.error}}</p>
-      <p class="intro1">Press 'Report Issue' to tell the Aquaria team, or press 'Cancel' to return to previous structure.</p>
+      <p class="intro1">{{data.errorMsg}} <br v-if="data.errorMsg"> <br v-if="data.errorMsg"> Press 'Report Issue' to tell the Aquaria team, or press 'Cancel' to return to previous structure.</p>
       <div>
         <md-button class="md-raised md-primary" :href='lastURL'>Cancel</md-button>
         <md-button class="md-raised md-primary" :href='issuesURL' target='_blank'>Report Issue</md-button>
@@ -29,7 +29,8 @@ export default {
     data () {
       return {
         message: store.state.message,
-        error: store.state.error
+        error: store.state.error,
+        errorMsg: store.state.errorMsg
       }
     },
     issuesURL () {
