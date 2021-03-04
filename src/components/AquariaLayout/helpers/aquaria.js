@@ -42,7 +42,7 @@ import * as LoadAQUARIA from '../../../utils/loadData'
 
 require('./utilities')
 
-var MAX_PROTEIN_HISTORY = 5;
+var MAX_PROTEIN_HISTORY = 10;
 
 (function ($) {
 
@@ -65,6 +65,7 @@ var MAX_PROTEIN_HISTORY = 5;
   }
 
   AQUARIA.proteinTopTen = new TopTen('protein_top_ten', MAX_PROTEIN_HISTORY)
+  AQUARIA.pdbTopTen = new TopTen('pdbTopten', MAX_PROTEIN_HISTORY)
   addProteinSubmitListener(AQUARIA.proteinTopTen)
 
   // Moved 2D structure rendering to separate file (show_matching_structures.js)

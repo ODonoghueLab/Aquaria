@@ -23,6 +23,12 @@ export function remoteSuccess () {
     AQUARIA.initialisePanels(true)
     window.AQUARIA.panel3d.blankApplet(true)
     AQUARIA.blankAll(true, 'Waiting for data...')
+    var previousPDB = window.AQUARIA.pdbTopTen.previousLookup(uniprotAccession)
+    if (!previousPDB) {
+      LoadAQUARIA.loadAccession(uniprotAccession)
+    } else {
+      LoadAQUARIA.loadAccession(uniprotAccession, previousPDB)
+    }
     LoadAQUARIA.loadAccession(uniprotAccession)
   } else if (pathname // primary accession and pdb
     .match(/\/(?:leap\/)?([A-Z a-z][0-9][A-Z a-z,0-9][A-Z a-z,0-9][A-Z a-z,0-9][0-9])\/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])\/?$/)) {
