@@ -219,7 +219,7 @@ function show_expanded_cluster (selectedCluster, id, number) {
     update(root)
   }
   // remove tree when background is clicked
-  $('div.dimmer2').one('click', function () { // console.log("clicked background");
+  $('div.dimmer2').on('click', function () { // console.log("clicked background");
     nodeClick(root)
     //	  if (root.children && root.children[0]) {
     //	    if (root.children[0].children) {

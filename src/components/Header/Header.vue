@@ -24,6 +24,7 @@ export default {
   methods: {
     showScrim: function () {
       document.querySelector('#scrim').className = 'show level3'
+      document.querySelector('#xr-button').click()
     }
   }
 }

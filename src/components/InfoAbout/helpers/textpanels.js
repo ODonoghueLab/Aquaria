@@ -1,10 +1,10 @@
 //Authors: Christian Stolte, Vivian Ho, Julian Heinrich
 ///////// sidebar information panels ////////////
-var axios = require('axios');
-var d3 = require('d3');
-var Store = require('../../../store/index')
+import axios from 'axios'
+import d3 from 'd3'
+import Store from '../../../store/index'
 
-function updatePDBPanel(PDBData, commonName, score) {
+export function updatePDBPanel(PDBData, commonName, score) {
 	var molecule_name, pdbid, chain, acc;
 	console.log("textpanels.updatePDBPanel updating PDB info", PDBData);
 	pdbid = PDBData.pdb_id;
@@ -147,7 +147,7 @@ function updatePDBPanel(PDBData, commonName, score) {
 
 }
 
-function updatePDBChain(pdbId, chainId, score, organism, id) {
+export function updatePDBChain(pdbId, chainId, score, organism, id) {
 	
 function updateText(chain, molecule_name, accession) {
 	if (typeof accession !== undefined && accession !== null) {
@@ -229,7 +229,7 @@ if (organism) {
 
 }
 
-function updateUniprotInfo(sequence) {
+export function updateUniprotInfo(sequence) {
 
 if (sequence === null ) {
 	$("#about h3 span.explanation").text("Unknown");
@@ -274,12 +274,12 @@ function extractLines() {
 }
 
 extractLines();	
-for (k in sections) {
+for (var k in sections) {
 	//format URLs
 	if (sections[k][1].indexOf("URL=")!= -1) { ////console.log("URL found in section["+k+"]");
 		var linkCode='',lhref='', lname='', ltitle='';
 		var parts = sections[k][1].split(";");
-		for (n in parts) { // parts is max. 3 strings (Name, URL, Note)
+		for (var n in parts) { // parts is max. 3 strings (Name, URL, Note)
 			parts[n] = parts[n].split("="); ////console.log("parts["+n+"]: "+ parts[n].toString());
 			if (parts[n][0].indexOf("URL") != -1) { lhref = parts[n][1]; }
 			if (parts[n][0].indexOf("Name") != -1) { lname = parts[n][1]; }
@@ -363,7 +363,7 @@ if (hiddenPs > 0) {
 AQUARIA.blankPanel("#uniProtDesc", false);
 }
 
-function fetchSynonyms(proteinId) {
+export function fetchSynonyms(proteinId) {
 //var orgId = localStorage.organism_id; 
 console.log("textpanels.fetchSynonyms "+proteinId);
 //if (orgId == "") { orgId = null; }
@@ -378,12 +378,12 @@ axios({
 	displayOrgSynonyms(response.data.OrganismInfo)
   })
   .catch(function (err) {
-	Store.commit('setErrorMsg', err)
+	Store.commit('setErrorTitle', err)
 	// window.AQUARIA.panel3d.blankApplet(true, err)
   })
 }
 
-var displayOrgSynonyms = function(orgNames) {
+export function displayOrgSynonyms (orgNames) {
 console.log("textpanels.displayOrgSynonyms: " + orgNames.synonyms[0]);
 let entries = orgNames.synonyms.length
 AQUARIA.Organism = {}
@@ -416,7 +416,7 @@ $("div#osyns p").expander({
 //$("p#organism span.text").wrap("<a href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="+orgNames.synonyms[0]+"' title='Go to NCBI' target='_blank' ></a>");
 };
 
-var displayProtSynonyms = function(data) {
+export function displayProtSynonyms (data) {
 	var pnames = ''
 	var gnames = "<b>Genes:</b>&nbsp;";
 	if (data.synonyms == "none") { 
@@ -428,7 +428,7 @@ var displayProtSynonyms = function(data) {
 			AQUARIA.preferred_protein_name = data.Synonym;
 		}
 	
-	var gns = data.genes;
+	var gns = (data.genes.length > 0) ? data.genes :data.Synonym;
 	var syns = data.synonyms;
 			
 	if (syns.length) {
@@ -488,7 +488,7 @@ var displayProtSynonyms = function(data) {
 	
 	//NEBLINA's SCRIPT FOR AFFORDANCE VIEW
 	if (gns && gns.length) {
-		gene_name = gns[0];
+		var gene_name = gns[0];
 	}
 
 	$("#gene_name").show()
@@ -526,11 +526,3 @@ $(this).expander({
 
 });	
 });
-
-
-module.exports.updatePDBPanel = updatePDBPanel;
-module.exports.fetchSynonyms = fetchSynonyms;
-module.exports.updatePDBChain = updatePDBChain;
-module.exports.updateUniprotInfo = updateUniprotInfo;
-module.exports.displayOrgSynonyms= displayOrgSynonyms;
-module.exports.displayProtSynonyms = displayProtSynonyms;

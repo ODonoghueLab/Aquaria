@@ -2,11 +2,11 @@
   <div>
     <div class="tabs rel level3">
       <div class="tab"  id="Structures">
-        <a href="#Structures">Matching Structures&nbsp;<span class="icon"><img v-bind:src="MS" /></span></a>
+        <a href="#Structures"><span class="icon"><img v-bind:src="MS" /></span>Matching Structures&nbsp;<span class="counter"></span></a>
       </div>
       <MatchingStructures />
       <div class="tab" id="Features">
-        <a href="#Features"><span class="icon"><img v-bind:src="FT" /></span> Features</a>
+        <a href="#Features"><span class="icon"><img v-bind:src="FT" /></span> Features <span class="counter" id="featureCounter"></span></a>
       </div>
       <Features />
     </div>
@@ -129,9 +129,17 @@ span.icon {
 
 .tab.active a, .tab.active a:hover {
     color: var(--dark-text);
+    font-size: inherit;
 }
+
 .tab.active, .tab.active:hover {
     background-color: var(--bg-highlite);
+}
+.tab.active span.counter, .tab.inactive span.counter, .tab:hover span.counter {
+    background: #707070;
+    color: #fff;
+    border-radius: 10px;
+    padding: 0 6px;
 }
 .tab:hover, .tab.inactive  {
     background-color: rgba(180, 180, 180, 0.7);
@@ -144,20 +152,25 @@ span.icon {
     border-radius: 50%;
     transition: All 0.5s ease;
 }
+.tab a:hover, .tab:hover a{
+    color: #FFF;
+    text-decoration: none;
+    transition: All 0.5s ease;
+    font-size: inherit;
+}
+.tab.inactive a {
+  font-size: inherit;
+  color: #dedede;
+}
+
+:target a {
+    color: var(--dark-text);
+}
 .tab a {
     color: var(--transparent);
     text-decoration: none;
     transition: All 0.5s ease;
-}
-.tab a:hover  {
-    color: #FFF;
-    text-decoration: none;
-    transition: All 0.5s ease;
-}
-.tab.inactive a { color: #dedede; }
-
-:target a {
-    color: var(--dark-text);
+    font-size: 0px;
 }
 .tab:target {
     background-color: var(--bg-highlite);

@@ -2,11 +2,11 @@
   <div id="AboutError" v-if="data.error" class='ErrorPanel overlay level7'>
     <a href="#" class="close" @click="loadLastSuccess"></a>
     <div>
-      <p class="thetitle">Error</p>
-      <p class="intro1">{{data.error}}</p>
+      <p class="thetitle">{{data.error}}</p>
+      <p class="intro1">{{data.errorMsg}} <br v-if="data.errorMsg"> <br v-if="data.errorMsg"> Press 'Report Issue' to tell the Aquaria team, or press 'OK' to return to previous structure.</p>
       <div>
-        <md-button class="md-raised md-primary" :href='lastURL'>Cancel</md-button>
-        <md-button class="md-raised md-primary" :href='issuesURL' target='_blank'>Report</md-button>
+        <md-button class="md-raised md-primary" :href='lastURL'>OK</md-button>
+        <md-button class="md-raised md-primary" :href='issuesURL' target='_blank'>Report Issue</md-button>
       </div>
       <!-- <p>We encourage you to <a v-bind:href="issues" target="_blank" title="Go to Github">report issues</a>, <a :href="changes" target="_blank" title="Go to Github">propose code changes</a>, or <a href="mailto:contact@aquaria.app" title="Email us">contact us</a> regarding suggestions.</p> -->
       <!-- <p><i>Last updated May, 2020. PDB entries released since then are not yet available in Aquaria.</i><p> -->
@@ -29,7 +29,8 @@ export default {
     data () {
       return {
         message: store.state.message,
-        error: store.state.error
+        error: store.state.error,
+        errorMsg: store.state.errorMsg
       }
     },
     issuesURL () {

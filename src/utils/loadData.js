@@ -39,7 +39,6 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
     history.pushState(primaryAccession, document.title, '/' +
       primaryAccession + pdbParam + (chainParam || '') + urlParams)
   }
-
   window.AQUARIA.blankPanel('#vis', true)
   window.AQUARIA.blankPanel('#uniProtDesc', true)
 
@@ -74,6 +73,9 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
     params: loadRequest
   })
     .then(function (response) {
+      if (typeof (response.data) === 'string') {
+        throw (response.data)
+      }
       const matches = response.data
       sequenceCallback(loadRequest, matches.sequences)
       clusterCallback(loadRequest, matches.clusters)
@@ -87,7 +89,7 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
             window.AQUARIA.blankPanel('#vis', true, err.message)
           } else {
             // window.AQUARIA.panel3d.blankApplet(true, err.message)
-            Store.commit('setErrorMsg', err.message)
+            Store.commit('setErrorTitle', err.message)
           }
         } else {
           if (matches.clusters) {
@@ -124,7 +126,8 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
     })
     .catch(function (err) {
       // window.AQUARIA.panel3d.blankApplet(true, err)
-      Store.commit('setErrorMsg', err)
+      Store.commit('setErrorTitle', err)
+      Store.commit('setErrorMsg', "This is a 'dark' protein, i.e., it has no matching structure in Aquaria.")
     })
     // });
 }
