@@ -37,14 +37,18 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 						addToVariantResidues(variantResidues, resSnp, [], posInfo, otherResInfo, '<a href="https://rostlab.org/owiki/index.php/Snap2" target="blank"> SNAP2</a>');
 					}
 					else if (featureType == 'Mutation score (average SNAP2 score)'){
-						cleanData_snap2_getAvgScore(description, varInfo, variantResidues[resSnp].newResidues, variantResidues[resSnp]);
-						// addToVariantResidues(variantResidues, resSnp, varInfo, [], [], 'SNAP2 prediction');
+						cleanData_snap2_getAvgScore_v2(description, posInfo, variantResidues[resSnp].newResidues, variantResidues[resSnp]);
+						addToVariantResidues(variantResidues, resSnp, [], posInfo, [], "<a href='https://rostlab.org/owiki/index.php/Snap2' target='blank'><i>SNAP2</i></a>");
+					}
+					else if (featureType.match(/^Mutation to /)){
+						cleanData_aaMutScore_snap2(variantResidues[resSnp], description);
 					}
 
 
 
 				}
 				else if (serverName == 'CATH') {
+					let cath_infoUrl = "<a href='https://www.cathdb.info/wiki' target='blank'>CATH</a>"
 					let posInfo = [];
 
 					if (featureType == 'Functional domain'){
@@ -55,7 +59,7 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
 					}
 
 
-					addToVariantResidues(variantResidues, resSnp, [], posInfo, [], 'CATH');
+					addToVariantResidues(variantResidues, resSnp, [], posInfo, [], cath_infoUrl);
 					// variantResidues[resSnp][serverName].push(obj_featType);
 				}
 
@@ -291,17 +295,18 @@ function cleanData_funVar(desc, variantResidues_res){
 	let arr = desc.split(/\|/);
 	let arr_aa = arr[0].split(/\>/);
 
-	let funvar_infoUrl = "<a href='https://funvar.cathdb.info/help' target='blank'>FunFams (v4_2_0):</a>";
+	let funvar_infoUrl = "<a href='https://funvar.cathdb.info/help' target='blank'>FunVar:</a>";
 
 	if (arr_aa.length > 1){
 
 		let arr_aa = arr[0].split(/\>/); //.replace(/\>/, "&#8594;");
 		let arr_desc = arr[1].split("<br>");
 
-		let toAdd = "<i>FunVar: </i>";
+		let toAdd = "<i>" + funvar_infoUrl + " </i>";
 		if (arr_desc.length >= 5){
 
-				arr_desc[5] = arr_desc[5].replace("<i> " + funvar_infoUrl + ":</i> ", '');
+				arr_desc[5] = arr_desc[5].replace(/\<[^\>\>]+\>/g, '');
+				arr_desc[5] = arr_desc[5].replace(/.*\: /, '')
 				console.log("The funvar desc newAa is " + arr_aa[1] + " " + arr_desc[5]);
 
 				let yesAndNoObjs = getCancerTypesSplit(arr_desc[4]);
@@ -398,7 +403,8 @@ function cleanData_cosmic(desc, variantResidues_res, posInfo, cleanData_cosmic){
 					toAddStr = toAddStr + ', ';
 				}
 
-				arr_tissue[i] = arr_tissue[i].replace(';', '; freq = ')
+				arr_tissue[i] = arr_tissue[i].replace('(', '(freq = ')
+				// arr_tissue[i] = arr_tissue[i].replace(';', '; freq = ')
 				toAddStr = toAddStr + arr_tissue[i];
 
 			}
@@ -413,6 +419,7 @@ function cleanData_cosmic(desc, variantResidues_res, posInfo, cleanData_cosmic){
 
 	}
 	else{
+		arr[2] = arr[2].replace('(', '(freq = ')
 		posInfo.push(arr[1] + " " + arr[2]);
 	}
 
@@ -429,7 +436,7 @@ function cleanData_uniprot_seqVar_v2(desc, variantResidues_res, posInfo, feature
 	desc = desc.replace(/\>/, '&#8594;')
 	let arr = desc.split(/[\s]+/);
 
-	console.log("The Uniprot seqVar desc 2 are " + arr);
+	//console.log("The Uniprot seqVar desc 2 are " + arr);
 
 	if (arr[1] == '&#8594;'){
 		if (oneAaCodes.includes(arr[2])){
@@ -471,7 +478,7 @@ function cleanData_uniprot_seqVar_v2(desc, variantResidues_res, posInfo, feature
 function cleanData_uniprot_seqVar(desc, newAas, varInfo, otherResInfo, posInfo){
 	// main to show, other residues;
 
-	console.log("The Uniprot seqVar desc are " + desc);
+	//console.log("The Uniprot seqVar desc are " + desc);
 
 
 	desc = desc.replace(/^[\s]+/, "");
@@ -514,10 +521,59 @@ function cleanData_uniprot_seqVar(desc, newAas, varInfo, otherResInfo, posInfo){
 	*/
 }
 
+
+function cleanData_aaMutScore_snap2(variantResidues_pos, desc){
+	let snap2_infoUrl = "<a href='https://rostlab.org/owiki/index.php/Snap2' target='blank'><i>SNAP2:</i></a>";
+
+
+	let arr = desc.split(";");
+	let theAa = arr[0].replace(/[\s]+/g, '');
+	theAa = theAa.replace(/^[A-Z]\>/, '');
+
+	let score = arr[1].replace(/[^\-0-9]+/, '');
+
+	if (!variantResidues_pos.hasOwnProperty(theAa)){
+		variantResidues_pos[theAa] = [];
+	}
+
+	if (parseInt(score) > 40){
+		variantResidues_pos[theAa].push(snap2_infoUrl + " Predicted to change function (score = " + score + ")")
+	}
+	else if (parseInt(score) < -40){
+		variantResidues_pos[theAa].push(snap2_infoUrl + " Predicted not to change function (score = " + score + ")")
+	}
+	else {
+		variantResidues_pos[theAa].push(snap2_infoUrl + " Not predicted to change function (score = " + score + ")")
+	}
+
+	//console.log("snap2 the new aa thing is " + arr[0] + " " + arr[1] + " " + score + " |" + theAa);
+}
+
+
+function cleanData_snap2_getAvgScore_v2(desc, arr_posInfo, newAas, variantResidues_pos){
+	let snap2_infoUrl = "<a href='https://rostlab.org/owiki/index.php/Snap2' target='blank'><i>SNAP2:</i></a>"
+
+	console.log("snap2 desc 2 mutation something something is " + desc);
+
+	let arr = desc.split(/\;/);
+
+	if (arr.length >= 2){
+		let score = arr[1].replace(/^.*\:/, '');
+		score = score.replace(/[\s]+/g, '');
+
+		if (parseFloat(score) >= -40 && parseFloat(score) <= 40){
+			arr_posInfo.push("Average sensitivity to mutation")
+		}
+		console.log("snap2 desc 2 mutation " + arr.length + " " + arr[1] + " " + score);
+	}
+
+
+}
+
 function cleanData_snap2_getAvgScore(desc, arr_posInfo, newAas, variantResidues_pos){
 	let snap2_infoUrl = "<a href='https://rostlab.org/owiki/index.php/Snap2' target='blank'><i>SNAP2:</i></a>"
 
-	console.log("snap2 desc 2 is " + desc);
+	// console.log("snap2 desc 2 is " + desc);
 
 	let arr = desc.split(/\;/);
 

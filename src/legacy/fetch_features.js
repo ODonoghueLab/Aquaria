@@ -41,6 +41,7 @@ var servers = [
 			"Server": 'SNAP2',
 			"URL": 'https://rostlab.org/services/aquaria/snap4aquaria/json.php?uniprotAcc=',
 		},
+		// Delete this when ready
 		{
 			"id": 'CATH',
 			"Server": 'CATH',
@@ -54,6 +55,7 @@ var servers = [
 			"URL_myVariant": 'https://myvariant.info/v1/query?q=', // p53&fetch_all=TRUE'
 			"URL_myGene": 'https://mygene.info/v3/query?species=human&q=', //P04637',
 		},
+		// Delete this when ready
 		{
 			"id": "FunVar",
 			"Server": "FunVar",
@@ -891,7 +893,7 @@ var processNextServer = function(primary_accession,
 		else if (servers[currentServer]['id'] == 'SNAP2'){
 
 
-			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
+			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + '&details', primary_accession, featureCallback, validateAquariaFeatureSet)
 			featureCallback(aggregatedAnnotations);
 			processNextServer(primary_accession,
 				featureCallback);
@@ -1546,6 +1548,19 @@ function checkURLForFeatures(primary_accession, server, featureCallback){
 
 function addNewResAndGrantham(varinatResidues_resNum, consInfo_resNum){
 
+	if (consInfo_resNum.hasOwnProperty('oldRes')){
+		Object.values(threeToOneResMap).forEach(function(anAa, i){
+
+					let granthamStr = grantham.getGranthamIsCons(anAa, consInfo_resNum['oldRes']);
+					if (granthamStr != ""){
+						if (!varinatResidues_resNum.hasOwnProperty(anAa)){
+							varinatResidues_resNum[anAa] = [];
+						}
+						varinatResidues_resNum[anAa].push(granthamStr);
+					}
+		});
+	}
+	/*
 	consInfo_resNum['newAas'].forEach(function(newAa, newAa_i){
 		if (!varinatResidues_resNum.hasOwnProperty(newAa)){
 			varinatResidues_resNum[newAa] = [];
@@ -1559,7 +1574,7 @@ function addNewResAndGrantham(varinatResidues_resNum, consInfo_resNum){
 		}
 
 	});
-
+	*/
 
 	/* for (let newAa in arr_newAas){
 		if (!variantResidues_res.hasOwnProperty(newAa)){

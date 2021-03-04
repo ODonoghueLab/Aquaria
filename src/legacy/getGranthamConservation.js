@@ -2,7 +2,7 @@ exports.getGranthamIsCons = getGranthamIsCons;
 
 function getGranthamIsCons(oldRes, newRes){
 	let granthamVal = -1;
-	let granthamUrlAndName = "<a href='https://en.wikipedia.org/wiki/Amino_acid_replacement#Grantham\'s_distance' target='blank'> <i>Grantham:</i></a>";
+	let granthamUrlAndName = '<a href="https://en.wikipedia.org/wiki/Amino_acid_replacement#Grantham\'s_distance" target="blank"> <i>Grantham:</i></a>';
 	if (rows.includes(oldRes) && cols.includes(newRes)){
 
 
