@@ -19,11 +19,11 @@ export default class DataServer {
             const pdbText = pako.inflate(response.data, {to:"string"});
             callback({ pdbId: window.AQUARIA.currentMember.pdb_id , pdbText })
             localStorage.setItem('LastSuccess', window.location.pathname)
-            if(!window.AQUARIA.pdbTopTen.previousLookup(window.AQUARIA.protein_primaryAccession[0])){
-                window.AQUARIA.pdbTopTen.submitFired(window.AQUARIA.Gene, window.AQUARIA.protein_primaryAccession[0], window.location.pathname.split('/')[2])
+            if(!window.AQUARIA.pdbTopTen.previousLookupByName(AQUARIA.Organism.Name + '_' +window.AQUARIA.Gene)){
+                window.AQUARIA.pdbTopTen.submitFired(AQUARIA.Organism.Name + '_' + window.AQUARIA.Gene, window.AQUARIA.protein_primaryAccession[0], window.AQUARIA.currentMember.pdb_id)
             }
             else {
-                window.AQUARIA.pdbTopTen.updatePDB(window.AQUARIA.protein_primaryAccession[0], window.location.pathname.split('/')[2])
+                window.AQUARIA.pdbTopTen.updatePDB(window.AQUARIA.protein_primaryAccession[0], window.AQUARIA.currentMember.pdb_id)
             }
 			}).catch(function (){
                 //Load next structure
