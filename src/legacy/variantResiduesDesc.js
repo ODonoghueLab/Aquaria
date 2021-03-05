@@ -290,8 +290,6 @@ function cleanData_pp(desc, varInfo){
 
 function cleanData_funVar(desc, variantResidues_res){
 
-	console.log("Leader and follower " + desc);
-
 	let arr = desc.split(/\|/);
 	let arr_aa = arr[0].split(/\>/);
 
@@ -543,7 +541,7 @@ function cleanData_aaMutScore_snap2(variantResidues_pos, desc){
 		variantResidues_pos[theAa].push(snap2_infoUrl + " Predicted not to change function (score = " + score + ")")
 	}
 	else {
-		variantResidues_pos[theAa].push(snap2_infoUrl + " Not predicted to change function (score = " + score + ")")
+		variantResidues_pos[theAa].push(snap2_infoUrl + " May or may not change function (score = " + score + ")")
 	}
 
 	//console.log("snap2 the new aa thing is " + arr[0] + " " + arr[1] + " " + score + " |" + theAa);

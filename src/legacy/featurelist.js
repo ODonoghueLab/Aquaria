@@ -7,7 +7,7 @@ var Highcharts = require('./highstocks.js');
 var d3 = require('d3');
 var featureMap = require('../utils/featureMap')
 var Panels = require('../utils/matches_features_panels');
-
+var extServerIds_;
 
 function createFeatureUI() {
 	width = document.getElementById("structureviewer").offsetWidth
@@ -25,8 +25,9 @@ function updateFeatureTabTitle(preferredProteinName) {
 	}
 };
 
-var updateFeatureUI = function(featureList) {
+var updateFeatureUI = function(featureList, extServerIds_forLoading) {
 	featureSet = featureList || featureSet;
+	extServerIds_ = extServerIds_forLoading || extServerIds_;
 	// console.log("featurelist.updateFeatureUI");
 
 
@@ -607,7 +608,25 @@ function showAnnotation(f, eid) {
 	balloon = balloon + "</div>";
 	btnsDiv = btnsDiv + "</div>";
 	balloon = balloon + btnsDiv;
-	balloon = balloon + "</div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"	+ f.label;
+	balloon = balloon + "</div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
+
+	if (f.name.includes("span_missenseHeading")){
+		if (typeof extServerIds_ !== 'undefined'){
+			console.log("extServerIds_forLoading");
+			let isAnyFalse = false;
+			for (let serverId in extServerIds_){
+				if (extServerIds_[serverId] === false){
+					isAnyFalse = true;
+				}
+			}
+			if (isAnyFalse == true){
+				balloon = balloon + '<img src="/images/ajax-loader1.gif" alt="this slowpoke moves"  width=20/> ';
+			}
+			console.log(extServerIds_);
+		}
+	}
+
+	balloon = balloon	+ f.label;
 
 	if (!f.name.includes("span_missenseHeading")){
 		balloon = balloon + " (";

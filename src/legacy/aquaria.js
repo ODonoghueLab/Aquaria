@@ -288,9 +288,9 @@ var MAX_PROTEIN_HISTORY = 5;
         AQUARIA.blankPanel("#featurelist", true);
         startSpin();
         fetch_das_annotations(primary_accession,
-          function(featureInfo) {
+          function(featureInfo, completeServers) {
 
-            featurelist.updateFeatureUI(featureInfo);
+            featurelist.updateFeatureUI(featureInfo, completeServers);
             AQUARIA.blankPanel("#featurelist", false);
             ///console.log('the feature info is: ')
 			///console.log(featureInfo);

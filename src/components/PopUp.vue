@@ -33,6 +33,7 @@ export default {
   },
   mounted () {
     this.dragElement(document.getElementById('popup'))
+    // $('#popup').draggable({ cancel: '#balloon' })
     // this.handler(document.getElementsByTagName('expandable-text-line'))
   },
   updated () {
@@ -317,4 +318,8 @@ export default {
     text-decoration: underline;
   }
   */
+  .theCursor{
+    cursor: context-menu;
+  }
+
 </style>

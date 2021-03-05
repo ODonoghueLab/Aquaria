@@ -41,14 +41,15 @@ var servers = [
 			"Server": 'SNAP2',
 			"URL": 'https://rostlab.org/services/aquaria/snap4aquaria/json.php?uniprotAcc=',
 		},
-		// Delete this when ready
+		/* // Delete this when ready
 		{
 			"id": 'CATH',
 			"Server": 'CATH',
 			"URL": window.location.protocol + '//www.cathdb.info/version/v4_3_0/api/rest/uniprot_to_funfam/',
 			"URL_covid": `${window.BACKEND}/covid19cath/`,
 			// ?content-type=application/json
-		},
+		}, */
+		/*
 		{
 			"id": "myVariant.info",
 			"Server": 'myVariant.info',
@@ -160,6 +161,14 @@ var currentServer = -1;
 // contains current records of all annotations
 var aggregatedAnnotations = [];
 var variantResidues = {};
+var extServerIds_forLoading = {
+	'PredictProtein': false,
+	'CATH': false,
+	'SNAP2': false,
+	'UniprotFeatures': false,
+	'myVariant.info': false,
+	'FunVar': false,
+};
 
 // color handling
 /**
@@ -877,7 +886,10 @@ var processNextServer = function(primary_accession,
 			// console.log(aggregatedAnnotations);
 
 			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
-			featureCallback(aggregatedAnnotations);
+			featureCallback(aggregatedAnnotations, extServerIds_forLoading);
+			if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
+				extServerIds_forLoading[servers[currentServer]['id']] = true;
+			}
 			processNextServer(primary_accession,
 				featureCallback);
 		}
@@ -886,7 +898,10 @@ var processNextServer = function(primary_accession,
 
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
 
-			featureCallback(aggregatedAnnotations);
+			featureCallback(aggregatedAnnotations, extServerIds_forLoading);
+			if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
+				extServerIds_forLoading[servers[currentServer]['id']] = true;
+			}
 			processNextServer(primary_accession,
 				featureCallback);
 		}
@@ -894,7 +909,8 @@ var processNextServer = function(primary_accession,
 
 
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + '&details', primary_accession, featureCallback, validateAquariaFeatureSet)
-			featureCallback(aggregatedAnnotations);
+			featureCallback(aggregatedAnnotations, extServerIds_forLoading);
+			extServerIds_forLoading[servers[currentServer]['id']] = true;
 			processNextServer(primary_accession,
 				featureCallback);
 		}
@@ -909,7 +925,10 @@ var processNextServer = function(primary_accession,
 			else {
 				// console.log('^^ Failed to fetch item: err=', err);
 				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet);
-				featureCallback(aggregatedAnnotations);
+				featureCallback(aggregatedAnnotations, extServerIds_forLoading);
+				if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
+					extServerIds_forLoading[servers[currentServer]['id']] = true;
+				}
 				processNextServer(primary_accession,
 					featureCallback);
 			}
@@ -924,7 +943,10 @@ var processNextServer = function(primary_accession,
 			else {
 				// FunVar cancer
 				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL_CATH_v2'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet);
-				featureCallback(aggregatedAnnotations);
+				if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
+					extServerIds_forLoading[servers[currentServer]['id']] = true;
+				}
+				featureCallback(aggregatedAnnotations, extServerIds_forLoading);
 				processNextServer(primary_accession,
 					featureCallback);
 			}
@@ -932,7 +954,10 @@ var processNextServer = function(primary_accession,
 		}
 		else if (servers[currentServer]['id'] == 'myVariant.info'){
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL_myGene'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
-			featureCallback(aggregatedAnnotations);
+			featureCallback(aggregatedAnnotations, extServerIds_forLoading);
+			if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
+				extServerIds_forLoading[servers[currentServer]['id']] = true;
+			}
 			processNextServer(primary_accession, featureCallback);
 		}
 
@@ -942,7 +967,7 @@ var processNextServer = function(primary_accession,
 	else {
 		// console.log("fetch_features.processNextServer finish DAS");
 		toDescAndAddToAdedFeat();
-		featureCallback(aggregatedAnnotations);
+		featureCallback(aggregatedAnnotations, extServerIds_forLoading);
 	}
 };
 
@@ -990,37 +1015,15 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 			description = "<br> " + variantResidues[residue].defaultDesc;
 		}
 
-		/*
-		if (variantResidues[residue].hasOwnProperty('variantInfo')){
-			for (let serverAndFsName in variantResidues[residue].variantInfo){
-				// console.log("The serverAndFsName is " + serverAndFsName);
-				// document.getElementById('divVI_varInfo').innerHTML = '<toReplace>' + variantResidues[residue]['variantInfo'][serverAndFsName][0] + '</toReplace>';
 
-
-				// Removed: "(" + variantResidues[residue].newResidue + ")"
-				description = description + '<toReplace_varInfo>' + "<i>" + serverAndFsName + ":</i> ";
-				for (let i =0; i<variantResidues[residue]['variantInfo'][serverAndFsName].length; i++){
-					description = description +  variantResidues[residue]['variantInfo'][serverAndFsName][i] +". ";
-				}
-
-				description = description + '</toReplace_varInfo>';
-
-			}
-		}
-		*/
-		// description = description + "<hr>";
-		//
 		if (variantResidues[residue].hasOwnProperty('positionInfo')){
 			for (let serverAndFsName in variantResidues[residue].positionInfo){
-				// console.log("The serverAndFsName is " + serverAndFsName);
-				// document.getElementById('divVI_posInfo').innerHTML = '<toReplace>' +  variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace>';
 
-				// description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['positionInfo'][serverAndFsName][0] + '</toReplace> <br>';
 
 
 				description = description + '<toReplace_posInfo>' + "<i>" + serverAndFsName + ":</i> ";
 				for (let i =0; i<variantResidues[residue]['positionInfo'][serverAndFsName].length; i++){
-					description = description +  variantResidues[residue]['positionInfo'][serverAndFsName][i] +". ";
+					description = description +  "<span class='theCursor'>" +  variantResidues[residue]['positionInfo'][serverAndFsName][i] +".</span> ";
 				}
 
 				description = description + '</toReplace_posInfo>';
@@ -1033,8 +1036,8 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 
 				if (variantResidues[residue].hasOwnProperty(anAa)){
 					for (let i=0; i<variantResidues[residue][anAa].length; i++){
-						description = description + '<toReplace_varInfo_' + anAa +'>'
-						description = description + variantResidues[residue][anAa][i] + ". ";
+						description = description + '<toReplace_varInfo_' + anAa +'><span class="theCursor">'
+						description = description + variantResidues[residue][anAa][i] + ".</span> ";
 						description = description + '</toReplace_varInfo_' + anAa +'>'
 					}
 				}
@@ -1051,78 +1054,15 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 		});
 
 
-		/*
-		if (variantResidues[residue].hasOwnProperty('otherResInfo')){
-			for (let serverAndFsName in variantResidues[residue].otherResInfo){
-				// console.log("The serverAndFsName is " + serverAndFsName);
 
-				// description = description + '<toReplace>' + " <u><i>" + serverAndFsName + ":</i></u> " + variantResidues[residue]['otherResInfo'][serverAndFsName][0] + '</toReplace> <br>';
-
-				description = description + '<toReplace_otherResInfo>' + " <u><i>" + serverAndFsName + ":</i></u> ";
-				for (let i =0; i<variantResidues[residue]['otherResInfo'][serverAndFsName].length; i++){
-					description = description +  variantResidues[residue]['otherResInfo'][serverAndFsName][i] +". ";
-				}
-
-				description = description + '</toReplace_otherResInfo>';
-
-			}
-		}
-		*/
-
-		for (let dataType in variantResidues[residue]){ // dataType == variantInfo | positionInfo | otherResInfo
-
-			// console.log("The dataType is " + dataType);
-
-			// if (serverName != 'newResidue' && serverName != 'defa')
-			/*
-
-			// console.log('Server name is ' + serverName);
-			if (serverName != 'newResidue' && serverName != 'defaultDesc'){
-				description = description + "<br> <br><b>" + serverName + "</b> ";
-				variantResidues[residue][serverName].forEach(function(featTypes, featType_i){
-					// console.log("What is this??");
-					// console.log(featTypes);
-
-					// arr_featTypes.forEach(function(aFeatObj, aFeatObj_i){
-						Object.keys(featTypes).forEach(function(aFeatType, aFeatType_i){
-							description = description + "<br> <i>"+ aFeatType + "</i>";
-							if (featTypes[aFeatType].hasOwnProperty('mainToShow')){
-								if (serverName == 'UniProt'){
-									description = description + " <br> <ul>" + featTypes[aFeatType].mainToShow + "</ul>";
-								}
-								else {
-									description = description + " <br>" + featTypes[aFeatType].mainToShow;
-								}
-							}
-							if (featTypes[aFeatType].hasOwnProperty('mainToHide')){
-								description = description + featTypes[aFeatType].mainToHide;
-							}
-							if (featTypes[aFeatType].hasOwnProperty('otherResidues')){
-								description = description + featTypes[aFeatType].otherResidues;
-
-								counter_complete = counter_complete + 1;
-							}
-
-							description = description + "<toReplace> Whatever you did, you have officially been labelled the disturber of peace! Gandalf I am glad you are back, so am I dear boy! Hello world! </toReplace>"
-
-
-						});
-					// });
-				});
-			}
-
-			*/
-
-			// let aDesc =  "<span class=\"teaser\"> <i> " + featureType + "</i> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + description + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> more... </span>";
-			// description = description + "<tr>";
-
-			// description = description + "</tr>";
+		for (let dataType in variantResidues[residue]){
 		}
 		// Aggregated Annotations - (other annotations)
 		for (let i =0; i < aggregatedAnnotations.length; i++){
 
 
 			if (aggregatedAnnotations[i].hasOwnProperty('Server')  && aggregatedAnnotations[i].Server == 'Added Features'){
+
 
 				if (aggregatedAnnotations[i].hasOwnProperty('Tracks') ){
 					// console.log("An aggregate annotation of interest is ");
@@ -1133,6 +1073,9 @@ function toDescAndAddToAdedFeat(){ // convert to description and add to added fe
 							// console.log(aggregatedAnnotations[i].Tracks[j][k]);
 
 							if (parseInt(residue) >= parseInt(aggregatedAnnotations[i].Tracks[j][k].start) &&  parseInt(residue) <= parseInt(aggregatedAnnotations[i].Tracks[j][k].end)){
+
+
+
 								aggregatedAnnotations[i].Tracks[j][k].desc = description; // aggregatedAnnotations[i].Tracks[j][k].desc  + description;
 
 								// console.log("The complete description is: " + aggregatedAnnotations[i].Tracks[j][k].desc );
