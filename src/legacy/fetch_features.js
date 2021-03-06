@@ -41,15 +41,14 @@ var servers = [
 			"Server": 'SNAP2',
 			"URL": 'https://rostlab.org/services/aquaria/snap4aquaria/json.php?uniprotAcc=',
 		},
-		/* // Delete this when ready
+		// Delete this when ready
 		{
 			"id": 'CATH',
 			"Server": 'CATH',
 			"URL": window.location.protocol + '//www.cathdb.info/version/v4_3_0/api/rest/uniprot_to_funfam/',
 			"URL_covid": `${window.BACKEND}/covid19cath/`,
 			// ?content-type=application/json
-		}, */
-		/*
+		},
 		{
 			"id": "myVariant.info",
 			"Server": 'myVariant.info',
@@ -166,7 +165,7 @@ var extServerIds_forLoading = {
 	'CATH': false,
 	'SNAP2': false,
 	'UniprotFeatures': false,
-	'myVariant.info': false,
+	'COSMIC': false,
 	'FunVar': false,
 };
 
@@ -887,9 +886,6 @@ var processNextServer = function(primary_accession,
 
 			fetch_uniprot(primary_accession, servers[currentServer], featureCallback);
 			featureCallback(aggregatedAnnotations, extServerIds_forLoading);
-			if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
-				extServerIds_forLoading[servers[currentServer]['id']] = true;
-			}
 			processNextServer(primary_accession,
 				featureCallback);
 		}
@@ -899,9 +895,6 @@ var processNextServer = function(primary_accession,
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet)
 
 			featureCallback(aggregatedAnnotations, extServerIds_forLoading);
-			if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
-				extServerIds_forLoading[servers[currentServer]['id']] = true;
-			}
 			processNextServer(primary_accession,
 				featureCallback);
 		}
@@ -910,7 +903,6 @@ var processNextServer = function(primary_accession,
 
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + '&details', primary_accession, featureCallback, validateAquariaFeatureSet)
 			featureCallback(aggregatedAnnotations, extServerIds_forLoading);
-			extServerIds_forLoading[servers[currentServer]['id']] = true;
 			processNextServer(primary_accession,
 				featureCallback);
 		}
@@ -926,9 +918,6 @@ var processNextServer = function(primary_accession,
 				// console.log('^^ Failed to fetch item: err=', err);
 				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet);
 				featureCallback(aggregatedAnnotations, extServerIds_forLoading);
-				if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
-					extServerIds_forLoading[servers[currentServer]['id']] = true;
-				}
 				processNextServer(primary_accession,
 					featureCallback);
 			}
@@ -943,9 +932,6 @@ var processNextServer = function(primary_accession,
 			else {
 				// FunVar cancer
 				getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL_CATH_v2'] + primary_accession + "?content-type=application/json", primary_accession, featureCallback, validateAquariaFeatureSet);
-				if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
-					extServerIds_forLoading[servers[currentServer]['id']] = true;
-				}
 				featureCallback(aggregatedAnnotations, extServerIds_forLoading);
 				processNextServer(primary_accession,
 					featureCallback);
@@ -955,9 +941,6 @@ var processNextServer = function(primary_accession,
 		else if (servers[currentServer]['id'] == 'myVariant.info'){
 			getJsonFromUrl(servers[currentServer]['id'], servers[currentServer]['URL_myGene'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
 			featureCallback(aggregatedAnnotations, extServerIds_forLoading);
-			if (extServerIds_forLoading.hasOwnProperty(servers[currentServer]['id'])){
-				extServerIds_forLoading[servers[currentServer]['id']] = true;
-			}
 			processNextServer(primary_accession, featureCallback);
 		}
 
@@ -1190,11 +1173,18 @@ function validateAquariaFeatureSet(convertedFeatureSet, primary_accession, featu
 	if (isValid){
 		// continue
 		// console.log("fetch_features.validateAquariaFeatureSet appending validated features " + 'PredictProtein')
-
+		// extServerIds_forLoading[]
+		console.log("The featureId in validateAgainstSchema " + featureId);
+		if (extServerIds_forLoading.hasOwnProperty(featureId)){
+			extServerIds_forLoading[featureId] = true;
+		}
 		parseFeatures(primary_accession, '', featureId,featureCallback, convertedFeatureSet, '', cathDataArr_hc);
 		// finishServer(convertedFeatureSet, primary_accession, featureCallback);
 	}
 	else {
+		if (extServerIds_forLoading.hasOwnProperty(featureId)){
+			extServerIds_forLoading[featureId] = true;
+		}
 		// cannot display these features
 		console.log("fetch_features.validateAquariaFeatureSet " + ajv.errorsText());
 		finishServer(new Array(), primary_accession,
@@ -1305,7 +1295,9 @@ function parseUniprot(xml) {
 
 			data[type]["Features"].push(feature);
 		});
-
+		if (extServerIds_forLoading.hasOwnProperty('UniprotFeatures')){
+			extServerIds_forLoading['UniprotFeatures'] = true;
+		}
 		resolve(data);
 	});
 

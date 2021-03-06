@@ -246,7 +246,7 @@ var updateFeatureUI = function(featureList, extServerIds_forLoading) {
 			if(document.querySelector('#outerFeatureMap')){
 				document.querySelector('#outerFeatureMap').remove()
 			}
-			drawfeatureMap = featureMap.createFeatureMap(addedFeatures[0])
+			drawfeatureMap = featureMap.createFeatureMap(addedFeatures[0], extServerIds_)
 			AQUARIA.addedFeature = true;
 			d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 			d3.select("svg.loaded").classed("loaded", false);
@@ -326,7 +326,7 @@ function drawTrack(datum, i) {
 				d3.selectAll("svg.loaded rect.feature").attr("fill", "#a4abdf");
 				d3.select("svg.loaded").classed("loaded", false);
 				d3.select(this).attr("class", "loaded");	//console.log("it's " + d3.select(this).attr("class"));
-				drawfeatureMap = featureMap.createFeatureMap(AQUARIA.currentFeature.data)
+				drawfeatureMap = featureMap.createFeatureMap(AQUARIA.currentFeature.data, extServerIds_)
 				Panels.hidePanels()
 				}
 			})
@@ -620,7 +620,7 @@ function showAnnotation(f, eid) {
 				}
 			}
 			if (isAnyFalse == true){
-				balloon = balloon + '<img src="/images/ajax-loader1.gif" alt="this slowpoke moves"  width=20/> ';
+				balloon = balloon + '<img src="/images/ajax-loader1.gif" alt="Loading..."  width=15/> ';
 			}
 			console.log(extServerIds_);
 		}

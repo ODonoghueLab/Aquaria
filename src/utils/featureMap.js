@@ -4,7 +4,7 @@ import * as Panels from './matches_features_panels'
 import * as common from '../utils/common'
 var Highcharts = require('../legacy/highstocks.js')
 
-export function createFeatureMap (datum) {
+export function createFeatureMap (datum, extServerIds_) {
   document.querySelectorAll("#selectedCluster [id*='r_'] rect").forEach(function (part) {
     part.style.fill = '#a5a5a5'
     part.style.stroke = '#a5a5a5'
@@ -20,7 +20,7 @@ export function createFeatureMap (datum) {
   this.height = 40 - window.AQUARIA.margin.top - window.AQUARIA.margin.bottom + 35 // height
   this.datum = datum
   var outerdiv = d3.select('#selectedFeature').append('div').attr('id', 'outerFeatureMap')
-  this.drawTrack(this.datum, this.createSVGforFeature(outerdiv, '100vw', this.height + 10, this.width + 1))
+  this.drawTrack(this.datum, this.createSVGforFeature(outerdiv, '100vw', this.height + 10, this.width + 1), extServerIds_)
   d3.select('#outerFeatureMap > svg').attr('class', 'loadedFeature')
 }
 
@@ -34,7 +34,7 @@ export function createSVGforFeature (outerdiv, width, height, viewboxWidth) {
 }
 
 // Draw selected feature track
-export function drawTrack (datum, svg) {
+export function drawTrack (datum, svg, extServerIds_) {
   var _this = this
   var features = []
   this.nusvg = svg
@@ -91,7 +91,7 @@ export function drawTrack (datum, svg) {
       d3.selectAll('svg.loaded rect.feature').attr('fill', '#a4abdf')
       d3.select('svg.loaded').classed('loaded', false)
       d3.select(this).attr('class', 'loaded') // console.log("it's " + d3.select(this).attr("class"));
-      _this.createFeatureMap(datum)
+      _this.createFeatureMap(datum, extServerIds_)
       Panels.hidePanels()
     }
   })
@@ -113,7 +113,7 @@ export function drawTrack (datum, svg) {
       .attr('class', 'insertion')
   }
   for (var p in features[o]) {
-    this.drawFeatures(p, o, features)
+    this.drawFeatures(p, o, features, extServerIds_)
   }
   d3.selectAll('#selectedFeature rect.feature').attr(
     'fill', function () {
@@ -122,7 +122,10 @@ export function drawTrack (datum, svg) {
 }
 
 // Draw feature by residue
-export function drawFeatures (p, o, features) {
+export function drawFeatures (p, o, features, extServerIds_) {
+  console.log('In createFeature map 1')
+  console.log(extServerIds_)
+
   this.nusg.append('rect')
     .attr('width', function () { return (/* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) > 2) ? /* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) : 2 })
     .attr('height', 14)
@@ -130,7 +133,7 @@ export function drawFeatures (p, o, features) {
     .attr('transform', 'translate(' + /* parseInt */ (features[o][p].start * (window.AQUARIA.srw - 0.0095)) + ',6)')
     .attr('color', features[o][p].color).attr('fill', '#a4abdf')
     .attr('class', 'feature')
-    .on('mouseover', createMouseOverCallback(features[o][p]))
+    .on('mouseover', createMouseOverCallback(features[o][p], extServerIds_))
     .on('mouseout',
       function () {
         var ID = d3.select(this).attr('id')
@@ -141,18 +144,20 @@ export function drawFeatures (p, o, features) {
     // })
 }
 
-export function createMouseOverCallback (feature) {
+export function createMouseOverCallback (feature, extServerIds_) {
   return function () {
+    console.log('In createFeature map 2')
+    console.log(extServerIds_)
     // console.log(">>>>>>>>>> over here ....???");
     var ID = d3.select(this).attr('id')
-    d3.select(this).call(mouseoverFeature, feature, ID)
+    d3.select(this).call(mouseoverFeature, feature, ID, extServerIds_)
   }
 }
 
 const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
 // show feature pop-up
-function showAnnotation (f, eid) {
+function showAnnotation (f, eid, extServerIds_) {
   console.log('It is actually this function')
   var urlhtml = ''
   if (f.urls.length > 0) {
@@ -191,7 +196,28 @@ function showAnnotation (f, eid) {
   balloon = balloon + '</div>'
   btnsDiv = btnsDiv + '</div>'
   balloon = balloon + btnsDiv
-  balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p>' + f.label
+  balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p>'
+
+  if (f.name.includes('span_missenseHeading')) {
+    console.log('wowwee 1 ' + extServerIds_)
+    if (typeof extServerIds_ !== 'undefined') {
+      console.log('wowwee extServerIds_forLoading')
+      let isAnyFalse = false
+      for (const serverId in extServerIds_) {
+        if (extServerIds_[serverId] === false) {
+          isAnyFalse = true
+          console.log('woweee 2 ' + serverId)
+        }
+      }
+      if (isAnyFalse === true) {
+        balloon = balloon + '<img src="/images/ajax-loader1.gif" alt="Loading..."  width=15/> '
+      }
+      console.log(extServerIds_)
+    }
+  }
+
+  balloon = balloon + f.label
+
   if (!f.name.includes('span_missenseHeading')) {
     balloon = balloon + ' ('
     if (f.start === f.end) {
@@ -268,9 +294,9 @@ function showAnnotation (f, eid) {
 }
 
 var t, s
-export function mouseoverFeature (el, f, eid) {
+export function mouseoverFeature (el, f, eid, extServerIds_) {
   t = setTimeout(function () {
-    showAnnotation(f, eid)
+    showAnnotation(f, eid, extServerIds_)
   }, 500)
   d3.select('#' + eid).attr('stroke-width', '2px').attr('stroke', 'white')
 }
