@@ -50,7 +50,6 @@ export default {
       }
       document.querySelector('div.dimmer').style.zIndex = '0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        document.querySelector('a.close').click()
         // document.querySelector('div.tabs').style.bottom = '50px'
         Panels.hidePanels()
       })

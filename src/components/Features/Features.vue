@@ -35,6 +35,7 @@ export default {
   margin-bottom:  -100px;
   width:  100vw;
   max-height: 80vh;
+  background: var(--primary-tab);
 }
 #groupedFeatures{
   margin-left:  6px;

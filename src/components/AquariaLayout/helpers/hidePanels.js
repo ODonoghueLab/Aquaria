@@ -10,4 +10,5 @@ export function hidePanels () {
   document.querySelector('#Structures').className = 'tab'
   document.querySelector('#Features').className = 'tab'
   document.querySelector('#Features')
+  document.querySelector('a.close').click()
 }

@@ -74,6 +74,9 @@ export default {
     window.scrollBy(0, 100)
     window.addEventListener('resize', function () {
       window.scrollBy(0, 100)
+      document.querySelector('#vis > .ruler').remove()
+      document.querySelectorAll('#vis > #allclusters .outer_container').forEach(el => el.remove())
+      window.AQUARIA.refresh()
     })
     setTimeout(function () {
       if (document.querySelector('.matrixLoading')) {

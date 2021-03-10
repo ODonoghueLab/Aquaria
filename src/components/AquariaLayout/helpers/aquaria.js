@@ -444,9 +444,9 @@ var MAX_PROTEIN_HISTORY = 10;
 
 AQUARIA.margin = {
   top: 10,
-  right: 80,
+  right: 70,
   bottom: 20,
-  left: 40
+  left: 20
 }
 
 AQUARIA.launchURL = function (url) {
