@@ -33,12 +33,17 @@ export default {
     /* margin-bottom: -54px; */
     margin-bottom: -55px;
     width: 100vw;
+    background: var(--primary-tab);
   }
   div.ruler {
     margin-left: 40px;
   }
   .outer_container{
     display: inline-flex;
+  }
+
+  .outer_container svg{
+    margin-left: 4px;
   }
 
   div[data-id="structurematches"].chardinjs-helper-layer.chardinjs-top {
@@ -52,6 +57,7 @@ export default {
   }
   #allclusters {
     background-color: var(--background);
+    overflow: hidden;
   }
 
   /**** SVG styles ****/
@@ -273,6 +279,7 @@ export default {
 
   div.container {
     height: 40px;
+    margin-left: -4px;
   }
 
   div.container:hover {

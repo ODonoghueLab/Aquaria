@@ -52,7 +52,7 @@ ShowMatchingStructures.prototype.initialise = function (sequence) {
   //		AQUARIA.structures2match = matching_structures;
 
   // this.width = document.getElementById("structure-viewer").offsetWidth
-  this.width = document.getElementById('structure-viewer').offsetWidth  - AQUARIA.margin.right - AQUARIA.margin.left
+  this.width = document.getElementById('structure-viewer').offsetWidth  - AQUARIA.margin.right - AQUARIA.margin.left - 50
 
   this.height = 40 - AQUARIA.margin.top - AQUARIA.margin.bottom + 35 // height
   this.xScale = d3.scale.linear().domain([1, seqLength]).range([1, this.width]) // .range([1, width]);
@@ -107,6 +107,10 @@ ShowMatchingStructures.prototype.showMap = function (cluster) {
 
 ShowMatchingStructures.prototype.addCluster = function (cluster) {
   this.clusters.push(cluster)
+  this.RenderCluster(cluster)
+}
+
+ShowMatchingStructures.prototype.RenderCluster = function (cluster) {
   var clusterRenderer = new ClusterRenderer(cluster, this.rank, this.xScale, this.width,
     this.height, function (d, clusterSelected) {
       console.log('ShowMatchingStructures.addCluster.onclick', clusterSelected)
@@ -183,8 +187,8 @@ ShowMatchingStructures.prototype.clusterItemClick = function (d) {
   document.querySelectorAll('.coverage_map_container').forEach(function (map) {
     map.remove()
   })
+  //Draw CoverageMap on Cluster click
   that.drawCoverageMap(that.clusters[cluster_nbr])
-  // document.querySelector(".featureTrack svg.loaded") check if exists to keep the feature.
 }
 
 ShowMatchingStructures.prototype.drawCoverageMap = function (cluster) {

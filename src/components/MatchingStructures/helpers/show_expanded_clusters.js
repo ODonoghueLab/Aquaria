@@ -495,7 +495,7 @@ function show_expanded_cluster (selectedCluster, id, number) {
             d.parent.children = [d] /// /console.log(d.parent.children);
 
             // selection made
-
+            AQUARIA.showMatchingStructures.drawCoverageMap(AQUARIA.structures2match.clusters[d.parent.cluster])
             load_structure(AQUARIA.structures2match, d, true)// console.log("d says: cluster "+d.cluster+", member "+d.member);
           }
 		  }
