@@ -236,9 +236,13 @@ var MAX_PROTEIN_HISTORY = 10;
             } else {
               // var interactive = attributes.interactive ? '/' + attributes.interactive : ''
               var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length)
-              history.pushState(null, sequences[0].primary_accession,
+            //   history.pushState(null, sequences[0].primary_accession,
+            //     window.location.protocol + '//' + window.location.host +
+            // '/' + sequences[0].primary_accession + '/' +
+            // pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
+            history.pushState(null, sequences[0].primary_accession,
                 window.location.protocol + '//' + window.location.host +
-            '/' + sequences[0].primary_accession + '/' +
+            '/' + AQUARIA.Organism.Name + '/' + AQUARIA.Gene + '/' +
             pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
             
             function findPDBMember (pdbid, chain) {

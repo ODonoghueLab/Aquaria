@@ -12,10 +12,10 @@ import * as LoadAQUARIA from './loadData'
 import Store from '../store/index'
 var AQUARIA = window.AQUARIA
 var uniprotAccession = []
-var pdb, chain
+var pdb, chain, previousPDB
 
 export function remoteSuccess () {
-  var pathname = document.location.origin + document.location.pathname // document.URL.split('?')[0];
+  var pathname = document.location.pathname // document.URL.split('?')[0];
 
   if (pathname
     .match(/\/(?:leap\/)?([A-Z a-z][0-9][A-Z a-z,0-9][A-Z a-z,0-9][A-Z a-z,0-9][0-9])\/?$/)) {
@@ -23,13 +23,13 @@ export function remoteSuccess () {
     AQUARIA.initialisePanels(true)
     window.AQUARIA.panel3d.blankApplet(true)
     AQUARIA.blankAll(true, 'Waiting for data...')
-    var previousPDB = window.AQUARIA.pdbTopTen.previousLookup(uniprotAccession)
+    previousPDB = window.AQUARIA.pdbTopTen.previousLookup(uniprotAccession)
     if (!previousPDB) {
       LoadAQUARIA.loadAccession(uniprotAccession)
     } else {
       LoadAQUARIA.loadAccession(uniprotAccession, previousPDB)
     }
-    LoadAQUARIA.loadAccession(uniprotAccession)
+    // LoadAQUARIA.loadAccession(uniprotAccession)
   } else if (pathname // primary accession and pdb
     .match(/\/(?:leap\/)?([A-Z a-z][0-9][A-Z a-z,0-9][A-Z a-z,0-9][A-Z a-z,0-9][0-9])\/([0-9]([A-Z a-z,0-9][A-z a-z,0-9])[A-Z a-z,0-9])\/?$/)) {
     uniprotAccession.push(RegExp.$1.toUpperCase())
@@ -49,7 +49,7 @@ export function remoteSuccess () {
     AQUARIA.blankAll(true, 'Waiting for data...')
     LoadAQUARIA.loadAccession(uniprotAccession, pdb, chain, false)
   } else if (pathname
-    .match(/\/(?:leap\/)?([0-9]([A-Z a-z,0-9][A-Z a-z,0-9])[A-Z a-z,0-9])?$/)) {
+    .match(/^\/([0-9]([A-Z a-z,0-9][A-Z a-z,0-9])[A-Z a-z,0-9])?$/)) {
     pdb = RegExp.$1.toLowerCase()
     var url = `${window.BACKEND}/getAccessionForPDB/${pdb}`
     axios({
@@ -98,7 +98,12 @@ export function remoteSuccess () {
         } else {
           AQUARIA.initialisePanels(true)
           window.AQUARIA.panel3d.blankApplet(true)
-          LoadAQUARIA.loadAccession(accession)
+          previousPDB = window.AQUARIA.pdbTopTen.previousLookupByName(AQUARIA.orgName + '_' + AQUARIA.gene)
+          if (!previousPDB) {
+            LoadAQUARIA.loadAccession(accession)
+          } else {
+            LoadAQUARIA.loadAccession(accession, previousPDB)
+          }
         }
       })
       .catch(function () {

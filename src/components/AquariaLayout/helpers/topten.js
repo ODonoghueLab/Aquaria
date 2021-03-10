@@ -62,6 +62,16 @@ TopTen.prototype.previousLookup = function (primary_accession) {
 	return pdb
 }
 
+TopTen.prototype.previousLookupByName = function (name) {
+	var pdb = false
+	this.cache.forEach(function (value) {
+		if(value.name == name) {
+			pdb = value.pdb_id
+		}
+	})
+	return pdb
+}
+
 TopTen.prototype.updatePDB = function (primary_accession, pdb) {
 	this.cache.forEach(function (value) {
 		if(value.primary_accession == primary_accession) {
