@@ -22,11 +22,11 @@ jobs:
       # production specific settings
       AQUARIA_CLIENT_EMIT_CNAME_PROD: aquaria.app
       VUE_APP_AQUARIA_BACKEND_PROD: https://odonoghuelab.org:8011
-      PUBLISH_REPO_PROD: aqclient/aqclient.github.io
+      PUBLISH_REPO_PROD: ODonoghueLab/aquaria.github.io
       # test specific settings
       AQUARIA_CLIENT_EMIT_CNAME_TEST: test.aquaria.app
       VUE_APP_AQUARIA_BACKEND_TEST: https://odonoghuelab.org:8011
-      PUBLISH_REPO_TEST: aqclient/test.aqclient.github.io
+      PUBLISH_REPO_TEST: ODonoghueLab/test.aquaria.github.io
 
     steps:
     - name: Configure environment (production)
