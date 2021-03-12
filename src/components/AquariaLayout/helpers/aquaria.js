@@ -13,6 +13,7 @@
 //  Kenny Sabir <traksewt@gmail.com>
 //  Neblina Sikta <n.sikta@garvan.org.au>
 //  Christian Stolte <christian.stolte@gmail.com>
+//  Sandeep Kaur <crystalsand10@gmail.com>
 //
 //  Jenny Vuong <vuong.jenny@gmail.com>
 //  Michael Joss <michael.joss@gmail.com>
@@ -244,7 +245,7 @@ var MAX_PROTEIN_HISTORY = 10;
                 window.location.protocol + '//' + window.location.host +
             '/' + AQUARIA.Organism.Name + '/' + AQUARIA.Gene + '/' +
             pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
-            
+
             function findPDBMember (pdbid, chain) {
               var pdbMember = []
               for (var clusterID in window.AQUARIA.structures2match.clusters) {

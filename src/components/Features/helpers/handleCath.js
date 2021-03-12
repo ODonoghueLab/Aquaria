@@ -122,7 +122,7 @@ function getAsUrl_sf(name, sf_id){
 
 function getAsUrl_ff(name, sf_id, ff_id){
 
-	let url_ff = 'https://www.cathdb.info/version/v4_2_0/superfamily/' + sf_id + '/funfam/' + ff_id;
+	let url_ff = 'https://www.cathdb.info/version/v4_3_0/superfamily/' + sf_id + '/funfam/' + ff_id;
 	console.log("<a href=\'" + url_ff + "\'>" + name + "</a>");
 	return ("<a href=\'" + url_ff + "\' target=\"_blank\" >" + name + "</a>");
 }
@@ -135,28 +135,28 @@ function getRequestProtocol(){
 }
 function url_funfamInfo(superfam_id, funfam_id){
 
-	return (getRequestProtocol() + "://www.cathdb.info/version/v4_2_0/api/rest/superfamily/" + superfam_id + "/funfam/" + funfam_id);
+	return (getRequestProtocol() + "://www.cathdb.info/version/v4_3_0/api/rest/superfamily/" + superfam_id + "/funfam/" + funfam_id);
 }
 
 
 function url_superfamInfo(superfam_id){
-	return (getRequestProtocol() +  "://www.cathdb.info/version/v4_2_0/api/rest/superfamily/" + superfam_id);
+	return (getRequestProtocol() +  "://www.cathdb.info/version/v4_3_0/api/rest/superfamily/" + superfam_id);
 }
 
 function url_go(superfam_id){
-	return (getRequestProtocol() + "://www.cathdb.info/version/v4_2_0/superfamily/" + superfam_id + "/highcharts/go");
+	return (getRequestProtocol() + "://www.cathdb.info/version/v4_3_0/superfamily/" + superfam_id + "/highcharts/go");
 }
 
 function url_ec(superfam_id){
-	return (getRequestProtocol() + "://www.cathdb.info/version/v4_2_0/superfamily/" + superfam_id + "/highcharts/ec");
+	return (getRequestProtocol() + "://www.cathdb.info/version/v4_3_0/superfamily/" + superfam_id + "/highcharts/ec");
 }
 
 function url_species(superfam_id){
-	return (getRequestProtocol() + "://www.cathdb.info/version/v4_2_0/superfamily/" + superfam_id + "/highcharts/species");
+	return (getRequestProtocol() + "://www.cathdb.info/version/v4_3_0/superfamily/" + superfam_id + "/highcharts/species");
 }
 
 function url_ancestors(superfam_id){
-	return (getRequestProtocol() + "://www.cathdb.info/version/v4_2_0/api/rest/cathtree/cath_id_ancestors/" + superfam_id);
+	return (getRequestProtocol() + "://www.cathdb.info/version/v4_3_0/api/rest/cathtree/cath_id_ancestors/" + superfam_id);
 }
 
 function handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, residues_, superFamFeatureSet, funFamFeatureSet, convertedFeatures, variantResidues){
@@ -325,7 +325,7 @@ function handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancesto
 
 					}
 
-					aSuperFam_description = aSuperFam_description + " <br>  <div style='height:150px; width:445px;'> <div class='row'> <div class='column' id='hc_go'> <center> <p class='popupText'> Gene annotation </p>  </center> </div> <div class='column' id='hc_ec'> <center> <p class='popupText'> Enzymatic class  </p> </center> </div> <div class='column' id='hc_species'> <center> <p class='popupText'> Species diversity  </p> </center> </div> <div class='column'> <center> <img src='" + getRequestProtocol()  + "://www.cathdb.info/version/v4_1_0/api/rest/id/" + aSuperFam.data.data.example_domain_id + ".png?size=M' width='100' height='100' /> <a href=\"https://www.cathdb.info/version/latest/domain/" +  aSuperFam.data.data.example_domain_id +  "\"  target=\"_blank\"> Example structure </a> </center> </div> </div>";
+					aSuperFam_description = aSuperFam_description + " <br>  <div style='height:150px; width:445px;'> <div class='row'> <div class='column' id='hc_go'> <center> <p class='popupText'> Gene annotation </p>  </center> </div> <div class='column' id='hc_ec'> <center> <p class='popupText'> Enzymatic class  </p> </center> </div> <div class='column' id='hc_species'> <center> <p class='popupText'> Species diversity  </p> </center> </div> <div class='column'> <center> <img src='" + getRequestProtocol()  + "://www.cathdb.info/version/v4_3_0/api/rest/id/" + aSuperFam.data.data.example_domain_id + ".png?size=M' width='100' height='100' /> <a href=\"https://www.cathdb.info/version/latest/domain/" +  aSuperFam.data.data.example_domain_id +  "\"  target=\"_blank\"> Example structure </a> </center> </div> </div>";
 
 
 
@@ -462,8 +462,8 @@ function handleResidues(res, featureName, description, variantResidues){
 	let re = new RegExp("\-");
 
 	if (!Array.isArray(res)){
-		console.log("HERE HERE HERE HERE HERE ");
-		console.log(res);
+		// console.log("HERE HERE HERE HERE HERE ");
+		// console.log(res);
 		if (re.test(res)){
 			let theResToDel = res.split(/\-/).map(Number)
 			features.push({'Name': featureName, 'Residues': theResToDel, 'Description': description});
@@ -478,8 +478,6 @@ function handleResidues(res, featureName, description, variantResidues){
 	}
 	else {
 		res.forEach(function(item, i){
-			console.log("HERE HERE HERE HERE HERE ");
-			console.log(item);
 			if (re.test(item)){
 				let theResToDel = item.split(/\-/).map(Number)
 				features.push({'Name': featureName, 'Residues': theResToDel, 'Description': description});

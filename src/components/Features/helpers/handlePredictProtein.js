@@ -17,9 +17,6 @@ var fs_nameMap = {
 module.exports = function (jsonObj, primary_accession, featureCallback, validateAgainstSchema, variantResidues, requestedFeature){
 
 
-	console.log('variantResidues ' + requestedFeature);
-	console.log(variantResidues);
-
 
 
 	let aquariaJsonObj = {};
@@ -56,10 +53,7 @@ module.exports = function (jsonObj, primary_accession, featureCallback, validate
 	//console.log("Converted PredictProtein")
 	//console.log(aquariaJsonObj)
 
-	console.log("The variantResidues ");
-	console.log(variantResidues);
-
-	validateAgainstSchema(aquariaJsonObj, primary_accession, featureCallback, 'PredictProtein'); 
+	validateAgainstSchema(aquariaJsonObj, primary_accession, featureCallback, 'PredictProtein');
 
 	// console.log(aquariaJsonObj);
 	//return (aquariaJsonObj);
@@ -132,6 +126,7 @@ function convertTheFeature(feature, variantResidues, requestedFeature){
 			}
 			if (sourceAndUrl.url != ''){
 				url_evidence.push(sourceAndUrl.url);
+				console.log("PP this url is " + sourceAndUrl.url);
 			}
 		}
 
@@ -140,7 +135,8 @@ function convertTheFeature(feature, variantResidues, requestedFeature){
 
 	});
 
-	checkIfValInSnpResAndAdd(residue[0], residue[1], variantResidues, featureKey, convertedFeature['Description'], requestedFeature, variants_featTypesOfInt);
+	// console.log("PP this url before is " + url_evidence[0]);
+	checkIfValInSnpResAndAdd(residue[0], residue[1], variantResidues, featureKey, convertedFeature['Description'] + "|" + url_evidence[0], requestedFeature, variants_featTypesOfInt);
 
 
 
@@ -183,6 +179,7 @@ function checkIfValInSnpResAndAdd(resStart_pp, resEnd_pp, variantResidues, featu
 function handleTheEvidences(evidencesArr){
 	let featureSet_source = '';
 	let featureSet_url = '';
+	// let featureSet_urlVisual = '';
 
 	evidencesArr.forEach(function(evidence){
 		if (evidence.hasOwnProperty('source')){
@@ -190,7 +187,8 @@ function handleTheEvidences(evidencesArr){
 				featureSet_source = evidence.source.name;
 			}
 			if (evidence.source.hasOwnProperty('url')){
-				featureSet_url = url.parse(evidence.source.url).host;
+				featureSet_url = evidence.source.url; // url.parse(evidence.source.url).host;
+				// featureSet_urlVisual = evidence.source.url;
 			}
 
 		}
