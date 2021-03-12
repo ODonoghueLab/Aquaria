@@ -199,14 +199,11 @@ function showAnnotation (f, eid, extServerIds_) {
   balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p>'
 
   if (f.name.includes('span_missenseHeading')) {
-    console.log('wowwee 1 ' + extServerIds_)
     if (typeof extServerIds_ !== 'undefined') {
-      console.log('wowwee extServerIds_forLoading')
       let isAnyFalse = false
       for (const serverId in extServerIds_) {
         if (extServerIds_[serverId] === false) {
           isAnyFalse = true
-          console.log('woweee 2 ' + serverId)
         }
       }
       if (isAnyFalse === true) {
