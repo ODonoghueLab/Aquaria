@@ -50,7 +50,7 @@ var servers = [
 			// ?content-type=application/json
 		},
 		{
-			"id": "myVariant.info",
+			"id": "myVariant.info", // COSMIC
 			"Server": 'myVariant.info',
 			"URL_myVariant": 'https://myvariant.info/v1/query?q=', // p53&fetch_all=TRUE'
 			"URL_myGene": 'https://mygene.info/v3/query?species=human&q=', //P04637',

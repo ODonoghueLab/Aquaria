@@ -93,7 +93,7 @@ var updateFeatureUI = function(featureList, extServerIds_forLoading) {
 				.html(
 						function(d) {
 							if (d.Type != ''){
-							  if(d.Server == "UniProt" || d.Server == "PredictProtein" || d.Server == "CATH" || d.Server == "SNAP2"){
+							  if(d.Server == "UniProt" || d.Server == "PredictProtein" || d.Server == "CATH" || d.Server == "SNAP2"  || d.Server == 'myVariant.info' || d.Server == 'FunVar'){
 								  var source = "Curated Features"
 				  }
 				  else{
@@ -107,7 +107,7 @@ var updateFeatureUI = function(featureList, extServerIds_forLoading) {
 									+ source
 									+ "</span></p>";
 							} else {
-								if(d.Server == "UniProt" || d.Server == "PredictProtein" || d.Server == "CATH" || d.Server == "SNAP2"){
+								if(d.Server == "UniProt" || d.Server == "PredictProtein" || d.Server == "CATH" || d.Server == "SNAP2"  || d.Server == 'COSMIC' || d.Server == 'FunVar'){
 									source = "Curated Features"
 				  }
 				  else{
