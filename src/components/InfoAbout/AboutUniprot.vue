@@ -7,7 +7,7 @@
       </div>
       <div id="uniProtDesc" v-if="uniprotDesc"></div>
         <div v-for="(description, i) in descriptions" :key="i" class='expandable'>
-        <expandable-text-line>
+        <expandable-text-line  use-click>
           <p><strong>{{description[0]}}</strong> : {{description[1]}}</p>
         </expandable-text-line>
       </div>
@@ -143,5 +143,12 @@ export default {
 <style scoped>
 .expandable {
   margin: 8px 0px;
+  /* cursor: ns-resize; */
+}
+.expandable-text-line {
+  cursor: s-resize;
+}
+.expandable-text-line.__extl-expanded{
+  cursor: n-resize;
 }
 </style>

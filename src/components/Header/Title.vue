@@ -20,12 +20,11 @@
         <a href="#Structure" class="" @click="makeActive">{{pdb}}</a>
       </span>
       <div id='titleAlign'>
-        <span id='left' class='titlepanel' v-if="seqRes">
+        <span class='titlepanel' v-if="seqRes">
           <a href="#Alignment" class="" @click="makeActive" >
-          Sequence <br/>Structure</a>
+          Sequence <strong>{{primary_accession}}:</strong> {{seqRes}} <br/>
+          Structure  <strong>{{pdb}}:</strong>  {{structRes}} </a>
         </span>
-        <span class='titlepanel' v-if="seqRes"><a href="#Alignment" class="" @click="makeActive" ><strong>{{primary_accession}}:</strong> <br/> <strong>{{pdb}}:</strong> </a></span>
-        <span id='right' class='titlepanel' v-if="seqRes"><a href="#Alignment" class="" @click="makeActive" >{{seqRes}} <br/> {{structRes}} </a></span>
       </div>
     </div>
 </template>
@@ -147,6 +146,7 @@ export default {
     left: 50%;
     top: 1.5vh;
     transform: translate(-50%, -5%);
+    width: fit-content;
 }
 #title span {
   white-space: nowrap;
@@ -192,26 +192,16 @@ span#pdb_id a, span#no_pdb_id a {
 }
 
 #titleAlign span a {
-  padding: calc(0.2rem + 2 * ((100vw - 320px) / 680)) 0.2rem;
+  padding: calc(0.2rem + 2 * ((100vw - 320px) / 680)) 1rem;
+  font-size: 95%;
   line-height: 1rem;
-}
-
-#titleAlign #left a {
-  padding-left: 1.5rem;
-  border-top-left-radius: 1.5rem;
-  border-bottom-left-radius: 1.5rem;
-  text-align: right;
-}
-
-#titleAlign #right a {
-  border-top-right-radius: 1.5rem;
-  border-bottom-right-radius: 1.5rem;
-  padding-right: 1.5rem;
+  border-radius: 1.25rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 8rem;
+  max-width: 18rem;
 }
+
 .titlepanel {
   text-align: left;
 }

@@ -113,7 +113,8 @@ export default {
 }
 
 #app {
-  height: 99vh;
+  height: 100vh;
+  overflow: hidden;
 }
 #home{
   background-color: #c0c0c0;

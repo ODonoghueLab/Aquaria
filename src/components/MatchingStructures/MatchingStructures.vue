@@ -62,7 +62,7 @@ export default {
 
   /**** SVG styles ****/
   svg {
-    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font-weight: 400;
   }
 
   .container>svg {
