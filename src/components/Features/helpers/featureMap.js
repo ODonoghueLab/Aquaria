@@ -5,6 +5,9 @@ import * as common from '../../AquariaLayout/helpers/common'
 var Highcharts = require('./highstocks.js')
 
 export function createFeatureMap (datum, extServerIds_) {
+  console.log("She is the quarterback ");
+  console.log(extServerIds_);
+
   document.querySelectorAll("#selectedCluster [id*='r_'] rect").forEach(function (part) {
     part.style.fill = '#a5a5a5'
     part.style.stroke = '#a5a5a5'
@@ -146,8 +149,6 @@ export function drawFeatures (p, o, features, extServerIds_) {
 
 export function createMouseOverCallback (feature, extServerIds_) {
   return function () {
-    console.log('In createFeature map 2')
-    console.log(extServerIds_)
     // console.log(">>>>>>>>>> over here ....???");
     var ID = d3.select(this).attr('id')
     d3.select(this).call(mouseoverFeature, feature, ID, extServerIds_)
@@ -158,7 +159,6 @@ const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 
 
 // show feature pop-up
 function showAnnotation (f, eid, extServerIds_) {
-  console.log('It is actually this function')
   var urlhtml = ''
   if (f.urls.length > 0) {
     // var lnx = f.urls.split(";");

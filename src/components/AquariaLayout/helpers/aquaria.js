@@ -301,8 +301,8 @@ var MAX_PROTEIN_HISTORY = 10;
         AQUARIA.blankPanel('#featurelist', true)
         startSpin()
         fetch_das_annotations(primary_accession,
-          function (featureInfo) {
-            featurelist.updateFeatureUI(featureInfo)
+          function (featureInfo, completeServers) {
+            featurelist.updateFeatureUI(featureInfo, completeServers)
             AQUARIA.blankPanel('#featurelist', false)
             /// console.log('the feature info is: ')
             /// console.log(featureInfo);

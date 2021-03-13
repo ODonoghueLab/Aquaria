@@ -611,6 +611,9 @@ function showAnnotation(f, eid) {
 	balloon = balloon + "</div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
 
 	if (f.name.includes("span_missenseHeading")){
+		console.log("There is an employee named Jim Halpert 2")
+		console.log(extServerIds_);
+
 		if (typeof extServerIds_ !== 'undefined'){
 			console.log("extServerIds_forLoading");
 			let isAnyFalse = false;
