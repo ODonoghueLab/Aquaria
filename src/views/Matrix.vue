@@ -26,8 +26,8 @@
 
 <script>
 import axios from 'axios'
-import MatrixHeader from '../components/MatrixHeader'
-import LoadingPage from '../components/LoadingPage'
+import MatrixHeader from '../components/MatrixLayout/MatrixHeader'
+import LoadingPage from '../components/MatrixLayout/LoadingPage'
 import VLazyImage from 'v-lazy-image'
 import store from '@/store/index'
 
@@ -234,10 +234,10 @@ export default {
 }
 
 /* Christian's work */
-@media (min-width: 550px){
+@media screen and (min-width: 550px){
   #matrix{
     height: 99vh;
-    background: #c0c0c0 url(../assets/img/Resource-banner.svg) no-repeat calc(6px + 0.4vw) calc(8px + 0.1vh);
+    background: #c0c0c0 url('../assets/img/Resource-banner.svg') no-repeat calc(6px + 0.4vw) calc(8px + 0.1vh);
     background-size: calc(115px + 5vw) calc(26px + 2vw);
     text-align: center;
   }
@@ -245,7 +245,7 @@ export default {
  @media screen and (max-width: 549px){
    #matrix{
   height: 99vh;
-  background: #c0c0c0 url(../assets/img/AquariaLogo.svg) no-repeat calc(6px + 0.4vw) calc(8px + 0.1vh);
+  background: #c0c0c0 url('../assets/img/AquariaLogo.svg') no-repeat calc(6px + 0.4vw) calc(8px + 0.1vh);
   background-size: calc(130px + 1.5vw) calc(35px + 1.5vw);
   text-align: center;
   }
@@ -353,9 +353,6 @@ export default {
         }
     }
     /* Alignment */
-    body {
-        /* text-align: center; */
-    }
     h1, h3, p {
         margin: 0;
     }
