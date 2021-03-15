@@ -21,6 +21,7 @@
 //
 // This work is licensed under the terms of the GNU GPL version 2.
 
+import * as LoadAQUARIA from '../../../utils/loadData'
 window.AQUARIA = {}
 var AQUARIA = window.AQUARIA
 var jQuery = require('jquery')
@@ -39,14 +40,12 @@ var d3 = require('d3')
 var axios = require('axios')
 // var resize_app = require('./resize_app')
 var aquariaRemote = require('../../../utils/url')
-import * as LoadAQUARIA from '../../../utils/loadData'
 
 require('./utilities')
 
 var MAX_PROTEIN_HISTORY = 10;
 
 (function ($) {
-
   var proteinSubmitListeners = []
   var addProteinSubmitListener = function (listener) {
     proteinSubmitListeners.push(listener)
@@ -237,29 +236,29 @@ var MAX_PROTEIN_HISTORY = 10;
             } else {
               // var interactive = attributes.interactive ? '/' + attributes.interactive : ''
               var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length)
-            //   history.pushState(null, sequences[0].primary_accession,
-            //     window.location.protocol + '//' + window.location.host +
-            // '/' + sequences[0].primary_accession + '/' +
-            // pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
-            history.pushState(null, sequences[0].primary_accession,
+              //   history.pushState(null, sequences[0].primary_accession,
+              //     window.location.protocol + '//' + window.location.host +
+              // '/' + sequences[0].primary_accession + '/' +
+              // pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
+              history.pushState(null, sequences[0].primary_accession,
                 window.location.protocol + '//' + window.location.host +
             '/' + AQUARIA.Organism.Name + '/' + AQUARIA.Gene + '/' +
             pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
 
-            function findPDBMember (pdbid, chain) {
-              var pdbMember = []
-              for (var clusterID in window.AQUARIA.structures2match.clusters) {
-                for (var memberID in window.AQUARIA.structures2match.clusters[clusterID].members) {
-                  if (window.AQUARIA.structures2match.clusters[clusterID].members[memberID].pdb_chain[0].includes(chain) && window.AQUARIA.structures2match.clusters[clusterID].members[memberID].pdb_id.includes(pdbid)) {
-                    pdbMember.cluster = parseInt(clusterID)
-                    pdbMember.member = parseInt(memberID)
-                    return pdbMember
+              function findPDBMember (pdbid, chain) {
+                var pdbMember = []
+                for (var clusterID in window.AQUARIA.structures2match.clusters) {
+                  for (var memberID in window.AQUARIA.structures2match.clusters[clusterID].members) {
+                    if (window.AQUARIA.structures2match.clusters[clusterID].members[memberID].pdb_chain[0].includes(chain) && window.AQUARIA.structures2match.clusters[clusterID].members[memberID].pdb_id.includes(pdbid)) {
+                      pdbMember.cluster = parseInt(clusterID)
+                      pdbMember.member = parseInt(memberID)
+                      return pdbMember
+                    }
                   }
                 }
               }
-            }
 
-            window.AQUARIA.PDBIndex = findPDBMember(window.AQUARIA.currentMember.pdb_id, window.AQUARIA.currentMember.pdb_chain)
+              window.AQUARIA.PDBIndex = findPDBMember(window.AQUARIA.currentMember.pdb_id, window.AQUARIA.currentMember.pdb_chain)
               if (AQUARIA.panel3d.initialised) {
                 // intiaties the refresh of the 3D panel
                 AQUARIA.panel3d.reload(attributes)
