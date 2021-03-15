@@ -5,8 +5,8 @@ import * as common from '../../AquariaLayout/helpers/common'
 var Highcharts = require('./highstocks.js')
 
 export function createFeatureMap (datum, extServerIds_) {
-  console.log("She is the quarterback ");
-  console.log(extServerIds_);
+  console.log('She is the quarterback ')
+  console.log(extServerIds_)
 
   document.querySelectorAll("#selectedCluster [id*='r_'] rect").forEach(function (part) {
     part.style.fill = '#a5a5a5'

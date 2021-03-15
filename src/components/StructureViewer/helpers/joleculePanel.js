@@ -25,7 +25,7 @@ var JoleculePanel = function (attachToDiv, chainSelected) {
     isToolbarOn: true,
     isTextOverlay: false,
     isMouseWheel: true
-  });
+  })
   // apply Neblina's scripts to alter jolecule appearance
   require('./jolecule-mods')
   var alignment = new jolecule.AquariaAlignment()
@@ -37,7 +37,7 @@ var JoleculePanel = function (attachToDiv, chainSelected) {
   }
 
   document.onkeydown = function (event) {
-    let c = String.fromCharCode(event.keyCode).toUpperCase()
+    const c = String.fromCharCode(event.keyCode).toUpperCase()
     if (false) {
     } else if (event.keyCode === 37) {
       const isClear = !event.shiftKey
@@ -65,32 +65,32 @@ var JoleculePanel = function (attachToDiv, chainSelected) {
     if (document.activeElement !== document.body) {
       return
     }
-    let data = e.clipboardData
+    const data = e.clipboardData
     if (data && data.getData) {
       alignment.selectSeq = ''
-      let text = data.getData('text/plain')
+      const text = data.getData('text/plain')
       // console.log('AlignAquaria.paste', text)
-      for (let c of text.toUpperCase()) {
+      for (const c of text.toUpperCase()) {
         alignment.selectNextChar(c)
       }
     }
   })
 }
 
-JoleculePanel.prototype.load = function(attributes) {
-  document.querySelector("#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar").style.display = 'none'
-  document.querySelector("#toggle-toolbar-button").style.display = 'none'
-  this.reload(attributes);
+JoleculePanel.prototype.load = function (attributes) {
+  document.querySelector('#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar').style.display = 'none'
+  document.querySelector('#toggle-toolbar-button').style.display = 'none'
+  this.reload(attributes)
 }
 
-JoleculePanel.prototype.changeViewerSize = function(w, h) {
+JoleculePanel.prototype.changeViewerSize = function (w, h) {
   this.embededJolecule.resize()
 }
 
-buildFeatures = function(featureNames, featureDescriptions, featurePositions, featureColours) {
-  let features = []
+buildFeatures = function (featureNames, featureDescriptions, featurePositions, featureColours) {
+  const features = []
   for (i = 0; i < featurePositions.length; i++) {
-    featurePosition = featurePositions[i].split(":")
+    featurePosition = featurePositions[i].split(':')
     featureStart = parseInt(featurePosition[0])
     featureEnd = parseInt(featurePosition[1])
     for (j = featureStart; j <= featureEnd; j++) {
@@ -98,29 +98,29 @@ buildFeatures = function(featureNames, featureDescriptions, featurePositions, fe
         Residue: j,
         Color: featureColours[i],
         Name: featureNames[i].replace(/\<[^\>\<]*\>/g, '').replace(/^.*\:/, ''),
-        Description: ""
+        Description: ''
       })
     }
   }
   return features
 }
 
-JoleculePanel.prototype.addAnnotation = function(id, annotationName, featureColours, featureNames, featureDescriptions, featurePositions, featureURLs, featureURLTexts) {
-  let features = buildFeatures(featureNames, featureDescriptions, featurePositions, featureColours)
+JoleculePanel.prototype.addAnnotation = function (id, annotationName, featureColours, featureNames, featureDescriptions, featurePositions, featureURLs, featureURLTexts) {
+  const features = buildFeatures(featureNames, featureDescriptions, featurePositions, featureColours)
   // console.log(`JoleculePanel.addAnnotation ${id} "${annotationName}"`, features)
   this.joleculeAlignment.colorFromFeatures(this.embededJolecule, features, id, annotationName)
-};
+}
 
-JoleculePanel.prototype.removeAnnotation = function(id, annotationName) {
+JoleculePanel.prototype.removeAnnotation = function (id, annotationName) {
   // console.log('JoleculePanel.removeAnnotation', id, annotationName, this.embededJolecule)
   this.joleculeAlignment.colorFromConservation(this.embededJolecule)
-};
+}
 
-JoleculePanel.prototype.setAlignment = function(attributes) {
+JoleculePanel.prototype.setAlignment = function (attributes) {
   // console.log('JoleculePanel.setAlignment', attributes)
   this.joleculeAlignment.reload(attributes, this.embededJolecule)
-  var that = this;
-  this.joleculeAlignment.selectNewChain = function(seqId, seqName, pdbId, chain) {
+  var that = this
+  this.joleculeAlignment.selectNewChain = function (seqId, seqName, pdbId, chain) {
     if (seqId && !(seqId === that.seqId && chain === that.chain)) {
       // console.log('JoleculePanel.setAlignment.selectNewChain', seqId, seqName, chain)
       that.chainSelected(seqId, pdbId, chain)
@@ -130,10 +130,10 @@ JoleculePanel.prototype.setAlignment = function(attributes) {
   }
 }
 
-JoleculePanel.prototype.reload = function(attributes) {
+JoleculePanel.prototype.reload = function (attributes) {
   // console.log('JoleculePanel.reload', attributes)
-  attributes = attributes || this.attributes;
-  this.attributes = attributes;
+  attributes = attributes || this.attributes
+  this.attributes = attributes
   this.seqId = attributes.sequences[0].primary_acccession
   this.embededJolecule.clear()
 
@@ -142,8 +142,8 @@ JoleculePanel.prototype.reload = function(attributes) {
   // the default chain is not the first
   this.joleculeAlignment.selectNewChain = () => {}
 
-  let that = this
-  var DataServer = require('./data-server');
+  const that = this
+  var DataServer = require('./data-server')
 
   let PDB_URI = ''
   if (attributes.biounit == 0) {
@@ -157,30 +157,30 @@ JoleculePanel.prototype.reload = function(attributes) {
     PDB_URI = `https://pdbj.org/rest/downloadPDBfile?format=bu&id=${attributes.pdb_id}.${attributes.biounit}`
   }
   console.log(PDB_URI)
-  const dataServer = new DataServer.DataServer(PDB_URI, attributes.pdb_id);
+  const dataServer = new DataServer.DataServer(PDB_URI, attributes.pdb_id)
   this.embededJolecule.asyncAddDataServer(
     dataServer
-      // jolecule.makeDataServer(
-      //   attributes.pdb_id,
-      //   "",
-      //   false,
-      //   false,
-      //   false,
-      //   attributes.biounit)
-    )
-    .then(function() {
+    // jolecule.makeDataServer(
+    //   attributes.pdb_id,
+    //   "",
+    //   false,
+    //   false,
+    //   false,
+    //   attributes.biounit)
+  )
+    .then(function () {
       that.setAlignment(attributes)
     })
-    .then(function() {
-      that.blankApplet(false);
-      that.initialised = true;
+    .then(function () {
+      that.blankApplet(false)
+      that.initialised = true
     })
-};
+}
 
-//for generating attributes use location+pdb_id
-JoleculePanel.prototype.generateAttributes = function(threeDWidth, threeDHeight, pdb_id, pdb_chain, biounit, source_primary_accession, sequences, common_names, pssh_alignment, links, transform,
+// for generating attributes use location+pdb_id
+JoleculePanel.prototype.generateAttributes = function (threeDWidth, threeDHeight, pdb_id, pdb_chain, biounit, source_primary_accession, sequences, common_names, pssh_alignment, links, transform,
   conservations) {
-  var instanceId = sequences[0].primary_accession + '-' + pdb_id + '-' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]);
+  var instanceId = sequences[0].primary_accession + '-' + pdb_id + '-' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0])
   return {
     width: threeDWidth,
     height: threeDHeight,
@@ -194,30 +194,29 @@ JoleculePanel.prototype.generateAttributes = function(threeDWidth, threeDHeight,
     conservations,
     sequenceAlignments: null,
     sequences
-  };
-};
-
-
-JoleculePanel.prototype.gestures = function() {
-  var ret = {};
-  return ret;
+  }
 }
 
-JoleculePanel.prototype.blankApplet = function(isOn, message) {
+JoleculePanel.prototype.gestures = function () {
+  var ret = {}
+  return ret
+}
+
+JoleculePanel.prototype.blankApplet = function (isOn, message) {
   if (isOn) {
-    var appletMessage = $('#waitingFrame').contents().find('#appletMessage');
+    var appletMessage = $('#waitingFrame').contents().find('#appletMessage')
     if (message) {
-      appletMessage.html(message);
+      appletMessage.html(message)
     } else {
-      appletMessage.text("Please wait...");
+      appletMessage.text('Please wait...')
     }
-    if (!$('#waitingFrame').is(":visible")) {
-      $('#waitingFrame').hide();
-      $('#waitingFrame').fadeIn("fast");
+    if (!$('#waitingFrame').is(':visible')) {
+      $('#waitingFrame').hide()
+      $('#waitingFrame').fadeIn('fast')
     }
   } else {
-    $('#waitingFrame').fadeOut("slow");
+    $('#waitingFrame').fadeOut('slow')
   }
-};
+}
 
-module.exports = JoleculePanel;
+module.exports = JoleculePanel
