@@ -19,22 +19,29 @@ export function checkPhone () {
   }
 }
 
-export function appendPopup (text, position, width) {
-  var s, tailLeft
+export function appendPopup (text, position, width, featureMap) {
+  $('div#popup').removeAttr('style')
+  var s, tailLeft, bottom
   document.querySelector('#popuptext').innerHTML = text
-  $('div#popup').fadeIn()
-  var popheight = document.querySelector('div#popup').offsetHeight
+  $('div#popup').fadeIn(60)
+  // var popheight = document.querySelector('div#popup').offsetHeight
 
   var bleft = parseInt(position.left + (width / 2) - 120)
-  var btop = parseInt(position.top - popheight)
+  // var btop = parseInt(position.top - popheight)
 
   // var tailLeft = parseInt(position.left + (width / 2))
   document.querySelector('#popupTail').style.marginLeft = '107px'
   // document.querySelector('#popupTail').style.top = btop + 'px'
+  if (featureMap) {
+    bottom = '17px'
+  } else {
+    bottom = parseInt(window.innerHeight - position.bottom) + 'px'
+  }
 
   $('div#popup').css({
     left: bleft + 'px',
-    top: btop + 'px',
+    // top: btop + 'px',
+    bottom: bottom,
     width: '400px'
   }).fadeIn(600)
 
