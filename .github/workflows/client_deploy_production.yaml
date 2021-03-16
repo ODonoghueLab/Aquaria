@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - test_AquariaExport
+      - dev
     paths-ignore:
       - README.md
       - .editorconfig
@@ -21,20 +21,26 @@ jobs:
       VUE_APP_STATIC_SPA_MODE: true
       # production specific settings
       AQUARIA_CLIENT_EMIT_CNAME_PROD: aquaria.app
-      VUE_APP_AQUARIA_BACKEND_PROD: https://aquaria.ws:8010
+      VUE_APP_AQUARIA_BACKEND_PROD: https://odonoghuelab.org:8011
       PUBLISH_REPO_PROD: ODonoghueLab/aquaria.github.io
       # test specific settings
-      AQUARIA_CLIENT_EMIT_CNAME_TEST: test.aquaria.app
-      VUE_APP_AQUARIA_BACKEND_TEST: https://aquaria.ws:8010
-      PUBLISH_REPO_TEST: ODonoghueLab/test.aquaria.github.io
+      AQUARIA_CLIENT_EMIT_CNAME_TEST: dev.aquaria.app
+      VUE_APP_AQUARIA_BACKEND_TEST: https://odonoghuelab.org:8011
+      PUBLISH_REPO_TEST: ODonoghueLab/dev.aquaria.github.io
 
     steps:
     - name: Configure environment (production)
+      if: github.ref == 'refs/heads/dev'
       run: |
         echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_PROD" >> $GITHUB_ENV
         echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_PROD" >> $GITHUB_ENV
         echo "PUBLISH_REPO=$PUBLISH_REPO_PROD" >> $GITHUB_ENV
-
+    - name: Configure environment (dev)
+      if: github.ref == 'refs/heads/dev'
+      run: |
+        echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_TEST" >> $GITHUB_ENV
+        echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_TEST" >> $GITHUB_ENV
+        echo "PUBLISH_REPO=$PUBLISH_REPO_TEST" >> $GITHUB_ENV
     - name: Checkout source repo
       uses: actions/checkout@v2
 
@@ -72,7 +78,7 @@ jobs:
       run: npm install
 
     - name: Build client
-      run: npm run build
+      run: npm run build --fix
 
     - name: Copy build
       run: 'cp -r ${{ env.BUILD_OUTPUT_PATH }}/* ${{ env.PUBLISH_REPO_PATH }}'

@@ -1,75 +1,83 @@
 <template>
-<div id="wrapper">
-  <!-- <div>{{data}}</div> -->
-    <Content/>
-    <Footer />
-    <BadBrowser />
+  <div class="main">
+    <!-- Header -->
+    <Header />
+    <!-- InfoAbout -->
+    <Sequence />
+    <div>
+      <AboutAlignment v-bind:alignment="alignment"/>
+    </div>
+    <div>
+      <AboutPdb />
+    </div>
+    <div>
+      <AboutAquaria />
+      <Errors />
+    </div>
+    <!-- StructureViewer -->
+    <StructureViewer />
+    <!-- AquariaLayout -->
+    <Tabs />
+    <PopUp />
+    <a href="#"><div id="scrim" class="hide" @click="dismissPanel"></div></a>
   </div>
 </template>
 
 <script>
-// most legacy code bundling is triggered from here (expects global jolecule)
-import '../legacy/aquaria'
-import Content from '../components/Content'
-import Footer from '../components/Footer'
-import BadBrowser from '../components/BadBrowser'
+
+import '../components/AquariaLayout/helpers/aquaria' // most legacy code bundling is triggered from here (expects global jolecule)
+import Header from '../components/Header/Header'
+import Sequence from '../components/InfoAbout/Sequence'
+import AboutAlignment from '../components/InfoAbout/AboutAlignment'
+import AboutPdb from '../components/InfoAbout/AboutPdb'
+import StructureViewer from '../components/StructureViewer/StructureViewer'
+import Tabs from '../components/AquariaLayout/Tabs'
+import PopUp from '../components/AquariaLayout/PopUp'
+import AboutAquaria from '../components/InfoAbout/AboutAquaria'
+import Errors from '../components/InfoAbout/Errors'
 
 export default {
   name: 'Wrapper',
   components: {
-    Content,
-    BadBrowser,
-    Footer
+    Header,
+    Sequence,
+    AboutAlignment,
+    AboutPdb,
+    StructureViewer,
+    Tabs,
+    PopUp,
+    AboutAquaria,
+    Errors
   },
-  // beforeMount () {
-  //   const Script1 = document.createElement('script')
-  //   Script1.setAttribute('src', '/javascripts/jquery-1.9.1.min.js')
-  //   document.body.appendChild(Script1)
-
-  //   const Script2 = document.createElement('script')
-  //   Script2.setAttribute('src', '/javascripts/chardinjs.mod.js')
-  //   document.body.appendChild(Script2)
-  // },
-  // created () {
-  //   var libs = [
-  //     '/javascripts/jquery-ui.1.10.3.js',
-  //     '/javascripts/jquery.expander.min.js',
-  //     '/javascripts/browser_check.js'
-  //   ]
-
-  //   var injectLibFromStack = function () {
-  //     if (libs.length > 0) {
-  //       // grab the next item on the stack
-  //       var nextLib = libs.shift()
-  //       var headTag = document.getElementsByTagName('head')[0]
-
-  //       // create a script tag with this library
-  //       var scriptTag = document.createElement('script')
-  //       scriptTag.src = nextLib
-
-  //       // when successful, inject the next script
-  //       scriptTag.onload = function (e) {
-  //         console.log('---> loaded: ' + e.target.src)
-  //         injectLibFromStack()
-  //       }
-
-  //       // append the script tag to the <head></head>
-  //       headTag.appendChild(scriptTag)
-  //       console.log('injecting: ' + nextLib)
-  //     }
-  //   }
-
-  //   // start script injection
-  //   injectLibFromStack()
-  // },
+  methods: {
+    // load: function () {
+    //   console.log('Loader loaded')
+    //   setTimeout(() => {
+    //     if (document.querySelector('div.loader')) {
+    //       document.querySelector('div.loader').style.display = 'none'
+    //       document.querySelector('div#jolecule-protein-container').style.display = 'block'
+    //       document.querySelector('div.tabs').style.display = 'flex'
+    //     }
+    //   }, 3000)
+    // },
+    dismissPanel: function () {
+      // hide scrim
+      document.querySelector('#scrim').className = 'hide'
+      // reset title to neutral state
+      document.querySelectorAll('#title span a').forEach(el => {
+        el.className = ''
+      })
+    }
+  },
   mounted () {
+    // this.load()
     window.scrollBy(0, 100)
     window.addEventListener('resize', function () {
       window.scrollBy(0, 100)
+      document.querySelector('#vis > .ruler').remove()
+      document.querySelectorAll('#vis > #allclusters .outer_container').forEach(el => el.remove())
+      window.AQUARIA.refresh()
     })
-    if (document.querySelector('#header')) {
-      document.querySelector('#header').remove()
-    }
     setTimeout(function () {
       if (document.querySelector('.matrixLoading')) {
         document.querySelector('.matrixLoading').style.visibility = 'hidden'
@@ -81,77 +89,53 @@ export default {
 </script>
 
 <style>
-  /* @import "https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"; */
-
-#wrapper{
-  font: 12px/18px "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
-  overflow: hidden;
+/* hide 3D structure and tabs while loading */
+/* div#jolecule-protein-container, div.tabs {
+  display: none;
+} */
+/* general layout + styling */
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    background-color: var(--background);
+    color: var(--dark-text);
+    font-size: calc(0.8rem + 3 * ((100vw - 320px) / 680));
+    transition: All 0.5s ease;
+  }
+.main {
+    margin: auto;
+    display: flex;
+    flex-flow: column nowrap;
+    align-content: stretch;
+    height: 95vh;
+}
+#scrim {
+  background: dimgrey;
+  position: fixed;
+  opacity: 0.7;
+  width: 100vw;
   height: 100vh;
-
+  top: 0;
+}
+/* 3D structure viewer */
+#structure-viewer {
+    width: 100%;
+    height: calc(100% - 70px);
+    display: flex;
 }
 
-/* a, p#psyns a, p#osyns a, .simulatelink {
-    color: #08C;
-    text-decoration: none;
-} */
-
-/* span>a{
-  color: rgb(104, 199, 247);
-  text-decoration: none;
-} */
-
-span.content p, p.expandable, p.hidden {
-    color: #5d5d5d;
+#structure-viewer:target {
+    /* when residue is selected */
+    background: radial-gradient(closest-side,var(--secondary-label), var(--background));
 }
-
-span.content p:last-child {
-    margin-bottom: 0.75em;
+.panel.overlay.about {
+  padding-top: 3em;
+  max-height: 85vh;
 }
-
-.panel h3, #gallery h3, .balloon h3, #about_overlay h3, #help_overlay h3 {
-    background-color: #999;
-    border-radius: 10px;
-    color: white;
-    font-size: 100%;
-    font-weight: normal;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    /* padding: 2px 3px 2px 10px; */
-    margin: 0px;
-    padding: 7px 10px 4px 29px;
+.about p {
+  margin: 0.25em 0;
 }
-
-div.panel {
-    background: #CCC;
-    border: 1px solid rgba(153, 153, 153, 0);
-    border-radius: 12px;
+.scrollable {
+  overflow-y: scroll;
+  max-height: 80vh;
 }
-
-.ui-widget-content {
-    background: #BBDDEE;
-    z-index: 222;
-    width: 100vh;
-}
-
-.ui-widget {
-    font-family: inherit;
-    font-size: 103%;
-}
-.ui-widget-content, .ui-widget-header {
-    border: 0 none;
-    color: inherit;
-    font-weight: normal;
-}
-
-.ui-autocomplete li {
-    margin: 0px;
-    padding: 2px 5px;
-    cursor: default;
-    display: block;
-    font: menu;
-    font-size: 12px;
-    line-height: 16px;
-    overflow: hidden;
-}
-
 </style>
