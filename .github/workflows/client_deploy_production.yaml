@@ -30,7 +30,7 @@ jobs:
 
     steps:
     - name: Configure environment (production)
-      if: github.ref == 'refs/heads/dev'
+      if: github.ref == 'refs/heads/master'
       run: |
         echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_PROD" >> $GITHUB_ENV
         echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_PROD" >> $GITHUB_ENV
