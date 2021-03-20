@@ -73,56 +73,62 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
     params: loadRequest
   })
     .then(function (response) {
+      console.log('loadData.get_matching_structures ')
+      console.log(response)
       if (typeof (response.data) === 'string') {
         throw (response.data)
       }
       const matches = response.data
       sequenceCallback(loadRequest, matches.sequences)
       clusterCallback(loadRequest, matches.clusters)
-      // })
-      // window.AQUARIA.remote.get_matching_structures(loadRequest, sequenceCallback, clusterCallback, function(err, loadRequest, Selected_PDB, finalClusters, cachedHit, version_string) {
-      if (loadRequest.primaryAccession === window.AQUARIA.structures2match.initialLoadRequest.primaryAccession) {
-        // window.AQUARIA.updateIssueEnvironment();
-        const err = matches.err
-        if (err !== undefined && err !== null) {
-          if (skip3DView && err.name === 'MatchingStructuresError') {
-            window.AQUARIA.blankPanel('#vis', true, err.message)
+      updateSelectedPdb(matches).then(function(){
+        // })
+        // window.AQUARIA.remote.get_matching_structures(loadRequest, sequenceCallback, clusterCallback, function(err, loadRequest, Selected_PDB, finalClusters, cachedHit, version_string) {
+        if (loadRequest.primaryAccession === window.AQUARIA.structures2match.initialLoadRequest.primaryAccession) {
+          // window.AQUARIA.updateIssueEnvironment();
+          const err = matches.err
+          if (err !== undefined && err !== null) {
+            if (skip3DView && err.name === 'MatchingStructuresError') {
+              window.AQUARIA.blankPanel('#vis', true, err.message)
+            } else {
+              // window.AQUARIA.panel3d.blankApplet(true, err.message)
+              Store.commit('setErrorTitle', err.message)
+            }
           } else {
-            // window.AQUARIA.panel3d.blankApplet(true, err.message)
-            Store.commit('setErrorTitle', err.message)
+            if (matches.clusters) {
+              window.AQUARIA.structures2match.clusters = matches.clusters
+            }
+
+            window.AQUARIA.showMatchingStructures.updateSizes(window.AQUARIA.structures2match.clusters)
+            window.AQUARIA.blankPanel('#vis', false)
+            console.log('The matches.Selected_PDB is ')
+            console.log(matches.Selected_PDB)
+            window.AQUARIA.structures2match.Selected_PDB = matches.Selected_PDB
+
+            window.AQUARIA.structures2match.version_string = matches.viewer
+            var clusterNumber = matches.Selected_PDB.cluster_number
+            var cluster = window.AQUARIA.structures2match.clusters[clusterNumber]
+            window.AQUARIA.showMatchingStructures.selectCluster(cluster,
+              clusterNumber)
+            if (!skip3DView) {
+              if (window.threedView === 'IDR') {
+                var threeDWidth = $('#threeD').width()
+                var threeDHeight = threeDWidth
+                threeDHeight = $('#threeDSpan').innerHeight()
+                if (threeDHeight < 570) {
+                  threeDHeight = 570
+                }
+                window.AQUARIA.panel3d.display_cluster(cluster, threeDWidth, threeDHeight)
+              }
+              window.AQUARIA.display_member()
+            }
+            window.AQUARIA.showMatchingStructures.drawCoverageMap(cluster)
           }
         } else {
-          if (matches.clusters) {
-            window.AQUARIA.structures2match.clusters = matches.clusters
-          }
-
-          window.AQUARIA.showMatchingStructures.updateSizes(window.AQUARIA.structures2match.clusters)
-          window.AQUARIA.blankPanel('#vis', false)
-
-          window.AQUARIA.structures2match.Selected_PDB = matches.Selected_PDB
-
-          window.AQUARIA.structures2match.version_string = matches.viewer
-          var clusterNumber = matches.Selected_PDB.cluster_number
-          var cluster = window.AQUARIA.structures2match.clusters[clusterNumber]
-          window.AQUARIA.showMatchingStructures.selectCluster(cluster,
-            clusterNumber)
-          if (!skip3DView) {
-            if (window.threedView === 'IDR') {
-              var threeDWidth = $('#threeD').width()
-              var threeDHeight = threeDWidth
-              threeDHeight = $('#threeDSpan').innerHeight()
-              if (threeDHeight < 570) {
-                threeDHeight = 570
-              }
-              window.AQUARIA.panel3d.display_cluster(cluster, threeDWidth, threeDHeight)
-            }
-            window.AQUARIA.display_member()
-          }
-          window.AQUARIA.showMatchingStructures.drawCoverageMap(cluster)
+          console.log('AQUARIA.loadAccession error: received old data for Best PDB: ' + loadRequest.primaryAccession + ', which does not match requested: ' + window.AQUARIA.structures2match.initialLoadRequest.primaryAccession)
         }
-      } else {
-        console.log('AQUARIA.loadAccession error: received old data for Best PDB: ' + loadRequest.primaryAccession + ', which does not match requested: ' + window.AQUARIA.structures2match.initialLoadRequest.primaryAccession)
-      }
+      })
+
     })
     .catch(function (err) {
       // window.AQUARIA.panel3d.blankApplet(true, err)
@@ -206,4 +212,52 @@ export function chainSelected (primaryAccession, pdbId, chainId) {
   if ('pdb_data' in window.AQUARIA) {
     textpanel.updatePDBChain(pdbId, chainId, window.AQUARIA.currentMember.alignment_identity_score, window.AQUARIA.pdb_data.Organism[primaryAccession])
   }
+}
+
+function updateSelectedPdb (matches) {
+  return new Promise(function(resolve, reject){
+    const featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/) // eslint-disable-line
+    var searchParam = decodeURIComponent(window.location.search.split('?')[1])
+    let chosenRes = 13;
+
+    if (featureRegex.test(searchParam)) {
+
+      let arr_allClusters = []; // Cluster numbers
+      let isSelectedPdb = false;
+
+      console.log('yes, to choose a new best matching cluster now')
+      if ('clusters' in matches) {
+
+        matches.clusters.forEach(function (item, itemI) {
+          // console.log('matching cluster ' + item.seq_start.length + ' '  + item.seq_start + ' ' + item.seq_end)
+          for (let i = 0; i<item.seq_start.length; i++){
+            // console.log(item)
+            if (chosenRes >= parseInt(item.seq_start[i]) && chosenRes <= parseInt(item.seq_end[i])){
+
+              if (isSelectedPdb == false){
+                isSelectedPdb = true;
+                matches.Selected_PDB.cluster_number = itemI
+                matches.Selected_PDB.member_number = 0
+                matches.Selected_PDB.pdb_chain = item.pdb_chain
+                matches.Selected_PDB.pdb_id = item.pdb_id
+              }
+              console.log('matching cluster ' + item.seq_start[i] + ' ' + item.seq_end[i] + ' ' + item.pdb_id + ' ' + item.pdb_chain + ' ' + itemI)
+
+              arr_allClusters.push(itemI);
+            }
+          }
+
+          if (itemI == matches.clusters.length - 1){
+            resolve(['matching structures - update the pd']);
+          }
+        })
+
+        console.log ('matching cluster ' + arr_allClusters)
+        // console.log('clusters found in matching cluster')
+      }
+    } else {
+      console.log('no need to choose a new best matching cluster now')
+      resolve(['matching structures - nothing to show']);
+    }
+  })
 }

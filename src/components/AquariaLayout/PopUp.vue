@@ -121,7 +121,7 @@ export default {
       function moveAndShowClickedDivAa (selAa) {
         for (let i = 0; i < oneAaCodes.length; i++) {
           if (selAa === oneAaCodes[i]) {
-            console.log('It comes down here!')
+            // console.log('It comes down here!')
             if (document.getElementById('divVI_varInfo_' + selAa)) {
               document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + selAa))
             }

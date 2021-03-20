@@ -861,7 +861,7 @@ var processNextServer = function (primary_accession,
 	 		}
 			else { */
       // console.log('^^ Failed to fetch item: err=', err);
-      console.log('Now fetching CATH .... ')
+      // console.log('Now fetching CATH .... ')
       getJsonFromUrl(servers[currentServer].id, servers[currentServer].URL + primary_accession + '?content-type=application/json', primary_accession, featureCallback, validateAquariaFeatureSet)
       featureCallback(aggregatedAnnotations, extServerIds_forLoading)
       processNextServer(primary_accession,
@@ -900,7 +900,7 @@ function generateShowHideFnStr2 (id_complete) {
 }
 
 function generateShowHideFnStr (id_complete) {
-  console.log(id_complete)
+  // console.log(id_complete)
   returnStr = "elem = document.getElementById('" + id_complete + "');"
 
   returnStr = returnStr + "if (elem.style.display == ''){elem.style.display = 'none'; console.log('Next sibling is'); console.log(elem.nextSibling.innerHTML); elem.nextSibling.innerHTML = '[+]';}"
@@ -931,7 +931,7 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       for (const serverAndFsName in variantResidues[residue].positionInfo) {
         description = description + '<toReplace_posInfo>' + '<i>' + serverAndFsName + ':</i> '
         for (let i = 0; i < variantResidues[residue].positionInfo[serverAndFsName].length; i++) {
-          description = description + "<span class='theCursor'>" + variantResidues[residue].positionInfo[serverAndFsName][i] + '.</span> '
+          description = description +  variantResidues[residue].positionInfo[serverAndFsName][i] + '. '
         }
 
         description = description + '</toReplace_posInfo>'
@@ -943,8 +943,8 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       if (anAa != variantResidues[residue].oldAa) {
         if (variantResidues[residue].hasOwnProperty(anAa)) {
           for (let i = 0; i < variantResidues[residue][anAa].length; i++) {
-            description = description + '<toReplace_varInfo_' + anAa + '><span class="theCursor">'
-            description = description + variantResidues[residue][anAa][i] + '.</span> '
+            description = description + '<toReplace_varInfo_' + anAa + '>'
+            description = description + variantResidues[residue][anAa][i] + '. '
             description = description + '</toReplace_varInfo_' + anAa + '>'
           }
         } else {
@@ -1077,7 +1077,7 @@ function validateAquariaFeatureSet (convertedFeatureSet, primary_accession, feat
     // continue
     // console.log("fetch_features.validateAquariaFeatureSet appending validated features " + 'PredictProtein')
     // extServerIds_forLoading[]
-    console.log('The featureId in validateAgainstSchema ' + featureId)
+    // console.log('The featureId in validateAgainstSchema ' + featureId)
     if (extServerIds_forLoading.hasOwnProperty(featureId)) {
       extServerIds_forLoading[featureId] = true
     }
@@ -1272,6 +1272,70 @@ function parseFeatures (primary_accession, categories, server, featureCallback, 
   finishServer(clustered_annotations, primary_accession, featureCallback)
 }
 
+function ifUrlHasVar_extractInfo(){
+  var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
+  var searchParam = decodeURIComponent(window.location.search.split('?')[1])
+
+  let variantResidues = {}; // variantRes{resNum} => {defaultDesc: , oldAa: , positionInfo: , newAas: [], A, C, D, }
+  if (featureRegex.test(searchParam)) {
+
+
+    console.log('Passes the regex')
+
+    var data = {}
+    var residue
+    var features = searchParam.split('&')
+    data.AddedFeatures = {}
+    data.AddedFeatures.Features = []
+    features.forEach(function (feature) {
+      feature = feature.replace(/%22/g, '\"')
+
+      const featAndDesc = extractDescription(feature)
+      const consInfo = consequence.getConsInfo(featAndDesc.featStr)
+
+      for (const resNum in consInfo) {
+        const aFeature = {}
+        if (resNum.match(/\-/)) {
+          aFeature.Residues = resNum.split(/\-/)
+        } else {
+          aFeature.Residue = resNum
+        }
+
+        aFeature.Description = featAndDesc.description
+        // aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
+        aFeature.Name = addThinSpaces(featAndDesc.featStr)
+        if (consInfo[resNum].hasOwnProperty('oldRes')) {
+          aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum].oldRes + '&#8201;&#8594;&#8201;' + consInfo[resNum].newAas[0] + ')</span>'
+        } else {
+          aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> </span>"
+        }
+
+        aFeature.Name = aFeature.Name + "<span class='pAaColor'>" + consInfo[resNum].consStr + '</span>'
+
+        // aFeature['Name'] = featAndDesc.featStr;
+        aFeature.Color = '#F73C3C'
+
+        // Adding for display
+        data.AddedFeatures.Features.push(aFeature)
+
+        // Adding for filling up pop-up info.
+        variantResidues[resNum] = {}
+        if (consInfo[resNum].hasOwnProperty('oldRes')) {
+          variantResidues[resNum].oldAa = consInfo[resNum].oldRes
+        }
+
+        // variantResidues[resNum]['newResidues'] = consInfo[resNum]['newAas'];
+        variantResidues[resNum].defaultDesc = aFeature.Description
+        addNewResAndGrantham(variantResidues[resNum], consInfo[resNum])
+      }
+    })
+
+    // console.log('The Variant residues 2 are: ')
+    // console.log(variantResidues)
+  }
+  return variantResidues;
+}
+
 function checkURLForFeatures (primary_accession, server, featureCallback) {
   var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
   var searchParam = decodeURIComponent(window.location.search.split('?')[1])
@@ -1451,7 +1515,7 @@ const threeToOneResMap = {
 
 function checkIfInKey_ig (threeLetterCode) {
   const key = Object.keys(threeToOneResMap).find(k => k.toLowerCase() === threeLetterCode.toLowerCase())
-  console.log('The key is ' + key)
+  // console.log('The key is ' + key)
   if (key) {
     return (threeToOneResMap[key])
   } else {
@@ -1529,7 +1593,7 @@ function extractVariantInfoFromUniprot (uniprotData) {
 
     let counter = 0
     for (const featureType in uniprotData) {
-      console.log('Uniprot: Feature type ' + featureType)
+      // console.log('Uniprot: Feature type ' + featureType)
       if (uniprotData[featureType].hasOwnProperty('Features')) {
         for (let i = 0; i < uniprotData[featureType].Features.length; i++) {
           if (uniprotData[featureType].Features[i].hasOwnProperty('Residue')) {

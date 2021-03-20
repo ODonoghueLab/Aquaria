@@ -112,7 +112,7 @@ function convertTheFeature (feature, variantResidues, requestedFeature) {
       }
       if (sourceAndUrl.url != '') {
         url_evidence.push(sourceAndUrl.url)
-        console.log('PP this url is ' + sourceAndUrl.url)
+        // console.log('PP this url is ' + sourceAndUrl.url)
       }
     }
   })
