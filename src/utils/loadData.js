@@ -5,6 +5,8 @@ import * as textpanel from '../components/InfoAbout/helpers/textpanels'
 import ShowMatchingStructures from '../components/MatchingStructures/helpers/show_matching_structures'
 import showExpandedCluster from '../components/MatchingStructures/helpers/show_expanded_clusters'
 import Store from '../store/index'
+// import ifUrlHasVarExtractInfo from '../components/Features/helpers/fetch_features' // eslint-disable-line
+// const ff = require('../components/Features/helpers/fetch_features.js') // eslint-disable-line
 
 export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain, skip3DView, preferredProteinName) {
   preferredProteinName = preferredProteinName || 'unknown'
@@ -81,7 +83,7 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
       const matches = response.data
       sequenceCallback(loadRequest, matches.sequences)
       clusterCallback(loadRequest, matches.clusters)
-      updateSelectedPdb(matches).then(function(){
+      updateSelectedPdb(matches).then(function () {
         // })
         // window.AQUARIA.remote.get_matching_structures(loadRequest, sequenceCallback, clusterCallback, function(err, loadRequest, Selected_PDB, finalClusters, cachedHit, version_string) {
         if (loadRequest.primaryAccession === window.AQUARIA.structures2match.initialLoadRequest.primaryAccession) {
@@ -128,7 +130,6 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
           console.log('AQUARIA.loadAccession error: received old data for Best PDB: ' + loadRequest.primaryAccession + ', which does not match requested: ' + window.AQUARIA.structures2match.initialLoadRequest.primaryAccession)
         }
       })
-
     })
     .catch(function (err) {
       // window.AQUARIA.panel3d.blankApplet(true, err)
@@ -215,49 +216,58 @@ export function chainSelected (primaryAccession, pdbId, chainId) {
 }
 
 function updateSelectedPdb (matches) {
-  return new Promise(function(resolve, reject){
+  return new Promise(function (resolve, reject) {
     const featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/) // eslint-disable-line
     var searchParam = decodeURIComponent(window.location.search.split('?')[1])
-    let chosenRes = 13;
+
+    // const chosenRes2 = ifUrlHasVar_extractInfo()
+    // console.log('CHOSENRES2 ')
+    // console.log(chosenRes2)
 
     if (featureRegex.test(searchParam)) {
-
-      let arr_allClusters = []; // Cluster numbers
-      let isSelectedPdb = false;
-
-      console.log('yes, to choose a new best matching cluster now')
-      if ('clusters' in matches) {
-
-        matches.clusters.forEach(function (item, itemI) {
-          // console.log('matching cluster ' + item.seq_start.length + ' '  + item.seq_start + ' ' + item.seq_end)
-          for (let i = 0; i<item.seq_start.length; i++){
-            // console.log(item)
-            if (chosenRes >= parseInt(item.seq_start[i]) && chosenRes <= parseInt(item.seq_end[i])){
-
-              if (isSelectedPdb == false){
-                isSelectedPdb = true;
-                matches.Selected_PDB.cluster_number = itemI
-                matches.Selected_PDB.member_number = 0
-                matches.Selected_PDB.pdb_chain = item.pdb_chain
-                matches.Selected_PDB.pdb_id = item.pdb_id
-              }
-              console.log('matching cluster ' + item.seq_start[i] + ' ' + item.seq_end[i] + ' ' + item.pdb_id + ' ' + item.pdb_chain + ' ' + itemI)
-
-              arr_allClusters.push(itemI);
-            }
-          }
-
-          if (itemI == matches.clusters.length - 1){
-            resolve(['matching structures - update the pd']);
-          }
+      // let chosenRes = 350
+      window.AQUARIA.ifUrlHasVarExtractInfo().then(function (varRes) {
+        console.log('Hello world!!')
+        const sortedKeys = Object.keys(varRes).sort(function (a, b) {
+          return a - b
         })
 
-        console.log ('matching cluster ' + arr_allClusters)
-        // console.log('clusters found in matching cluster')
-      }
+        const chosenRes = sortedKeys[0]
+        var arrAllClusters = [] // Cluster numbers
+        let isSelectedPdb = false
+
+        console.log('yes, to choose a new best matching cluster now')
+        if ('clusters' in matches) {
+          matches.clusters.forEach(function (item, itemI) {
+            // console.log('matching cluster ' + item.seq_start.length + ' '  + item.seq_start + ' ' + item.seq_end)
+            for (let i = 0; i < item.seq_start.length; i++) {
+              // console.log(item)
+              if (chosenRes >= parseInt(item.seq_start[i]) && chosenRes <= parseInt(item.seq_end[i])) {
+                if (isSelectedPdb === false) {
+                  isSelectedPdb = true
+                  matches.Selected_PDB.cluster_number = itemI
+                  matches.Selected_PDB.member_number = 0
+                  matches.Selected_PDB.pdb_chain = item.pdb_chain
+                  matches.Selected_PDB.pdb_id = item.pdb_id
+                }
+                console.log('matching cluster ' + item.seq_start[i] + ' ' + item.seq_end[i] + ' ' + item.pdb_id + ' ' + item.pdb_chain + ' ' + itemI)
+
+                arrAllClusters.push(itemI)
+              }
+            }
+
+            if (itemI === matches.clusters.length - 1) {
+              resolve(['matching structures - update the pd'])
+            }
+          })
+
+          console.log('matching cluster ' + arrAllClusters)
+          // console.log('clusters found in matching cluster')
+        }
+      })
     } else {
       console.log('no need to choose a new best matching cluster now')
-      resolve(['matching structures - nothing to show']);
+      resolve(['matching structures - nothing to show'])
     }
   })
 }
