@@ -1372,7 +1372,15 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
         // aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
         aFeature.Name = addThinSpaces(featAndDesc.featStr, consInfo[resNum].consStr)
         if (consInfo[resNum].hasOwnProperty('oldRes') && consInfo[resNum].hasOwnProperty('newAas')) {
-          aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum].oldRes + '&#8201;&#8594;&#8201;' + consInfo[resNum].newAas[0] + ')</span>'
+          aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum].oldRes + '&#8201;&#8594;&#8201;'
+
+          if (consInfo[resNum].newAas[0] != 'X'){
+            aFeature.Name = aFeature.Name + consInfo[resNum].newAas[0]
+          }
+          aFeature.Name = aFeature.Name + ')</span>'
+
+
+
         } else {
           aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> </span>"
         }

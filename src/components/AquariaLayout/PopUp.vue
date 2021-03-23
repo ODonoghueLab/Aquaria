@@ -62,7 +62,12 @@ export default {
             document.getElementById('btnVI_' + oneAaCodes[k]).addEventListener('click', function () {
               // Change heading amino acid.
               let a = document.getElementById('span_missenseHeading').innerHTML
-              a = a.replace(/[a-zA-Z]+\)/, oneAaCodes[k] + ')')
+              if (a.match(/[a-zA-Z\*\?]+\)/)) {
+                a = a.replace(/[a-zA-Z\*\?]+\)/, oneAaCodes[k] + ')')
+              } else {
+                a = a.replace(/\)/, oneAaCodes[k] + ')')
+              }
+
               document.getElementById('span_missenseHeading').innerHTML = a
 
               // Hide clicked button, and unhide any other button
