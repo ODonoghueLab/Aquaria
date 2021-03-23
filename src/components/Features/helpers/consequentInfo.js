@@ -2,7 +2,6 @@
 
 exports.getConsInfo = getConsInfo
 
-// module.exports = function (featStr){
 function getConsInfo (featStr) {
   let consequentStr = ''
   const newResidues = {} // {resPos (or resPos-seqLen)} => {newAas} => [newAa1, newAa2, .. newAaN]; {consequent} => consequentStr;
@@ -95,7 +94,10 @@ function getConsInfo (featStr) {
   // Deletion-insertion
   else if (featStr.match(/[dD][eE][lL][iI][nN][sS]/)) {
     const resPos = getResPos_simple(featStr)
-    newResidues[resPos] = {}
+    let thePos = resPos
+
+
+
 
     let range_deleted = {}; let range_inserted = []
     // resPositions.push(resPos);
@@ -108,11 +110,14 @@ function getConsInfo (featStr) {
       // muliple amino acid deletion
       consequentStr = consequentStr + 'multiple deletion '
       range_deleted = getTheRange(featStr)
+      thePos = range_deleted.startPos + '-' + range_deleted.endPos
     }
 
     if (featStr.match(/[dD][eE][lL][iI][nN][sS][a-zA-Z]+$/)) {
       const res = getFirstNewRes_delinsAndIsSingleAa(featStr, isOne)
-      addToObj(newResidues[resPos], 'newAas', res.firstRes)
+
+      newResidues[thePos] = {}
+      addToObj(newResidues[thePos], 'newAas', res.firstRes)
 
       if (res.isSingleAa) {
         // single amino acid insertion
@@ -125,61 +130,84 @@ function getConsInfo (featStr) {
     } else if (featStr.match(/[dD][eE][lL][iI][nN][sS][0-9\*]+$/)) {
       // Muliple amino acid insertion
       consequentStr = consequentStr + 'multiple insertion '
-      addToObj(newResidues[resPos], 'newAas', 'X')
+      newResidues[thePos] = {}
+      addToObj(newResidues[thePos], 'newAas', 'X')
     } else {
-      addToObj(newResidues[resPos], 'newAas', 'X')
+      newResidues[thePos] = {}
+      addToObj(newResidues[thePos], 'newAas', 'X')
     }
-    console.log('The range deleted is ')
-    console.log(range_deleted)
-    getAndAddRange_newResAsX(range_deleted, range_inserted, newResidues, consequentStr, 'X')
-    newResidues[resPos].consStr = consequentStr
+
+
+    if (!newResidues.hasOwnProperty(thePos)){
+      newResidues[thePos] = {}
+    }
+
+    const oldRes = getOldRes(featStr)
+    newResidues[thePos]['oldRes'] = oldRes;
+
+    // getAndAddRange_newResAsX(range_deleted, range_inserted, newResidues, consequentStr, 'X')
+    newResidues[thePos].consStr = consequentStr
   }
 
   // Deletion
   else if (featStr.match(/[dD][eE][lL]/)) {
     const resPos = getResPos_simple(featStr)
-    newResidues[resPos] = {}
+    let thePos = resPos
     // resPositions.push(resPos);
 
     consequentStr = consequentStr + 'Deletion '
 
     if (featStr.match(/^[A-Za-z]+[0-9]+[dD][eE][lL]$/)) {
-      consequentStr = consequentStr + 'single amino acid '
+      consequentStr = consequentStr + 'of a single amino acid '
+
     } else if (featStr.match(/^[a-zA-Z]+[0-9]+\_[a-zA-Z]+[0-9]+[dD][eE][lL]$/)) {
-      consequentStr = consequentStr + 'multiple amino acids '
-      // New translation initiation site (downstream);
-      // get second residue,
-      // getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
+      consequentStr = consequentStr + 'of multiple amino acids '
+
       const range_deleted = getTheRange_del(featStr)
-      getAndAddRange_newResAsX(range_deleted, [], newResidues, consequentStr, 'X')
+      // Changing to single segment: getAndAddRange_newResAsX(range_deleted, [], newResidues, consequentStr, 'X')
+      thePos = range_deleted.startPos + '-' + range_deleted.endPos
+
+
     }
-    addToObj(newResidues[resPos], 'newAas', 'X')
-    newResidues[resPos].consStr = consequentStr
+
+    newResidues[thePos] = {}
+
+    const oldRes = getOldRes(featStr)
+    newResidues[thePos]['oldRes'] = oldRes;
+
+    addToObj(newResidues[thePos], 'newAas', 'X')
+    newResidues[thePos].consStr = consequentStr
   }
 
   // Duplication
   else if (featStr.match(/[dD][uU][pP]/)) {
     const resPos = getResPos_simple(featStr)
-    newResidues[resPos] = {}
+    let thePos = resPos
     // resPositions.push(resPos);
 
     consequentStr = consequentStr + 'Duplication '
     if (featStr.match(/^[a-zA-Z]+[0-9]+[dD][uU][pP]$/)) {
-      consequentStr = consequentStr + 'single amino acid '
+      consequentStr = consequentStr + 'of single amino acid '
     } else if (featStr.match(/^[a-zA-Z]+[0-9]+\_[a-zA-Z]+[0-9]+[dD][uU][pP]$/)) {
-      consequentStr = consequentStr + 'multiple amino acids '
+      consequentStr = consequentStr + 'of multiple amino acids '
 
       const range_deleted = getTheRange_del(featStr)
-      getAndAddRange_newResAsX(range_deleted, [], newResidues, consequentStr, 'X')
+      thePos = range_deleted.startPos + '-' + range_deleted.endPos
+      // Change to a single amino acid: getAndAddRange_newResAsX(range_deleted, [], newResidues, consequentStr, 'X')
     }
-    addToObj(newResidues[resPos], 'newAas', 'X')
-    newResidues[resPos].consStr = consequentStr
+    newResidues[thePos] = {}
+
+    const oldRes = getOldRes(featStr)
+    newResidues[thePos].oldRes = oldRes
+
+    addToObj(newResidues[thePos], 'newAas', 'X')
+    newResidues[thePos].consStr = consequentStr
   }
 
   // Insertion
   else if (featStr.match(/[iI][nN][sS]/)) {
     const resPos = getResPos_simple(featStr)
-    newResidues[resPos] = {}
+    let thePos = resPos
     // resPositions.push(resPos);
 
     consequentStr = consequentStr + 'Insertion '
@@ -195,17 +223,27 @@ function getConsInfo (featStr) {
         // getAndAddRange_newResAsX(featStr, newResidues, consequentStr);
       }
 
+
       const range_deleted = getTheRange_del(featStr)
-      getAndAddRange_newResAsX(range_deleted, [], newResidues, consequentStr, 'X')
+      thePos = range_deleted.startPos + "-" + range_deleted.endPos
+      // Changing to segment: getAndAddRange_newResAsX(range_deleted, [], newResidues, consequentStr, 'X')
     }
-    addToObj(newResidues[resPos], 'newAas', 'X')
-    newResidues[resPos].consStr = consequentStr
+    newResidues[thePos] = {}
+
+    const oldRes = getOldRes(featStr)
+    newResidues[thePos]['oldRes'] = oldRes;
+
+    addToObj(newResidues[thePos], 'newAas', 'X')
+    newResidues[thePos].consStr = consequentStr
   }
 
   // Repeated sequences
   else if (featStr.match(/^[^\[].*?\[[0-9\;\_]+\]$/)) {
     const resPos = getResPos_simple(featStr)
     newResidues[resPos] = {}
+
+    const oldRes = getOldRes(featStr)
+    newResidues[resPos]['oldRes'] = oldRes;
     // resPositions.push(resPos);
 
     consequentStr = consequentStr + 'Repeated sequences '
@@ -223,30 +261,43 @@ function getConsInfo (featStr) {
   // Frame shift
   else if (featStr.match(/[fF][sS]/)) {
     const resPos = getResPos_simple(featStr)
-    const thePos = resPos + '-' + AQUARIA.showMatchingStructures.sequence.length
-    newResidues[thePos] = {}
+    let thePos = resPos + '-' + AQUARIA.showMatchingStructures.sequence.length // default as full length.
+
     // resPositions.push(resPos);
 
     consequentStr = consequentStr + 'Frame shift '
     if (featStr.match(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss]([Tt][eE][rR]|\*)[0-9]+$/)) { // [a-zA-Z0-9\*\?]+$/)){
       // extract new amino acid;
       const terPos = getTerminatingPos_fs(featStr)
+      thePos = resPos + '-' + terPos // update the Pos
       consequentStr = consequentStr + ' terminating at position ' + terPos
       const res = getFirstNewRes_ext(featStr, isOne)
+
+      newResidues[thePos] = {}
       addToObj(newResidues[thePos], 'newAas', res.firstRes)
     } else if (featStr.match(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss]\*\?/)) {
       consequentStr = consequentStr + ' no terminating codon encountered.'
 
       const res = getFirstNewRes_ext(featStr, isOne)
+
+      newResidues[thePos] = {}
       addToObj(newResidues[thePos], 'newAas', res.firstRes)
+    } else {
+      newResidues[thePos] = {}
+      addToObj(newResidues[thePos], 'newAas', 'X')
     }
+
+
     newResidues[thePos].consStr = consequentStr
+    const oldRes = getOldRes(featStr)
+    newResidues[thePos]['oldRes'] = oldRes
   }
 
   // Extension
   else if (featStr.match(/[eE][xX][tT]/)) {
     const resPos = getResPos_simple(featStr)
     newResidues[resPos] = {}
+
     // resPositions.push(resPos);
 
     consequentStr = consequentStr + 'Extension '
@@ -260,6 +311,8 @@ function getConsInfo (featStr) {
     }
 
     newResidues[resPos].consStr = consequentStr
+    const oldRes = getOldRes(featStr)
+    newResidues[resPos]['oldRes'] = oldRes
   }
 
   // Substitution
@@ -270,6 +323,8 @@ function getConsInfo (featStr) {
     const thePos = resPos + '-' + AQUARIA.showMatchingStructures.sequence.length
 
     newResidues[thePos] = {}
+    const oldAa_rightOne = checkAndGetRightAa(featStr, isOne)
+    newResidues[thePos].oldRes = oldAa_rightOne
     // resPositions.push(resPos);
 
     consequentStr = consequentStr + 'Nonsense '
@@ -300,8 +355,10 @@ function getConsInfo (featStr) {
 	} */
   else if (featStr.match(/^Met1\?$/) || featStr.match(/^M1\?$/)) {
     const resPos = getResPos_simple(featStr)
-    newResidues[resPos] = {}
+    const oldRes = getOldRes(featStr)
 
+    newResidues[resPos] = {}
+    newResidues[resPos]['oldRes'] = oldRes;
     consequentStr = consequentStr + 'Unknown consequence '
     addToObj(newResidues[resPos], 'newAas', '?')
     newResidues[resPos].consStr = consequentStr
@@ -309,8 +366,10 @@ function getConsInfo (featStr) {
   // Substitution - uncertain
   else if (featStr.match(/^[A-Za-z]+[0-9]+[A-Za-z]+(\^[A-Za-z]+)+$/)) {
     const resPos = getResPos_simple(featStr)
-    newResidues[resPos] = {}
+    const oldRes = getOldRes(featStr)
 
+    newResidues[resPos] = {}
+    newResidues[resPos]['oldRes'] = oldRes;
     consequentStr = consequentStr + 'Uncertain consequence '
     // get all new residues
     concatToObj(newResidues[resPos], 'newAas', getAllNewRes(featStr))
@@ -322,9 +381,10 @@ function getConsInfo (featStr) {
     newResidues[resPos] = {}
 
     consequentStr = consequentStr + 'Chimeric '
-    const newRes = getFirstNewRes_chimeric(featStr)
+    const oldAndNew = getFirstNewRes_chimeric(featStr)
 
-    addToObj(newResidues[resPos], 'newAas', newRes)
+    newResidues[resPos]['oldRes'] = oldAndNew.old
+    addToObj(newResidues[resPos], 'newAas', oldAndNew.new)
     newResidues[resPos].consStr = consequentStr
   }
   // Substitution - mosaic
@@ -334,9 +394,10 @@ function getConsInfo (featStr) {
     // resPositions.push(resPos);
 
     consequentStr = consequentStr + 'Mosaic (somatic case) '
-    const newRes = getFirstNewRes_mosaic(featStr)
+    const oldAndNew = getFirstNewRes_mosaic(featStr)
 
-    addToObj(newResidues[resPos], 'newAas', newRes)
+    newResidues[resPos].oldRes = oldAndNew.old
+    addToObj(newResidues[resPos], 'newAas', oldAndNew.new)
     newResidues[resPos].consStr = consequentStr
   } else {
     const resPos = getResPos_simple(featStr)
@@ -357,6 +418,24 @@ function getConsInfo (featStr) {
 
   console.log('The feature is ' + featStr + ',  consequentStr is ' + consequentStr + ', newRes are ')
   console.log(newResidues)
+
+  for (let rP in newResidues){
+    if (newResidues[rP].hasOwnProperty('oldRes') && isOne == false){
+      if (threeToOneResMap.hasOwnProperty(newResidues[rP].oldRes)){
+        newResidues[rP].oldRes = threeToOneResMap[newResidues[rP].oldRes];
+      }
+    }
+    if (newResidues[rP].hasOwnProperty('newAas') && isOne == false){
+      for (let i=0; i< newResidues[rP]['newAas'].length; i++){
+        if (threeToOneResMap.hasOwnProperty(newResidues[rP]['newAas'][i])){
+          newResidues[rP]['newAas'][i] = threeToOneResMap[newResidues[rP]['newAas'][i]];
+        }
+
+      }
+    }
+
+  }
+
 
   return (newResidues)
 }
@@ -398,7 +477,6 @@ function getTheRange (featStr) {
   const arr = tmpStr.split(/\_/)
   arr[0] = arr[0].replace(/[^0-9]+/g, '')
   arr[1] = arr[1].replace(/[^0-9]+/g, '')
-  console.log('Foetal surgeon ' + arr[1])
 
   return { startPos: arr[0], endPos: arr[1] }
 }
@@ -413,7 +491,7 @@ function getTheRange_del (featStr) {
   return { startPos: arr[0], endPos: arr[1] }
 }
 
-function getAndAddRange_newResAsX (range_deleted, range_inserted, newResidues, consStr, defaultAa) {
+function getAndAddRange_newResAsX (range_deleted, range_inserted, newResidues, consStr, defaultAa, oldAa) {
   console.log('Comes in here 1')
 
   let counter_ins = 1
@@ -464,6 +542,10 @@ function isOneTOrThreeF (featStr) {
   return true
 }
 
+function getOldRes (featStr) {
+  const oldRes = featStr.replace(/[0-9]+.*$/, '')
+  return oldRes
+}
 function getNewRes (featStr) {
   const newResStr = featStr.split(/[0-9\_]+/)
 
@@ -561,14 +643,14 @@ function getFirstNewRes_mosaic (featStr) {
   const arr = featStr.split(/[0-9]+\=\//)
   // let arr_1 = arr[1].split(/\^/);
 
-  return arr[1]
+  return {old:arr[0], new:arr[1]}
 }
 
 function getFirstNewRes_chimeric (featStr) {
   const arr = featStr.split(/[0-9]+\=\/\//)
   // let arr_1 = arr[1].split(/\^/);
 
-  return arr[1]
+  return {old:arr[0], new:arr[1]}
 }
 
 function getTheTwoPositions (featStr) {

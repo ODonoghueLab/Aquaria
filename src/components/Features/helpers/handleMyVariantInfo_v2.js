@@ -116,8 +116,6 @@ function convertToAquariaObj (cosmicData, variantResidues) {
       }
     }
 
-    console.log('The cosmic features are')
-    console.log(features)
     resolve(features)
   })
 }
