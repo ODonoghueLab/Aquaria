@@ -3,6 +3,7 @@
 exports.getConsInfo = getConsInfo
 
 function getConsInfo (featStr) {
+  let theOrigFeatStr = featStr;
   let consequentStr = ''
   const newResidues = {} // {resPos (or resPos-seqLen)} => {newAas} => [newAa1, newAa2, .. newAaN]; {consequent} => consequentStr;
   let isOne = true
@@ -64,7 +65,11 @@ function getConsInfo (featStr) {
     const sub_variants = featStr.split(/[\;\,]+/)
 
     for (let i = 0; i < sub_variants.length; i++) {
-      const consInfo = getConsInfo(sub_variants[i])
+      const consInfoRes = getConsInfo(sub_variants[i])
+      const consInfo = consInfoRes.newResidues
+
+      console.log("The recursive featStr is " + consInfoRes.theOrigFeatStr + " orig is " + sub_variants[i])
+      theOrigFeatStr = theOrigFeatStr.replace(sub_variants[i], consInfoRes.theOrigFeatStr)
 
       const keys = Object.keys(consInfo)
       for (let k = 0; k < keys.length; k++) {
@@ -78,9 +83,11 @@ function getConsInfo (featStr) {
           }
         }
 
-        for (let l = 0; l < consInfo[keys[k]].newAas.length; l++) {
-          if (!newResidues[keys[k]].newAas.includes(consInfo[keys[k]].newAas[l])) {
-            newResidues[keys[k]].newAas.push(consInfo[keys[k]].newAas[l])
+        if (consInfo[keys[k]].hasOwnProperty('newAas')){
+          for (let l = 0; l < consInfo[keys[k]].newAas.length; l++) {
+            if (!newResidues[keys[k]].newAas.includes(consInfo[keys[k]].newAas[l])) {
+              newResidues[keys[k]].newAas.push(consInfo[keys[k]].newAas[l])
+            }
           }
         }
 
@@ -269,8 +276,8 @@ function getConsInfo (featStr) {
     if (featStr.match(/^[a-zA-Z]+[0-9]+[a-zA-Z]+[fF][Ss]([Tt][eE][rR]|\*)[0-9]+$/)) { // [a-zA-Z0-9\*\?]+$/)){
       // extract new amino acid;
       const terPos = getTerminatingPos_fs(featStr)
-      thePos = resPos + '-' + terPos // update the Pos
-      consequentStr = consequentStr + ' terminating at position ' + terPos
+      // thePos = resPos + '-' + terPos // update the Pos
+      consequentStr = consequentStr + ' with protein terminating at position ' + terPos
       const res = getFirstNewRes_ext(featStr, isOne)
 
       newResidues[thePos] = {}
@@ -323,8 +330,10 @@ function getConsInfo (featStr) {
     const thePos = resPos + '-' + AQUARIA.showMatchingStructures.sequence.length
 
     newResidues[thePos] = {}
-    const oldAa_rightOne = checkAndGetRightAa(featStr, isOne)
-    newResidues[thePos].oldRes = oldAa_rightOne
+    // const oldAa_rightOne = checkAndGetRightAa(featStr, isOne)
+    const oldRes = getOldRes(featStr)
+
+    newResidues[thePos].oldRes = oldRes
     // resPositions.push(resPos);
 
     consequentStr = consequentStr + 'Nonsense '
@@ -337,7 +346,9 @@ function getConsInfo (featStr) {
     newResidues[resPos] = {}
     // resPositions.push(resPos);
 
-    const oldAa_rightOne = checkAndGetRightAa(featStr, isOne)
+    // const oldAa_rightOne = checkAndGetRightAa(featStr, isOne)
+    const oldRes = getOldRes(featStr) // Getting the original amino acid (for later replacement);
+
     consequentStr = consequentStr + 'Missense '
     const newRes = getNewRes(featStr)
 
@@ -346,7 +357,7 @@ function getConsInfo (featStr) {
     // GRANTHAM
     // let granthamStr = grantham.getGranthamIsCons(newRes.oldRes, newRes.newRes);
     newResidues[resPos].consStr = consequentStr // + " " + granthamStr;
-    newResidues[resPos].oldRes = oldAa_rightOne
+    newResidues[resPos].oldRes = oldRes
   }
 
   // Substitution - translation initiation codon
@@ -416,31 +427,71 @@ function getConsInfo (featStr) {
   // Convert new Aas to is One, and validate isOne (not doing the isOne validation - will do individ. validation during scraping).
   // convertNewResTo1Letter(newResidues);
 
-  console.log('The feature is ' + featStr + ',  consequentStr is ' + consequentStr + ', newRes are ')
-  console.log(newResidues)
 
   for (let rP in newResidues){
-    if (newResidues[rP].hasOwnProperty('oldRes') && isOne == false){
-      if (threeToOneResMap.hasOwnProperty(newResidues[rP].oldRes)){
-        newResidues[rP].oldRes = threeToOneResMap[newResidues[rP].oldRes];
-      }
-    }
+    let theRightOldAa = checkAndGetRightAa_fromAa(rP)
+    theOrigFeatStr = updateFeatStr(theOrigFeatStr, theRightOldAa,  newResidues[rP].oldRes, isOne)
+
+
+    // Get the right oldAa based on the sequence position;
+    newResidues[rP].oldRes = theRightOldAa;
+
+
     if (newResidues[rP].hasOwnProperty('newAas') && isOne == false){
       for (let i=0; i< newResidues[rP]['newAas'].length; i++){
         if (threeToOneResMap.hasOwnProperty(newResidues[rP]['newAas'][i])){
           newResidues[rP]['newAas'][i] = threeToOneResMap[newResidues[rP]['newAas'][i]];
         }
-
       }
     }
 
   }
 
+  console.log('The feature is ' + featStr + ',  consequentStr is ' + consequentStr + ', newRes are ' + theOrigFeatStr)
+  console.log(newResidues)
 
-  return (newResidues)
+  return {newResidues: newResidues, theOrigFeatStr: theOrigFeatStr}
 }
 
 /// ////////////////////////////////// AUX
+function updateFeatStr(theOrigFeatStr, theRightOldAa, theUserOldAa, isOne){
+
+  if (theUserOldAa.match(/ter/i)){
+    return theOrigFeatStr
+  }
+  if (isOne == false){
+
+    let tmp = getThreeLetterCode(theRightOldAa);
+    console.log("The featureStr ssays its one " + tmp + " " + theRightOldAa);
+    if (tmp != '-'){
+      theRightOldAa = tmp
+    }
+  }
+
+  let arr = theOrigFeatStr.split(/[0-9]+/);
+
+  if (!arr[0].match(theRightOldAa)){
+    theOrigFeatStr = theOrigFeatStr.replace(theUserOldAa, theRightOldAa)
+  }
+
+  return theOrigFeatStr
+}
+
+
+function checkAndGetRightAa_fromAa(resPos){
+  if (resPos.match("-")){
+    let arr = resPos.split("-")
+    resPos = arr[0]
+  }
+
+  let theRightAa = ''
+  if (AQUARIA.hasOwnProperty('showMatchingStructures') && AQUARIA.showMatchingStructures.hasOwnProperty('sequence') && AQUARIA.showMatchingStructures.sequence.hasOwnProperty('sequence')) {
+    theRightAa = AQUARIA.showMatchingStructures.sequence.sequence[parseInt(resPos) - 1]
+  }
+
+  return theRightAa
+}
+
 function checkAndGetRightAa (featStr, isOne) {
   const arr = featStr.split(/[0-9]+/)
   const oldAa = arr[0]
@@ -713,6 +764,20 @@ function convertNewResTo1Letter (newResidues) {
     }
   }
 }
+
+function getThreeLetterCode(oneLetterCode){
+    let theKeys = Object.keys(threeToOneResMap)
+
+    for (let i =0; i< theKeys.length; i++){
+
+      if (threeToOneResMap[theKeys[i]] == oneLetterCode.toUpperCase()){
+        return theKeys[i]
+      }
+    }
+
+    return '-'
+}
+
 
 const threeToOneResMap = {
   Gly: 'G',

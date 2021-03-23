@@ -1288,7 +1288,9 @@ AQUARIA.ifUrlHasVarExtractInfo = function(){
         feature = feature.replace(/%22/g, '\"')
 
         const featAndDesc = extractDescription(feature)
-        const consInfo = consequence.getConsInfo(featAndDesc.featStr)
+        const consInfoRes = consequence.getConsInfo(featAndDesc.featStr)
+        const consInfo = consInfoRes.newResidues;
+        featAndDesc.featStr = consInfoRes.theOrigFeatStr;
 
         let counter =0;
         for (const resNum in consInfo) {
@@ -1354,7 +1356,9 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
       feature = feature.replace(/%22/g, '\"')
 
       const featAndDesc = extractDescription(feature)
-      const consInfo = consequence.getConsInfo(featAndDesc.featStr)
+      const consInfoRes = consequence.getConsInfo(featAndDesc.featStr)
+      consInfo = consInfoRes.newResidues;
+      featAndDesc.featStr = consInfoRes.theOrigFeatStr;
 
       for (const resNum in consInfo) {
         const aFeature = {}
@@ -1367,7 +1371,7 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
         aFeature.Description = featAndDesc.description
         // aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
         aFeature.Name = addThinSpaces(featAndDesc.featStr, consInfo[resNum].consStr)
-        if (consInfo[resNum].hasOwnProperty('oldRes')) {
+        if (consInfo[resNum].hasOwnProperty('oldRes') && consInfo[resNum].hasOwnProperty('newAas')) {
           aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum].oldRes + '&#8201;&#8594;&#8201;' + consInfo[resNum].newAas[0] + ')</span>'
         } else {
           aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> </span>"
