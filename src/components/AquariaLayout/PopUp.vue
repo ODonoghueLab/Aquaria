@@ -62,8 +62,8 @@ export default {
             document.getElementById('btnVI_' + oneAaCodes[k]).addEventListener('click', function () {
               // Change heading amino acid.
               let a = document.getElementById('span_missenseHeading').innerHTML
-              if (a.match(/[a-zA-Z\*\?]+\)/)) {
-                a = a.replace(/[a-zA-Z\*\?]+\)/, oneAaCodes[k] + ')')
+              if (a.match(/[a-zA-Z\*\?]+\)/)) { // eslint-disable-line no-useless-escape
+                a = a.replace(/[a-zA-Z\*\?]+\)/, oneAaCodes[k] + ')') // eslint-disable-line no-useless-escape
               } else {
                 a = a.replace(/\)/, oneAaCodes[k] + ')')
               }
