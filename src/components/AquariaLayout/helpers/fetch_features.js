@@ -929,7 +929,7 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       for (const serverAndFsName in variantResidues[residue].positionInfo) {
         description = description + '<toReplace_posInfo>' + '<i>' + serverAndFsName + ':</i> '
         for (let i = 0; i < variantResidues[residue].positionInfo[serverAndFsName].length; i++) {
-          description = description + "<span class='theCursor'>" + variantResidues[residue].positionInfo[serverAndFsName][i] + '.</span> '
+          description = description + variantResidues[residue].positionInfo[serverAndFsName][i] + '. '
         }
 
         description = description + '</toReplace_posInfo>'
@@ -941,8 +941,8 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       if (anAa != variantResidues[residue].oldAa) {
         if (variantResidues[residue].hasOwnProperty(anAa)) {
           for (let i = 0; i < variantResidues[residue][anAa].length; i++) {
-            description = description + '<toReplace_varInfo_' + anAa + '><span class="theCursor">'
-            description = description + variantResidues[residue][anAa][i] + '.</span> '
+            description = description + '<toReplace_varInfo_' + anAa + '>'
+            description = description + variantResidues[residue][anAa][i] + '. '
             description = description + '</toReplace_varInfo_' + anAa + '>'
           }
         } else {
@@ -1289,7 +1289,7 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
         }
       })
   } else if (featureRegex.test(searchParam)) {
-    console.log('Passes the regex')
+    // console.log('Passes the regex')
 
     var data = {}
     var residue
@@ -1339,8 +1339,8 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
       }
     })
 
-    console.log('The Variant residues 2 are: ')
-    console.log(variantResidues)
+    // console.log('The Variant residues 2 are: ')
+    // console.log(variantResidues)
 
     parseFeatures(primary_accession, server.Categories, server.Server, featureCallback, data, searchParam)
   } else {
@@ -1392,7 +1392,7 @@ function addThinSpaces (featStr) {
   const aa_new = featStr.replace(/^[a-zA-Z\.]+[0-9]+/, '')
   let aa_pos = featStr.replace(/^[^0-9]+/, '')
   aa_pos = aa_pos.replace(/[^0-9].*$/, '')
-  console.log('The feature is featStr ' + featStr + ' ' + ' oldAa: ' + aa_old + ' newAa: ' + aa_new + ' posAa: ' + aa_pos)
+  // console.log('The feature is featStr ' + featStr + ' ' + ' oldAa: ' + aa_old + ' newAa: ' + aa_new + ' posAa: ' + aa_pos)
 
   return (aa_old + '&#8201;' + aa_pos + '&#8201;' + aa_new)
 }
@@ -1449,7 +1449,7 @@ const threeToOneResMap = {
 
 function checkIfInKey_ig (threeLetterCode) {
   const key = Object.keys(threeToOneResMap).find(k => k.toLowerCase() === threeLetterCode.toLowerCase())
-  console.log('The key is ' + key)
+  // console.log('The key is ' + key)
   if (key) {
     return (threeToOneResMap[key])
   } else {

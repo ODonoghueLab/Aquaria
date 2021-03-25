@@ -521,7 +521,7 @@ function doThePlotting_v2 (divId, theSeriesData_inner, theSeriesData_outer, theT
 					    }
         })
         resolve()
-        console.log('In the highcharts plotting function')
+        // console.log('In the highcharts plotting function')
       } catch (error) {
         console.log('Highcharts error')
         console.log(error)
@@ -542,7 +542,7 @@ const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 
 
 function showAnnotation (f, eid) {
   	// console.log(eid);
-  	console.log('Hovered ' + f.name)
+  	// console.log('Hovered ' + f.name)
   	var urlhtml = ''
   	if (f.urls.length > 0) {
   		// var lnx = f.urls.split(";");
@@ -586,7 +586,7 @@ function showAnnotation (f, eid) {
     //  console.log(extServerIds_);
 
   		if (typeof extServerIds_ !== 'undefined') {
-  			console.log('extServerIds_forLoading')
+  			// console.log('extServerIds_forLoading')
   			let isAnyFalse = false
   			for (const serverId in extServerIds_) {
   				if (extServerIds_[serverId] === false) {
@@ -596,7 +596,7 @@ function showAnnotation (f, eid) {
   			if (isAnyFalse == true) {
   				balloon = balloon + '<img src="/images/ajax-loader1.gif" alt="Loading..."  width=15/> '
   			}
-  			console.log(extServerIds_)
+  			// console.log(extServerIds_)
   		}
   	}
 

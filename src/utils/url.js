@@ -74,6 +74,8 @@ export function remoteSuccess () {
       url: url
     })
       .then(function (response) {
+        console.log('In url.js, looking at the response')
+        console.log(response)
         AQUARIA.orgName = attr[1]
         AQUARIA.gene = attr[2]
         // const orgID = response.data[0].orgID

@@ -9,7 +9,7 @@ function getGranthamIsCons (oldRes, newRes) {
 
     granthamVal = Grantham[idxOld][idxNew]
 
-    console.log('Get the two indexes, then get the Val :) ' + oldRes + ' ' + newRes + ' ' + idxOld + ' ' + idxNew + ' ' + granthamVal)
+    // console.log('Get the two indexes, then get the Val :) ' + oldRes + ' ' + newRes + ' ' + idxOld + ' ' + idxNew + ' ' + granthamVal)
   }
 
   if (granthamVal <= 0 && rows.includes(newRes) && cols.includes(oldRes)) {
@@ -18,7 +18,7 @@ function getGranthamIsCons (oldRes, newRes) {
 
     granthamVal = Grantham[idxOld][idxNew]
 
-    console.log('Get the two indexes, then get the Val :) ' + oldRes + ' ' + newRes + ' ' + idxOld + ' ' + idxNew + ' ' + granthamVal)
+    // console.log('Get the two indexes, then get the Val :) ' + oldRes + ' ' + newRes + ' ' + idxOld + ' ' + idxNew + ' ' + granthamVal)
   }
 
   if (granthamVal >= 0 && granthamVal <= 100) {
