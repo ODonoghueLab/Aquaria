@@ -5,8 +5,6 @@ import * as common from '../../AquariaLayout/helpers/common'
 var Highcharts = require('./highstocks.js')
 
 export function createFeatureMap (datum, extServerIds_) {
-  console.log('She is the quarterback ')
-  console.log(extServerIds_)
 
   document.querySelectorAll("#selectedCluster [id*='r_'] rect").forEach(function (part) {
     part.style.fill = '#a5a5a5'
@@ -126,8 +124,6 @@ export function drawTrack (datum, svg, extServerIds_) {
 
 // Draw feature by residue
 export function drawFeatures (p, o, features, extServerIds_) {
-  console.log('In createFeature map 1')
-  console.log(extServerIds_)
 
   this.nusg.append('rect')
     .attr('width', function () { return (/* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) > 2) ? /* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) : 2 })
@@ -209,7 +205,7 @@ function showAnnotation (f, eid, extServerIds_) {
       if (isAnyFalse === true) {
         balloon = balloon + '<img src="/images/ajax-loader1.gif" alt="Loading..."  width=15/> '
       }
-      console.log(extServerIds_)
+      // console.log(extServerIds_)
     }
   }
 
@@ -240,8 +236,8 @@ function showAnnotation (f, eid, extServerIds_) {
   // var popheight = $('div.popup').innerHeight()
 
   if (Object.prototype.hasOwnProperty.call(f, 'hc_go') && Object.prototype.hasOwnProperty.call(f, 'hc_ec') && Object.prototype.hasOwnProperty.call(f, 'hc_species')) {
-    console.log('CATH plot data')
-    console.log(f)
+    // console.log('CATH plot data')
+    // console.log(f)
     handleCathPopups(f).then(function () {
       updateTheStyleOfHc()
     })

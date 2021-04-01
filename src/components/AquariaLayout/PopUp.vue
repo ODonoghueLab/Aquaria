@@ -62,7 +62,12 @@ export default {
             document.getElementById('btnVI_' + oneAaCodes[k]).addEventListener('click', function () {
               // Change heading amino acid.
               let a = document.getElementById('span_missenseHeading').innerHTML
-              a = a.replace(/[a-zA-Z]+\)/, oneAaCodes[k] + ')')
+              if (a.match(/[a-zA-Z\*\?]+\)/)) { // eslint-disable-line no-useless-escape
+                a = a.replace(/[a-zA-Z\*\?]+\)/, oneAaCodes[k] + ')') // eslint-disable-line no-useless-escape
+              } else {
+                a = a.replace(/\)/, oneAaCodes[k] + ')')
+              }
+
               document.getElementById('span_missenseHeading').innerHTML = a
 
               // Hide clicked button, and unhide any other button
@@ -121,7 +126,7 @@ export default {
       function moveAndShowClickedDivAa (selAa) {
         for (let i = 0; i < oneAaCodes.length; i++) {
           if (selAa === oneAaCodes[i]) {
-            console.log('It comes down here!')
+            // console.log('It comes down here!')
             if (document.getElementById('divVI_varInfo_' + selAa)) {
               document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + selAa))
             }

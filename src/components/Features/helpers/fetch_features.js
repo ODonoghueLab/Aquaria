@@ -861,7 +861,7 @@ var processNextServer = function (primary_accession,
 	 		}
 			else { */
       // console.log('^^ Failed to fetch item: err=', err);
-      console.log('Now fetching CATH .... ')
+      // console.log('Now fetching CATH .... ')
       getJsonFromUrl(servers[currentServer].id, servers[currentServer].URL + primary_accession + '?content-type=application/json', primary_accession, featureCallback, validateAquariaFeatureSet)
       featureCallback(aggregatedAnnotations, extServerIds_forLoading)
       processNextServer(primary_accession,
@@ -900,7 +900,7 @@ function generateShowHideFnStr2 (id_complete) {
 }
 
 function generateShowHideFnStr (id_complete) {
-  console.log(id_complete)
+  // console.log(id_complete)
   returnStr = "elem = document.getElementById('" + id_complete + "');"
 
   returnStr = returnStr + "if (elem.style.display == ''){elem.style.display = 'none'; console.log('Next sibling is'); console.log(elem.nextSibling.innerHTML); elem.nextSibling.innerHTML = '[+]';}"
@@ -931,7 +931,7 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       for (const serverAndFsName in variantResidues[residue].positionInfo) {
         description = description + '<toReplace_posInfo>' + '<i>' + serverAndFsName + ':</i> '
         for (let i = 0; i < variantResidues[residue].positionInfo[serverAndFsName].length; i++) {
-          description = description + "<span class='theCursor'>" + variantResidues[residue].positionInfo[serverAndFsName][i] + '.</span> '
+          description = description +  variantResidues[residue].positionInfo[serverAndFsName][i] + '. '
         }
 
         description = description + '</toReplace_posInfo>'
@@ -943,8 +943,8 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       if (anAa != variantResidues[residue].oldAa) {
         if (variantResidues[residue].hasOwnProperty(anAa)) {
           for (let i = 0; i < variantResidues[residue][anAa].length; i++) {
-            description = description + '<toReplace_varInfo_' + anAa + '><span class="theCursor">'
-            description = description + variantResidues[residue][anAa][i] + '.</span> '
+            description = description + '<toReplace_varInfo_' + anAa + '>'
+            description = description + variantResidues[residue][anAa][i] + '. '
             description = description + '</toReplace_varInfo_' + anAa + '>'
           }
         } else {
@@ -1077,7 +1077,7 @@ function validateAquariaFeatureSet (convertedFeatureSet, primary_accession, feat
     // continue
     // console.log("fetch_features.validateAquariaFeatureSet appending validated features " + 'PredictProtein')
     // extServerIds_forLoading[]
-    console.log('The featureId in validateAgainstSchema ' + featureId)
+    // console.log('The featureId in validateAgainstSchema ' + featureId)
     if (extServerIds_forLoading.hasOwnProperty(featureId)) {
       extServerIds_forLoading[featureId] = true
     }
@@ -1272,6 +1272,59 @@ function parseFeatures (primary_accession, categories, server, featureCallback, 
   finishServer(clustered_annotations, primary_accession, featureCallback)
 }
 
+AQUARIA.ifUrlHasVarExtractInfo = function(){
+  return new Promise(function(resolve, reject){
+    console.log("In the magic function");
+    var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
+    var searchParam = decodeURIComponent(window.location.search.split('?')[1])
+
+    let variantResidues = {}; // variantRes{resNum} => {defaultDesc: , oldAa: , positionInfo: , newAas: [], A, C, D, }
+    if (featureRegex.test(searchParam)) {
+
+      var features = searchParam.split('&')
+
+
+      features.forEach(function (feature, feature_i) {
+        feature = feature.replace(/%22/g, '\"')
+
+        const featAndDesc = extractDescription(feature)
+        const consInfoRes = consequence.getConsInfo(featAndDesc.featStr)
+        const consInfo = consInfoRes.newResidues;
+        featAndDesc.featStr = consInfoRes.theOrigFeatStr;
+
+        let counter =0;
+        for (const resNum in consInfo) {
+
+          // Adding for filling up pop-up info.
+          variantResidues[resNum] = {}
+          if (consInfo[resNum].hasOwnProperty('oldRes')) {
+            variantResidues[resNum].oldAa = consInfo[resNum].oldRes
+          }
+
+          if (consInfo[resNum].hasOwnProperty('newAas')) {
+            variantResidues[resNum]['newAas'] = consInfo[resNum]['newAas']
+          }
+
+
+          variantResidues[resNum].defaultDesc = featAndDesc.description
+          addNewResAndGrantham(variantResidues[resNum], consInfo[resNum])
+
+          counter = counter + 1;
+        }
+
+        if (feature_i == features.length - 1){
+          console.log("In the ifUrlHasVar_extractInfo fn: ");
+          console.log(variantResidues);
+          console.log(Object.keys(variantResidues))
+          resolve(variantResidues);
+        }
+      })
+
+    }
+
+  })
+}
+
 function checkURLForFeatures (primary_accession, server, featureCallback) {
   var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
   var searchParam = decodeURIComponent(window.location.search.split('?')[1])
@@ -1291,6 +1344,7 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
         }
       })
   } else if (featureRegex.test(searchParam)) {
+
     console.log('Passes the regex')
 
     var data = {}
@@ -1302,7 +1356,9 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
       feature = feature.replace(/%22/g, '\"')
 
       const featAndDesc = extractDescription(feature)
-      const consInfo = consequence.getConsInfo(featAndDesc.featStr)
+      const consInfoRes = consequence.getConsInfo(featAndDesc.featStr)
+      consInfo = consInfoRes.newResidues;
+      featAndDesc.featStr = consInfoRes.theOrigFeatStr;
 
       for (const resNum in consInfo) {
         const aFeature = {}
@@ -1314,9 +1370,17 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
 
         aFeature.Description = featAndDesc.description
         // aFeature['Description'] = featAndDesc.description + "<br><i>Mutation consequence</i>: " + consInfo[resNum]['consStr'];
-        aFeature.Name = addThinSpaces(featAndDesc.featStr)
-        if (consInfo[resNum].hasOwnProperty('oldRes')) {
-          aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum].oldRes + '&#8201;&#8594;&#8201;' + consInfo[resNum].newAas[0] + ')</span>'
+        aFeature.Name = addThinSpaces(featAndDesc.featStr, consInfo[resNum].consStr)
+        if (consInfo[resNum].hasOwnProperty('oldRes') && consInfo[resNum].hasOwnProperty('newAas')) {
+          aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> (" + consInfo[resNum].oldRes + '&#8201;&#8594;&#8201;'
+
+          if (consInfo[resNum].newAas[0] != 'X'){
+            aFeature.Name = aFeature.Name + consInfo[resNum].newAas[0]
+          }
+          aFeature.Name = aFeature.Name + ')</span>'
+
+
+
         } else {
           aFeature.Name = aFeature.Name + " <span id='span_missenseHeading' class='btnAaBold'> </span>"
         }
@@ -1365,45 +1429,29 @@ function addNewResAndGrantham (varinatResidues_resNum, consInfo_resNum) {
       }
     })
   }
-  /*
-	consInfo_resNum['newAas'].forEach(function(newAa, newAa_i){
-		if (!varinatResidues_resNum.hasOwnProperty(newAa)){
-			varinatResidues_resNum[newAa] = [];
-
-			if (consInfo_resNum.hasOwnProperty('oldRes')){
-				let granthamStr = grantham.getGranthamIsCons(newAa, consInfo_resNum['oldRes']);
-				if (granthamStr != ""){
-					varinatResidues_resNum[newAa].push(granthamStr);
-				}
-			}
-		}
-
-	});
-	*/
-
-  /* for (let newAa in arr_newAas){
-		if (!variantResidues_res.hasOwnProperty(newAa)){
-			variantResidues_res[newAa] = {};
-			// let granthamStr = grantham.getGranthamIsCons(newRes.oldRes, newRes.newRes);
-		}
-	} */
 }
 
-function addThinSpaces (featStr) {
-  const aa_old = featStr.replace(/[0-9].*$/, '')
-  const aa_new = featStr.replace(/^[a-zA-Z\.]+[0-9]+/, '')
-  let aa_pos = featStr.replace(/^[^0-9]+/, '')
-  aa_pos = aa_pos.replace(/[^0-9].*$/, '')
-  console.log('The feature is featStr ' + featStr + ' ' + ' oldAa: ' + aa_old + ' newAa: ' + aa_new + ' posAa: ' + aa_pos)
+function addThinSpaces (featStr, consStr) {
+  if (consStr == 'Missense'){
+    const aa_old = featStr.replace(/[0-9].*$/, '')
+    const aa_new = featStr.replace(/^[a-zA-Z\.]+[0-9]+/, '')
+    let aa_pos = featStr.replace(/^[^0-9]+/, '')
+    aa_pos = aa_pos.replace(/[^0-9].*$/, '')
+    console.log('The feature is featStr ' + featStr + ' ' + ' oldAa: ' + aa_old + ' newAa: ' + aa_new + ' posAa: ' + aa_pos)
 
-  return (aa_old + '&#8201;' + aa_pos + '&#8201;' + aa_new)
+    return (aa_old + '&#8201;' + aa_pos + '&#8201;' + aa_new)
+  }
+  else {
+    return featStr
+  }
+
 }
 
 function extractDescription (feature) {
   let desc = ''; let featStr = feature
 
   if (featStr.match(/\=\"/)) {
-    const arr = feature.split(/\=\"/)
+    const arr = feature.split('="')
     if (arr[1]) {
       desc = arr[1]
     }
@@ -1411,7 +1459,7 @@ function extractDescription (feature) {
 
     featStr = arr[0]
   }
-
+  // console.log("The featStr " + featStr + " " + desc);
   return { featStr: featStr, description: desc }
 }
 
@@ -1451,7 +1499,7 @@ const threeToOneResMap = {
 
 function checkIfInKey_ig (threeLetterCode) {
   const key = Object.keys(threeToOneResMap).find(k => k.toLowerCase() === threeLetterCode.toLowerCase())
-  console.log('The key is ' + key)
+  // console.log('The key is ' + key)
   if (key) {
     return (threeToOneResMap[key])
   } else {
@@ -1479,7 +1527,7 @@ function checkIfInVal_ig (oneLetterCode) {
  * This function collects all annotations for a given protein id from a
  * specified server
  */
-fetch_uniprot = function (primary_accession, server, featureCallback) {
+function fetch_uniprot (primary_accession, server, featureCallback) {
   console.log('fetch_features.fetch_uniprot fetching features from uniprot...')
   url = 'https://www.uniprot.org/uniprot/' + primary_accession + '.xml'
   $.ajax({
@@ -1529,7 +1577,7 @@ function extractVariantInfoFromUniprot (uniprotData) {
 
     let counter = 0
     for (const featureType in uniprotData) {
-      console.log('Uniprot: Feature type ' + featureType)
+      // console.log('Uniprot: Feature type ' + featureType)
       if (uniprotData[featureType].hasOwnProperty('Features')) {
         for (let i = 0; i < uniprotData[featureType].Features.length; i++) {
           if (uniprotData[featureType].Features[i].hasOwnProperty('Residue')) {
@@ -1546,4 +1594,4 @@ function extractVariantInfoFromUniprot (uniprotData) {
   })
 }
 
-module.exports = fetch_annotations
+exports.fetch_annotations = fetch_annotations
