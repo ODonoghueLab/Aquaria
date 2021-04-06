@@ -88,8 +88,9 @@ export default {
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
-    top: 3rem;
+    top: var(--spacer-bottom);
 }
+
 .tab {
     flex: 0 0 auto;
     height: 2rem;

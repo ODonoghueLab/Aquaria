@@ -1,6 +1,6 @@
 <template>
     <div class="panel">
-        <a href="#" class="close" @click="closeTab"></a>
+        <a href="#" class="close intab" @click="closeTab"></a>
         <div id="vis">
           <div id='allclusters' data-intro='Visual summary of all structures in PDB matching the specified protein, grouped by region of match.' data-position='left'></div>
         </div>
@@ -59,6 +59,7 @@ export default {
     background-color: var(--background);
     overflow: hidden;
   }
+  .panel .close.intab::after { top: -0.1em; }
 
   /**** SVG styles ****/
   svg {

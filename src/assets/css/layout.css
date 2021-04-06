@@ -19,7 +19,19 @@
     --strand-conserved: #998436;
     --strand-match: #f6c719;
     --structurecoverage: #afafaf;
-    }     
+    --spacer-bottom: 5.5vh; 
+    }   
+
+@media all and (min-aspect-ratio: 8/5) {
+    :root {
+        --spacer-bottom: 6vh;    
+    }
+}   
+@media all and (min-width: 1800px) {
+    :root {
+        --spacer-bottom: 5vh;    
+    }
+}    
  
 /* positioning classes (for panels and scrim) */
 .level1 { z-index: 1 }
