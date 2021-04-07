@@ -113,6 +113,7 @@ p.thetitle {
  }
   .affiliations {
     font-size: 70%;
+    line-height: 1.4em;
   }
   #About span {
     display: inline-block;
