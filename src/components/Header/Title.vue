@@ -84,6 +84,9 @@ export default {
       })
       ev.target.className = 'active'
       document.querySelector('#scrim').className = 'show level3'
+      if (ev.target.getAttribute('href') === '#Alignment') {
+        document.querySelector('#titleAlign').className = 'active'
+      }
     },
     removeHighlight: function () {
       document.querySelectorAll('#titleAlign span').forEach(el => {
@@ -190,7 +193,11 @@ span#pdb_id a, span#no_pdb_id a {
 #titleAlign {
   display: flex;
 }
-
+#titleAlign.active {
+  width: 86vw;
+  background-color: var(--primary-highlight);
+  border-radius: 1.5rem;
+}
 #titleAlign span a {
   padding: calc(0.2rem + 2 * ((100vw - 320px) / 680)) 1rem;
   font-size: 95%;
@@ -199,7 +206,7 @@ span#pdb_id a, span#no_pdb_id a {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 18rem;
+  max-width: 15rem;
 }
 
 .titlepanel {

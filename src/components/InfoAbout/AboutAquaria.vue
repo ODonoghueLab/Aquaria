@@ -79,6 +79,8 @@ export default {
     },
     hideScrim: function () {
       document.querySelector('#scrim').className = 'hide'
+      console.log('hideScrim')
+      document.querySelector('#titleAlign').className = ''
     }
   }
 }
