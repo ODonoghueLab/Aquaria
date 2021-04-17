@@ -19,7 +19,7 @@
       <span id="pdb_id" v-if="pdb && !seqRes" >
         <a href="#Structure" class="" @click="makeActive">{{pdb}}</a>
       </span>
-      <div id='titleAlign'>
+      <div id='titleAlign'><a href="#" class="close"></a>
         <span class='titlepanel' v-if="seqRes">
           <a href="#Alignment" class="" @click="makeActive" >
           Sequence <strong>{{primary_accession}}:</strong> {{seqRes}} <br/>
