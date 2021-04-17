@@ -5,7 +5,7 @@
     <!-- InfoAbout -->
     <Sequence />
     <div>
-      <AboutAlignment v-bind:alignment="alignment"/>
+      <AboutAlignment />  <!--  v-bind:alignment="alignment"/> -->
     </div>
     <div>
       <AboutPdb />
