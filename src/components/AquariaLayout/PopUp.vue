@@ -261,6 +261,17 @@ export default {
 </style>
 
 <style>
+
+  .expandable {
+    margin: 8px 0px;
+    /* cursor: ns-resize; */
+  }
+  .expandable-text-line {
+    cursor: s-resize !important;
+  }
+  .expandable-text-line.__extl-expanded{
+    cursor: n-resize !important;
+  }
   #popuptext a{
     color: var(--background);
   }
@@ -302,8 +313,9 @@ export default {
     text-decoration: underline;
   }
   */
+  /*
   .theCursor{
     cursor: context-menu;
   }
-
+*/
 </style>

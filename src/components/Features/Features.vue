@@ -1,6 +1,6 @@
 <template>
     <div class="panel">
-        <a href="#" class="close" @click="closeTab"></a>
+        <a href="javascript:closeTab" class="close" @click="closeTab"></a>
         <div id="featurelist"></div>
     </div>
 </template>
@@ -10,7 +10,7 @@ export default {
   name: 'Features',
   methods: {
     closeTab: function () {
-      // document.querySelector('div.tabs').style.bottom = '50px'
+      window.scrollBy(0, 100)
       Panels.hidePanels()
     }
   }

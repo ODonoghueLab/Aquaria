@@ -11,4 +11,5 @@ export function hidePanels () {
   document.querySelector('#Features').className = 'tab'
   document.querySelector('#Features')
   document.querySelector('a.close').click()
+  window.scrollBy(0, 100)
 }
