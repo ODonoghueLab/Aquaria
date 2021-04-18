@@ -19,13 +19,14 @@
       <span id="pdb_id" v-if="pdb && !seqRes" >
         <a href="#Structure" class="" @click="makeActive">{{pdb}}</a>
       </span>
-      <div id='titleAlign'><a href="#" class="close"></a>
+      <div id='titleAlign' class=''>
         <span class='titlepanel' v-if="seqRes">
           <a href="#Alignment" class="" @click="makeActive" >
           Sequence <strong>{{primary_accession}}:</strong> {{seqRes}} <br/>
           Structure  <strong>{{pdb}}:</strong>  {{structRes}} </a>
         </span>
       </div>
+      <a href="#" class="close" @click="dismissPanel"></a>
     </div>
 </template>
 
@@ -83,19 +84,20 @@ export default {
         el.className = ''
       })
       ev.target.className = 'active'
+      document.querySelector('#title').className += ' active'
       document.querySelector('#scrim').className = 'show level3'
       if (ev.target.getAttribute('href') === '#Alignment') {
         document.querySelector('#titleAlign').className = 'active'
       }
     },
-    removeHighlight: function () {
-      document.querySelectorAll('#titleAlign span').forEach(el => {
-        el.style.background = '#888888'
-      })
-    },
-    highlightTitle: function () {
-      document.querySelectorAll('#titleAlign span').forEach(el => {
-        el.style.background = '#3ca8f7'
+    dismissPanel: function () {
+      // hide scrim
+      document.querySelector('#scrim').className = 'hide'
+      // reset title to neutral state
+      document.querySelector('#title').className = 'item title fix level6'
+      document.querySelector('#titleAlign').className = ''
+      document.querySelectorAll('#title span a').forEach(el => {
+        el.className = ''
       })
     },
     resetSelection: function () {
@@ -151,8 +153,21 @@ export default {
     transform: translate(-50%, -5%);
     width: fit-content;
 }
+#title.active, #titleAlign.active {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  width: 78vw;
+  max-width: 29.5rem;
+  margin-top: .25rem;
+}
 #title span {
+  background-color: var(--primary-label);
   white-space: nowrap;
+  text-align: left;
+}
+#title.active span#pdb_id, #title.active span#no_pdb_id {
+  flex-grow: 2;
 }
 #title span a {
   display: inline-block;
@@ -175,7 +190,11 @@ export default {
   border-right: 1px dotted var(--background);
   border-left: 1px dotted var(--background);
 }
-span#org_prot a, span#uniprotpanel a  {
+span#org_prot, span#uniprotpanel {
+  border-top-left-radius: 1.5rem;
+  border-bottom-left-radius: 1.5rem;
+}
+span#org_prot a, span#uniprotpanel a {
   padding-left: 1rem;
   border-top-left-radius: 1.5rem;
   border-bottom-left-radius: 1.5rem;
@@ -184,7 +203,7 @@ span#org_prot a, span#uniprotpanel a  {
 span#org_prot img, span#uniprotpanel img  {
 height: calc(10px + .4vw);
 }
-span#pdb_id a, span#no_pdb_id a {
+span#pdb_id , span#no_pdb_id {
   padding-right: 1rem;
   font-weight: 600;
   border-top-right-radius: 1.5rem;
@@ -194,8 +213,7 @@ span#pdb_id a, span#no_pdb_id a {
   display: flex;
 }
 #titleAlign.active {
-  width: 86vw;
-  background-color: var(--primary-highlight);
+  /* background-color: var(--primary-highlight); */
   border-radius: 1.5rem;
 }
 #titleAlign span a {
@@ -209,7 +227,13 @@ span#pdb_id a, span#no_pdb_id a {
   max-width: 15rem;
 }
 
-.titlepanel {
+#title span.titlepanel {
+  background-color: transparent;
   text-align: left;
+}
+
+#titleAlign.active span.titlepanel a {
+  width: 80vw;
+  max-width: 29.5rem;
 }
 </style>

@@ -79,6 +79,7 @@ export default {
       // hide scrim
       document.querySelector('#scrim').className = 'hide'
       // reset title to neutral state
+      document.querySelector('#title').className = 'item title fix level6'
       document.querySelectorAll('#title span a').forEach(el => {
         el.className = ''
       })
