@@ -1,6 +1,6 @@
 <template>
     <div class="panel">
-        <a href="javascript:closeTab" class="close intab" @click="closeTab"></a>
+        <a href="javascript:" class="close intab" @click="closeTab"></a>
         <div id="vis">
           <div id='allclusters' data-intro='Visual summary of all structures in PDB matching the specified protein, grouped by region of match.' data-position='left'></div>
         </div>

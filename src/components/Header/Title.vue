@@ -19,8 +19,8 @@
       <span id="pdb_id" v-if="pdb && !seqRes" >
         <a href="#Structure" class="" @click="makeActive">{{pdb}}</a>
       </span>
-      <div id='titleAlign' class=''>
-        <span class='titlepanel' v-if="seqRes">
+      <div id='titleAlign' class='' v-if="seqRes">
+        <span class='titlepanel'>
           <a href="#Alignment" class="" @click="makeActive" >
           Sequence <strong>{{primary_accession}}:</strong> {{seqRes}} <br/>
           Structure  <strong>{{pdb}}:</strong>  {{structRes}} </a>
@@ -86,7 +86,7 @@ export default {
       ev.target.className = 'active'
       document.querySelector('#title').className += ' active'
       document.querySelector('#scrim').className = 'show level3'
-      if (ev.target.getAttribute('href') === '#Alignment') {
+      if (document.querySelector('#titleAlign') !== null) {
         document.querySelector('#titleAlign').className = 'active'
       }
     },
@@ -95,7 +95,7 @@ export default {
       document.querySelector('#scrim').className = 'hide'
       // reset title to neutral state
       document.querySelector('#title').className = 'item title fix level6'
-      document.querySelector('#titleAlign').className = ''
+      if (document.querySelector('#titleAlign') !== null) { document.querySelector('#titleAlign').className = '' }
       document.querySelectorAll('#title span a').forEach(el => {
         el.className = ''
       })
@@ -151,7 +151,7 @@ export default {
     left: 50%;
     top: 1.5vh;
     transform: translate(-50%, -5%);
-    width: fit-content;
+    /* width: fit-content; */
 }
 #title.active, #titleAlign.active {
   display: flex;
@@ -159,21 +159,22 @@ export default {
   justify-content: flex-start;
   width: 78vw;
   max-width: 29.5rem;
-  margin-top: .25rem;
+  margin-top: .125rem;
 }
 #title span {
   background-color: var(--primary-label);
   white-space: nowrap;
   text-align: left;
+  flex-shrink: 0;
 }
 #title.active span#pdb_id, #title.active span#no_pdb_id {
   flex-grow: 2;
+  flex-shrink: 0;
+  /* width: 50%; */
 }
 #title span a {
   display: inline-block;
   background-color: var(--primary-label);
-  background-position: 1rem 50%;
-  background-size: 0;
   padding: calc(0.4rem + 3 * ((100vw - 320px) / 680)) 0.2rem;
   transition: all 0.5s ease;
   color: var(--text);
