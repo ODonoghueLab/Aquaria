@@ -32,13 +32,6 @@ export default {
   methods: {
     handler: function () {
       this.dragElement(document.getElementById('popup'))
-      var balloon_ = document.getElementById('balloon')
-      balloon_.addEventListener('mousedown', function () {
-        this.parentNode.parentNode.setAttribute('draggable', false)
-      })
-      balloon_.addEventListener('mouseup', function () {
-        this.parentNode.parentNode.setAttribute('draggable', true)
-      })
 
       /*
       draggable="true" ondragstart=\"event.preventDefault();event.stopPropagation();\"
@@ -124,11 +117,13 @@ export default {
         for (let i = 0; i < oneAaCodes.length; i++) {
           if (clickedAa === oneAaCodes[i]) {
             if (document.getElementById('btnVI_' + clickedAa)) {
-              document.getElementById('btnVI_' + clickedAa).style.display = 'none'
+              // document.getElementById('btnVI_' + clickedAa).style.display = 'none'
+              document.getElementById('btnVI_' + clickedAa).classList.add('selCol')
             }
           } else {
             if (document.getElementById('btnVI_' + oneAaCodes[i])) {
-              document.getElementById('btnVI_' + oneAaCodes[i]).style.display = 'inline'
+              // document.getElementById('btnVI_' + oneAaCodes[i]).style.display = 'inline'
+              document.getElementById('btnVI_' + oneAaCodes[i]).classList.remove('selCol')
             }
           }
         }
@@ -309,6 +304,11 @@ export default {
     padding-right: 3.5px;
     display: inline;
   }
+
+  .selCol {
+    color: #707070 !important;
+  }
+
   .pAaColor {
     display: inline;
     color: #929192 !important;
