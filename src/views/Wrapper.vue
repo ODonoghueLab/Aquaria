@@ -87,7 +87,7 @@ export default {
   },
   mounted () {
     window.scrollBy(0, 100)
-    this.inspectHeight()
+    // this.inspectHeight()
     window.addEventListener('resize', function () {
       window.scrollBy(0, 100)
       document.querySelector('#vis > .ruler').remove()
@@ -105,7 +105,7 @@ export default {
   },
   updated () {
     // const isPhone = this.checkPhone()
-    this.inspectHeight()
+    // this.inspectHeight()
   }
 }
 </script>
