@@ -113,13 +113,55 @@ export function drawTrack (datum, svg, extServerIds_) {
       .attr('transform', 'translate(0,13)')
       .attr('class', 'insertion')
   }
+  let smallestPos = -1;
+  let smallestId = "";
   for (var p in features[o]) {
     this.drawFeatures(p, o, features, extServerIds_)
+
+    if (features[o][p].label.match('span_missenseHeading')){
+      console.log("A feature is ")
+      console.log(features[o][p])
+
+      if (smallestPos == -1){
+        smallestPos = features[o][p].start
+        smallestId = 'r_' + o + '_' + p
+
+      }
+
+    }
   }
+
+  console.log("The smallest pos is " + smallestPos)
+
+  var element = document.getElementById(smallestId)
+  var event = new MouseEvent('mouseover', {
+    'view': window,
+    'bubbles': true,
+    'cancelable': true
+  });
+  element.dispatchEvent(event);
+  d3.select('#' + smallestId).attr('stroke-width', '0px')
+
+
+
+
+  console.log("Element width is ")
+  console.log(element)
+
   d3.selectAll('#selectedFeature rect.feature').attr(
     'fill', function () {
       return d3.select(this).attr('color')
     })
+
+  /*
+  var event_2 = new MouseEvent('mouseleave', {
+    'view': window,
+    'bubbles': true,
+    'cancelable': true
+  });
+  element.dispatchEvent(event_2)
+  */
+
 }
 
 // Draw feature by residue
