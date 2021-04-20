@@ -4,8 +4,8 @@
     <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
     <!-- <div id="mydivheader">
     </div> -->
-    <p id='popuptext'>Pop-up text box component for features</p>
-    <img v-bind:src="popupTail" id='popupTail'>
+        <p id='popuptext'>Pop-up text box component for features</p>
+        <img v-bind:src="popupTail" id='popupTail'>
     </div>
 </template>
 
@@ -31,6 +31,18 @@ export default {
   },
   methods: {
     handler: function () {
+      this.dragElement(document.getElementById('popup'))
+      var balloon_ = document.getElementById('balloon')
+      balloon_.addEventListener('mousedown', function () {
+        this.parentNode.parentNode.setAttribute('draggable', false)
+      })
+      balloon_.addEventListener('mouseup', function () {
+        this.parentNode.parentNode.setAttribute('draggable', true)
+      })
+
+      /*
+      draggable="true" ondragstart=\"event.preventDefault();event.stopPropagation();\"
+      */
       const ExpandableTextLineCtor = Vue.extend(ExpandableTextLine)
       const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
       const b = document.getElementsByTagName('toReplace_varInfo')
@@ -69,7 +81,6 @@ export default {
               }
 
               document.getElementById('span_missenseHeading').innerHTML = a
-
               // Hide clicked button, and unhide any other button
               hideClickedUnhideOthrs(oneAaCodes[k])
               // document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[k]))
@@ -196,13 +207,15 @@ export default {
     //   })
     // },
     dragElement: function (elmnt) {
+      console.log('smiting of the first born')
+      console.log(elmnt)
       var pos1 = 0; var pos2 = 0; var pos3 = 0; var pos4 = 0
       if (document.getElementById(elmnt.id + 'header')) {
         // if present, the header is where you move the DIV from:
         document.getElementById(elmnt.id + 'header').onmousedown = dragMouseDown
       } else {
         // otherwise, move the DIV from anywhere inside the DIV:
-        elmnt.onmousedown = dragMouseDown
+        // elmnt.onmousedown = dragMouseDown
       }
 
       function dragMouseDown (e) {

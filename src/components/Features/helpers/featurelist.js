@@ -580,7 +580,7 @@ function showAnnotation (f, eid) {
   	balloon = balloon + '</div>'
   	btnsDiv = btnsDiv + '</div>'
   	balloon = balloon + btnsDiv
-  	balloon = balloon + "</div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p>"
+  	balloon = balloon + "</div><div class='balloon' id='balloon'><span class='x'>&nbsp;</span><p id='popupheader'>"
 
   	if (f.name.includes('span_missenseHeading')) {
     //  console.log(extServerIds_);

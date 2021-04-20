@@ -131,7 +131,8 @@ export function drawTrack (datum, svg, extServerIds_) {
     }
   }
 
-  console.log("The smallest pos is " + smallestPos)
+  // popup open by default on page load.
+  // console.log("The smallest pos is " + smallestPos)
 
   var element = document.getElementById(smallestId)
   var event = new MouseEvent('mouseover', {
@@ -234,7 +235,7 @@ function showAnnotation (f, eid, extServerIds_) {
   balloon = balloon + '</div>'
   btnsDiv = btnsDiv + '</div>'
   balloon = balloon + btnsDiv
-  balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p>'
+  balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p id="popupheader">'
 
   if (f.name.includes('span_missenseHeading')) {
     if (typeof extServerIds_ !== 'undefined') {
@@ -252,7 +253,7 @@ function showAnnotation (f, eid, extServerIds_) {
   }
 
   balloon = balloon + f.label
-
+  console.log("Testing 123 " + f.label);
   if (!f.name.includes('span_missenseHeading')) {
     balloon = balloon + ' ('
     if (f.start === f.end) {
