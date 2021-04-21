@@ -127,6 +127,10 @@ export function drawTrack (datum, svg, extServerIds_) {
         smallestId = 'r_' + o + '_' + p
 
       }
+      else if (features[o][p].start < smallestPos){
+        smallestPos = features[o][p].start
+        smallestId = 'r_' + o + '_' + p
+      }
 
     }
   }
@@ -190,7 +194,6 @@ export function drawFeatures (p, o, features, extServerIds_) {
     // .attr('fill-opacity', function () {
     //   return (this.datum.Class.track === 'single_track') ? 0.3 : 1
     // })
-    console.log("Aquaria magic numbers " + offsetWidth + " " + trans_x + " " +  window.AQUARIA.srw.toFixed(2) +  ' ' + (window.AQUARIA.srw.toFixed(2) - 1) + " " + window.innerWidth + " " + seqLength + " " + trans_x)
 }
 
 export function createMouseOverCallback (feature, extServerIds_) {
