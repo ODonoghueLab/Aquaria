@@ -113,6 +113,7 @@ export function drawResidues (cluster, rank, el) {
       continue
     }
 
+    // console.log("Thickness is " + thickness)
     var rect = this.nusvg.select(
       'g#structure_' + cluster.pdb_id.toLowerCase() + '_' + rank + ' g.cluster').append('g').attr('class', 'residue ' + el.type)
       .attr('id', 'r_' + rank + '_' + n).attr('transform',

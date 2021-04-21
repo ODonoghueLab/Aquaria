@@ -167,12 +167,18 @@ export function drawTrack (datum, svg, extServerIds_) {
 
 // Draw feature by residue
 export function drawFeatures (p, o, features, extServerIds_) {
+  var offsetWidth = document.getElementById('structure-viewer').offsetWidth
+  var seqLength = window.AQUARIA.showMatchingStructures.sequence.length
 
+  var myScale = d3.scale.linear().domain([1, seqLength]).range([1, document.getElementById('structure-viewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left - 5])
+  var trans_x = myScale(parseInt(features[o][p].start))
+  // var trans_x = Math.floor(parseInt(features[o][p].start)/seqLength * (offsetWidth - 300)) // ((parseInt(features[o][p].start)) * (parseFloat(window.AQUARIA.srw)))
   this.nusg.append('rect')
     .attr('width', function () { return (/* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) > 2) ? /* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) : 2 })
     .attr('height', 14)
     .attr('id', 'r_' + o + '_' + p)
-    .attr('transform', 'translate(' + /* parseInt */ (features[o][p].start * (window.AQUARIA.srw - 0.0095)) + ',6)')
+    .attr('x', trans_x)
+    .attr('transform', 'translate(0,6)')
     .attr('color', features[o][p].color).attr('fill', '#a4abdf')
     .attr('class', 'feature')
     .on('mouseover', createMouseOverCallback(features[o][p], extServerIds_))
@@ -184,6 +190,7 @@ export function drawFeatures (p, o, features, extServerIds_) {
     // .attr('fill-opacity', function () {
     //   return (this.datum.Class.track === 'single_track') ? 0.3 : 1
     // })
+    console.log("Aquaria magic numbers " + offsetWidth + " " + trans_x + " " +  window.AQUARIA.srw.toFixed(2) +  ' ' + (window.AQUARIA.srw.toFixed(2) - 1) + " " + window.innerWidth + " " + seqLength + " " + trans_x)
 }
 
 export function createMouseOverCallback (feature, extServerIds_) {
