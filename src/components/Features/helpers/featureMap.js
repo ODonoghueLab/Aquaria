@@ -119,8 +119,8 @@ export function drawTrack (datum, svg, extServerIds_) {
     this.drawFeatures(p, o, features, extServerIds_)
 
     if (features[o][p].label.match('span_missenseHeading')){
-      console.log("A feature is ")
-      console.log(features[o][p])
+      // console.log("A feature is ")
+      // console.log(features[o][p])
 
       if (smallestPos == -1){
         smallestPos = features[o][p].start
@@ -150,8 +150,8 @@ export function drawTrack (datum, svg, extServerIds_) {
 
 
 
-  console.log("Element width is ")
-  console.log(element)
+  // console.log("Element width is ")
+  // console.log(element)
 
   d3.selectAll('#selectedFeature rect.feature').attr(
     'fill', function () {
@@ -263,7 +263,6 @@ function showAnnotation (f, eid, extServerIds_) {
   }
 
   balloon = balloon + f.label
-  console.log("Testing 123 " + f.label);
   if (!f.name.includes('span_missenseHeading')) {
     balloon = balloon + ' ('
     if (f.start === f.end) {
@@ -411,7 +410,7 @@ function handleCathPopups (f) {
     // handle this one.
     if (typeof f.hc_go !== 'undefined' && Object.prototype.hasOwnProperty.call(f.hc_go, 'data') && Object.prototype.hasOwnProperty.call(f.hc_go.data, 'series') && f.hc_go.data.series.length >= 2) {
       doThePlottingV2('hc_go_div', f.hc_go.data.series[0].data, f.hc_go.data.series[1].data, '', f.hc_go.data.series[0].size, f.hc_go.data.series[0].dataLabels.color, f.hc_go.data.series[0].dataLabels.dist, f.hc_go.data.series[1].innerSize, f.hc_go.data.series[0].name, f.hc_go.data.series[1].name, f.hc_go.data.series[1].dataLabels.color).then(function () {
-        console.log('CATH plot: 1')
+        // console.log('CATH plot: 1')
         document.getElementById('hc_go').prepend(document.getElementById('hc_go_div'))
       })
         .catch(function (error) {
@@ -435,7 +434,7 @@ function handleCathPopups (f) {
         document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML + '<br> <br> <center> No data</center>'
       })
       // }
-      console.log('CATH plot: 3')
+      // console.log('CATH plot: 3')
 
       // document.getElementById('hc_go_div').style['background-color'] = "white";
     }
@@ -597,12 +596,12 @@ function doThePlottingV2 (divId, theSeriesDataInner, theSeriesDataOuter, theTitl
           }
         })
         resolve()
-        console.log('In the highcharts plotting function')
+        // console.log('In the highcharts plotting function')
       } catch (error) {
         console.log('Highcharts error')
         console.log(error)
         resolve()
-        console.log('In the highcharts plotting function')
+        // console.log('In the highcharts plotting function')
       }
     })
     /* }

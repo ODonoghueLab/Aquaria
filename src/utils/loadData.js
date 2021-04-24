@@ -228,65 +228,100 @@ function updateSelectedPdb (matches) {
       // let chosenRes = 350
       window.AQUARIA.ifUrlHasVarExtractInfo().then(function (varRes) {
         console.log('Hello world!!')
-
+        console.log(varRes)
         const sortedKeys = Object.keys(varRes).sort(function (a, b) {
-          return a - b
+          console.log(varRes[a].order + '; ' + varRes[b].order)
+          return varRes[a].order - varRes[b].order
         })
 
         console.log(sortedKeys)
 
         // const chosenRes = sortedKeys[0]
-        var allMatchingClus = {} // dict_{clustNum} => [start, end] (end gets updated evertime the same one is encountered)
+        var matchingClusters = {} // dict_{resNum} => [matchingClus1, matchingClus2, matchingClus3, ...] (end gets updated evertime the same one is encountered)
         // let isSelectedPdb = false
-        let maxNumResFit = -1
-        console.log('yes, to choose a new best matching cluster now')
+        // let maxNumResFit = -1
+
         if ('clusters' in matches) {
-          matches.clusters.forEach(function (item, itemI) {
-            let toAdd = true
-            // console.log('matching cluster ' + item.seq_start.length + ' '  + item.seq_start + ' ' + item.seq_end)
-            // to help choose the first maximal.
-            for (let i = 0; i < item.seq_start.length; i++) {
-              // console.log(item)
-              if (Object.prototype.hasOwnProperty.call(allMatchingClus, itemI)) {
-                var startToAdd = Math.min(parseInt(allMatchingClus[itemI][0]), parseInt(item.seq_start[i]))
-                var endToAdd = Math.max(parseInt(allMatchingClus[itemI][1]), parseInt(item.seq_end[i]))
-                allMatchingClus[itemI] = [startToAdd, endToAdd]
-
-                toAdd = false
-              }
-
-              for (let cr = 0; cr < sortedKeys.length; cr++) {
-                console.log('The maxNumResFit clust is ' + cr + ' ' + maxNumResFit + ' ' + item.pdb_id + ' ' + sortedKeys[cr] + ' ' + item.seq_start[i] + ':' + item.seq_end[i])
-
-                if ((toAdd === true && sortedKeys[cr] >= parseInt(item.seq_start[i]) && sortedKeys[cr] <= parseInt(item.seq_end[i])) || (toAdd === false && sortedKeys[cr] >= allMatchingClus[itemI][0] && sortedKeys[cr] <= allMatchingClus[itemI][1])) {
-                  // if (isSelectedPdb === false) {
-                  //   isSelectedPdb = true
-
-                  if (cr > maxNumResFit) {
-                    maxNumResFit = maxNumResFit + 1
-                    matches.Selected_PDB.cluster_number = itemI
-                    matches.Selected_PDB.member_number = 0
-                    matches.Selected_PDB.pdb_chain = item.pdb_chain
-                    matches.Selected_PDB.pdb_id = item.pdb_id
-                    // }
+          matches.clusters.forEach(function (aCluster, aClusterI) {
+            // return new Promise(function (resolve_1, reject_1) { // eslint-disable-line
+            for (let i = 0; i < aCluster.seq_start.length; i++) {
+              sortedKeys.forEach(function (aRes, aResI) {
+                if (aRes >= parseInt(aCluster.seq_start[i]) && aRes <= parseInt(aCluster.seq_end[i])) {
+                  // Add to dict
+                  if (!Object.prototype.hasOwnProperty.call(matchingClusters, aRes)) {
+                    matchingClusters[aRes] = []
                   }
-
-                  if (toAdd === true) {
-                    allMatchingClus[itemI] = [parseInt(item.seq_start[i]), parseInt(item.seq_end[i])]
-                  }
-                  // console.log('matching cluster ' + item.seq_start[i] + ' ' + item.seq_end[i] + ' ' + item.pdb_id + ' ' + item.pdb_chain + ' ' + itemI)
-                } else {
-                  break
+                  matchingClusters[aRes].push(aClusterI)
                 }
-              }
+              // })
+              })
             }
+            if (aClusterI === matches.clusters.length - 1) {
+              console.log(matchingClusters)
+              getTheBestCluster(matchingClusters, sortedKeys).then(function(intersectList) { // eslint-disable-line
+                if (intersectList) {
+                  matches.Selected_PDB.cluster_number = intersectList[0]
+                  matches.Selected_PDB.member_number = 0
+                  matches.Selected_PDB.pdb_chain = matches.clusters[intersectList[0]].pdb_chain
+                  matches.Selected_PDB.pdb_id = matches.clusters[intersectList[0]].pdb_id
+                } else {
+                  matches.Selected_PDB.cluster_number = 0
+                  matches.Selected_PDB.member_number = 0
+                  matches.Selected_PDB.pdb_chain = matches.clusters[0].pdb_chain
+                  matches.Selected_PDB.pdb_id = matches.clusters[0].pdb_id
+                }
 
-            // console.log('The total arrAllClusters is ' + arrAllClusters)
-            if (itemI === matches.clusters.length - 1) {
-              console.log(allMatchingClus)
-              resolve(['matching structures - update the pd'])
+                resolve(['matching structures - update the pd'])
+              })
             }
           })
+          // console.log(matchingClusters)
+          /*
+          let toAdd = true
+
+          // to help choose the first maximal.
+          for (let i = 0; i < item.seq_start.length; i++) {
+            // console.log(item)
+            if (Object.prototype.hasOwnProperty.call(allMatchingClus, itemI)) {
+              var startToAdd = Math.min(parseInt(allMatchingClus[itemI][0]), parseInt(item.seq_start[i]))
+              var endToAdd = Math.max(parseInt(allMatchingClus[itemI][1]), parseInt(item.seq_end[i]))
+              allMatchingClus[itemI] = [startToAdd, endToAdd]
+
+              toAdd = false
+            }
+
+            for (let cr = 0; cr < sortedKeys.length; cr++) {
+              // console.log('The maxNumResFit clust is ' + cr + ' ' + maxNumResFit + ' ' + item.pdb_id + ' ' + sortedKeys[cr] + ' ' + item.seq_start[i] + ':' + item.seq_end[i])
+
+              if ((toAdd === true && sortedKeys[cr] >= parseInt(item.seq_start[i]) && sortedKeys[cr] <= parseInt(item.seq_end[i])) || (toAdd === false && sortedKeys[cr] >= allMatchingClus[itemI][0] && sortedKeys[cr] <= allMatchingClus[itemI][1])) {
+                // if (isSelectedPdb === false) {
+                //   isSelectedPdb = true
+
+                if (cr > maxNumResFit) {
+                  maxNumResFit = maxNumResFit + 1
+                  matches.Selected_PDB.cluster_number = itemI
+                  matches.Selected_PDB.member_number = 0
+                  matches.Selected_PDB.pdb_chain = item.pdb_chain
+                  matches.Selected_PDB.pdb_id = item.pdb_id
+                  // }
+                }
+
+                if (toAdd === true) {
+                  allMatchingClus[itemI] = [parseInt(item.seq_start[i]), parseInt(item.seq_end[i])]
+                }
+                // console.log('matching cluster ' + item.seq_start[i] + ' ' + item.seq_end[i] + ' ' + item.pdb_id + ' ' + item.pdb_chain + ' ' + itemI)
+              } else {
+                break
+              }
+            }
+          }
+
+          // console.log('The total arrAllClusters is ' + arrAllClusters)
+          if (itemI === matches.clusters.length - 1) {
+            console.log(allMatchingClus)
+            resolve(['matching structures - update the pd'])
+          }
+          */
 
           // console.log('matching cluster ' + arrAllClusters)
           // console.log('clusters found in matching cluster')
@@ -297,4 +332,47 @@ function updateSelectedPdb (matches) {
       resolve(['matching structures - nothing to show'])
     }
   })
+}
+
+function getTheBestCluster (matchingClusters, sortedKeys) {
+  return new Promise(function(resolve, reject) { // eslint-disable-line
+    var theFirstWithData = []; var theFirstPos = -1
+    for (let i = 0; i < sortedKeys.length; i++) {
+      if (matchingClusters.hasOwnProperty(sortedKeys[i])) { // eslint-disable-line
+
+        // console.log(matchingClusters[sortedKeys[i]])
+        theFirstWithData = matchingClusters[sortedKeys[i]]
+        console.log('The intersecting list is (1) ' + theFirstWithData)
+        theFirstPos = i
+        break
+      }
+    }
+
+    if (theFirstPos > -1) {
+      console.log('theFirstPos ' + theFirstPos + ' sortedKeys.len ' + sortedKeys.length)
+      if (theFirstPos + 1 < sortedKeys.length) {
+        for (let i = theFirstPos + 1; i < sortedKeys.length; i++) {
+          if (matchingClusters.hasOwnProperty(sortedKeys[i])) { // eslint-disable-line
+            // Check intersection
+            var intersectList = intersect(theFirstWithData, matchingClusters[sortedKeys[i]])
+            console.log('The intersecting list is ' + intersectList)
+            if (intersectList.length > 0) {
+              theFirstWithData = intersectList
+            }
+          }
+          if (i == sortedKeys.length - 1) { // eslint-disable-line
+            resolve(theFirstWithData)
+          }
+        }
+      } else {
+        resolve(theFirstWithData)
+      }
+    } else {
+      resolve()
+    }
+  })
+}
+
+function intersect (a, b) {
+  return a.filter(Set.prototype.has, new Set(b))
 }

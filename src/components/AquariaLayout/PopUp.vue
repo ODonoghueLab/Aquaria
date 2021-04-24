@@ -202,8 +202,6 @@ export default {
     //   })
     // },
     dragElement: function (elmnt) {
-      console.log('smiting of the first born')
-      console.log(elmnt)
       var pos1 = 0; var pos2 = 0; var pos3 = 0; var pos4 = 0
       if (document.getElementById(elmnt.id + 'header')) {
         // if present, the header is where you move the DIV from:

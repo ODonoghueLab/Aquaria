@@ -1274,11 +1274,11 @@ function parseFeatures (primary_accession, categories, server, featureCallback, 
 
 AQUARIA.ifUrlHasVarExtractInfo = function(){
   return new Promise(function(resolve, reject){
-    console.log("In the magic function");
+    // console.log("In the magic function");
     var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
     var searchParam = decodeURIComponent(window.location.search.split('?')[1])
 
-    let variantResidues = {}; // variantRes{resNum} => {defaultDesc: , oldAa: , positionInfo: , newAas: [], A, C, D, }
+    let variantResidues = {}; // variantRes{resNum} => {defaultDesc: , oldAa: , positionInfo: , order: , newAas: [], A, C, D, }
     if (featureRegex.test(searchParam)) {
 
       var features = searchParam.split('&')
@@ -1309,6 +1309,8 @@ AQUARIA.ifUrlHasVarExtractInfo = function(){
           variantResidues[resNum].defaultDesc = featAndDesc.description
           addNewResAndGrantham(variantResidues[resNum], consInfo[resNum])
 
+
+          variantResidues[resNum].order = feature_i
           counter = counter + 1;
         }
 

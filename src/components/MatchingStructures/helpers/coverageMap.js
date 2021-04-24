@@ -103,10 +103,6 @@ export function drawCluster (cluster, rank) {
 }
 
 export function drawResidues (cluster, rank, el) {
-  console.log("Element start and end " + cluster.pdb_id + " " + el.start + " " + el.end)
-  console.log(cluster)
-  console.log(el)
-
   var seqLength = window.AQUARIA.showMatchingStructures.sequence.length
   var myScale = d3.scale.linear().domain([1, seqLength]).range([1, document.getElementById('structure-viewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left - 5])
 
