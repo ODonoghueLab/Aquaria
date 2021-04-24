@@ -228,40 +228,67 @@ function updateSelectedPdb (matches) {
       // let chosenRes = 350
       window.AQUARIA.ifUrlHasVarExtractInfo().then(function (varRes) {
         console.log('Hello world!!')
+
         const sortedKeys = Object.keys(varRes).sort(function (a, b) {
           return a - b
         })
 
-        const chosenRes = sortedKeys[0]
-        var arrAllClusters = [] // Cluster numbers
-        let isSelectedPdb = false
+        console.log(sortedKeys)
 
+        // const chosenRes = sortedKeys[0]
+        var allMatchingClus = {} // dict_{clustNum} => [start, end] (end gets updated evertime the same one is encountered)
+        // let isSelectedPdb = false
+        let maxNumResFit = -1
         console.log('yes, to choose a new best matching cluster now')
         if ('clusters' in matches) {
           matches.clusters.forEach(function (item, itemI) {
+            let toAdd = true
             // console.log('matching cluster ' + item.seq_start.length + ' '  + item.seq_start + ' ' + item.seq_end)
+            // to help choose the first maximal.
             for (let i = 0; i < item.seq_start.length; i++) {
               // console.log(item)
-              if (chosenRes >= parseInt(item.seq_start[i]) && chosenRes <= parseInt(item.seq_end[i])) {
-                if (isSelectedPdb === false) {
-                  isSelectedPdb = true
-                  matches.Selected_PDB.cluster_number = itemI
-                  matches.Selected_PDB.member_number = 0
-                  matches.Selected_PDB.pdb_chain = item.pdb_chain
-                  matches.Selected_PDB.pdb_id = item.pdb_id
-                }
-                console.log('matching cluster ' + item.seq_start[i] + ' ' + item.seq_end[i] + ' ' + item.pdb_id + ' ' + item.pdb_chain + ' ' + itemI)
+              if (Object.prototype.hasOwnProperty.call(allMatchingClus, itemI)) {
+                var startToAdd = Math.min(parseInt(allMatchingClus[itemI][0]), parseInt(item.seq_start[i]))
+                var endToAdd = Math.max(parseInt(allMatchingClus[itemI][1]), parseInt(item.seq_end[i]))
+                allMatchingClus[itemI] = [startToAdd, endToAdd]
 
-                arrAllClusters.push(itemI)
+                toAdd = false
+              }
+
+              for (let cr = 0; cr < sortedKeys.length; cr++) {
+                console.log('The maxNumResFit clust is ' + cr + ' ' + maxNumResFit + ' ' + item.pdb_id + ' ' + sortedKeys[cr] + ' ' + item.seq_start[i] + ':' + item.seq_end[i])
+
+                if ((toAdd === true && sortedKeys[cr] >= parseInt(item.seq_start[i]) && sortedKeys[cr] <= parseInt(item.seq_end[i])) || (toAdd === false && sortedKeys[cr] >= allMatchingClus[itemI][0] && sortedKeys[cr] <= allMatchingClus[itemI][1])) {
+                  // if (isSelectedPdb === false) {
+                  //   isSelectedPdb = true
+
+                  if (cr > maxNumResFit) {
+                    maxNumResFit = maxNumResFit + 1
+                    matches.Selected_PDB.cluster_number = itemI
+                    matches.Selected_PDB.member_number = 0
+                    matches.Selected_PDB.pdb_chain = item.pdb_chain
+                    matches.Selected_PDB.pdb_id = item.pdb_id
+                    // }
+                  }
+
+                  if (toAdd === true) {
+                    allMatchingClus[itemI] = [parseInt(item.seq_start[i]), parseInt(item.seq_end[i])]
+                  }
+                  // console.log('matching cluster ' + item.seq_start[i] + ' ' + item.seq_end[i] + ' ' + item.pdb_id + ' ' + item.pdb_chain + ' ' + itemI)
+                } else {
+                  break
+                }
               }
             }
 
+            // console.log('The total arrAllClusters is ' + arrAllClusters)
             if (itemI === matches.clusters.length - 1) {
+              console.log(allMatchingClus)
               resolve(['matching structures - update the pd'])
             }
           })
 
-          console.log('matching cluster ' + arrAllClusters)
+          // console.log('matching cluster ' + arrAllClusters)
           // console.log('clusters found in matching cluster')
         }
       })

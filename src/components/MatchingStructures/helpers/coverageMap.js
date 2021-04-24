@@ -37,6 +37,9 @@ export function drawClusterContainer (cluster, s, element) {
     console.log('ClusterRenderer.drawClusterContainer error: cannot draw cluster as it has no secondary structure: ', cluster)
     return
   }
+  var seqLength = window.AQUARIA.showMatchingStructures.sequence.length
+  var myScale = d3.scale.linear().domain([1, seqLength]).range([1, document.getElementById('structure-viewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left - 5])
+
 
   var structStart = this.xScale(cluster.secondary_structure[0][0].start)
   var structEnd = this.xScale(cluster.secondary_structure[0][cluster.secondary_structure[0].length - 1].end)
@@ -100,11 +103,77 @@ export function drawCluster (cluster, rank) {
 }
 
 export function drawResidues (cluster, rank, el) {
+  console.log("Element start and end " + cluster.pdb_id + " " + el.start + " " + el.end)
+  console.log(cluster)
+  console.log(el)
+
+  var seqLength = window.AQUARIA.showMatchingStructures.sequence.length
+  var myScale = d3.scale.linear().domain([1, seqLength]).range([1, document.getElementById('structure-viewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left - 5])
+
+  var offset = cluster.secondary_structure[0][0].start
+  var thickness = 0
+  for (var n = el.start; n <= el.end; n++) {
+    var conservation = cluster.conservationArray[0][n]
+    if (n !== el.end && conservation === cluster.conservationArray[0][n + 1]) {
+      thickness++
+      continue
+    }
+
+    // console.log("Thickness is " + thickness)
+    var translateVal = n - offset - thickness
+    var rect_id = 'g#structure_' + cluster.pdb_id.toLowerCase() + '_' + rank + ' g.cluster';
+    var g_id = 'r_' + rank + '_' + n
+    var rect = this.nusvg.select(rect_id)
+      .append('g')
+      .attr('class', 'residue ' + el.type)
+      .attr('id', g_id)
+      .attr('transform', 'translate(' + this.xScale(translateVal) + ',8)')
+      .append('rect')
+      .attr('class', conservation)
+      .attr('width', this.xScale(thickness + 1))
+      .attr('height', 10)
+
+      var rect = this.nusvg.select(
+        'g#structure_' + cluster.pdb_id.toLowerCase() + '_' + rank + ' g.cluster').append('g').attr('class', 'residue ' + el.type)
+        .attr('id', 'r_' + rank + '_' + n).attr('transform',
+          'translate(' + this.xScale(n - offset - thickness) + ',8)')
+        .append('rect').attr('class', conservation).attr('width',
+          this.xScale(thickness + 1)).attr('height', 10)
+
+      // if (data.conservationArray[n] === 'conserved') {
+      // rect.attr("class", "conserved");
+      // }
+      if (el.type === 'SHEET') {
+        rect.attr('height', 14).attr('transform', 'translate(0,-2)')
+        if (n === el.end) {
+          rect.attr('width', window.AQUARIA.srw * (thickness))
+          //      }
+          this.nusvg.select('g.residue#r_' + rank + '_' + n).append('svg:polygon')
+            .attr('class', conservation).attr('transform',
+              'translate(' + this.xScale(thickness) + ',0)').attr(
+              'points', window.AQUARIA.srw + ',0 0,-6 0,16 ' + window.AQUARIA.srw + ',10')
+          // this.nusvg.select("g.residue#r_"+rank+"_"+n+" rect").remove();
+        } else {
+          // console.log(' not at the end:' + n);
+        }
+      }
+      if (el.type === 'HELIX') {
+        this.nusvg.select('g.residue#r_' + rank + '_' + n + ' rect')
+          .attr('height', 16).attr('class', conservation).attr('transform',
+            'translate(0,-3)')
+      }
+      thickness = 0
+  }
+  /*
   // for each residue, draw one rectangle with a unique position id, so we can
   // assign a class/status later
   var offset = cluster.secondary_structure[0][0].start
 
   var thickness = 0
+
+  console.log("Element start and end " + cluster.pdb_id + " " + el.start + " " + el.end)
+  console.log(cluster)
+  console.log(el)
 
   for (var n = el.start; n <= el.end; n++) {
     var conservation = cluster.conservationArray[0][n]
@@ -145,6 +214,7 @@ export function drawResidues (cluster, rank, el) {
     }
     thickness = 0
   }
+  */
 }
 
 export function setConservation (data) { // console.log("setting conservation
