@@ -113,8 +113,9 @@ export function drawTrack (datum, svg, extServerIds_) {
       .attr('transform', 'translate(0,13)')
       .attr('class', 'insertion')
   }
-  let smallestPos = -1;
-  let smallestId = "";
+
+  let firstSpecifiedPos = -1;
+  let firstSpecifiedId = "";
   for (var p in features[o]) {
     this.drawFeatures(p, o, features, extServerIds_)
 
@@ -122,14 +123,27 @@ export function drawTrack (datum, svg, extServerIds_) {
       // console.log("A feature is ")
       // console.log(features[o][p])
 
-      if (smallestPos == -1){
-        smallestPos = features[o][p].start
-        smallestId = 'r_' + o + '_' + p
+      if (firstSpecifiedPos == -1){
+        window.AQUARIA.ifUrlHasVarExtractInfo().then(function (varRes) {
+          Object.keys(varRes).forEach(function(aRes, aRes_i){
+            // console.log('aRes.order is ' + varRes[aRes].order)
+            if (varRes[aRes].order == 0){
+              firstSpecifiedPos = aRes_i
+              firstSpecifiedId = 'r_' + o + '_' + p
 
-      }
-      else if (features[o][p].start < smallestPos){
-        smallestPos = features[o][p].start
-        smallestId = 'r_' + o + '_' + p
+              var element = document.getElementById(firstSpecifiedId)
+              console.log("The first specified element is " + element)
+              var event = new MouseEvent('mouseover', {
+                'view': window,
+                'bubbles': true,
+                'cancelable': true
+              });
+              element.dispatchEvent(event);
+              d3.select('#' + firstSpecifiedId).attr('stroke-width', '0px')
+
+            }
+          })
+        })
       }
 
     }
@@ -137,15 +151,6 @@ export function drawTrack (datum, svg, extServerIds_) {
 
   // popup open by default on page load.
   // console.log("The smallest pos is " + smallestPos)
-
-  var element = document.getElementById(smallestId)
-  var event = new MouseEvent('mouseover', {
-    'view': window,
-    'bubbles': true,
-    'cancelable': true
-  });
-  element.dispatchEvent(event);
-  d3.select('#' + smallestId).attr('stroke-width', '0px')
 
 
 

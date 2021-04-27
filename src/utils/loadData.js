@@ -349,13 +349,13 @@ function getTheBestCluster (matchingClusters, sortedKeys) {
     }
 
     if (theFirstPos > -1) {
-      console.log('theFirstPos ' + theFirstPos + ' sortedKeys.len ' + sortedKeys.length)
+      // console.log('theFirstPos ' + theFirstPos + ' sortedKeys.len ' + sortedKeys.length)
       if (theFirstPos + 1 < sortedKeys.length) {
         for (let i = theFirstPos + 1; i < sortedKeys.length; i++) {
           if (matchingClusters.hasOwnProperty(sortedKeys[i])) { // eslint-disable-line
             // Check intersection
             var intersectList = intersect(theFirstWithData, matchingClusters[sortedKeys[i]])
-            console.log('The intersecting list is ' + intersectList)
+            // console.log('The intersecting list is ' + intersectList)
             if (intersectList.length > 0) {
               theFirstWithData = intersectList
             }
