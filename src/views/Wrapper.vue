@@ -20,12 +20,12 @@
     <!-- AquariaLayout -->
     <Tabs />
     <PopUp />
-    <a href="#"><div id="scrim" class="hide" @click="dismissPanel"></div></a>
+    <a v-bind:href="data.hash"><div id="scrim" class="hide" @click="dismissPanel"></div></a>
   </div>
 </template>
 
 <script>
-
+import store from '../store/index'
 import '../components/AquariaLayout/helpers/aquaria' // most legacy code bundling is triggered from here (expects global jolecule)
 import Header from '../components/Header/Header'
 import Sequence from '../components/InfoAbout/Sequence'
@@ -49,6 +49,13 @@ export default {
     PopUp,
     AboutAquaria,
     Errors
+  },
+  computed: {
+    data () {
+      return {
+        hash: store.state.hash
+      }
+    }
   },
   methods: {
     checkPhone: function () {
@@ -80,6 +87,7 @@ export default {
       document.querySelector('#scrim').className = 'hide'
       // reset title to neutral state
       document.querySelector('#title').className = 'item title fix level6'
+      if (document.querySelector('#titleAlign') !== null) { document.querySelector('#titleAlign').className = '' }
       document.querySelectorAll('#title span a').forEach(el => {
         el.className = ''
       })

@@ -26,11 +26,12 @@
           Structure  <strong>{{pdb}}:</strong>  {{structRes}} </a>
         </span>
       </div>
-      <a href="#" class="close" @click="dismissPanel"></a>
+      <a  v-bind:href="data.hash" class="close" @click="dismissPanel"></a>
     </div>
 </template>
 
 <script>
+import store from '../../store/index'
 export default {
   name: 'Title',
   data () {
@@ -41,8 +42,14 @@ export default {
       pdb: null,
       search: require('../../assets/img/search_100.png'),
       seqRes: null,
-      structRes: null,
-      alignment: null
+      structRes: null
+    }
+  },
+  computed: {
+    data () {
+      return {
+        hash: store.state.hash
+      }
     }
   },
   beforeMount () {
@@ -88,6 +95,8 @@ export default {
       document.querySelector('#scrim').className = 'show level3'
       if (document.querySelector('#titleAlign') !== null) {
         document.querySelector('#titleAlign').className = 'active'
+        store.commit('setAlignment', window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard())
+        store.commit('setHash', window.location.hash)
       }
     },
     dismissPanel: function () {
@@ -122,14 +131,15 @@ export default {
       if (document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display === 'none') {
         _this.seqRes = null
         _this.structRes = null
-        _this.alignment = null
+        // _this.alignment = null
+        store.commit('setAlignment', '')
       } else {
         var residues = document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').innerText.split('\n')
         var pdb = window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain + ':'
         var accession = window.AQUARIA.Gene + ':'
         _this.seqRes = residues[1].split(accession)[1]
         _this.structRes = residues[0].split(pdb)[1]
-        _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+        // _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
       }
     })
     selectedRes.observe(document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection'), {
