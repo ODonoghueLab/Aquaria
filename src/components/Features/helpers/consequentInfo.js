@@ -471,7 +471,15 @@ function updateFeatStr(theOrigFeatStr, theRightOldAa, theUserOldAa, isOne){
   let arr = theOrigFeatStr.split(/[0-9]+/);
 
   if (!arr[0].match(theRightOldAa)){
-    theOrigFeatStr = theOrigFeatStr.replace(theUserOldAa, theRightOldAa)
+    console.log("Does not match the right oldAa " + theOrigFeatStr)
+    var theNewFeatStr = theOrigFeatStr.replace(theUserOldAa, theRightOldAa)
+
+    var oldUrl = window.location.toString()
+    var newUrl = oldUrl.replace(theOrigFeatStr, theNewFeatStr)
+    window.history.pushState({path:newUrl},'',newUrl);
+
+    theOrigFeatStr = theNewFeatStr;
+
   }
 
   return theOrigFeatStr
