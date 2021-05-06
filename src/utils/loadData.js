@@ -36,7 +36,7 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
   var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length)
   if (window.AQUARIA.orgName) {
     history.pushState(primaryAccession, document.title, '/' +
-     window.AQUARIA.orgName + '/' + window.AQUARIA.gene + pdbParam + chainParam + urlParams)
+     window.AQUARIA.orgName + '/' + window.AQUARIA.Gene + pdbParam + chainParam + urlParams)
   } else {
     history.pushState(primaryAccession, document.title, '/' +
       primaryAccession + pdbParam + (chainParam || '') + urlParams)
