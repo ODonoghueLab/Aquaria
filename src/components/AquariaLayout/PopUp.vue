@@ -304,7 +304,9 @@ export default {
   }
 
   .selCol {
-    color: #707070 !important;
+    color: var(--text) !important;
+    background-color: var(--primary-highlight);
+    border-radius: 25%;
   }
 
   .pAaColor {

@@ -183,7 +183,7 @@ export function drawFeatures (p, o, features, extServerIds_) {
   var trans_x = myScale(parseInt(features[o][p].start))
   // var trans_x = Math.floor(parseInt(features[o][p].start)/seqLength * (offsetWidth - 300)) // ((parseInt(features[o][p].start)) * (parseFloat(window.AQUARIA.srw)))
   this.nusg.append('rect')
-    .attr('width', function () { return (/* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) > 2) ? /* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) : 2 })
+    .attr('width', function () { return (parseInt((features[o][p].size + 1) * window.AQUARIA.coverageMapsrw) > 2) ? parseInt((features[o][p].size + 1) * window.AQUARIA.coverageMapsrw) : 2 })
     .attr('height', 14)
     .attr('id', 'r_' + o + '_' + p)
     .attr('x', trans_x)
