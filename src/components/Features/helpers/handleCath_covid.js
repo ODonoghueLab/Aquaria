@@ -1,6 +1,8 @@
 var cathFunctions = require('./handleCath.js')
 
-module.exports = function (jsonObj1, getFeatures, validateAgainstSchema, primary_accession, featureCallback) {
+module.exports = function (jsonObj1, getFeatures, validateAgainstSchema, primary_accession, featureCallback, variantResidues) {
+
+  console.log("In this function handleCath_covid");
   // Stage 1:
   let convertedFeatures = {}
   const dataArr_hc = []
@@ -12,6 +14,7 @@ module.exports = function (jsonObj1, getFeatures, validateAgainstSchema, primary
   let superFamFeatureSet = []
 
   if (!jsonObj1 || jsonObj1 === null || !jsonObj1.hasOwnProperty('data') || jsonObj1.data === null || Object.getOwnPropertyNames(jsonObj1.data).length < 1) { // || jsonObj1.data.length < 1){
+    console.log("Does it come here???")
     validateAgainstSchema(convertedFeatures, primary_accession, featureCallback, 'CATH')
   }
 
@@ -43,7 +46,7 @@ module.exports = function (jsonObj1, getFeatures, validateAgainstSchema, primary
 					console.log("The ancestor data is");
 					console.log(ancestorDataObj);
 					*/
-            cathFunctions.handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancestorDataObj, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet).then(function (resObj) {
+            cathFunctions.handlePromiseData_sfAndRel(superFamRequests, convertedFeatures, ancestorDataObj, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet, variantResidues).then(function (resObj) {
               superFamFeatureSet = resObj.superFamFeatureSet
               convertedFeatures = resObj.convertedFeatures
               resolve()
@@ -53,14 +56,16 @@ module.exports = function (jsonObj1, getFeatures, validateAgainstSchema, primary
       })
       .then(function () {
         return new Promise(function (resolve, reject) {
-          // console.log("$$$$$$$$ ");
+          console.log("$$$$$$$$ ");
           // console.log(thePromises.funfamIds);
-          handleData_ff(thePromises.funfamIds, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet, funFamFeatureSet, convertedFeatures).then(function () {
+          handleData_ff(thePromises.funfamIds, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet, funFamFeatureSet, convertedFeatures, variantResidues).then(function () {
             resolve()
           })
         })
       })
       .then(function () {
+        console.log("Cath covid: converted features: ")
+        console.log(convertedFeatures)
         validateAgainstSchema(convertedFeatures, primary_accession, featureCallback, 'CATH', hcDataObj)
       })
       .catch(function (error) {
@@ -75,7 +80,7 @@ module.exports = function (jsonObj1, getFeatures, validateAgainstSchema, primary
   // Send the multiple requests.
 }
 
-function handleData_ff (funFamData, dataArr_hc, hcDataObj, residues_, superFamFeatureSet, funFamFeatureSet, convertedFeatures) {
+function handleData_ff (funFamData, dataArr_hc, hcDataObj, residues_, superFamFeatureSet, funFamFeatureSet, convertedFeatures, variantResidues) {
   return new Promise(function (resolve, reject) {
     const keyFunFam = 'Functional families'
 
@@ -86,7 +91,7 @@ function handleData_ff (funFamData, dataArr_hc, hcDataObj, residues_, superFamFe
 
       hcDataObj = cathFunctions.handleEcGoSpecies(dataArr_hc, i, aFunFamFeature.Name, hcDataObj)
 
-      const funFamFeat_res = cathFunctions.handleResidues_funFam(residues_[i], superFamFeatureSet, aFunFamFeature.Name)
+      const funFamFeat_res = cathFunctions.handleResidues_funFam(residues_[i], superFamFeatureSet, aFunFamFeature.Name, variantResidues)
 
       if (Object.keys(funFamFeat_res).length > 0) {
         // add to set.

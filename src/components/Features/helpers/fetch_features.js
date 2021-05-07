@@ -777,9 +777,9 @@ function getJsonFromUrl (requestedFeature, url, primary_accession, featureCallba
         handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues)
       }
       if (requestedFeature == 'CathCovid') {
-        console.log("!!!! The cath covid response data is ");
+        console.log("!!!! The cath covid response data is - this is the right fetch_features");
         console.log(response);
-        handleCath_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback)
+        handleCath_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues)
       }
 
       if (requestedFeature == 'FunVar') {
@@ -856,8 +856,11 @@ var processNextServer = function (primary_accession,
 
       if (primary_accession == 'P0DTC1' || primary_accession == 'P0DTC2'|| primary_accession == 'P0DTC7' || primary_accession == 'P0DTD1'){
 				// console.log("!!!!!!!!!! A COVID PROTEIN ENCOUNTERED");
-				getJsonFromUrl('CathCovid',servers[currentServer]['URL_covid'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
+				getJsonFromUrl('CathCovid',servers[currentServer]['URL_covid'] + primary_accession + '?content-type=application/json', primary_accession, featureCallback, validateAquariaFeatureSet);
 				// handleCath_covid(primary_accession);
+        featureCallback(aggregatedAnnotations, extServerIds_forLoading)
+        processNextServer(primary_accession,
+          featureCallback)
 	 		}
 			else {
       // console.log('^^ Failed to fetch item: err=', err);

@@ -775,8 +775,8 @@ function getJsonFromUrl (requestedFeature, url, primary_accession, featureCallba
         handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues)
       }
       if (requestedFeature == 'CathCovid') {
-        // console.log("!!!! The cath covid response data is ");
-        // console.log(response);
+        console.log("!!!! The cath covid response data is ");
+        console.log(response);
         handleCath_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback)
       }
 
@@ -856,6 +856,9 @@ var processNextServer = function (primary_accession,
 				console.log("!!!!!!!!!! A COVID PROTEIN ENCOUNTERED");
 				getJsonFromUrl('CathCovid',servers[currentServer]['URL_covid'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
 				// handleCath_covid(primary_accession);
+        featureCallback(aggregatedAnnotations, extServerIds_forLoading)
+        processNextServer(primary_accession,
+          featureCallback)
 	 		}
 			else {
       // console.log('^^ Failed to fetch item: err=', err);
