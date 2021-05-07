@@ -28,11 +28,12 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
           if (featureType == 'Mutational sensitivity (SNAP2 ratio of effect mutations)') {
             cleanData_snap2_effects(description, variantResidues[resSnp].newResidues, posInfo, otherResInfo)
             addToVariantResidues(variantResidues, resSnp, [], posInfo, otherResInfo, '<a href="https://rostlab.org/owiki/index.php/Snap2" target="blank"> SNAP2</a>')
+          } else if (featureType.match(/^Mutation to /)) {
+            console.log()
+            cleanData_aaMutScore_snap2(variantResidues[resSnp], description)
           } else if (featureType == 'Mutation score (average SNAP2 score)') {
             cleanData_snap2_getAvgScore_v2(description, posInfo, variantResidues[resSnp].newResidues, variantResidues[resSnp])
             addToVariantResidues(variantResidues, resSnp, [], posInfo, [], "<a href='https://rostlab.org/owiki/index.php/Snap2' target='blank'><i>SNAP2</i></a>")
-          } else if (featureType.match(/^Mutation to /)) {
-            cleanData_aaMutScore_snap2(variantResidues[resSnp], description)
           }
         } else if (serverName == 'CATH') {
           const cath_infoUrl = "<a href='https://www.cathdb.info/wiki' target='blank'>CATH</a>"
@@ -465,11 +466,52 @@ function cleanData_snap2_getAvgScore_v2 (desc, arr_posInfo, newAas, variantResid
 
   const arr = desc.split(/\;/)
 
-  if (arr.length >= 2) {
+  if (arr.length >= 3){
+    arr[2] = arr[2].replace(/[\s\t]+/g, '')
+    arr[2] = arr[2].replace(/functionchangingare\:/, '')
+    arr_scores = arr[2].split(",")
+
+    let total = 0; // 1 if val > 40; -1 if < -40 else 0. Then sum to get which condition.
+
+    arr_scores.forEach(function(item, item_i){
+      let indivScore = item.replace(/[^\d]/, '').replace(/\:/, '')
+
+      if (parseFloat(indivScore) > 40){
+        // arrCounts.push(1)
+        total = total + 1
+      }
+      else if (parseFloat(indivScore) <-40){
+        // arrCounts.push(-1)
+        total = total - 1
+      }
+      else {
+        // arrCounts.push(0)
+        // total = total + 0
+      }
+      // console.log('SNAP indiv score is ' + indivScore)
+    });
+
+    let avgScore = total / arr_scores.length;
+    // console.log('SNAP AVG score is ' + total);
+
+    if (avgScore > 11){ // 11 is based on the number of amino acids (from Andrea's slides)
+
+    }
+    else if ( avgScore < 11){
+
+    }
+    else{
+      arr_posInfo.push('Average sensitivity to mutation')
+    }
+
+  }
+  else if (arr.length >= 2) {
     let score = arr[1].replace(/^.*\:/, '')
     score = score.replace(/[\s]+/g, '')
 
     if (parseFloat(score) >= -40 && parseFloat(score) <= 40) {
+      // console.log("SNAP this case is " + parseFloat(score) + ". Length is " + arr.length);
+      // console.log("SNAP this case is " + desc)
       arr_posInfo.push('Average sensitivity to mutation')
     }
     // console.log('snap2 desc 2 mutation ' + arr.length + ' ' + arr[1] + ' ' + score)
