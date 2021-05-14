@@ -22,8 +22,8 @@
       <div id='titleAlign' class='' v-if="seqRes">
         <span class='titlepanel'>
           <a href="#Alignment" class="" @click="makeActive" >
-          Sequence <strong>{{primary_accession}}:</strong> {{seqRes}} <br/>
-          Structure  <strong>{{pdb}}:</strong>  {{structRes}} </a>
+          <strong>{{primary_accession}}</strong> Sequence: {{seqRes}} <br/>
+          <strong>{{pdb}}</strong> Structure: {{structRes}} </a>
         </span>
       </div>
       <a  v-bind:href="data.hash" class="close" @click="dismissPanel"></a>
@@ -91,7 +91,7 @@ export default {
         el.className = ''
       })
       ev.target.className = 'active'
-      document.querySelector('#title').className += ' active'
+      if (document.querySelector('#title').className.indexOf('active') === -1) { document.querySelector('#title').className += ' active' }
       document.querySelector('#scrim').className = 'show level3'
       if (document.querySelector('#titleAlign') !== null) {
         document.querySelector('#titleAlign').className = 'active'
@@ -246,5 +246,8 @@ span#pdb_id , span#no_pdb_id {
 #titleAlign.active span.titlepanel a {
   width: 80vw;
   max-width: 29.5rem;
+}
+#titleAlign.active + a.close::after {
+    top: calc(0.5rem + 3 * ((100vw - 320px) / 680));
 }
 </style>
