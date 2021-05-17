@@ -115,4 +115,8 @@ export default {
       padding: 0.2em;
       margin: 2px 0;
   }
+ #Menu.panel .close::after {
+    top: -0.5rem;
+    right: -0.5rem;
+  }
 </style>

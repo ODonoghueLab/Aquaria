@@ -125,8 +125,4 @@ p.thetitle {
   .affiliations span {
       margin-right: 1.2em;
   }
-  .panel .close::after {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
  </style>
