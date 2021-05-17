@@ -361,8 +361,8 @@ var MAX_PROTEIN_HISTORY = 10;
         selectChain: window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : this.member.pdb_chain[0]
       }
 
-      // var url = `${window.BACKEND}/get_3D_alignment`
-      var url = `http://localhost:8009/get_3D_alignment`
+      var url = `${window.BACKEND}/get_3D_alignment`
+      // var url = `http://localhost:8009/get_3D_alignment`
       // var url = 'https://vuejs.org/v2/guide/events.html'
       axios({
         method: 'get',
