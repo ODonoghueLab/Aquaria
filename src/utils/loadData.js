@@ -215,9 +215,73 @@ export function chainSelected (primaryAccession, pdbId, chainId) {
   }
 }
 
+function getSeqResAndAlignInfo (intersectList, resPos, newAas, uniprotId) {
+  return new Promise(function (resolve, reject) {
+    console.log('The intersect list is ' + intersectList + ' ' + newAas + ' ' + uniprotId + ' ' + resPos)
+
+    var arrMatchingPdbs = [] // [{clusNum, memNum, pdbId, pdbChain}, ...]
+
+    getJsonFromUrl(uniprotId).then(function (response) {
+      if (Object.prototype.hasOwnProperty.call(response, 'data')) {
+        // console.log('The intersect is ')
+        // console.log(response.data)
+        intersectList.forEach(function (clusNum, clusNumI) {
+          if (clusNum < response.data.length) {
+            response.data[clusNum].members.forEach(function (anAlignment, anAlignmentI) {
+              var arrAlignPos = anAlignment.Alignment.split(' ')
+              for (var i = 0; i < arrAlignPos.length; i++) {
+                var arrRefPdb = arrAlignPos[i].split(':')
+                var arrRef = arrRefPdb[0].split('-')
+                if (resPos >= parseInt(arrRef[0]) && resPos <= parseInt(arrRef[1])) {
+                  var arrPdb = arrRefPdb[1].split('-')
+                  var distance = resPos - parseInt(arrRef[0])
+                  var resPosInPdb = parseInt(arrPdb[0]) + distance
+
+                  console.log('An alignment is ' + arrRefPdb[0] + ' ' + arrRefPdb[1] + '|' + arrRef[0] + ' ' + arrRef[1] + ' ' + distance + ' ' + resPosInPdb + ' SeqLen:' + anAlignment.SEQRES.length + ' ' + ' PdbAa:' + anAlignment.SEQRES[distance] + ' PdbId:' + anAlignment.PDB_ID + ' ' + ' PdbChain:' + anAlignment.Chain)
+                  if (newAas.includes(anAlignment.SEQRES[distance])) {
+                    arrMatchingPdbs.push({ clusNum: clusNum, memNum: anAlignmentI, pdbId: anAlignment.PDB_ID, pdbChain: anAlignment.Chain })
+                  }
+                }
+              }
+              // console.log(anAlignment)
+            })
+          }
+          if (clusNumI === intersectList.length - 1) {
+            resolve(arrMatchingPdbs)
+          }
+        })
+      }
+      // else no data recieved
+    })
+  })
+}
+
+function getJsonFromUrl (uniprotId) {
+  return new Promise(function (resolve, reject) {
+    var url = 'https://odonoghuelab.org:8011/getSequence?selector[]=' + uniprotId
+
+    axios({
+      method: 'get',
+      url: url
+    })
+      .then(function (response) {
+        resolve(response)
+      })
+      .catch(function (error) { /* eslint handle-callback-err: "warn" */
+        // handle error
+        console.log('Error: encountered in fetching seqres and alignment information from aquaria backend.')
+        resolve({})
+      })
+  })
+}
 function updateSelectedPdb (matches) {
   return new Promise(function (resolve, reject) {
+    console.log('Mother of dragons')
+    console.log(matches)
     const featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/) // eslint-disable-line
+
+    var uniprotId = window.AQUARIA.protein_primaryAccession
+
     var searchParam = decodeURIComponent(window.location.search.split('?')[1])
 
     // const chosenRes2 = ifUrlHasVar_extractInfo()
@@ -260,18 +324,43 @@ function updateSelectedPdb (matches) {
               console.log(matchingClusters)
               getTheBestCluster(matchingClusters, sortedKeys).then(function(intersectList) { // eslint-disable-line
                 if (intersectList) {
-                  matches.Selected_PDB.cluster_number = intersectList[0]
-                  matches.Selected_PDB.member_number = 0
-                  matches.Selected_PDB.pdb_chain = matches.clusters[intersectList[0]].pdb_chain
-                  matches.Selected_PDB.pdb_id = matches.clusters[intersectList[0]].pdb_id
+                  if (Object.prototype.hasOwnProperty.call(varRes[sortedKeys[0]], 'newAas')) {
+                    getSeqResAndAlignInfo(intersectList, sortedKeys[0], varRes[sortedKeys[0]].newAas, uniprotId).then(function (arrMatchingPdbs) {
+                      console.log('The intersecting position is ')
+                      console.log(arrMatchingPdbs)
+
+                      if (arrMatchingPdbs && arrMatchingPdbs.length > 0) {
+                        matches.Selected_PDB.cluster_number = arrMatchingPdbs[0].clusNum
+                        matches.Selected_PDB.member_number = arrMatchingPdbs[0].memNum
+                        matches.Selected_PDB.pdb_chain = arrMatchingPdbs[0].pdbChain
+                        matches.Selected_PDB.pdb_id = arrMatchingPdbs[0].pdbId
+
+                        resolve(['matching structures - update the pd'])
+                      } else {
+                        matches.Selected_PDB.cluster_number = intersectList[0]
+                        matches.Selected_PDB.member_number = 0
+                        matches.Selected_PDB.pdb_chain = matches.clusters[intersectList[0]].pdb_chain
+                        matches.Selected_PDB.pdb_id = matches.clusters[intersectList[0]].pdb_id
+
+                        resolve(['matching structures - update the pd'])
+                      }
+                    })
+                  } else {
+                    matches.Selected_PDB.cluster_number = intersectList[0]
+                    matches.Selected_PDB.member_number = 0
+                    matches.Selected_PDB.pdb_chain = matches.clusters[intersectList[0]].pdb_chain
+                    matches.Selected_PDB.pdb_id = matches.clusters[intersectList[0]].pdb_id
+
+                    resolve(['matching structures - update the pd'])
+                  }
                 } else {
                   matches.Selected_PDB.cluster_number = 0
                   matches.Selected_PDB.member_number = 0
                   matches.Selected_PDB.pdb_chain = matches.clusters[0].pdb_chain
                   matches.Selected_PDB.pdb_id = matches.clusters[0].pdb_id
-                }
 
-                resolve(['matching structures - update the pd'])
+                  resolve(['matching structures - update the pd'])
+                }
               })
             }
           })
