@@ -1,26 +1,26 @@
 <template>
     <div id="title" class="item title fix level6">
-      <span id="org_prot"  v-if="organism_name && !seqRes">
+      <span id="org_prot"  v-if="organism_name && !seqRes" v-on:click="storeHash">
         <a href="#Sequence" class="" @click="makeActive">
           <img v-bind:src="search">
           {{organism_name}} <strong>{{primary_accession}}</strong>
         </a>
       </span>
-      <span id="uniprotpanel" class='titlepanel' v-if="!organism_name && !seqRes">
+      <span id="uniprotpanel" class='titlepanel' v-if="!organism_name && !seqRes" v-on:click="storeHash">
           <a href="#Sequence" class="" @click="makeActive"><img v-bind:src="search">
           Protein Sequence</a>
         </span>
-      <span id="alignmt" v-if="!seqRes" >
+      <span id="alignmt" v-if="!seqRes" v-on:click="storeHash">
           <a href="#Alignment" class="" @click="makeActive" >aligned onto</a>
       </span>
-      <span id="no_pdb_id" v-if="!pdb" >
+      <span id="no_pdb_id" v-if="!pdb" v-on:click="storeHash">
         <a href="#Structure" class="" @click="makeActive">PDB ID</a>
       </span>
-      <span id="pdb_id" v-if="pdb && !seqRes" >
+      <span id="pdb_id" v-if="pdb && !seqRes" v-on:click="storeHash">
         <a href="#Structure" class="" @click="makeActive">{{pdb}}</a>
       </span>
       <div id='titleAlign' class='' v-if="seqRes">
-        <span class='titlepanel'>
+        <span class='titlepanel' v-on:click="storeHash">
           <a href="#Alignment" class="" @click="makeActive" >
           <strong>{{primary_accession}}</strong> Sequence: {{seqRes}} <br/>
           <strong>{{pdb}}</strong> Structure: {{structRes}} </a>
@@ -86,6 +86,9 @@ export default {
     }
   },
   methods: {
+    storeHash: function () {
+      store.commit('setHash', window.location.hash)
+    },
     makeActive: function (ev) {
       document.querySelectorAll('#title span a').forEach(el => {
         el.className = ''

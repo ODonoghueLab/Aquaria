@@ -1,6 +1,6 @@
 <template>
     <div class="panel">
-        <a href="javascript:" class="close intab" @click="closeTab"></a>
+        <a v-bind:href="data.hash" class="close intab" @click="closeTab"></a>
         <div id="vis">
           <div id='allclusters' data-intro='Visual summary of all structures in PDB matching the specified protein, grouped by region of match.' data-position='left'></div>
         </div>
@@ -9,11 +9,19 @@
 
 <script>
 import * as Panels from '../AquariaLayout/helpers/hidePanels'
+import store from '../../store/index'
 export default {
   name: 'MatchingStructures',
   data () {
     return {
       clusters: window.AQUARIA.structures2match.clusters
+    }
+  },
+  computed: {
+    data () {
+      return {
+        hash: store.state.hash
+      }
     }
   },
   methods: {
