@@ -235,10 +235,10 @@ function getSeqResAndAlignInfo (intersectList, resPos, newAas, uniprotId) {
                 if (resPos >= parseInt(arrRef[0]) && resPos <= parseInt(arrRef[1])) {
                   var arrPdb = arrRefPdb[1].split('-')
                   var distance = resPos - parseInt(arrRef[0])
-                  var resPosInPdb = parseInt(arrPdb[0]) + distance
+                  var resPosInPdb = parseInt(arrPdb[0]) + distance - 1
 
-                  console.log('An alignment is ' + arrRefPdb[0] + ' ' + arrRefPdb[1] + '|' + arrRef[0] + ' ' + arrRef[1] + ' ' + distance + ' ' + resPosInPdb + ' SeqLen:' + anAlignment.SEQRES.length + ' ' + ' PdbAa:' + anAlignment.SEQRES[distance] + ' PdbId:' + anAlignment.PDB_ID + ' ' + ' PdbChain:' + anAlignment.Chain)
-                  if (newAas.includes(anAlignment.SEQRES[distance])) {
+                  console.log('An alignment is ' + arrRefPdb[0] + ' ' + arrRefPdb[1] + '|' + arrRef[0] + ' ' + arrRef[1] + ' ' + distance + ' ' + resPosInPdb + ' SeqLen:' + anAlignment.SEQRES.length + ' ' + ' PdbAa:' + anAlignment.SEQRES[resPosInPdb] + ' PdbId:' + anAlignment.PDB_ID + ' ' + ' PdbChain:' + anAlignment.Chain)
+                  if (newAas.includes(anAlignment.SEQRES[resPosInPdb])) {
                     arrMatchingPdbs.push({ clusNum: clusNum, memNum: anAlignmentI, pdbId: anAlignment.PDB_ID, pdbChain: anAlignment.Chain })
                   }
                 }
