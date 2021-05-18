@@ -232,9 +232,13 @@ function getSeqResAndAlignInfo (intersectList, resPos, newAas, uniprotId) {
               for (var i = 0; i < arrAlignPos.length; i++) {
                 var arrRefPdb = arrAlignPos[i].split(':')
                 var arrRef = arrRefPdb[0].split('-')
-                if (resPos >= parseInt(arrRef[0]) && resPos <= parseInt(arrRef[1])) {
+                var resStart = resPos
+                if (resPos.match(/\-/)){ // eslint-disable-line
+                  resStart = resPos.split('-')[0]
+                }
+                if (resStart >= parseInt(arrRef[0]) && resStart <= parseInt(arrRef[1])) {
                   var arrPdb = arrRefPdb[1].split('-')
-                  var distance = resPos - parseInt(arrRef[0])
+                  var distance = resStart - parseInt(arrRef[0])
                   var resPosInPdb = parseInt(arrPdb[0]) + distance - 1
 
                   console.log('An alignment is ' + arrRefPdb[0] + ' ' + arrRefPdb[1] + '|' + arrRef[0] + ' ' + arrRef[1] + ' ' + distance + ' ' + resPosInPdb + ' SeqLen:' + anAlignment.SEQRES.length + ' ' + ' PdbAa:' + anAlignment.SEQRES[resPosInPdb] + ' PdbId:' + anAlignment.PDB_ID + ' ' + ' PdbChain:' + anAlignment.Chain)
@@ -310,7 +314,25 @@ function updateSelectedPdb (matches) {
             // return new Promise(function (resolve_1, reject_1) { // eslint-disable-line
             for (let i = 0; i < aCluster.seq_start.length; i++) {
               sortedKeys.forEach(function (aRes, aResI) {
-                if (aRes >= parseInt(aCluster.seq_start[i]) && aRes <= parseInt(aCluster.seq_end[i])) {
+                let aResStart = -1
+                let aResEnd = -1
+
+                if (aRes.match(/\-/)) { // eslint-disable-line
+                  console.log('A res is ' + aRes)
+                  aResStart = parseInt(aRes.split('-')[0])
+                  aResEnd = parseInt(aRes.split('-')[1])
+                  console.log('A res is ' + aResStart + ' ' + aResEnd)
+                } else {
+                  aResStart = aRes
+                }
+
+                if (aResEnd != -1 && aResStart >= parseInt(aCluster.seq_start[i]) && aResStart <= parseInt(aCluster.seq_end[i]) && aResEnd >= parseInt(aCluster.seq_start[i]) && aResEnd <= parseInt(aCluster.seq_end[i])) { // eslint-disable-line
+                  console.log('A cluster is Start:' + aCluster.seq_start[i] + ' End:' + aCluster.seq_end[i])
+                  if (!Object.prototype.hasOwnProperty.call(matchingClusters, aRes)) {
+                    matchingClusters[aRes] = []
+                  }
+                  matchingClusters[aRes].push(aClusterI)
+                } else if (aResStart >= parseInt(aCluster.seq_start[i]) && aResStart <= parseInt(aCluster.seq_end[i])) {
                   // Add to dict
                   if (!Object.prototype.hasOwnProperty.call(matchingClusters, aRes)) {
                     matchingClusters[aRes] = []
