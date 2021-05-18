@@ -309,6 +309,15 @@ export default {
     border-radius: 25%;
   }
 
+  /*
+  .selCol:hover {
+    background-color: var(--primary-link);
+  }
+  #title span a:active, #title span a.active {
+    background-color: var(--primary-highlight);
+  }
+  */
+
   .pAaColor {
     display: inline;
     color: #929192 !important;
@@ -320,6 +329,15 @@ export default {
     padding-left: 10px;
     padding-right: 10px;
   }
+
+  .btnAaBold:hover {
+    background-color: var(--primary-link);
+  }
+
+  .btnAaBold_b:hover {
+    background-color: var(--primary-link);
+  }
+
   /* Add this via class to link.
   a:link {
     color: #d5d4d5;
