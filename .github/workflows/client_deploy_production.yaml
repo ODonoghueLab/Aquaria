@@ -10,7 +10,7 @@ on:
       - .editorconfig
       - .gitignore
       - .eslintrc.js
-
+      
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

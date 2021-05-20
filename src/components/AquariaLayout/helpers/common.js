@@ -42,7 +42,7 @@ export function appendPopup (text, position, width, featureMap) {
     left: bleft + 'px',
     // top: btop + 'px',
     bottom: bottom,
-    width: '400px'
+    width: '430px'
   }).fadeIn(600)
 
   if (bleft < 0) {

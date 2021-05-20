@@ -44,7 +44,7 @@ var servers = [
     id: 'CATH',
     Server: 'CATH',
     URL: window.location.protocol + '//www.cathdb.info/version/v4_3_0/api/rest/uniprot_to_funfam/',
-    URL_covid: 'https://aquaria.ws/covid19cath/P0DTD1' // `${window.BACKEND}/covid19cath/`,
+    URL_covid: 'https://aquaria.ws/covid19cath/' // `${window.BACKEND}/covid19cath/`,
     // ?content-type=application/json
   },
   {
@@ -775,8 +775,8 @@ function getJsonFromUrl (requestedFeature, url, primary_accession, featureCallba
         handleCath.handleCathData(response.data, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues)
       }
       if (requestedFeature == 'CathCovid') {
-        // console.log("!!!! The cath covid response data is ");
-        // console.log(response);
+        console.log("!!!! The cath covid response data is ");
+        console.log(response);
         handleCath_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback)
       }
 
@@ -852,19 +852,22 @@ var processNextServer = function (primary_accession,
     } else if (servers[currentServer].id == 'CATH') {
       // console.log('############################ Requesting Cath features')
 
-      /* if (primary_accession == 'P0DTC1' || primary_accession == 'P0DTC2'|| primary_accession == 'P0DTC7' || primary_accession == 'P0DTD1'){
-				// console.log("!!!!!!!!!! A COVID PROTEIN ENCOUNTERED");
+      if (primary_accession == 'P0DTC1' || primary_accession == 'P0DTC2'|| primary_accession == 'P0DTC7' || primary_accession == 'P0DTD1'){
+				console.log("!!!!!!!!!! A COVID PROTEIN ENCOUNTERED");
 				getJsonFromUrl('CathCovid',servers[currentServer]['URL_covid'] + primary_accession, primary_accession, featureCallback, validateAquariaFeatureSet);
 				// handleCath_covid(primary_accession);
+        featureCallback(aggregatedAnnotations, extServerIds_forLoading)
+        processNextServer(primary_accession,
+          featureCallback)
 	 		}
-			else { */
+			else {
       // console.log('^^ Failed to fetch item: err=', err);
-      console.log('Now fetching CATH .... ')
+      // console.log('Now fetching CATH .... ')
       getJsonFromUrl(servers[currentServer].id, servers[currentServer].URL + primary_accession + '?content-type=application/json', primary_accession, featureCallback, validateAquariaFeatureSet)
       featureCallback(aggregatedAnnotations, extServerIds_forLoading)
       processNextServer(primary_accession,
         featureCallback)
-      // }
+      }
     } else if (servers[currentServer].id == 'FunVar') {
       if (primary_accession == 'P0DTC1' || primary_accession == 'P0DTC2' || primary_accession == 'P0DTC7' || primary_accession == 'P0DTD1') {
         // FunVar covid
@@ -929,7 +932,7 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       for (const serverAndFsName in variantResidues[residue].positionInfo) {
         description = description + '<toReplace_posInfo>' + '<i>' + serverAndFsName + ':</i> '
         for (let i = 0; i < variantResidues[residue].positionInfo[serverAndFsName].length; i++) {
-          description = description + "<span class='theCursor'>" + variantResidues[residue].positionInfo[serverAndFsName][i] + '.</span> '
+          description = description + variantResidues[residue].positionInfo[serverAndFsName][i] + '. '
         }
 
         description = description + '</toReplace_posInfo>'
@@ -941,8 +944,8 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       if (anAa != variantResidues[residue].oldAa) {
         if (variantResidues[residue].hasOwnProperty(anAa)) {
           for (let i = 0; i < variantResidues[residue][anAa].length; i++) {
-            description = description + '<toReplace_varInfo_' + anAa + '><span class="theCursor">'
-            description = description + variantResidues[residue][anAa][i] + '.</span> '
+            description = description + '<toReplace_varInfo_' + anAa + '>'
+            description = description + variantResidues[residue][anAa][i] + '. '
             description = description + '</toReplace_varInfo_' + anAa + '>'
           }
         } else {
@@ -1289,7 +1292,7 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
         }
       })
   } else if (featureRegex.test(searchParam)) {
-    console.log('Passes the regex')
+    // console.log('Passes the regex')
 
     var data = {}
     var residue
@@ -1339,8 +1342,8 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
       }
     })
 
-    console.log('The Variant residues 2 are: ')
-    console.log(variantResidues)
+    // console.log('The Variant residues 2 are: ')
+    // console.log(variantResidues)
 
     parseFeatures(primary_accession, server.Categories, server.Server, featureCallback, data, searchParam)
   } else {
@@ -1392,7 +1395,7 @@ function addThinSpaces (featStr) {
   const aa_new = featStr.replace(/^[a-zA-Z\.]+[0-9]+/, '')
   let aa_pos = featStr.replace(/^[^0-9]+/, '')
   aa_pos = aa_pos.replace(/[^0-9].*$/, '')
-  console.log('The feature is featStr ' + featStr + ' ' + ' oldAa: ' + aa_old + ' newAa: ' + aa_new + ' posAa: ' + aa_pos)
+  // console.log('The feature is featStr ' + featStr + ' ' + ' oldAa: ' + aa_old + ' newAa: ' + aa_new + ' posAa: ' + aa_pos)
 
   return (aa_old + '&#8201;' + aa_pos + '&#8201;' + aa_new)
 }
@@ -1449,7 +1452,7 @@ const threeToOneResMap = {
 
 function checkIfInKey_ig (threeLetterCode) {
   const key = Object.keys(threeToOneResMap).find(k => k.toLowerCase() === threeLetterCode.toLowerCase())
-  console.log('The key is ' + key)
+  // console.log('The key is ' + key)
   if (key) {
     return (threeToOneResMap[key])
   } else {

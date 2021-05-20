@@ -299,7 +299,7 @@ var MAX_PROTEIN_HISTORY = 10;
       if (typeof (fetch_das_annotations) !== 'undefined') {
         AQUARIA.blankPanel('#featurelist', true)
         startSpin()
-        fetch_das_annotations(primary_accession,
+        fetch_das_annotations.fetch_annotations(primary_accession,
           function (featureInfo, completeServers) {
             featurelist.updateFeatureUI(featureInfo, completeServers)
             AQUARIA.blankPanel('#featurelist', false)
@@ -362,6 +362,8 @@ var MAX_PROTEIN_HISTORY = 10;
       }
 
       var url = `${window.BACKEND}/get_3D_alignment`
+      // var url = `http://localhost:8009/get_3D_alignment`
+      // var url = 'https://vuejs.org/v2/guide/events.html'
       axios({
         method: 'get',
         url: url,

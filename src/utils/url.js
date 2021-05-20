@@ -74,8 +74,10 @@ export function remoteSuccess () {
       url: url
     })
       .then(function (response) {
+        console.log('In url.js, looking at the response')
+        console.log(response)
         AQUARIA.orgName = attr[1]
-        AQUARIA.gene = attr[2]
+        AQUARIA.Gene = attr[2]
         // const orgID = response.data[0].orgID
         accession.push(response.data[0].Primary_Accession)
         if (attr.length > 4) {
@@ -98,7 +100,7 @@ export function remoteSuccess () {
         } else {
           AQUARIA.initialisePanels(true)
           window.AQUARIA.panel3d.blankApplet(true)
-          previousPDB = window.AQUARIA.pdbTopTen.previousLookupByName(AQUARIA.orgName + '_' + AQUARIA.gene)
+          previousPDB = window.AQUARIA.pdbTopTen.previousLookupByName(AQUARIA.orgName + '_' + AQUARIA.Gene)
           if (!previousPDB) {
             LoadAQUARIA.loadAccession(accession)
           } else {

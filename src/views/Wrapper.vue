@@ -5,7 +5,7 @@
     <!-- InfoAbout -->
     <Sequence />
     <div>
-      <AboutAlignment v-bind:alignment="alignment"/>
+      <AboutAlignment />  <!--  v-bind:alignment="alignment"/> -->
     </div>
     <div>
       <AboutPdb />
@@ -14,17 +14,18 @@
       <AboutAquaria />
       <Errors />
     </div>
+    <div id="heightinspector"></div>
     <!-- StructureViewer -->
     <StructureViewer />
     <!-- AquariaLayout -->
     <Tabs />
     <PopUp />
-    <a href="#"><div id="scrim" class="hide" @click="dismissPanel"></div></a>
+    <a v-bind:href="data.hash"><div id="scrim" class="hide" @click="dismissPanel"></div></a>
   </div>
 </template>
 
 <script>
-
+import store from '../store/index'
 import '../components/AquariaLayout/helpers/aquaria' // most legacy code bundling is triggered from here (expects global jolecule)
 import Header from '../components/Header/Header'
 import Sequence from '../components/InfoAbout/Sequence'
@@ -49,34 +50,59 @@ export default {
     AboutAquaria,
     Errors
   },
+  computed: {
+    data () {
+      return {
+        hash: store.state.hash
+      }
+    }
+  },
   methods: {
-    // load: function () {
-    //   console.log('Loader loaded')
-    //   setTimeout(() => {
-    //     if (document.querySelector('div.loader')) {
-    //       document.querySelector('div.loader').style.display = 'none'
-    //       document.querySelector('div#jolecule-protein-container').style.display = 'block'
-    //       document.querySelector('div.tabs').style.display = 'flex'
-    //     }
-    //   }, 3000)
-    // },
+    checkPhone: function () {
+      var iDevices = [
+        'iPad Simulator',
+        'iPhone Simulator',
+        'iPod Simulator',
+        'iPad',
+        'iPhone',
+        'iPod'
+      ]
+
+      if (navigator.platform) {
+        while (iDevices.length) {
+          if (navigator.platform === iDevices.pop() || (screen.width >= 300 && screen.width <= 600)) { return true }
+        }
+      } else {
+        return false
+      }
+    },
+    inspectHeight: function () {
+      // var visible = window.toolbar.visible
+      document.querySelector('#heightinspector').innerHTML = 'reset'
+      var hDiff = (window.outerHeight - window.innerHeight)
+      document.querySelector('#heightinspector').innerHTML = 'HO:' + window.outerHeight + ', hDiff:' + hDiff + ', scroll: ' + window.scrollY + ' bodyHeight: ' + document.body.scrollHeight
+    },
     dismissPanel: function () {
       // hide scrim
       document.querySelector('#scrim').className = 'hide'
       // reset title to neutral state
+      document.querySelector('#title').className = 'item title fix level6'
+      if (document.querySelector('#titleAlign') !== null) { document.querySelector('#titleAlign').className = '' }
       document.querySelectorAll('#title span a').forEach(el => {
         el.className = ''
       })
     }
   },
   mounted () {
-    // this.load()
     window.scrollBy(0, 100)
+    // this.inspectHeight()
     window.addEventListener('resize', function () {
       window.scrollBy(0, 100)
       document.querySelector('#vis > .ruler').remove()
       document.querySelectorAll('#vis > #allclusters .outer_container').forEach(el => el.remove())
       window.AQUARIA.refresh()
+      var hDiff = (window.outerHeight - window.innerHeight)
+      document.querySelector('#heightinspector').innerHTML = 'HO:' + window.outerHeight + ', hDiff:' + hDiff + ', scroll: ' + window.scrollY + ' bodyHeight: ' + document.body.scrollHeight
     })
     setTimeout(function () {
       if (document.querySelector('.matrixLoading')) {
@@ -84,15 +110,23 @@ export default {
         document.querySelector('.matrixLoading').style.display = 'none'
       }
     }, 1500)
+  },
+  updated () {
+    // const isPhone = this.checkPhone()
+    // this.inspectHeight()
   }
 }
 </script>
 
 <style>
-/* hide 3D structure and tabs while loading */
-/* div#jolecule-protein-container, div.tabs {
+
+div#heightinspector {
   display: none;
-} */
+  position: absolute;
+  top:10em;
+  left:2em;
+  z-index: 1000;
+}
 /* general layout + styling */
 body {
     font-family: 'Source Sans Pro', sans-serif;

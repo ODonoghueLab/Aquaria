@@ -2,7 +2,7 @@
     <!-- About Alignment -->
     <div id="Alignment" class="panel overlay about level4" >
       <div class="scrollable">
-        <p class="spacer" v-if="alignment">&nbsp;</p>
+        <p class="spacer" v-if="data.alignment">&nbsp;</p>
         <p>What you see in the 3D viewer is the experimentally-determined structure of {{pdbName}} from
         <a href='http://www.rcsb.org/pdb/explore.do?structureId={{}}' target='_blank'> PDB entry {{pdbId}}</a>chain {{chainId}}.
         </p>
@@ -11,23 +11,33 @@
         <p class='quality'> This alignment has an HHblits E-value of {{evalueString}} &times; <nobr>10<sup>{{power}}</sup></nobr>, which is considered to be {{quality}}.
             Based on cross-validation, the likelihood that your specified protein ({{uniprotName}}) adopts a structure similar to that shown is estimated to be {{precisiontxt}}%.</p>
             <p>Note that the structure shown is taken directly from the PDB; it has not been derived by ab-initio or comparative modeling.</p>
-        <expandable-text-line :use-click="Hover" v-if="alignment"> <!--  -->
-            <p v-if="$mq === 'laptop' || $mq === 'tablet'"><strong>Alignment:</strong><pre>{{ alignment }}</pre></p>
-        </expandable-text-line>
+        <div v-if="data.alignment"> <!-- :use-click="hover" -->
+            <p v-if="$mq === 'laptop' || $mq === 'tablet'"><b>Alignment:</b><br/>
+              <pre>{{ data.alignment }}</pre>
+            </p>
+        </div>
       </div>
     </div>
 </template>
 <script>
+import store from '../../store/index'
 import $ from 'jquery'
 import d3 from 'd3'
-import ExpandableTextLine from 'vue-expandable-text-line'
+// import ExpandableTextLine from 'vue-expandable-text-line'
 
 export default {
   name: 'AboutAlignment',
-  components: {
-    ExpandableTextLine
+  // components: {
+  //   ExpandableTextLine
+  // },
+  // props: ['alignment'],
+  computed: {
+    data () {
+      return {
+        alignment: store.state.alignment
+      }
+    }
   },
-  props: ['alignment'],
   data () {
     return {
       pdbName: null,
@@ -138,18 +148,10 @@ export default {
 }
 </script>
 <style scoped>
-.expandable-text-line{
-  max-width: 50vw;
+pre {
+  font-size: 0.65rem;
+  /* max-width: 50vw; */
   max-height: 33vh;
-  overflow: hidden;
-  white-space: nowrap;
-}
-.expandable-text-line strong {
-  display: block;
-}
-.expandable-text-line pre {
-  font-size: 0.75rem;
-  max-height: 30vh;
   overflow: auto;
 }
 </style>

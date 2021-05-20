@@ -15,7 +15,6 @@
 <script>
 // import axios from 'axios'
 import { screenshot } from './components/AquariaLayout/helpers/Screenshot'
-import store from './store/index'
 
 // @TODO consider how best to expose screenshot feature in UI
 window.ss = async (resX, resY, bgColor, bgAlpha) => {
@@ -33,8 +32,7 @@ export default {
   name: 'App',
   data () {
     return {
-      primary_accession: null,
-      hostname: store.state.url
+      primary_accession: null
     }
   },
   beforeCreate () {

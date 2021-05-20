@@ -28,11 +28,12 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
           if (featureType == 'Mutational sensitivity (SNAP2 ratio of effect mutations)') {
             cleanData_snap2_effects(description, variantResidues[resSnp].newResidues, posInfo, otherResInfo)
             addToVariantResidues(variantResidues, resSnp, [], posInfo, otherResInfo, '<a href="https://rostlab.org/owiki/index.php/Snap2" target="blank"> SNAP2</a>')
+          } else if (featureType.match(/^Mutation to /)) {
+            console.log()
+            cleanData_aaMutScore_snap2(variantResidues[resSnp], description)
           } else if (featureType == 'Mutation score (average SNAP2 score)') {
             cleanData_snap2_getAvgScore_v2(description, posInfo, variantResidues[resSnp].newResidues, variantResidues[resSnp])
             addToVariantResidues(variantResidues, resSnp, [], posInfo, [], "<a href='https://rostlab.org/owiki/index.php/Snap2' target='blank'><i>SNAP2</i></a>")
-          } else if (featureType.match(/^Mutation to /)) {
-            cleanData_aaMutScore_snap2(variantResidues[resSnp], description)
           }
         } else if (serverName == 'CATH') {
           const cath_infoUrl = "<a href='https://www.cathdb.info/wiki' target='blank'>CATH</a>"
@@ -47,8 +48,8 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
           addToVariantResidues(variantResidues, resSnp, [], posInfo, [], cath_infoUrl)
           // variantResidues[resSnp][serverName].push(obj_featType);
         } else if (serverName == 'UniProt') {
-          console.log('uniprot featuretype is ' + featureType)
-          console.log('uniprot feature description is ' + description)
+          // console.log('uniprot featuretype is ' + featureType)
+          // console.log('uniprot feature description is ' + description)
           const uniprot_infourl = "<a href='https://www.uniprot.org/help/about' target='blank'>UniProt</a>"
           description = description.replace(/[\s]+$/, '')
           if (featureType == 'Metal ion-binding site') {
@@ -84,16 +85,16 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
         } else if (serverName == 'COSMIC') {
           const varInfo = []; const posInfo = []; const otherResInfo = []
           const cosmic_infoUrl = "<a href='https://cancer.sanger.ac.uk/cosmic/help/mutation/overview' target='blank'>COSMIC</a>"
-          console.log('The newAas are ')
-          console.log(variantResidues[resSnp])
+          // console.log('The newAas are ')
+          // console.log(variantResidues[resSnp])
           cleanData_cosmic(description, variantResidues[resSnp], posInfo, cosmic_infoUrl)
 
           addToVariantResidues(variantResidues, resSnp, varInfo, posInfo, otherResInfo, cosmic_infoUrl)
-          console.log('The cosmic description is ' + description)
+          // console.log('The cosmic description is ' + description)
         } else if (serverName == 'FunVar') {
           const varInfo = []; const otherResInfo = []
 
-          console.log('The funVar description is 111 ' + description)
+          // console.log('The funVar description is 111 ' + description)
           cleanData_funVar(description, variantResidues[resSnp])
 
           // addToVariantResidues(variantResidues, resSnp, varInfo, [], otherResInfo, 'FunVar')
@@ -166,18 +167,18 @@ function addToVariantResidues (variantResidues, resSnp, varInfo, posInfo, otherR
   }
 
   if (varInfo.length > 0) {
-    console.log('The VAR INFO IS ' + varInfo)
-    console.log(varInfo)
+    // console.log('The VAR INFO IS ' + varInfo)
+    // console.log(varInfo)
     if (!variantResidues[resSnp].variantInfo.hasOwnProperty(serverName)) {
       variantResidues[resSnp].variantInfo[serverName] = varInfo
     } else {
       variantResidues[resSnp].variantInfo[serverName] = variantResidues[resSnp].variantInfo[serverName].concat(varInfo)
-      console.log(variantResidues[resSnp].variantInfo[serverName])
+      // console.log(variantResidues[resSnp].variantInfo[serverName])
     }
   }
 
   if (posInfo.length > 0) {
-    console.log('snap2 the positionInfo is ' + posInfo)
+    // console.log('snap2 the positionInfo is ' + posInfo)
     if (!variantResidues[resSnp].positionInfo.hasOwnProperty(serverName)) {
       variantResidues[resSnp].positionInfo[serverName] = posInfo
     } else {
@@ -186,13 +187,13 @@ function addToVariantResidues (variantResidues, resSnp, varInfo, posInfo, otherR
   }
 
   if (otherResInfo.length > 0) {
-    console.log('The OTHERRES INFO IS ' + otherResInfo)
+    // console.log('The OTHERRES INFO IS ' + otherResInfo)
     if (!variantResidues[resSnp].otherResInfo.hasOwnProperty(serverName)) {
       variantResidues[resSnp].otherResInfo[serverName] = otherResInfo
     } else {
-      console.log('THE OTHERRES INFO appending')
+      // console.log('THE OTHERRES INFO appending')
       variantResidues[resSnp].otherResInfo[serverName] = variantResidues[resSnp].otherResInfo[serverName].concat(otherResInfo)
-      console.log(variantResidues[resSnp].otherResInfo[serverName])
+      // console.log(variantResidues[resSnp].otherResInfo[serverName])
     }
   }
 
@@ -278,7 +279,7 @@ function getCancerTypesSplit (cTypeDesc) {
   for (let i = 0; i < arr.length; i++) {
     const arr_indiv = arr[i].split('(')
     arr_indiv[1] = arr_indiv[1].replace(/[\)\s\t]+/g, '')
-    console.log('Funvar desc here is |' + arr_indiv[1] + '| ' + arr_indiv[0])
+    // console.log('Funvar desc here is |' + arr_indiv[1] + '| ' + arr_indiv[0])
 
     arr_indiv[0] = arr_indiv[0].replace(/^[\s]+/, '')
     arr_indiv[0] = arr_indiv[0].replace(/[\s]+$/, '')
@@ -298,7 +299,7 @@ function cleanData_cosmic (desc, variantResidues_res, posInfo, cleanData_cosmic)
   arr[0] = arr[0].replace(/^p\./, '')
   arr_aas = arr[0].split(/[0-9]+/)
 
-  console.log('Cosmic 1 ' + arr_aas[1])
+  // console.log('Cosmic 1 ' + arr_aas[1])
   if (arr_aas.length >= 1 && arr_aas[1] != 'fs') {
     let cosmic_newAa = arr_aas[1]
     let cosmic_oldAa = arr_aas[0]
@@ -339,7 +340,7 @@ function cleanData_cosmic (desc, variantResidues_res, posInfo, cleanData_cosmic)
       // variantResidues_res[cosmic_newAa].push('<i>COSMIC:</i> In tumors from ' + arr[2]);
       variantResidues_res[cosmic_newAa].push(toAddStr)
 
-      console.log('The cosmic arr[2] is ' + arr[2])
+      // console.log('The cosmic arr[2] is ' + arr[2])
     }
   } else {
     arr[2] = arr[2].replace('(', '(freq = ')
@@ -350,7 +351,7 @@ function cleanData_cosmic (desc, variantResidues_res, posInfo, cleanData_cosmic)
 function cleanData_uniprot_seqVar_v2 (desc, variantResidues_res, posInfo, featureType, uniprot_infourl) {
   // main to show, other residues;
 
-  console.log('The Uniprot seqVar desc are ' + desc)
+  // console.log('The Uniprot seqVar desc are ' + desc)
 
   desc = desc.replace(/^[\s]+/, '')
   desc = desc.replace(/\.$/, '')
@@ -461,18 +462,59 @@ function cleanData_aaMutScore_snap2 (variantResidues_pos, desc) {
 function cleanData_snap2_getAvgScore_v2 (desc, arr_posInfo, newAas, variantResidues_pos) {
   const snap2_infoUrl = "<a href='https://rostlab.org/owiki/index.php/Snap2' target='blank'><i>SNAP2:</i></a>"
 
-  console.log('snap2 desc 2 mutation something something is ' + desc)
+  // console.log('snap2 desc 2 mutation something something is ' + desc)
 
   const arr = desc.split(/\;/)
 
-  if (arr.length >= 2) {
+  if (arr.length >= 3){
+    arr[2] = arr[2].replace(/[\s\t]+/g, '')
+    arr[2] = arr[2].replace(/functionchangingare\:/, '')
+    arr_scores = arr[2].split(",")
+
+    let total = 0; // 1 if val > 40; -1 if < -40 else 0. Then sum to get which condition.
+
+    arr_scores.forEach(function(item, item_i){
+      let indivScore = item.replace(/[^\d]/, '').replace(/\:/, '')
+
+      if (parseFloat(indivScore) > 40){
+        // arrCounts.push(1)
+        total = total + 1
+      }
+      else if (parseFloat(indivScore) <-40){
+        // arrCounts.push(-1)
+        total = total - 1
+      }
+      else {
+        // arrCounts.push(0)
+        // total = total + 0
+      }
+      // console.log('SNAP indiv score is ' + indivScore)
+    });
+
+    let avgScore = total / arr_scores.length;
+    // console.log('SNAP AVG score is ' + total);
+
+    if (avgScore > 11){ // 11 is based on the number of amino acids (from Andrea's slides)
+
+    }
+    else if ( avgScore < 11){
+
+    }
+    else{
+      arr_posInfo.push('Average sensitivity to mutation')
+    }
+
+  }
+  else if (arr.length >= 2) {
     let score = arr[1].replace(/^.*\:/, '')
     score = score.replace(/[\s]+/g, '')
 
     if (parseFloat(score) >= -40 && parseFloat(score) <= 40) {
+      // console.log("SNAP this case is " + parseFloat(score) + ". Length is " + arr.length);
+      // console.log("SNAP this case is " + desc)
       arr_posInfo.push('Average sensitivity to mutation')
     }
-    console.log('snap2 desc 2 mutation ' + arr.length + ' ' + arr[1] + ' ' + score)
+    // console.log('snap2 desc 2 mutation ' + arr.length + ' ' + arr[1] + ' ' + score)
   }
 }
 
@@ -563,7 +605,7 @@ function cleanData_cath (desc, varInfo, partOf) {
   const arr = desc.split(/\:\s/)
   arr[0] = arr[0].replace(/CATH/, '')
 
-  console.log('The cath arr thingo is ' + arr[1])
+  // console.log('The cath arr thingo is ' + arr[1])
   varInfo.push("Part of '" + arr[1] + "' " + partOf)
 
   // let obj_featType = {};
@@ -576,7 +618,7 @@ function cleanData_cath (desc, varInfo, partOf) {
 }
 
 function cleanData_snap2_effects (desc, newAas, arr_posInfo, arr_otherResInfo) {
-  console.log('snap2 desc 1 ' + desc)
+  // console.log('snap2 desc 1 ' + desc)
   const arr = desc.split(/\;/)
 
   let posInfoDesc = ''
@@ -676,7 +718,7 @@ function getToAddStr_funVar (yesOrNoArr) {
 }
 
 function getSubstringOfInterest (description, newResidue) {
-  console.log('SNAP2 the newResidue is ' + newResidue)
+  // console.log('SNAP2 the newResidue is ' + newResidue)
   const arr = description.split(/\;/)
   description = arr[0]
 
@@ -685,8 +727,8 @@ function getSubstringOfInterest (description, newResidue) {
 
   arr_res = arr[1].split(/\,/)
 
-  console.log('SNAP2 the rest of the array is ')
-  console.log(arr_res)
+  // console.log('SNAP2 the rest of the array is ')
+  // console.log(arr_res)
 
   for (let i = 0; i < arr_res.length; i++) {
     if (arr_res[i].includes(newResidue)) {
@@ -732,7 +774,7 @@ const threeToOneResMap = {
 
 function checkIfInKey_ig (threeLetterCode) {
   const key = Object.keys(threeToOneResMap).find(k => k.toLowerCase() === threeLetterCode.toLowerCase())
-  console.log('The key is ' + key)
+  // console.log('The key is ' + key)
   if (key) {
     return (threeToOneResMap[key])
   } else {

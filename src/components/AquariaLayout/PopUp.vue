@@ -4,8 +4,8 @@
     <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
     <!-- <div id="mydivheader">
     </div> -->
-    <p id='popuptext'>Pop-up text box component for features</p>
-    <img v-bind:src="popupTail" id='popupTail'>
+        <p id='popuptext'>Pop-up text box component for features</p>
+        <img v-bind:src="popupTail" id='popupTail'>
     </div>
 </template>
 
@@ -31,6 +31,11 @@ export default {
   },
   methods: {
     handler: function () {
+      this.dragElement(document.getElementById('popup'))
+
+      /*
+      draggable="true" ondragstart=\"event.preventDefault();event.stopPropagation();\"
+      */
       const ExpandableTextLineCtor = Vue.extend(ExpandableTextLine)
       const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
       const b = document.getElementsByTagName('toReplace_varInfo')
@@ -62,9 +67,13 @@ export default {
             document.getElementById('btnVI_' + oneAaCodes[k]).addEventListener('click', function () {
               // Change heading amino acid.
               let a = document.getElementById('span_missenseHeading').innerHTML
-              a = a.replace(/[a-zA-Z]+\)/, oneAaCodes[k] + ')')
-              document.getElementById('span_missenseHeading').innerHTML = a
+              if (a.match(/[a-zA-Z\*\?]+\)/)) { // eslint-disable-line no-useless-escape
+                a = a.replace(/[a-zA-Z\*\?]+\)/, oneAaCodes[k] + ')') // eslint-disable-line no-useless-escape
+              } else {
+                a = a.replace(/\)/, oneAaCodes[k] + ')')
+              }
 
+              document.getElementById('span_missenseHeading').innerHTML = a
               // Hide clicked button, and unhide any other button
               hideClickedUnhideOthrs(oneAaCodes[k])
               // document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + oneAaCodes[k]))
@@ -108,11 +117,13 @@ export default {
         for (let i = 0; i < oneAaCodes.length; i++) {
           if (clickedAa === oneAaCodes[i]) {
             if (document.getElementById('btnVI_' + clickedAa)) {
-              document.getElementById('btnVI_' + clickedAa).style.display = 'none'
+              // document.getElementById('btnVI_' + clickedAa).style.display = 'none'
+              document.getElementById('btnVI_' + clickedAa).classList.add('selCol')
             }
           } else {
             if (document.getElementById('btnVI_' + oneAaCodes[i])) {
-              document.getElementById('btnVI_' + oneAaCodes[i]).style.display = 'inline'
+              // document.getElementById('btnVI_' + oneAaCodes[i]).style.display = 'inline'
+              document.getElementById('btnVI_' + oneAaCodes[i]).classList.remove('selCol')
             }
           }
         }
@@ -121,7 +132,7 @@ export default {
       function moveAndShowClickedDivAa (selAa) {
         for (let i = 0; i < oneAaCodes.length; i++) {
           if (selAa === oneAaCodes[i]) {
-            console.log('It comes down here!')
+            // console.log('It comes down here!')
             if (document.getElementById('divVI_varInfo_' + selAa)) {
               document.getElementById('divVI_chosen').appendChild(document.getElementById('divVI_varInfo_' + selAa))
             }
@@ -197,7 +208,7 @@ export default {
         document.getElementById(elmnt.id + 'header').onmousedown = dragMouseDown
       } else {
         // otherwise, move the DIV from anywhere inside the DIV:
-        elmnt.onmousedown = dragMouseDown
+        // elmnt.onmousedown = dragMouseDown
       }
 
       function dragMouseDown (e) {
@@ -256,6 +267,17 @@ export default {
 </style>
 
 <style>
+
+  .expandable {
+    margin: 8px 0px;
+    /* cursor: ns-resize; */
+  }
+  .expandable-text-line {
+    cursor: s-resize !important;
+  }
+  .expandable-text-line.__extl-expanded{
+    cursor: n-resize !important;
+  }
   #popuptext a{
     color: var(--background);
   }
@@ -280,6 +302,22 @@ export default {
     padding-right: 3.5px;
     display: inline;
   }
+
+  .selCol {
+    color: var(--text) !important;
+    background-color: var(--primary-highlight);
+    border-radius: 25%;
+  }
+
+  /*
+  .selCol:hover {
+    background-color: var(--primary-link);
+  }
+  #title span a:active, #title span a.active {
+    background-color: var(--primary-highlight);
+  }
+  */
+
   .pAaColor {
     display: inline;
     color: #929192 !important;
@@ -291,14 +329,24 @@ export default {
     padding-left: 10px;
     padding-right: 10px;
   }
+
+  .btnAaBold:hover {
+    background-color: var(--primary-link);
+  }
+
+  .btnAaBold_b:hover {
+    background-color: var(--primary-link);
+  }
+
   /* Add this via class to link.
   a:link {
     color: #d5d4d5;
     text-decoration: underline;
   }
   */
+  /*
   .theCursor{
     cursor: context-menu;
   }
-
+*/
 </style>

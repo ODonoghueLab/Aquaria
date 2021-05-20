@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="tabs rel level3">
-      <div class="tab"  id="Structures">
+      <div class="tab"  id="Structures" v-on:click="storeHash">
         <a href="#Structures"><span class="icon"><img v-bind:src="MS" /></span>Matching Structures&nbsp;<span class="counter"></span></a>
       </div>
       <MatchingStructures />
-      <div class="tab" id="Features">
+      <div class="tab" id="Features" v-on:click="storeHash">
         <a href="#Features"><span class="icon"><img v-bind:src="FT" /></span> Features <span class="counter" id="featureCounter"></span></a>
       </div>
       <Features />
@@ -18,6 +18,7 @@ import MatchingStructures from '../MatchingStructures/MatchingStructures'
 import Features from '../Features/Features'
 import CoverageMap from '../MatchingStructures/CoverageMap'
 import * as Panels from './helpers/hidePanels'
+import store from '../../store/index'
 export default {
   name: 'Tabs',
   components: {
@@ -29,6 +30,11 @@ export default {
     return {
       MS: require('../../assets/img/MS-01.svg'),
       FT: require('../../assets/img/FT-01.svg')
+    }
+  },
+  methods: {
+    storeHash: function () {
+      store.commit('setHash', window.location.hash)
     }
   },
   mounted () {

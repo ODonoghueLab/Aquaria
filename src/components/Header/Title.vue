@@ -1,35 +1,37 @@
 <template>
     <div id="title" class="item title fix level6">
-      <span id="org_prot"  v-if="organism_name && !seqRes">
+      <span id="org_prot"  v-if="organism_name && !seqRes" v-on:click="storeHash">
         <a href="#Sequence" class="" @click="makeActive">
           <img v-bind:src="search">
           {{organism_name}} <strong>{{primary_accession}}</strong>
         </a>
       </span>
-      <span id="uniprotpanel" class='titlepanel' v-if="!organism_name && !seqRes">
+      <span id="uniprotpanel" class='titlepanel' v-if="!organism_name && !seqRes" v-on:click="storeHash">
           <a href="#Sequence" class="" @click="makeActive"><img v-bind:src="search">
           Protein Sequence</a>
         </span>
-      <span id="alignmt" v-if="!seqRes" >
+      <span id="alignmt" v-if="!seqRes" v-on:click="storeHash">
           <a href="#Alignment" class="" @click="makeActive" >aligned onto</a>
       </span>
-      <span id="no_pdb_id" v-if="!pdb" >
+      <span id="no_pdb_id" v-if="!pdb" v-on:click="storeHash">
         <a href="#Structure" class="" @click="makeActive">PDB ID</a>
       </span>
-      <span id="pdb_id" v-if="pdb && !seqRes" >
+      <span id="pdb_id" v-if="pdb && !seqRes" v-on:click="storeHash">
         <a href="#Structure" class="" @click="makeActive">{{pdb}}</a>
       </span>
-      <div id='titleAlign'><a href="#" class="close"></a>
-        <span class='titlepanel' v-if="seqRes">
+      <div id='titleAlign' class='' v-if="seqRes">
+        <span class='titlepanel' v-on:click="storeHash">
           <a href="#Alignment" class="" @click="makeActive" >
-          Sequence <strong>{{primary_accession}}:</strong> {{seqRes}} <br/>
-          Structure  <strong>{{pdb}}:</strong>  {{structRes}} </a>
+          <strong>{{primary_accession}}</strong> Sequence: {{seqRes}} <br/>
+          <strong>{{pdb}}</strong> Structure: {{structRes}} </a>
         </span>
       </div>
+      <a  v-bind:href="data.hash" class="close" @click="dismissPanel"></a>
     </div>
 </template>
 
 <script>
+import store from '../../store/index'
 export default {
   name: 'Title',
   data () {
@@ -40,8 +42,14 @@ export default {
       pdb: null,
       search: require('../../assets/img/search_100.png'),
       seqRes: null,
-      structRes: null,
-      alignment: null
+      structRes: null
+    }
+  },
+  computed: {
+    data () {
+      return {
+        hash: store.state.hash
+      }
     }
   },
   beforeMount () {
@@ -78,21 +86,30 @@ export default {
     }
   },
   methods: {
+    storeHash: function () {
+      store.commit('setHash', window.location.hash)
+    },
     makeActive: function (ev) {
       document.querySelectorAll('#title span a').forEach(el => {
         el.className = ''
       })
       ev.target.className = 'active'
+      if (document.querySelector('#title').className.indexOf('active') === -1) { document.querySelector('#title').className += ' active' }
       document.querySelector('#scrim').className = 'show level3'
+      if (document.querySelector('#titleAlign') !== null) {
+        document.querySelector('#titleAlign').className = 'active'
+        store.commit('setAlignment', window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard())
+        store.commit('setHash', window.location.hash)
+      }
     },
-    removeHighlight: function () {
-      document.querySelectorAll('#titleAlign span').forEach(el => {
-        el.style.background = '#888888'
-      })
-    },
-    highlightTitle: function () {
-      document.querySelectorAll('#titleAlign span').forEach(el => {
-        el.style.background = '#3ca8f7'
+    dismissPanel: function () {
+      // hide scrim
+      document.querySelector('#scrim').className = 'hide'
+      // reset title to neutral state
+      document.querySelector('#title').className = 'item title fix level6'
+      if (document.querySelector('#titleAlign') !== null) { document.querySelector('#titleAlign').className = '' }
+      document.querySelectorAll('#title span a').forEach(el => {
+        el.className = ''
       })
     },
     resetSelection: function () {
@@ -117,14 +134,15 @@ export default {
       if (document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').style.display === 'none') {
         _this.seqRes = null
         _this.structRes = null
-        _this.alignment = null
+        // _this.alignment = null
+        store.commit('setAlignment', '')
       } else {
         var residues = document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').innerText.split('\n')
         var pdb = window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain + ':'
         var accession = window.AQUARIA.Gene + ':'
         _this.seqRes = residues[1].split(accession)[1]
         _this.structRes = residues[0].split(pdb)[1]
-        _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
+        // _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()
       }
     })
     selectedRes.observe(document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection'), {
@@ -146,16 +164,30 @@ export default {
     left: 50%;
     top: 1.5vh;
     transform: translate(-50%, -5%);
-    width: fit-content;
+    /* width: fit-content; */
+}
+#title.active, #titleAlign.active {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  width: 78vw;
+  max-width: 29.5rem;
+  margin-top: .125rem;
 }
 #title span {
+  background-color: var(--primary-label);
   white-space: nowrap;
+  text-align: left;
+  flex-shrink: 0;
+}
+#title.active span#pdb_id, #title.active span#no_pdb_id {
+  flex-grow: 2;
+  flex-shrink: 0;
+  /* width: 50%; */
 }
 #title span a {
   display: inline-block;
   background-color: var(--primary-label);
-  background-position: 1rem 50%;
-  background-size: 0;
   padding: calc(0.4rem + 3 * ((100vw - 320px) / 680)) 0.2rem;
   transition: all 0.5s ease;
   color: var(--text);
@@ -172,7 +204,11 @@ export default {
   border-right: 1px dotted var(--background);
   border-left: 1px dotted var(--background);
 }
-span#org_prot a, span#uniprotpanel a  {
+span#org_prot, span#uniprotpanel {
+  border-top-left-radius: 1.5rem;
+  border-bottom-left-radius: 1.5rem;
+}
+span#org_prot a, span#uniprotpanel a {
   padding-left: 1rem;
   border-top-left-radius: 1.5rem;
   border-bottom-left-radius: 1.5rem;
@@ -181,7 +217,7 @@ span#org_prot a, span#uniprotpanel a  {
 span#org_prot img, span#uniprotpanel img  {
 height: calc(10px + .4vw);
 }
-span#pdb_id a, span#no_pdb_id a {
+span#pdb_id , span#no_pdb_id {
   padding-right: 1rem;
   font-weight: 600;
   border-top-right-radius: 1.5rem;
@@ -190,7 +226,10 @@ span#pdb_id a, span#no_pdb_id a {
 #titleAlign {
   display: flex;
 }
-
+#titleAlign.active {
+  /* background-color: var(--primary-highlight); */
+  border-radius: 1.5rem;
+}
 #titleAlign span a {
   padding: calc(0.2rem + 2 * ((100vw - 320px) / 680)) 1rem;
   font-size: 95%;
@@ -199,10 +238,19 @@ span#pdb_id a, span#no_pdb_id a {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 18rem;
+  max-width: 15rem;
 }
 
-.titlepanel {
+#title span.titlepanel {
+  background-color: transparent;
   text-align: left;
+}
+
+#titleAlign.active span.titlepanel a {
+  width: 80vw;
+  max-width: 29.5rem;
+}
+#titleAlign.active + a.close::after {
+    top: calc(0.5rem + 3 * ((100vw - 320px) / 680));
 }
 </style>
