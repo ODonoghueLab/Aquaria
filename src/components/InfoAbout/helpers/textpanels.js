@@ -404,8 +404,13 @@ export function displayProtSynonyms (data) {
     if (AQUARIA.preferred_protein_name === 'unknown') {
       AQUARIA.preferred_protein_name = data.Synonym
     }
-
-    var gns = (data.genes.length > 0) ? data.genes : data.Synonym
+    var gns = []
+    if(data.genes.length > 0) {
+      gns = data.genes
+    }
+    else {
+      gns[0] = data.Synonym
+    }
     var syns = data.synonyms
 
     if (syns.length) {

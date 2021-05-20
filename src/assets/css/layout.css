@@ -19,7 +19,19 @@
     --strand-conserved: #998436;
     --strand-match: #f6c719;
     --structurecoverage: #afafaf;
-    }     
+    --spacer-bottom: 5vh; 
+    }   
+
+@media all and (min-aspect-ratio: 8/5) {
+    :root {
+        --spacer-bottom: 5.4vh;    
+    }
+}   
+@media all and (min-width: 1800px) {
+    :root {
+        --spacer-bottom: 4.5vh;    
+    }
+}    
  
 /* positioning classes (for panels and scrim) */
 .level1 { z-index: 1 }
@@ -57,15 +69,15 @@
     transition: All 0.8s ease;
 }
 /* Close button for panels */
-.panel .close {
+.panel .close, .title.active .close {
     position: relative;
     display: block;
   }
-  .panel .close::after {
+  .panel .close::after, .title.active .close::after {
     right: 0.25rem;
-    top: 0.25rem;
-    width: 1.25rem;
-    height: 1.25rem;
+    top: calc(0.2rem + 3 * ((100vw - 320px) / 680));
+    width: 1.5rem;
+    height: 1.5rem;
     position: absolute;
     display: flex;
     z-index: 11;
@@ -76,9 +88,9 @@
     color: white;
     content: "×";
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.25rem;
   }
-  .panel .close:hover::after { 
+  .panel .close:hover::after, .title.active .close:hover::after { 
       background-color: var(--primary-highlight);
   }
  .panel.overlay {

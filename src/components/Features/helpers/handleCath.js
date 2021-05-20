@@ -70,8 +70,8 @@ function handleCath (jsonObj1, getFeatures, validateAgainstSchema, primary_acces
               superFamFeatureSet = resObj.superFamFeatureSet
               convertedFeatures = resObj.convertedFeatures
 
-              console.log('The hcDataObj is ')
-              console.log(hcDataObj)
+              // console.log('The hcDataObj is ')
+              // console.log(hcDataObj)
 
               resolve()
             })
@@ -83,8 +83,8 @@ function handleCath (jsonObj1, getFeatures, validateAgainstSchema, primary_acces
         return new Promise(function (resolve, reject) {
           Promise.all(thePromises.funFamInfo).then(function (funFamData) {
             handlePromiseData_ff(funFamData, dataArr_hc, hcDataObj, thePromises.residues, superFamFeatureSet, funFamFeatureSet, convertedFeatures, variantResidues).then(function () {
-              console.log('The hcDataObj is ')
-              console.log(hcDataObj)
+              // console.log('The hcDataObj is ')
+              // console.log(hcDataObj)
 
               resolve()
             })
@@ -104,13 +104,13 @@ function handleCath (jsonObj1, getFeatures, validateAgainstSchema, primary_acces
 }
 
 function getAsUrl_sf (name, sf_id) {
-  console.log('<a href="https://www.cathdb.info/version/latest/superfamily/' + sf_id + '">' + name + '</a>')
+  // console.log('<a href="https://www.cathdb.info/version/latest/superfamily/' + sf_id + '">' + name + '</a>')
   return ('<a href="https://www.cathdb.info/version/latest/superfamily/' + sf_id + '" target="_blank">' + name + '</a>')
 }
 
 function getAsUrl_ff (name, sf_id, ff_id) {
   const url_ff = 'https://www.cathdb.info/version/v4_3_0/superfamily/' + sf_id + '/funfam/' + ff_id
-  console.log("<a href=\'" + url_ff + "\'>" + name + '</a>')
+  // console.log("<a href=\'" + url_ff + "\'>" + name + '</a>')
   return ("<a href=\'" + url_ff + "\' target=\"_blank\" >" + name + '</a>')
 }
 
@@ -439,7 +439,7 @@ function addToArray_features (features, resKey, superFamArr, idx_superFam, funFa
 }
 
 function handleResidues_funFam (res, superFamArr, funFamName, variantResidues) {
-  console.log('In the funfam handle residues ' + funFamName)
+  // console.log('In the funfam handle residues ' + funFamName)
   let features = []
 
   const re = new RegExp('\-')

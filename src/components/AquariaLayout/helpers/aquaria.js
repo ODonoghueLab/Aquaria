@@ -362,6 +362,8 @@ var MAX_PROTEIN_HISTORY = 10;
       }
 
       var url = `${window.BACKEND}/get_3D_alignment`
+      // var url = `http://localhost:8009/get_3D_alignment`
+      // var url = 'https://vuejs.org/v2/guide/events.html'
       axios({
         method: 'get',
         url: url,

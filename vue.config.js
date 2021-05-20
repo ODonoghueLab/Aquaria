@@ -1,10 +1,10 @@
-const { ProvidePlugin } = require('webpack');
+const { ProvidePlugin } = require('webpack')
 
-console.log(`Aquaria Backend: ${process.env.VUE_APP_AQUARIA_BACKEND}`);
-console.log(`Export Backend: ${process.env.VUE_APP_AQUARIA_EXPORT_URL}`);
-console.log(`Static SPA Mode Enabled: ${!!process.env.VUE_APP_STATIC_SPA_MODE}`);
+console.log(`Aquaria Backend: ${process.env.VUE_APP_AQUARIA_BACKEND}`)
+console.log(`Export Backend: ${process.env.VUE_APP_AQUARIA_EXPORT_URL}`)
+console.log(`Static SPA Mode Enabled: ${!!process.env.VUE_APP_STATIC_SPA_MODE}`)
 if (process.env.AQUARIA_CLIENT_EMIT_CNAME) {
-  console.log(`Emit CNAME: ${process.env.AQUARIA_CLIENT_EMIT_CNAME}`);
+  console.log(`Emit CNAME: ${process.env.AQUARIA_CLIENT_EMIT_CNAME}`)
 }
 
 module.exports = {
@@ -13,7 +13,7 @@ module.exports = {
       module: {
         rules: [
           {
-            test: /node_modules[\/\\]d3[\/\\]/,  // fix old d3/jsdom compile errors by excluding jsdom
+            test: /node_modules[\\/\\]d3[\\/\\]/, // fix old d3/jsdom compile errors by excluding jsdom
             loader: 'string-replace-loader',
             options: {
               multiple: [
@@ -36,12 +36,12 @@ module.exports = {
           cacheGroups: {
             legacy: { // extract legacy aquaria code into separate bundle
               chunks: 'all',
-              test: /src[\/\\]legacy/
+              test: /src[\\/\\]legacy/
             },
             vendor: { // extract dependencies into separate bundle
               chunks: 'all',
               test: /node_modules/
-            },
+            }
           }
         }
       },
@@ -62,9 +62,9 @@ module.exports = {
                 compilation.assets.CNAME = {
                   source: () => process.env.AQUARIA_CLIENT_EMIT_CNAME,
                   size: () => process.env.AQUARIA_CLIENT_EMIT_CNAME
-                };
+                }
               }
-            });
+            })
           }
         }
       ],
@@ -77,8 +77,7 @@ module.exports = {
 
     if (process.env.NODE_ENV === 'production') {
 
-    }
-    else {
+    } else {
       // bust cache during development (Vue's default ETag implementation doesn't work well with Safari in particular)
       config.output = {
         filename: '[name].[hash].js',
@@ -86,17 +85,17 @@ module.exports = {
       }
     }
 
-    return config;
+    return config
   },
   chainWebpack: config => {
     // ignore 404.html unless static SPA mode configured
     if (!process.env.VUE_APP_STATIC_SPA_MODE) {
       config.plugin('copy').tap(args => {
-        args[0][0].ignore.push('404.html');
-        return args;
-      });
+        args[0][0].ignore.push('404.html')
+        return args
+      })
     }
-    return config;
+    return config
   }
 
 }

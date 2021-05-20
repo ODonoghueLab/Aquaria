@@ -34,8 +34,8 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
               const aquariaFeatObj = {}
               const arr_feats = []
 
-              console.log('FunVar features are ')
-              console.log(features)
+              // console.log('FunVar features are ')
+              // console.log(features)
 
               // Convert to AquariaFeatObj format;
 
@@ -81,8 +81,8 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
             })
           })
           .then(function (aquariaFeatObj) {
-            console.log('FunVar aquariaFeatObj is - blah blah ')
-            console.log(aquariaFeatObj)
+            // console.log('FunVar aquariaFeatObj is - blah blah ')
+            // console.log(aquariaFeatObj)
             validateAgainstSchema(aquariaFeatObj, primary_accession, featureCallback, 'FunVar', null)
           })
       })

@@ -113,23 +113,81 @@ export function drawTrack (datum, svg, extServerIds_) {
       .attr('transform', 'translate(0,13)')
       .attr('class', 'insertion')
   }
+
+  let firstSpecifiedPos = -1;
+  let firstSpecifiedId = "";
   for (var p in features[o]) {
     this.drawFeatures(p, o, features, extServerIds_)
+
+    if (features[o][p].label.match('span_missenseHeading')){
+      // console.log("A feature is ")
+      // console.log(features[o][p])
+
+      if (firstSpecifiedPos == -1){
+        window.AQUARIA.ifUrlHasVarExtractInfo().then(function (varRes) {
+          Object.keys(varRes).forEach(function(aRes, aRes_i){
+            // console.log('aRes.order is ' + varRes[aRes].order)
+            if (varRes[aRes].order == 0){
+              firstSpecifiedPos = aRes_i
+              firstSpecifiedId = 'r_' + o + '_' + p
+
+              var element = document.getElementById(firstSpecifiedId)
+              console.log("The first specified element is " + element)
+              var event = new MouseEvent('mouseover', {
+                'view': window,
+                'bubbles': true,
+                'cancelable': true
+              });
+              element.dispatchEvent(event);
+              d3.select('#' + firstSpecifiedId).attr('stroke-width', '0px')
+
+            }
+          })
+        })
+      }
+
+    }
   }
+
+  // popup open by default on page load.
+  // console.log("The smallest pos is " + smallestPos)
+
+
+
+
+  // console.log("Element width is ")
+  // console.log(element)
+
   d3.selectAll('#selectedFeature rect.feature').attr(
     'fill', function () {
       return d3.select(this).attr('color')
     })
+
+  /*
+  var event_2 = new MouseEvent('mouseleave', {
+    'view': window,
+    'bubbles': true,
+    'cancelable': true
+  });
+  element.dispatchEvent(event_2)
+  */
+
 }
 
 // Draw feature by residue
 export function drawFeatures (p, o, features, extServerIds_) {
+  var offsetWidth = document.getElementById('structure-viewer').offsetWidth
+  var seqLength = window.AQUARIA.showMatchingStructures.sequence.length
 
+  var myScale = d3.scale.linear().domain([1, seqLength]).range([1, document.getElementById('structure-viewer').offsetWidth / 1.2 - window.AQUARIA.margin.right - window.AQUARIA.margin.left - 5])
+  var trans_x = myScale(parseInt(features[o][p].start))
+  // var trans_x = Math.floor(parseInt(features[o][p].start)/seqLength * (offsetWidth - 300)) // ((parseInt(features[o][p].start)) * (parseFloat(window.AQUARIA.srw)))
   this.nusg.append('rect')
-    .attr('width', function () { return (/* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) > 2) ? /* parseInt */((features[o][p].size + 1) * window.AQUARIA.srw) : 2 })
+    .attr('width', function () { return (parseInt((features[o][p].size + 1) * window.AQUARIA.coverageMapsrw) > 2) ? parseInt((features[o][p].size + 1) * window.AQUARIA.coverageMapsrw) : 2 })
     .attr('height', 14)
     .attr('id', 'r_' + o + '_' + p)
-    .attr('transform', 'translate(' + /* parseInt */ (features[o][p].start * (window.AQUARIA.srw - 0.0095)) + ',6)')
+    .attr('x', trans_x)
+    .attr('transform', 'translate(0,6)')
     .attr('color', features[o][p].color).attr('fill', '#a4abdf')
     .attr('class', 'feature')
     .on('mouseover', createMouseOverCallback(features[o][p], extServerIds_))
@@ -192,7 +250,7 @@ function showAnnotation (f, eid, extServerIds_) {
   balloon = balloon + '</div>'
   btnsDiv = btnsDiv + '</div>'
   balloon = balloon + btnsDiv
-  balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p>'
+  balloon = balloon + '</div><div class="balloon" id="balloon"><span class="x">&nbsp;</span><p id="popupheader">'
 
   if (f.name.includes('span_missenseHeading')) {
     if (typeof extServerIds_ !== 'undefined') {
@@ -210,7 +268,6 @@ function showAnnotation (f, eid, extServerIds_) {
   }
 
   balloon = balloon + f.label
-
   if (!f.name.includes('span_missenseHeading')) {
     balloon = balloon + ' ('
     if (f.start === f.end) {
@@ -358,7 +415,7 @@ function handleCathPopups (f) {
     // handle this one.
     if (typeof f.hc_go !== 'undefined' && Object.prototype.hasOwnProperty.call(f.hc_go, 'data') && Object.prototype.hasOwnProperty.call(f.hc_go.data, 'series') && f.hc_go.data.series.length >= 2) {
       doThePlottingV2('hc_go_div', f.hc_go.data.series[0].data, f.hc_go.data.series[1].data, '', f.hc_go.data.series[0].size, f.hc_go.data.series[0].dataLabels.color, f.hc_go.data.series[0].dataLabels.dist, f.hc_go.data.series[1].innerSize, f.hc_go.data.series[0].name, f.hc_go.data.series[1].name, f.hc_go.data.series[1].dataLabels.color).then(function () {
-        console.log('CATH plot: 1')
+        // console.log('CATH plot: 1')
         document.getElementById('hc_go').prepend(document.getElementById('hc_go_div'))
       })
         .catch(function (error) {
@@ -382,7 +439,7 @@ function handleCathPopups (f) {
         document.getElementById('hc_go_noData').innerHTML = document.getElementById('hc_go_noData').innerHTML + '<br> <br> <center> No data</center>'
       })
       // }
-      console.log('CATH plot: 3')
+      // console.log('CATH plot: 3')
 
       // document.getElementById('hc_go_div').style['background-color'] = "white";
     }
@@ -544,12 +601,12 @@ function doThePlottingV2 (divId, theSeriesDataInner, theSeriesDataOuter, theTitl
           }
         })
         resolve()
-        console.log('In the highcharts plotting function')
+        // console.log('In the highcharts plotting function')
       } catch (error) {
         console.log('Highcharts error')
         console.log(error)
         resolve()
-        console.log('In the highcharts plotting function')
+        // console.log('In the highcharts plotting function')
       }
     })
     /* }
