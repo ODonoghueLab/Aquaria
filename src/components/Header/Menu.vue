@@ -61,6 +61,8 @@ export default {
       ev.preventDefault() // prevent default navigation
       toggleActive(ev) // toggle active state
       document.querySelector('#help').style.display = 'block'
+      document.querySelector('.ytpl-player').style.height = '100%'
+      document.querySelector('.ytpl-player > iframe').style.height = '100%'
     })
     document.querySelector('#Sidechains').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
