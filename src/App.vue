@@ -39,7 +39,7 @@ export default {
     // var regex = /(^\d+\/*$)/
     if (window.location.pathname === '/') {
       if (localStorage.getItem('LastSuccess') == null) {
-        window.location.pathname = '/P04637/3kmd'
+        window.location.pathname = '/Human/TP53'
       } else {
         window.location.pathname = localStorage.getItem('LastSuccess')
       }
