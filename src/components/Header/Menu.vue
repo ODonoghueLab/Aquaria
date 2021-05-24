@@ -3,6 +3,7 @@
       <a href="#" class="close"></a>
       <div>
         <a class="lnk" id='print' href="#">Print</a>
+        <a class="lnk" id='helpbtn' href="#">Help</a>
       </div>
       <div>
         <a class="lnk" id='Sidechains' href="#Menu">Sidechains</a>
@@ -56,6 +57,13 @@ export default {
     //   ev.preventDefault() // prevent default navigation
     //   document.querySelector('.xr-menu-button').click()
     // })
+    document.querySelector('#helpbtn').addEventListener('click', function (ev) {
+      ev.preventDefault() // prevent default navigation
+      toggleActive(ev) // toggle active state
+      document.querySelector('#help').style.display = 'block'
+      document.querySelector('.ytpl-player').style.height = '100%'
+      document.querySelector('.ytpl-player > iframe').style.height = '100%'
+    })
     document.querySelector('#Sidechains').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
       toggleActive(ev) // toggle active state
