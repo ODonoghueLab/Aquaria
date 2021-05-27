@@ -349,7 +349,18 @@ var MAX_PROTEIN_HISTORY = 10;
       //   AQUARIA.panel3d.blankApplet(true, "Waiting for PDB...");
       //   AQUARIA.blankPanel("#vis", true);
       // }
+
+      if (localStorage.getItem('LastSuccess') == null) {
+        document.querySelector('#help').style.display = 'block'
+        document.querySelector('.ytpl-player').style.height = '100%'
+        document.querySelector('.ytpl-player > iframe').style.height = '100%'
+        // document.querySelector('.ytpl-playlist, .ytpl-playlist ps').style.height = '100%'
+        // window.addEventListener('resize', function () {
+        //   document.querySelector('.ytpl-playlist, .ytpl-playlist ps').style.height = '100%'
+        // });
+      }
       AQUARIA.panel3d.blankApplet(true, 'Waiting for PDB...')
+      //if first time using Aquaria, display Youtube playlist
       AQUARIA.blankPanel('#featurelist', true)
       AQUARIA.blankPanel('#aboutPDB', true)
       // AQUARIA.blankPanel("#uniProtDesc", true);
@@ -362,6 +373,8 @@ var MAX_PROTEIN_HISTORY = 10;
       }
 
       var url = `${window.BACKEND}/get_3D_alignment`
+      // var url = `http://localhost:8009/get_3D_alignment`
+      // var url = 'https://vuejs.org/v2/guide/events.html'
       axios({
         method: 'get',
         url: url,

@@ -736,6 +736,23 @@ function fetch_annotations (primary_accession,
     featureCallback)
 };
 
+function getTotalNumOfStructs(residue){
+  let totalNumStructs = 0; let isShown = false
+  Object.values(threeToOneResMap).forEach(function (anAa, anAa_i) {
+    if (window.AQUARIA.variantStructs[residue].hasOwnProperty(anAa)){
+      if(window.AQUARIA.variantStructs[residue][anAa].hasOwnProperty('pdbs')){
+        totalNumStructs = totalNumStructs + window.AQUARIA.variantStructs[residue][anAa].pdbs.length
+      }
+    }
+  })
+
+  if(window.AQUARIA.variantStructs[residue].hasOwnProperty('isShown')){
+    isShown = window.AQUARIA.variantStructs[residue].isShown
+  }
+
+  return {totalNumStructs: totalNumStructs, isShown: isShown}
+}
+
 function getCurrentUrl () {
   /* console.log("CURRENT URL IS ");
 	console.log(window.location.search.substring(1));
@@ -941,6 +958,19 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       }
     }
 
+    if (window.AQUARIA.hasOwnProperty('variantStructs') && window.AQUARIA.variantStructs.hasOwnProperty(residue)){
+      let dict_totalAndIsShown = getTotalNumOfStructs(residue)
+      description = description + '<toReplace_posInfo>' + '<i>' + 'Structures with residue ' + residue + ': '
+
+      if (dict_totalAndIsShown.isShown == true){
+        description = description + "<span class='selCol'>" + dict_totalAndIsShown.totalNumStructs + "</span>" 
+      }
+      else {
+        description = description +  dict_totalAndIsShown.totalNumStructs
+      }
+      description = description + '</i></toReplace_posInfo>'
+    }
+
     Object.values(threeToOneResMap).forEach(function (anAa, anAa_i) {
       // console.log("An extraordinary life " + anAa);
       if (anAa != variantResidues[residue].oldAa) {
@@ -956,6 +986,28 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
           description = description + 'No data to show. '
           description = description + '</toReplace_varInfo_' + anAa + '>'
           // }
+        }
+
+        if (window.AQUARIA.hasOwnProperty('variantStructs') && window.AQUARIA.variantStructs.hasOwnProperty(residue) && window.AQUARIA.variantStructs[residue].hasOwnProperty(anAa) && window.AQUARIA.variantStructs[residue][anAa].hasOwnProperty('pdbs')){
+          description = description + '<toReplace_varInfo_' + anAa + '><i>'
+          description = description + 'Structures with ' + variantResidues[residue].oldAa + residue + anAa + "</i>: ";
+
+          if (window.AQUARIA.hasOwnProperty('variantStructs') && window.AQUARIA.variantStructs.hasOwnProperty(residue) && window.AQUARIA.variantStructs[residue].hasOwnProperty(anAa) && window.AQUARIA.variantStructs[residue][anAa].hasOwnProperty('isShown')){
+            description = description + "<span class='selCol'>" +  window.AQUARIA.variantStructs[residue][anAa].pdbs.length + "</span>"
+
+          }
+          else {
+            description = description + window.AQUARIA.variantStructs[residue][anAa].pdbs.length
+          }
+
+          description = description + '</toReplace_varInfo_' + anAa + '>'
+          // let totalNumStructs = getTotalNumOfStructs(residue)
+          // description = description + '<toReplace_posInfo>' + '<i>' + 'Structures with residue ' + residue + ': ' +  totalNumStructs + '</i></toReplace_posInfo>'
+        }
+        else {
+          description = description + '<toReplace_varInfo_' + anAa + '><i>'
+          description = description + 'Structures with ' + variantResidues[residue].oldAa + residue + anAa + "</i>: " + 0
+          description = description + '</toReplace_varInfo_' + anAa + '>'
         }
         // console.log("We almost always kick full " + anAa);
       }
