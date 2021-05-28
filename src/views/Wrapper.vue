@@ -144,7 +144,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .dimmer {
   z-index: 99;
 }
@@ -185,6 +185,7 @@ body {
     background-color: var(--background);
     color: var(--dark-text);
     font-size: calc(0.8rem + 3 * ((100vw - 320px) / 680));
+    line-height: 1.05rem;
     transition: All 0.5s ease;
   }
 .main {
@@ -214,7 +215,7 @@ body {
     background: radial-gradient(closest-side,var(--secondary-label), var(--background));
 }
 .panel.overlay.about {
-  padding-top: 3em;
+  padding-top: 4em;
   max-height: 85vh;
 }
 .about p {

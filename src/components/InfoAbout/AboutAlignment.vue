@@ -150,8 +150,7 @@ export default {
 </script>
 <style scoped>
 pre {
-  font-size: 0.65rem;
-  /* max-width: 50vw; */
+  font-size: clamp(0.5rem, -0.254rem + 1.4141vw, 0.85rem);
   max-height: 33vh;
   overflow: auto;
 }

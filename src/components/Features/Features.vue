@@ -211,7 +211,7 @@ div.popup  {
 }
 
 .highcharts-data-table  table  {
-  font-family:  Verdana,  sans-serif;
+  font-family:  'Source Sans Pro',  sans-serif;
   border-collapse:  collapse;
   border:  1px  solid  #EBEBEB;
   margin:  10px  auto;
@@ -244,7 +244,7 @@ div.popup  {
 }
 
 .column  {
-  float:  left;
+  /* float:  left; */
   width:  25%;
   padding:  2px;
   display:  inline-block;
