@@ -12,6 +12,8 @@
     </div>
     <div>
       <AboutAquaria />
+      <div class='dimmer' @click="closeHelp"></div>
+      <UserHelp />
       <Errors />
     </div>
     <div id="heightinspector"></div>
@@ -20,21 +22,19 @@
     <!-- AquariaLayout -->
     <Tabs />
     <PopUp />
-    <div id = 'help'>
-      <div class='dimmer' @click="closeHelp"></div>
+    <!-- <div id = 'help'>
       <div id='helpDoc'>
         <a href="https://aquaria.ws/help>">Help manual</a>
         <a href="#" class="close" @click="closeHelp">X</a>
         </div>
       <youtube-playlist :videos="data.arrayOfVideos" id='playlist'></youtube-playlist>
-      <!-- <iframe id='playlist' src="https://www.youtube.com/embed/videoseries?list=PLsGaleFn8YydVFkxDhOvHHE5NoTsl6D1e" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
-    </div>
+      <iframe id='playlist' src="https://www.youtube.com/embed/videoseries?list=PLsGaleFn8YydVFkxDhOvHHE5NoTsl6D1e" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div> -->
     <a v-bind:href="data.hash"><div id="scrim" class="hide" @click="dismissPanel"></div></a>
   </div>
 </template>
 
 <script>
-import YouTubePlaylist from 'vue-youtube-playlist'
 import store from '../store/index'
 import '../components/AquariaLayout/helpers/aquaria' // most legacy code bundling is triggered from here (expects global jolecule)
 import Header from '../components/Header/Header'
@@ -46,11 +46,11 @@ import Tabs from '../components/AquariaLayout/Tabs'
 import PopUp from '../components/AquariaLayout/PopUp'
 import AboutAquaria from '../components/InfoAbout/AboutAquaria'
 import Errors from '../components/InfoAbout/Errors'
+import UserHelp from '../components/InfoAbout/UserHelp'
 
 export default {
   name: 'Wrapper',
   components: {
-    'youtube-playlist': YouTubePlaylist,
     Header,
     Sequence,
     AboutAlignment,
@@ -59,7 +59,8 @@ export default {
     Tabs,
     PopUp,
     AboutAquaria,
-    Errors
+    Errors,
+    UserHelp
   },
   computed: {
     data () {
@@ -74,10 +75,12 @@ export default {
   },
   methods: {
     closeHelp: function () {
-      // fetch some id and assign some class
-      document.querySelector('#help').style.display = 'none'
-      var elem = document.querySelector('#helpbtn')
-      this.toggleActive(elem)
+      var _this = this
+      document.querySelector('#UserHelp').style.display = 'none'
+      document.querySelector('.dimmer').style.display = 'none'
+      if (document.querySelector('#helpbtn').classList.contains('active')) {
+        _this.toggleActive(document.querySelector('#helpbtn'))
+      }
     },
     checkPhone: function () {
       var iDevices = [
@@ -112,6 +115,7 @@ export default {
       document.querySelectorAll('#title span a').forEach(el => {
         el.className = ''
       })
+      document.querySelector('#pdb_id > span#help').style.visibility = 'visible'
     },
     toggleActive: function (ev) {
       if (ev.className === 'lnk active') {
@@ -147,8 +151,9 @@ export default {
 <style scoped>
 .dimmer {
   z-index: 99;
+  display: none;
 }
-.close {
+/* .close {
   float: right;
 }
 #helpDoc {
@@ -158,7 +163,6 @@ export default {
   padding: 4px;
 }
 #help {
-  /* display: block; */
   position: absolute;
   width: 90vw;
   height: 90vh;
@@ -171,7 +175,7 @@ export default {
   height: 100%;
   z-index: 9999;
   background: black;
-}
+} */
 div#heightinspector {
   display: none;
   position: absolute;

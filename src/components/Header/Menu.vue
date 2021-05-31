@@ -60,9 +60,8 @@ export default {
     document.querySelector('#helpbtn').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
       toggleActive(ev) // toggle active state
-      document.querySelector('#help').style.display = 'block'
-      document.querySelector('.ytpl-player').style.height = '100%'
-      document.querySelector('.ytpl-player > iframe').style.height = '100%'
+      document.querySelector('#UserHelp').style.display = 'flex'
+      document.querySelector('.main .dimmer').style.display = 'block'
     })
     document.querySelector('#Sidechains').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation

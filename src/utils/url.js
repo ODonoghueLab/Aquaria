@@ -16,7 +16,6 @@ var pdb, chain, previousPDB
 
 export function remoteSuccess () {
   var pathname = document.location.pathname // document.URL.split('?')[0];
-  document.querySelector('#help').style.display = 'none'
   if (pathname
     .match(/\/(?:leap\/)?([A-Z a-z][0-9][A-Z a-z,0-9][A-Z a-z,0-9][A-Z a-z,0-9][0-9])\/?$/)) {
     uniprotAccession.push(RegExp.$1.toUpperCase())

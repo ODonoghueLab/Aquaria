@@ -18,7 +18,9 @@ export default class DataServer {
       const pdbText = pako.inflate(response.data, { to: 'string' })
       callback({ pdbId: window.AQUARIA.currentMember.pdb_id, pdbText })
       if (localStorage.getItem('LastSuccess') == null) {
-        document.querySelector('#help').style.display = 'block'
+        Store.commit('setHelpTitle', 'Welcome to Aquaria')
+        document.querySelector('#UserHelp').style.display = 'flex'
+        document.querySelector('.main .dimmer').style.display = 'block'
       }
       localStorage.setItem('LastSuccess', window.location.pathname)
       if (!window.AQUARIA.pdbTopTen.previousLookupByName(AQUARIA.Organism.Name + '_' + window.AQUARIA.Gene)) {

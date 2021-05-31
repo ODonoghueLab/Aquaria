@@ -100,14 +100,14 @@ p.thetitle {
   .affiliations {
     font-size: 70%;
   }
-  #AboutError span {
+  /* #AboutError span {
     display: inline-block;
     white-space: nowrap;
     margin-right: 0.25em;
   }
   .affiliations span {
       margin-right: 1.2em;
-  }
+  } */
   .ErrorPanel .close::after {
     width: 1.5rem;
     height: 1.5rem;
