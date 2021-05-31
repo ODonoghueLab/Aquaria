@@ -248,6 +248,7 @@ span#pdb_id , span#no_pdb_id {
 }
 #titleAlign {
   display: flex;
+  justify-content: center;
 }
 #titleAlign.active {
   /* background-color: var(--primary-highlight); */
@@ -262,6 +263,7 @@ span#pdb_id , span#no_pdb_id {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 15rem;
+  text-align: center;
 }
 
 #title span.titlepanel {

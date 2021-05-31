@@ -825,7 +825,7 @@ div.balloon p.quality.high { background: #555; color: #DFF; }
 
   /**** SVG styles ****/
   svg {
-    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font-family: "Source Sans Pro", sans-serif;
   }
 
   .container>svg {
