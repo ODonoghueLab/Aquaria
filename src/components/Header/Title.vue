@@ -163,10 +163,10 @@ export default {
 #pdb_id > span#help {
   background: white;
   color: #595656;
-  padding: 1px 6px;
-  border-radius: 18px;
+  padding: 0px 7px;
+  border-radius: 12px;
   margin: 2px;
-  font-size: 110%;
+  font-size: 100%;
 }
 /* #pdb_id:hover{
   background-color: var(--primary-link);
