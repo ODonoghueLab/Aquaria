@@ -304,7 +304,7 @@ function filterByExactResPos (intersectList, resPos, newAas, uniprotId, matching
                       window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].pdbs = []
                     }
 
-                    if (Object.prototype.hasOwnProperty.call(theInfo, 'pdbId')) {
+                    if (theInfo && theInfo != undefined &&  Object.prototype.hasOwnProperty.call(theInfo, 'pdbId')) { // eslint-disable-line
                       if (anAlignment.PDB_ID == theInfo.pdbId){ // eslint-disable-line
                         window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].isShown = true
                       }
