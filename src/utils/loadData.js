@@ -59,8 +59,8 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
 
   var loadRequest = {
     selector: primaryAccession,
-    selectPDB: autoSelectPDB,
-    selectChain: autoSelectChain
+    selectPDB: autoSelectPDB, // optional fields
+    selectChain: autoSelectChain // optional fields
   }
   window.AQUARIA.structures2match = {
     initialLoadRequest: loadRequest,

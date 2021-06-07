@@ -31,19 +31,39 @@ export default {
     }
   },
   methods: {
-    onChange (event) {
+    onChange: function (event) {
       const id = event.target.value.toLowerCase()
       document.querySelector('#threeDSpan-inner-menu-' + id).click()
-    }
-  },
-  mounted () {
-    const toggleActive = function (ev) {
+    },
+    showHelp: function () {
+      var _this = this
+      document.getElementById('UserHelp').classList.remove('deactive')
+      document.getElementById('UserHelp').className += (' active')
+      // document.querySelector('#UserHelp').style.display = 'flex'
+      // document.querySelector('.main .dimmer').style.display = 'block'
+      if (!document.querySelector('div.dimmer')) {
+        window.AQUARIA.overlay()
+        document.querySelector('div.dimmer').style.zIndex = '7'
+      }
+      document.querySelector('div.dimmer').addEventListener('click', function () {
+        window.AQUARIA.RemoveOverlay()
+        document.getElementById('UserHelp').classList.remove('active')
+        document.getElementById('UserHelp').className += (' deactive')
+        var elem = {}
+        elem.target = document.querySelector('#helpbtn')
+        _this.toggleActive(elem)
+      })
+    },
+    toggleActive: function (ev) {
       if (ev.target.className === 'lnk active') {
         ev.target.className = 'lnk'
       } else {
         ev.target.className = 'lnk active'
       }
     }
+  },
+  mounted () {
+    var _this = this
     document.querySelector('#print').addEventListener('click', async function (ev) {
       ev.preventDefault() // prevent default navigation
       const screenshotHref = await screenshot(7680, 4320, 0, 0)
@@ -59,28 +79,27 @@ export default {
     // })
     document.querySelector('#helpbtn').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
-      document.querySelector('#UserHelp').style.display = 'flex'
-      document.querySelector('.main .dimmer').style.display = 'block'
+      _this.toggleActive(ev) // toggle active state
+      _this.showHelp()
     })
     document.querySelector('#Sidechains').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
+      _this.toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar > span:nth-child(6)').click()
     })
     document.querySelector('#Neighbors').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
+      _this.toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar > span:nth-child(7)').click()
     })
     document.querySelector('#Ligands').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
+      _this.toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner-menu-ligand').click()
     })
     document.querySelector('#Water').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
+      _this.toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner-menu-water').click()
     })
   }

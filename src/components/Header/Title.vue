@@ -88,8 +88,19 @@ export default {
   },
   methods: {
     showHelp: function () {
-      document.querySelector('#UserHelp').style.display = 'flex'
-      document.querySelector('.main .dimmer').style.display = 'block'
+      document.getElementById('UserHelp').classList.remove('deactive')
+      document.getElementById('UserHelp').className += (' active')
+      // document.querySelector('#UserHelp').style.display = 'flex'
+      // document.querySelector('.main .dimmer').style.display = 'block'
+      if (!document.querySelector('div.dimmer')) {
+        window.AQUARIA.overlay()
+        document.querySelector('div.dimmer').style.zIndex = '7'
+      }
+      document.querySelector('div.dimmer').addEventListener('click', function () {
+        window.AQUARIA.RemoveOverlay()
+        document.getElementById('UserHelp').classList.remove('active')
+        document.getElementById('UserHelp').className += (' deactive')
+      })
     },
     storeHash: function () {
       store.commit('setHash', window.location.hash)
