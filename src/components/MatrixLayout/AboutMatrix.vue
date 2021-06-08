@@ -131,7 +131,7 @@ export default {
       document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 25 + 'px'
       document.querySelector('#content').style.display = 'none'
       document.querySelector('#title_0').style.visibility = 'visible'
-      document.querySelector('div.dimmer').remove()
+      window.AQUARIA.RemoveOverlay()
       setTimeout(function () { document.querySelector('#help').style.pointerEvents = 'auto' }, 1000)
       document.querySelector('#help').style.pointerEvents = 'none'
     },
@@ -156,10 +156,10 @@ export default {
           }
           document.querySelector('#content').style.display = 'none'
           document.querySelector('#title_0').style.visibility = 'visible'
-          document.querySelector('div.dimmer').remove()
+          window.AQUARIA.RemoveOverlay()
         })
       } else {
-        document.querySelector('div.dimmer').remove()
+        window.AQUARIA.RemoveOverlay()
       }
     },
     activateOver () {

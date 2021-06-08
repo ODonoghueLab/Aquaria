@@ -76,7 +76,8 @@ export default {
   methods: {
     closeHelp: function () {
       var _this = this
-      document.querySelector('#UserHelp').style.display = 'none'
+      document.getElementById('UserHelp').classList.remove('active')
+      document.getElementById('UserHelp').className += (' deactive')
       document.querySelector('.dimmer').style.display = 'none'
       if (document.querySelector('#helpbtn').classList.contains('active')) {
         window.AQUARIA.RemoveOverlay()

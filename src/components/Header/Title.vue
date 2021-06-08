@@ -88,13 +88,15 @@ export default {
   },
   methods: {
     showHelp: function () {
+      store.commit('setHelpTitle', 'Aquaria Help')
+      store.commit('setUserStatus', false)
       document.getElementById('UserHelp').classList.remove('deactive')
       document.getElementById('UserHelp').className += (' active')
       // document.querySelector('#UserHelp').style.display = 'flex'
       // document.querySelector('.main .dimmer').style.display = 'block'
       if (!document.querySelector('div.dimmer')) {
         window.AQUARIA.overlay()
-        document.querySelector('div.dimmer').style.zIndex = '7'
+        document.querySelector('div.dimmer').className += ' level7'
       }
       document.querySelector('div.dimmer').addEventListener('click', function () {
         window.AQUARIA.RemoveOverlay()
@@ -174,7 +176,7 @@ export default {
 #pdb_id > span#help {
   background: white;
   color: #595656;
-  padding: 0px 7px;
+  padding: 0px 0.4em;
   border-radius: 12px;
   margin: 2px;
   font-size: 100%;
@@ -243,7 +245,7 @@ span#org_prot, span#uniprotpanel {
   border-bottom-left-radius: 1.5rem;
 }
 span#org_prot a, span#uniprotpanel a {
-  padding-left: 1rem;
+  padding-left: 0.5rem;
   border-top-left-radius: 1.5rem;
   border-bottom-left-radius: 1.5rem;
   transition: all 0.7s ease;
@@ -252,7 +254,7 @@ span#org_prot img, span#uniprotpanel img, span#pdb_id img  {
 height: calc(10px + .4vw);
 }
 span#pdb_id , span#no_pdb_id {
-  padding-right: 1rem;
+  padding-right: 0.5rem;
   font-weight: 600;
   border-top-right-radius: 1.5rem;
   border-bottom-right-radius: 1.5rem;

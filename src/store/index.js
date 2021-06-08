@@ -12,9 +12,13 @@ export default new Vuex.Store({
     organism: '',
     error: '',
     errorMsg: '',
-    helpTitle: 'Aquaria Help'
+    helpTitle: 'Aquaria Help',
+    newUser: true
   },
   mutations: {
+    setUserStatus (state, value) {
+      state.newUser = value
+    },
     setHelpTitle (state, value) {
       state.helpTitle = value
     },

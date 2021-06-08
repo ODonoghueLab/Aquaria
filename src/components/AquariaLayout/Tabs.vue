@@ -54,7 +54,8 @@ export default {
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
-      document.querySelector('div.dimmer').style.zIndex = '0'
+      document.querySelector('div.dimmer').className += ' level0'
+      // document.querySelector('div.dimmer').style.zIndex = '0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         // document.querySelector('div.tabs').style.bottom = '50px'
         Panels.hidePanels()
@@ -71,7 +72,7 @@ export default {
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
-      document.querySelector('div.dimmer').style.zIndex = '0'
+      document.querySelector('div.dimmer').className += ' level0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelector('a.close').click()
         // document.querySelector('div.tabs').style.bottom = '50px'

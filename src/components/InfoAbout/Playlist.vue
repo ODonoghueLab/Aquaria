@@ -22,13 +22,12 @@ export default {
       document.getElementById('UserHelp').classList.remove('level7')
       document.getElementById('UserHelp').classList.remove('dialouge-window')
       document.getElementById('UserHelp').className += ' fullwindow'
-      for (var i = 0; i < this.$parent.$refs.youtube.length; i++) {
-        if (this.$parent.$refs.youtube[i].$attrs.id === id) {
+      for (var i = 0; i < this.$parent.$children.length; i++) {
+        if (this.$parent.$children[i].$attrs.id === id) {
           var index = i
         }
       }
-      this.$parent.$refs.youtube[index].player.playVideo()
-    //   document.getElementById(id).className += ' fill'
+      this.$parent.$children[index].player.playVideo()
     }
   }
 }

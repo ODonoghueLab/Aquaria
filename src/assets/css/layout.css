@@ -34,6 +34,7 @@
 }    
  
 /* positioning classes (for panels and scrim) */
+.level0 { z-index: 0 }
 .level1 { z-index: 1 }
 .level2 { z-index: 2 }
 .level3 { z-index: 3 }

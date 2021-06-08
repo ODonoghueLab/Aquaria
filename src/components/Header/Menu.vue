@@ -22,7 +22,7 @@
 <script>
 
 import { screenshot } from '../AquariaLayout/helpers/Screenshot'
-
+import store from '../../store/index'
 export default {
   name: 'Menu',
   data () {
@@ -37,13 +37,13 @@ export default {
     },
     showHelp: function () {
       var _this = this
+      store.commit('setHelpTitle', 'Aquaria Help')
+      store.commit('setUserStatus', false)
       document.getElementById('UserHelp').classList.remove('deactive')
       document.getElementById('UserHelp').className += (' active')
-      // document.querySelector('#UserHelp').style.display = 'flex'
-      // document.querySelector('.main .dimmer').style.display = 'block'
       if (!document.querySelector('div.dimmer')) {
         window.AQUARIA.overlay()
-        document.querySelector('div.dimmer').style.zIndex = '7'
+        document.querySelector('div.dimmer').className += ' level7'
       }
       document.querySelector('div.dimmer').addEventListener('click', function () {
         window.AQUARIA.RemoveOverlay()

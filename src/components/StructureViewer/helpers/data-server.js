@@ -17,10 +17,8 @@ export default class DataServer {
 		  }).then(function (response) {
       const pdbText = pako.inflate(response.data, { to: 'string' })
       callback({ pdbId: window.AQUARIA.currentMember.pdb_id, pdbText })
-      if (localStorage.getItem('LastSuccess') == null) {
-        Store.commit('setHelpTitle', 'Welcome to Aquaria')
-        document.querySelector('#UserHelp').style.display = 'flex'
-        document.querySelector('.main .dimmer').style.display = 'block'
+      if (localStorage.getItem('LastSuccess') === null) {
+        showHelp()
       }
       localStorage.setItem('LastSuccess', window.location.pathname)
       if (!window.AQUARIA.pdbTopTen.previousLookupByName(AQUARIA.Organism.Name + '_' + window.AQUARIA.Gene)) {
@@ -60,6 +58,21 @@ export default class DataServer {
   deleteView (viewId, callback) {
     callback()
   }
+}
+
+function showHelp () {
+  Store.commit('setHelpTitle', 'Welcome to Aquaria')
+  document.getElementById('UserHelp').classList.remove('deactive')
+  document.getElementById('UserHelp').className += (' active')
+  if (!document.querySelector('div.dimmer')) {
+    window.AQUARIA.overlay()
+    document.querySelector('div.dimmer').className += ' level7'
+  }
+  document.querySelector('div.dimmer').addEventListener('click', function () {
+    window.AQUARIA.RemoveOverlay()
+    document.getElementById('UserHelp').classList.remove('active')
+    document.getElementById('UserHelp').className += (' deactive')
+  })
 }
 
 export { DataServer }

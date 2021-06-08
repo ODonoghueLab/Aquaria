@@ -5,13 +5,14 @@
             <youtube v-for="video in videos" :key="video.id" :id='video.id' :video-id="video.id" class='deactive' ref="youtube" @paused="paused($event)" @ended="finished($event)"></youtube>
           </div>
           <div id='contents'>
-          <p class="thetitle">{{data.title}}</p>
-          <p class="intro1">Watch tutorial videos to get started.</p>
-          <p>Skip watching tutorial videos and start using Aquaria.</p>
-          <youtube v-if='data.show' id='intro-video' video-id="FAQ3yVGYSzY" ref="youtube" @playing="playing($event)" @paused="paused($event)" @ended="finished($event)"></youtube>
-          <Playlist v-bind:playlist='videos'/>
-          <!-- <iframe id='playlist' src="https://www.youtube.com/embed/videoseries?list=PLsGaleFn8YydVFkxDhOvHHE5NoTsl6D1e" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
-          <a href="#" id='skip' @click="closeHelp">Skip > </a>
+            <p class="thetitle">{{data.title}}</p>
+            <p class="intro1">Watch tutorial videos to get started.</p>
+            <p>Skip watching tutorial videos and start using Aquaria.</p>
+            <Playlist v-if="!data.newUser" v-bind:playlist='videos'/>
+            <div v-if="data.newUser">
+              <youtube id='intro-video' video-id="FAQ3yVGYSzY" ref="youtube" @playing="playing($event)" @paused="paused($event)" @ended="finished($event)"></youtube>
+            </div>
+            <a href="#" id='skip' @click="closeHelp">Skip > </a>
           </div>
     </div>
 </template>
@@ -35,13 +36,10 @@ export default {
     }
   },
   computed: {
-    intro () {
-      return this.$refs.youtube.player
-    },
     data () {
       return {
         title: store.state.helpTitle,
-        show: false
+        newUser: store.state.newUser
       }
     }
   },
@@ -61,7 +59,6 @@ export default {
         event.h.id = activeVideoID
         _this.paused(event)
       } else {
-        store.commit('setHelpTitle', 'Aquaria Help')
         window.AQUARIA.RemoveOverlay()
         document.getElementById('UserHelp').classList.remove('active')
         document.getElementById('UserHelp').className += (' deactive')
@@ -79,32 +76,38 @@ export default {
         ev.className = 'lnk active'
       }
     },
-    playing: function (event) {
-      targetId = event.h.id
+    getIndex: function (targetId) {
       for (var i = 0; i < this.$refs.youtube.length; i++) {
         if (this.$refs.youtube[i].$attrs.id === targetId) {
-          index = i
+          return i
         }
       }
-      this.$refs.youtube[index].player.playVideo()
-      // this.player.playVideo()
-      var iframe = document.querySelector('#intro-video')
-      var requestFullScreen = iframe.requestFullScreen || iframe.mozRequestFullScreen || iframe.webkitRequestFullScreen
-      if (requestFullScreen) {
-        requestFullScreen.bind(iframe)()
+    },
+    playing: function (event) {
+      targetId = event.h.id
+      if (this.$refs.youtube.length) {
+        index = this.getIndex(targetId)
+        this.$refs.youtube[index].player.playVideo()
+      } else {
+        this.$refs.youtube.player.playVideo()
+        var iframe = document.querySelector('#intro-video')
+        var requestFullScreen = iframe.requestFullScreen || iframe.mozRequestFullScreen || iframe.webkitRequestFullScreen
+        if (requestFullScreen) {
+          requestFullScreen.bind(iframe)()
+        }
       }
     },
     paused: function (event) {
       targetId = event.h.id
-      for (var i = 0; i < this.$refs.youtube.length; i++) {
-        if (this.$refs.youtube[i].$attrs.id === targetId) {
-          index = i
-        }
-      }
       if (document.querySelector('iframe.active')) {
         this.closeHelp()
       } else {
-        this.$refs.youtube[index].player.pauseVideo()
+        if (this.$refs.youtube.length) {
+          index = this.getIndex(targetId)
+          this.$refs.youtube[index].player.pauseVideo()
+        } else {
+          this.$refs.youtube.player.pauseVideo()
+        }
         if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
           document.exitFullscreen()
         }
@@ -112,18 +115,17 @@ export default {
     },
     finished: function (event) {
       targetId = event.h.id
-      for (var i = 0; i < this.$refs.youtube.length; i++) {
-        if (this.$refs.youtube[i].$attrs.id === targetId) {
-          index = i
-        }
+      if (this.$refs.youtube.length) {
+        index = this.getIndex(targetId)
+        this.$refs.youtube[index].player.stopVideo()
+      } else {
+        this.$refs.youtube.player.stopVideo()
       }
-      this.$refs.youtube[index].player.stopVideo()
       if (document.querySelector('iframe.active')) {
         document.querySelector('#UserHelp a.close').click()
       }
       document.exitFullscreen()
       this.closeHelp()
-      store.commit('setHelpTitle', 'Aquaria Help')
     }
   }
 }
@@ -159,8 +161,8 @@ export default {
   height: 100vh;
 }
 iframe#intro-video {
-  /* width: 100%; */
   height: 29vh;
+  margin-bottom: 0.5rem;
 }
 #skip {
   float: right;
@@ -173,7 +175,7 @@ iframe#intro-video {
     z-index: 9;
     top: 1vh;
     background: var(--primary-tab);
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 0.5rem 0.75rem 0.5rem;
     border-radius: 1rem;
     flex-direction: column;
 }
@@ -204,7 +206,7 @@ p.thetitle {
     left: 50%;
     transform: translate(-50%, 0%);
     width: 90vw;
-    max-width: 20rem;
+    max-width: 24rem;
   }
   .HelpPanel .close::after {
     width: 1.5rem;
