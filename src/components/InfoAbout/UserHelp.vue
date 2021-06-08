@@ -6,8 +6,8 @@
           </div>
           <div id='contents'>
             <p class="thetitle">{{data.title}}</p>
-            <p class="intro1">Watch tutorial videos to get started.</p>
-            <p>Skip watching tutorial videos and start using Aquaria.</p>
+            <p class="intro">Watch tutorial videos to get started.</p>
+            <p class="intro">Skip watching tutorial videos and start using Aquaria.</p>
             <Playlist v-if="!data.newUser" v-bind:playlist='videos'/>
             <div v-if="data.newUser">
               <youtube id='intro-video' video-id="FAQ3yVGYSzY" ref="youtube" @playing="playing($event)" @paused="paused($event)" @ended="finished($event)"></youtube>
@@ -132,6 +132,9 @@ export default {
 </script>
 
 <style>
+.intro {
+  padding: 0px 4px;
+}
 .dialouge-window {
   left: 50%;
   max-height: 86vh;

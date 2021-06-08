@@ -40,8 +40,8 @@ export default {
 }
 .thumbnail-container img {
     width: 100%;
-    height: auto;
-    padding: 5px;
+    height: 100%;
+    padding: 3px 7px 3px 3px;
 }
 .thumbnail-container .btn {
     position: absolute;
