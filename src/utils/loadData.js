@@ -85,7 +85,8 @@ export function loadAccession (primaryAccession, autoSelectPDB, autoSelectChain,
       const matches = response.data
       sequenceCallback(loadRequest, matches.sequences)
       clusterCallback(loadRequest, matches.clusters)
-      updateSelectedPdb(matches).then(function () {
+
+      updateSelectedPdb(matches, pdbParam, chainParam).then(function () {
         // })
         // window.AQUARIA.remote.get_matching_structures(loadRequest, sequenceCallback, clusterCallback, function(err, loadRequest, Selected_PDB, finalClusters, cachedHit, version_string) {
         if (loadRequest.primaryAccession === window.AQUARIA.structures2match.initialLoadRequest.primaryAccession) {
@@ -206,6 +207,7 @@ export function chainSelected (primaryAccession, pdbId, chainId) {
   /// console.log('AQUARIA.chainSelected ' + primaryAccession + ', for pdb chain: ' + pdbId + ":" + chainId);
   const uniprotAccession = []
   uniprotAccession.push(primaryAccession)
+  console.log('The pdbId and the chainId are ' + pdbId + ' ' + chainId)
   window.AQUARIA.currentChain = chainId
 
   // TODO THis shouldn't call load Accession because that loads everything as if it is the first time.
@@ -217,7 +219,7 @@ export function chainSelected (primaryAccession, pdbId, chainId) {
   }
 }
 
-function filterByExactResPos (intersectList, resPos, newAas, uniprotId, matchingClusters) {
+function filterByExactResPos (intersectList, resPos, newAas, uniprotId, matchingClusters, theInfo) {
   return new Promise(function (resolve, reject) {
     console.log('The intersect list is ' + intersectList + ' ' + newAas + ' ' + uniprotId + ' ' + resPos)
 
@@ -270,6 +272,7 @@ function filterByExactResPos (intersectList, resPos, newAas, uniprotId, matching
             resolve(arrMatchingPdbs)
           } */
         })
+
         intersectList.forEach(function (clusNum, clusNumI) {
           if (clusNum < response.data.length) {
             response.data[clusNum].members.forEach(function (anAlignment, anAlignmentI) {
@@ -301,7 +304,13 @@ function filterByExactResPos (intersectList, resPos, newAas, uniprotId, matching
                       window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].pdbs = []
                     }
 
-                    window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].isShown = true
+                    if (theInfo && theInfo != undefined &&  Object.prototype.hasOwnProperty.call(theInfo, 'pdbId')) { // eslint-disable-line
+                      if (anAlignment.PDB_ID == theInfo.pdbId){ // eslint-disable-line
+                        window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].isShown = true
+                      }
+                    } else {
+                      window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].isShown = true
+                    }
                   }
                 }
               }
@@ -324,6 +333,7 @@ function filterByExactResPos (intersectList, resPos, newAas, uniprotId, matching
 }
 
 function getVariantPosCovered (seqStart, seqEnd, sortedKeys) {
+  // console.log('In this function, seqStart: ')
   for (let i = 0; i < seqStart.length; i++) {
     sortedKeys.forEach(function (resNum, resNumI) {
       var resStart = resNum
@@ -334,7 +344,7 @@ function getVariantPosCovered (seqStart, seqEnd, sortedKeys) {
       // console.log('SeqStart: ' + seqStart[i] + ' seqEnd:' + seqEnd[i] + ' ' + resStart)
 
       if (parseInt(resStart) >= parseInt(seqStart[i]) && parseInt(resStart) <= parseInt(seqEnd[i])) {
-        console.log('Yes, this should be added ' + resNum)
+        // console.log('Yes, this should be added ' + resNum)
         window.AQUARIA.variantResidues[resNum].inStructPos = true
         window.AQUARIA.variantStructs[resNum].isShown = true
       }
@@ -360,9 +370,39 @@ function getJsonFromUrl (uniprotId) {
       })
   })
 }
-function updateSelectedPdb (matches) {
+
+function getClusterContainingPdb (matches, pdbParam, chainParam) {
   return new Promise(function (resolve, reject) {
-    console.log('Mother of dragons')
+    let res = {}
+    // let clusterNum = -1 // ; let memberNum = -1;
+    matches.clusters.forEach(function (aCluster, aClusterI) {
+      aCluster.members.forEach(function (aMember, aMemberI) {
+        if (pdbParam === aMember.pdb_id) {
+          // clusterNum = aClusterI
+          console.log('The pdbParam ' + aMember.pdb_id + ' ' + aClusterI + ' ' + aMemberI)
+          console.log(aCluster)
+
+          let chainId = chainParam
+          if (!aMember.pdb_chain.includes(chainParam)) {
+            chainId = aMember.pdb_chain[0]
+          }
+          // check for chainParam - if provided
+          res = { clusNum: aClusterI, memNum: aMemberI, pdbId: aMember.pdb_id, chainId: chainId, seqStart: aCluster.seq_start, seqEnd: aCluster.seq_end }
+          resolve (res) // eslint-disable-line
+        }
+        if (aClusterI == matches.clusters.length - 1 && aMemberI == aCluster.members.length - 1){ // eslint-disable-line
+          resolve (res) // eslint-disable-line
+        }
+      })
+    })
+  })
+}
+
+function updateSelectedPdb (matches, pdbParam, chainParam) {
+  return new Promise(function (resolve, reject) {
+    pdbParam = pdbParam.replace('\/', '') // eslint-disable-line
+    chainParam = chainParam.replace('\/', '') // eslint-disable-line
+    console.log('The pdbParam and the chainParam are ' + pdbParam + ' ' + chainParam)
     console.log(matches)
     const featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/) // eslint-disable-line
 
@@ -432,12 +472,27 @@ function updateSelectedPdb (matches) {
               console.log(matchingClusters)
               getTheBestCluster(matchingClusters, sortedKeys).then(function(intersectList) { // eslint-disable-line
                 console.log('Yes, it resovles')
-                if (intersectList) {
+                if (pdbParam.match(/[a-zA-Z0-9]/)) {
+                  getClusterContainingPdb(matches, pdbParam, chainParam).then(function (theInfo) {
+                    console.log('The pdbparam and chain - this function returns ' + sortedKeys[0])
+                    filterByExactResPos(intersectList, sortedKeys[0], varRes[sortedKeys[0]].newAas, uniprotId, matchingClusters, theInfo).then(function (arrMatchingPdbs) {
+                      if (Object.prototype.hasOwnProperty.call(theInfo, 'seqStart')) {
+                        getVariantPosCovered(theInfo.seqStart, theInfo.seqEnd, sortedKeys)
+                        matches.Selected_PDB.cluster_number = theInfo.clusNum
+                        matches.Selected_PDB.member_number = theInfo.memNum
+                        matches.Selected_PDB.pdb_chain = theInfo.chainId
+                        matches.Selected_PDB.pdb_id = theInfo.pdbId
+                        resolve(['matching structures - update the pd'])
+                      } else {
+                        resolve(['matching structures - nothing to show'])
+                      }
+                    })
+                  })
+                } else if (intersectList) {
                   if (Object.prototype.hasOwnProperty.call(varRes[sortedKeys[0]], 'newAas')) {
                     filterByExactResPos(intersectList, sortedKeys[0], varRes[sortedKeys[0]].newAas, uniprotId, matchingClusters).then(function (arrMatchingPdbs) {
                       console.log('The intersecting position is ')
                       console.log(arrMatchingPdbs)
-
                       if (arrMatchingPdbs && arrMatchingPdbs.length > 0) {
                         // console.log(matches.cluster[arrMatchingPdbs[0].clusNum])
                         getVariantPosCovered(matches.clusters[arrMatchingPdbs[0].clusNum].seq_start, matches.clusters[arrMatchingPdbs[0].clusNum].seq_end, sortedKeys)
@@ -478,56 +533,6 @@ function updateSelectedPdb (matches) {
               })
             }
           })
-          // console.log(matchingClusters)
-          /*
-          let toAdd = true
-
-          // to help choose the first maximal.
-          for (let i = 0; i < item.seq_start.length; i++) {
-            // console.log(item)
-            if (Object.prototype.hasOwnProperty.call(allMatchingClus, itemI)) {
-              var startToAdd = Math.min(parseInt(allMatchingClus[itemI][0]), parseInt(item.seq_start[i]))
-              var endToAdd = Math.max(parseInt(allMatchingClus[itemI][1]), parseInt(item.seq_end[i]))
-              allMatchingClus[itemI] = [startToAdd, endToAdd]
-
-              toAdd = false
-            }
-
-            for (let cr = 0; cr < sortedKeys.length; cr++) {
-              // console.log('The maxNumResFit clust is ' + cr + ' ' + maxNumResFit + ' ' + item.pdb_id + ' ' + sortedKeys[cr] + ' ' + item.seq_start[i] + ':' + item.seq_end[i])
-
-              if ((toAdd === true && sortedKeys[cr] >= parseInt(item.seq_start[i]) && sortedKeys[cr] <= parseInt(item.seq_end[i])) || (toAdd === false && sortedKeys[cr] >= allMatchingClus[itemI][0] && sortedKeys[cr] <= allMatchingClus[itemI][1])) {
-                // if (isSelectedPdb === false) {
-                //   isSelectedPdb = true
-
-                if (cr > maxNumResFit) {
-                  maxNumResFit = maxNumResFit + 1
-                  matches.Selected_PDB.cluster_number = itemI
-                  matches.Selected_PDB.member_number = 0
-                  matches.Selected_PDB.pdb_chain = item.pdb_chain
-                  matches.Selected_PDB.pdb_id = item.pdb_id
-                  // }
-                }
-
-                if (toAdd === true) {
-                  allMatchingClus[itemI] = [parseInt(item.seq_start[i]), parseInt(item.seq_end[i])]
-                }
-                // console.log('matching cluster ' + item.seq_start[i] + ' ' + item.seq_end[i] + ' ' + item.pdb_id + ' ' + item.pdb_chain + ' ' + itemI)
-              } else {
-                break
-              }
-            }
-          }
-
-          // console.log('The total arrAllClusters is ' + arrAllClusters)
-          if (itemI === matches.clusters.length - 1) {
-            console.log(allMatchingClus)
-            resolve(['matching structures - update the pd'])
-          }
-          */
-
-          // console.log('matching cluster ' + arrAllClusters)
-          // console.log('clusters found in matching cluster')
         }
       })
     } else {
