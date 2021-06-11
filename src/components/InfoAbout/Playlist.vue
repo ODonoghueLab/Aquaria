@@ -16,8 +16,8 @@ export default {
   props: ['playlist'],
   methods: {
     play: function (id) {
-      document.querySelector('#contents').className = ' deactive'
-      document.getElementById(id).className += ' active'
+      document.querySelector('#contents').className = ' hide'
+      document.getElementById(id).className += ' show'
       document.getElementById('UserHelp').classList.remove('overlay')
       document.getElementById('UserHelp').classList.remove('level7')
       document.getElementById('UserHelp').classList.remove('dialouge-window')

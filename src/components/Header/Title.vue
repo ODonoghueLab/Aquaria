@@ -90,8 +90,8 @@ export default {
     showHelp: function () {
       store.commit('setHelpTitle', 'Aquaria Help')
       store.commit('setUserStatus', false)
-      document.getElementById('UserHelp').classList.remove('deactive')
-      document.getElementById('UserHelp').className += (' active')
+      document.getElementById('UserHelp').classList.remove('hide')
+      document.getElementById('UserHelp').className += (' show')
       // document.querySelector('#UserHelp').style.display = 'flex'
       // document.querySelector('.main .dimmer').style.display = 'block'
       if (!document.querySelector('div.dimmer')) {
@@ -100,8 +100,8 @@ export default {
       }
       document.querySelector('div.dimmer').addEventListener('click', function () {
         window.AQUARIA.RemoveOverlay()
-        document.getElementById('UserHelp').classList.remove('active')
-        document.getElementById('UserHelp').className += (' deactive')
+        document.getElementById('UserHelp').classList.remove('show')
+        document.getElementById('UserHelp').className += (' hide')
       })
     },
     storeHash: function () {

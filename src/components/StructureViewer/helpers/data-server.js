@@ -62,16 +62,16 @@ export default class DataServer {
 
 function showHelp () {
   Store.commit('setHelpTitle', 'Welcome to Aquaria')
-  document.getElementById('UserHelp').classList.remove('deactive')
-  document.getElementById('UserHelp').className += (' active')
+  document.getElementById('UserHelp').classList.remove('hide')
+  document.getElementById('UserHelp').className += (' show')
   if (!document.querySelector('div.dimmer')) {
     window.AQUARIA.overlay()
     document.querySelector('div.dimmer').className += ' level7'
   }
   document.querySelector('div.dimmer').addEventListener('click', function () {
     window.AQUARIA.RemoveOverlay()
-    document.getElementById('UserHelp').classList.remove('active')
-    document.getElementById('UserHelp').className += (' deactive')
+    document.getElementById('UserHelp').classList.remove('show')
+    document.getElementById('UserHelp').className += (' hide')
   })
 }
 

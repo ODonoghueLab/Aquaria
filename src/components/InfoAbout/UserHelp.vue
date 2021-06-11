@@ -1,8 +1,8 @@
 <template>
-    <div id="UserHelp" class="HelpPanel deactive dialouge-window overlay level7">
+    <div id="UserHelp" class="HelpPanel hide dialouge-window overlay level7">
         <a href="#" class="close" @click="closeHelp"></a>
           <div id='fullwindow-video' class='fill'>
-            <youtube v-for="video in videos" :key="video.id" :id='video.id' :video-id="video.id" class='deactive' ref="youtube" @paused="paused($event)" @ended="finished($event)"></youtube>
+            <youtube v-for="video in videos" :key="video.id" :id='video.id' :video-id="video.id" class='hide' ref="youtube" @paused="paused($event)" @ended="finished($event)"></youtube>
           </div>
           <div id='contents'>
             <p class="thetitle">{{data.title}}</p>
@@ -46,10 +46,10 @@ export default {
   methods: {
     closeHelp: function () {
       var _this = this
-      if (document.querySelector('iframe.active')) {
-        var activeVideoID = document.querySelector('iframe.active').id
-        document.getElementById('contents').classList.remove('deactive')
-        document.getElementById(activeVideoID).classList.remove('active')
+      if (document.querySelector('iframe.show')) {
+        var activeVideoID = document.querySelector('iframe.show').id
+        document.getElementById('contents').classList.remove('hide')
+        document.getElementById(activeVideoID).classList.remove('show')
         document.getElementById('UserHelp').className += ' dialouge-window'
         document.getElementById('UserHelp').className += ' overlay'
         document.getElementById('UserHelp').className += ' level7'
@@ -60,8 +60,8 @@ export default {
         _this.paused(event)
       } else {
         window.AQUARIA.RemoveOverlay()
-        document.getElementById('UserHelp').classList.remove('active')
-        document.getElementById('UserHelp').className += (' deactive')
+        document.getElementById('UserHelp').classList.remove('show')
+        document.getElementById('UserHelp').className += (' hide')
         // document.querySelector('#UserHelp').style.display = 'none'
         // document.querySelector('.dimmer').style.display = 'none'
         if (document.querySelector('#helpbtn').classList.contains('active')) {

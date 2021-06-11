@@ -39,16 +39,16 @@ export default {
       var _this = this
       store.commit('setHelpTitle', 'Aquaria Help')
       store.commit('setUserStatus', false)
-      document.getElementById('UserHelp').classList.remove('deactive')
-      document.getElementById('UserHelp').className += (' active')
+      document.getElementById('UserHelp').classList.remove('hide')
+      document.getElementById('UserHelp').className += (' show')
       if (!document.querySelector('div.dimmer')) {
         window.AQUARIA.overlay()
         document.querySelector('div.dimmer').className += ' level7'
       }
       document.querySelector('div.dimmer').addEventListener('click', function () {
         window.AQUARIA.RemoveOverlay()
-        document.getElementById('UserHelp').classList.remove('active')
-        document.getElementById('UserHelp').className += (' deactive')
+        document.getElementById('UserHelp').classList.remove('show')
+        document.getElementById('UserHelp').className += (' hide')
         var elem = {}
         elem.target = document.querySelector('#helpbtn')
         _this.toggleActive(elem)
