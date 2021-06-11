@@ -86,6 +86,9 @@ export default {
 }
 </script>
 <style scoped>
+#About .close {
+  top: calc(0.1rem - 0.4vw);
+}
 p.thetitle {
   display: flex;
     background-color: var(--primary-label);

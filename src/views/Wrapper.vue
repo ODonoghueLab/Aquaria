@@ -191,7 +191,7 @@ body {
     background-color: var(--background);
     color: var(--dark-text);
     font-size: calc(0.8rem + 3 * ((100vw - 320px) / 680));
-    line-height: 1.05rem;
+    line-height: 1.3;
     transition: All 0.5s ease;
   }
 .main {

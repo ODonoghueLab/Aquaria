@@ -209,12 +209,12 @@ p.thetitle {
     left: 50%;
     transform: translate(-50%, 0%);
     width: 90vw;
-    max-width: 24rem;
+    max-width: calc(23rem + 3vw);
   }
-  .HelpPanel .close::after {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
+  /* .HelpPanel .close::after {
+    width: calc(1.25rem + 0.5vw);
+    height: calc(1.25rem + 0.5vw);
+  } */
 
   .HelpPanel .close {
     position: relative;
@@ -223,8 +223,8 @@ p.thetitle {
   .HelpPanel .close::after {
     right: 0.25rem;
     top: 0.25rem;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: calc(1.25rem + 0.5vw);
+    height: calc(1.25rem + 0.5vw);
     position: absolute;
     display: flex;
     z-index: 11;
@@ -235,7 +235,7 @@ p.thetitle {
     color: white;
     content: "×";
     cursor: pointer;
-    font-size: 1rem;
+    font-size: calc(1rem + 0.5vw)
   }
   .HelpPanel .close:hover::after {
       background-color: var(--primary-highlight);

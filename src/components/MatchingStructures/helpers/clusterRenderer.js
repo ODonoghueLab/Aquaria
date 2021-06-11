@@ -114,7 +114,7 @@ ClusterRenderer.prototype.drawClusterContainer = function (cluster, s) {
   this.addThumbnails(id, structStart, structEnd, pad)
 
   this.nusvg.select('g#structure_' + id).append('text') // label for cluster size
-    .attr('text-anchor', 'end').attr('fill', 'white').attr('x',
+    .attr('text-anchor', 'end').attr('fill', 'white').style("font-size", "16px").attr('x',
       (structEnd - structStart + 24 + pad)).attr('y', 13).attr('dx', -3) // padding-right
     .attr('dy', '.35em') // vertical-align: middle)
 

@@ -77,8 +77,8 @@
   .panel .close::after, .title.active .close::after {
     right: 0.25rem;
     top: calc(0.2rem + 3 * ((100vw - 320px) / 680));
-    width: 1.5rem;
-    height: 1.5rem;
+    width: calc(1.25rem + 0.5vw);
+    height: calc(1.25rem + 0.5vw);
     position: absolute;
     display: flex;
     z-index: 11;
@@ -89,7 +89,7 @@
     color: white;
     content: "×";
     cursor: pointer;
-    font-size: 1.25rem;
+    font-size: calc(1.25rem + 0.5vw);
   }
   .panel .close:hover::after, .title.active .close:hover::after { 
       background-color: var(--primary-highlight);
