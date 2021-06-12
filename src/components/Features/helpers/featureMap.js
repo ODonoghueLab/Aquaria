@@ -236,7 +236,7 @@ function showAnnotation (f, eid, extServerIds_) {
   oneAaCodes.forEach(function (anAa, _i) {
     if (anAa !== oldAa) {
       balloon = balloon + "<div id='divVI_varInfo_" + anAa + "'></div>"
-      const isUniCosOrFun = isUniCosOrFunPresent(anAa, f.desc)
+      const isUniCosOrFun = isUniCosOrFunPresent(anAa, f.desc, f.start)
       btnsDiv = btnsDiv + "<button id='btnVI_" + anAa + "'"
       if (isUniCosOrFun === true) {
         btnsDiv = btnsDiv + ' class="btnAaBold_b"> <b>' + anAa + '</b> '
@@ -374,7 +374,8 @@ export function moveTheDiv () {
   })
 }
 
-function isUniCosOrFunPresent (anAa, desc) {
+function isUniCosOrFunPresent (anAa, desc, resNum) {
+  console.log('These values are: ' + anAa + ' ' + resNum)
   const tagOpen = '<toReplace_varInfo_' + anAa + '>'
   const tagClose = '</toReplace_varInfo_' + anAa + '>'
 
@@ -383,7 +384,7 @@ function isUniCosOrFunPresent (anAa, desc) {
 
   const description = desc.substring(firstOpenPos, lastClosePos)
 
-  if (description.match('UniProt') || description.match('FunVar') || description.match('COSMIC')) {
+  if (description.match('UniProt') || description.match('FunVar') || description.match('COSMIC') || (window.AQUARIA.variantStructs.hasOwnProperty(resNum) && window.AQUARIA.variantStructs[resNum].hasOwnProperty(anAa) && window.AQUARIA.variantStructs[resNum][anAa].hasOwnProperty('pdbs') && window.AQUARIA.variantStructs[resNum][anAa]['pdbs'].length > 0)) {
     return true
   }
   return false
