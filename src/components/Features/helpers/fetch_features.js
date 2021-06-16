@@ -958,7 +958,7 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       }
     }
     console.log("The variantStructs object is")
-    console.log(window.AQUARIA.variantStructs) 
+    console.log(window.AQUARIA.variantStructs)
     if (window.AQUARIA.hasOwnProperty('variantStructs') && window.AQUARIA.variantStructs.hasOwnProperty(residue)){
       let dict_totalAndIsShown = getTotalNumOfStructs(residue)
       console.log('The total number of structs is ')
@@ -966,7 +966,7 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
       description = description + '<toReplace_posInfo>' + '<i>' + 'Structures with residue ' + residue + ': '
 
       if (dict_totalAndIsShown.isShown == true){
-        description = description + "<span class='selCol'>" + dict_totalAndIsShown.totalNumStructs + "</span>"
+        description = description + "<span class='selCol'>&#8201;" + dict_totalAndIsShown.totalNumStructs + "&#8201;</span>"
       }
       else {
         description = description +  dict_totalAndIsShown.totalNumStructs
@@ -996,7 +996,7 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
           description = description + 'Structures with ' + variantResidues[residue].oldAa + residue + anAa + "</i>: ";
 
           if (window.AQUARIA.hasOwnProperty('variantStructs') && window.AQUARIA.variantStructs.hasOwnProperty(residue) && window.AQUARIA.variantStructs[residue].hasOwnProperty(anAa) && window.AQUARIA.variantStructs[residue][anAa].hasOwnProperty('isShown')){
-            description = description + "<span class='selCol'>" +  window.AQUARIA.variantStructs[residue][anAa].pdbs.length + "</span>"
+            description = description + "<span class='selCol'>&#8201;" +  window.AQUARIA.variantStructs[residue][anAa].pdbs.length + "&#8201;</span>"
 
           }
           else {

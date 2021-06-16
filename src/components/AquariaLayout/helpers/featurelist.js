@@ -676,6 +676,7 @@ function showAnnotation (f, eid) {
 }
 
 function isUniCosOrFunPresent (anAa, desc) {
+  console.log("IS it this one .... ? " + anAa)
   const tag_open = '<toReplace_varInfo_' + anAa + '>'
   const tag_close = '</toReplace_varInfo_' + anAa + '>'
 
