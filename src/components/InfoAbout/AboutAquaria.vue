@@ -1,6 +1,6 @@
 <template>
   <div id="About" class="panel overlay level7">
-    <a href="#" class="close" @click="hideScrim"></a>
+    <a v-bind:href="data.hash" class="close" @click="hideScrim"></a>
     <div>
       <p class="thetitle">About Aquaria</p>
       <p class="intro1">Aquaria helps biologists use 3D structures to gain insight into function. For all <a href="https://www.uniprot.org/help/about" title="Visit their website">SwissProt sequences</a>,
@@ -62,7 +62,8 @@ export default {
     data () {
       return {
         message: store.state.message,
-        error: store.state.error
+        error: store.state.error,
+        hash: store.state.hash
       }
     }
   },

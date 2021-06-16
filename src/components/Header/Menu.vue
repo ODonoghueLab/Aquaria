@@ -107,7 +107,8 @@ export default {
 </script>
 <style scoped>
 /* Menu */
-  #Menu:target.panel.floating {
+  @media only screen and (max-width: 570px) {
+    #Menu:target.panel.floating {
     display: flex;
     background-color: transparent;
     width: 136px;
@@ -115,6 +116,18 @@ export default {
     top: 3rem;
     right: 1rem;
     }
+  }
+  @media only screen and (min-width: 571px) {
+    #Menu:target.panel.floating {
+    display: flex;
+    background-color: transparent;
+    width: 136px;
+    border-radius: 0.25rem;
+    top: 1rem;
+    right: 1rem;
+    }
+  }
+
   #Menu a.lnk {
     color: var(--text);
     display: block;
