@@ -281,58 +281,61 @@ function filterByExactResPos (intersectList, resPos, newAas, uniprotId, matching
             })
           })
         })
+        if (intersectList && intersectList.length > 0) {
+          intersectList.forEach(function (clusNum, clusNumI) {
+            if (clusNum < response.data.length) {
+              response.data[clusNum].members.forEach(function (anAlignment, anAlignmentI) {
+                var arrAlignPos = anAlignment.Alignment.split(' ')
+                for (var i = 0; i < arrAlignPos.length; i++) {
+                  var arrRefPdb = arrAlignPos[i].split(':')
+                  var arrRef = arrRefPdb[0].split('-')
+                  var resStart = resPos
+                  if (resPos.match(/\-/)){ // eslint-disable-line
+                    resStart = resPos.split('-')[0]
+                  }
+                  if (resStart >= parseInt(arrRef[0]) && resStart <= parseInt(arrRef[1])) {
+                    var arrPdb = arrRefPdb[1].split('-')
+                    var distance = resStart - parseInt(arrRef[0])
+                    var resPosInPdb = parseInt(arrPdb[0]) + distance - 1
 
-        intersectList.forEach(function (clusNum, clusNumI) {
-          if (clusNum < response.data.length) {
-            response.data[clusNum].members.forEach(function (anAlignment, anAlignmentI) {
-              var arrAlignPos = anAlignment.Alignment.split(' ')
-              for (var i = 0; i < arrAlignPos.length; i++) {
-                var arrRefPdb = arrAlignPos[i].split(':')
-                var arrRef = arrRefPdb[0].split('-')
-                var resStart = resPos
-                if (resPos.match(/\-/)){ // eslint-disable-line
-                  resStart = resPos.split('-')[0]
-                }
-                if (resStart >= parseInt(arrRef[0]) && resStart <= parseInt(arrRef[1])) {
-                  var arrPdb = arrRefPdb[1].split('-')
-                  var distance = resStart - parseInt(arrRef[0])
-                  var resPosInPdb = parseInt(arrPdb[0]) + distance - 1
+                    console.log('An alignment is ' + arrRefPdb[0] + ' ' + arrRefPdb[1] + '|' + arrRef[0] + ' ' + arrRef[1] + ' ' + distance + ' ' + resPosInPdb + ' SeqLen:' + anAlignment.SEQRES.length + ' ' + ' PdbAa:' + anAlignment.SEQRES[resPosInPdb] + ' PdbId:' + anAlignment.PDB_ID + ' ' + ' PdbChain:' + anAlignment.Chain)
+                    if (newAas.includes(anAlignment.SEQRES[resPosInPdb])) {
+                      arrMatchingPdbs.push({ clusNum: clusNum, memNum: anAlignmentI, pdbId: anAlignment.PDB_ID, pdbChain: anAlignment.Chain })
+                      // window.AQUARIA.variantResidues[resPos].inStructAa = anAlignment.SEQRES[resPosInPdb]
 
-                  console.log('An alignment is ' + arrRefPdb[0] + ' ' + arrRefPdb[1] + '|' + arrRef[0] + ' ' + arrRef[1] + ' ' + distance + ' ' + resPosInPdb + ' SeqLen:' + anAlignment.SEQRES.length + ' ' + ' PdbAa:' + anAlignment.SEQRES[resPosInPdb] + ' PdbId:' + anAlignment.PDB_ID + ' ' + ' PdbChain:' + anAlignment.Chain)
-                  if (newAas.includes(anAlignment.SEQRES[resPosInPdb])) {
-                    arrMatchingPdbs.push({ clusNum: clusNum, memNum: anAlignmentI, pdbId: anAlignment.PDB_ID, pdbChain: anAlignment.Chain })
-                    // window.AQUARIA.variantResidues[resPos].inStructAa = anAlignment.SEQRES[resPosInPdb]
+                      // Add to window.AQUARIA.variantStructs
+                      if (!Object.prototype.hasOwnProperty.call(window.AQUARIA.variantStructs, resPos)) { // resPos in dict_
+                        window.AQUARIA.variantStructs[resPos] = {}
+                      }
 
-                    // Add to window.AQUARIA.variantStructs
-                    if (!Object.prototype.hasOwnProperty.call(window.AQUARIA.variantStructs, resPos)) { // resPos in dict_
-                      window.AQUARIA.variantStructs[resPos] = {}
-                    }
+                      if (!Object.prototype.hasOwnProperty.call(window.AQUARIA.variantStructs[resPos], anAlignment.SEQRES[resPosInPdb])) { // aa in dict_[resPos]
+                        window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]] = {}
+                        window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].pdbs = []
+                      }
 
-                    if (!Object.prototype.hasOwnProperty.call(window.AQUARIA.variantStructs[resPos], anAlignment.SEQRES[resPosInPdb])) { // aa in dict_[resPos]
-                      window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]] = {}
-                      window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].pdbs = []
-                    }
-
-                    if (theInfo && theInfo != undefined &&  Object.prototype.hasOwnProperty.call(theInfo, 'pdbId')) { // eslint-disable-line
-                      if (anAlignment.PDB_ID == theInfo.pdbId){ // eslint-disable-line
+                      if (theInfo && theInfo != undefined &&  Object.prototype.hasOwnProperty.call(theInfo, 'pdbId')) { // eslint-disable-line
+                        if (anAlignment.PDB_ID == theInfo.pdbId){ // eslint-disable-line
+                          window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].isShown = true
+                        }
+                      } else {
                         window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].isShown = true
                       }
-                    } else {
-                      window.AQUARIA.variantStructs[resPos][anAlignment.SEQRES[resPosInPdb]].isShown = true
                     }
                   }
                 }
-              }
-              // console.log(anAlignment)
-            })
-          }
-          if (clusNumI === intersectList.length - 1) {
-            console.log('Everybody is free: ')
-            console.log(window.AQUARIA.variantStructs)
+                // console.log(anAlignment)
+              })
+            }
+            if (clusNumI === intersectList.length - 1) {
+              console.log('Everybody is free: ')
+              console.log(window.AQUARIA.variantStructs)
 
-            resolve(arrMatchingPdbs)
-          }
-        })
+              resolve(arrMatchingPdbs)
+            }
+          })
+        } else {
+          resolve(arrMatchingPdbs)
+        }
       } else {
         // else no data recieved
         resolve(arrMatchingPdbs)
@@ -528,6 +531,7 @@ function getBestAndAssignSelected (matches, matchingClusters, sortedKeys, pdbPar
       if (pdbParam.match(/[a-zA-Z0-9]/)) { // if pdb identifier is provided
         getClusterContainingPdb(matches, pdbParam, chainParam).then(function (theInfo) {
           // console.log('The pdbparam and chain - this function returns ' + sortedKeys[0])
+          console.log('Is the pdb param specified')
           filterByExactResPos(intersectList, sortedKeys[0], varRes[sortedKeys[0]].newAas, uniprotId, matchingClusters, theInfo).then(function (arrMatchingPdbs) {
             if (Object.prototype.hasOwnProperty.call(theInfo, 'seqStart')) {
               console.log('Scenario 1')
@@ -540,7 +544,8 @@ function getBestAndAssignSelected (matches, matchingClusters, sortedKeys, pdbPar
             }
           })
         })
-      } else if (intersectList) { // else pick the pdb identifier which spans the most amino acids, starting from the order of specification
+      } else if (intersectList && intersectList.length > 0) { // else pick the pdb identifier which spans the most amino acids, starting from the order of specification
+        console.log('Else select from intersect list')
         if (Object.prototype.hasOwnProperty.call(varRes[sortedKeys[0]], 'newAas')) {
           filterByExactResPos(intersectList, sortedKeys[0], varRes[sortedKeys[0]].newAas, uniprotId, matchingClusters).then(function (arrMatchingPdbs) {
             if (arrMatchingPdbs && arrMatchingPdbs.length > 0) {
@@ -606,7 +611,7 @@ function getTheBestCluster (matchingClusters, sortedKeys) {
         resolve(theFirstWithData)
       }
     } else {
-      resolve()
+      resolve(theFirstWithData)
     }
   })
 }
