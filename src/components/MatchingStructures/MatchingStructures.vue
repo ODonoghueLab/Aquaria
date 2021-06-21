@@ -34,7 +34,9 @@ export default {
 </script>
 
 <style>
-
+  .thumbnail text {
+    font-size: 16px;
+  }
   #vis {
     max-height: 40vh;
     overflow: scroll;

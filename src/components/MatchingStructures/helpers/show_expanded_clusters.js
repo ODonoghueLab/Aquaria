@@ -14,12 +14,15 @@ var axios = require('axios')
 
 module.exports.expand_cluster = function expand_cluster (d, cluster, sequence) {
   console.log('show_expanded_cluster.expand_cluster')
+  console.log('d is ')
+  console.log(d)
   // dim background
 
   // hide applet temporarily for Windows
   // if(browser.indexOf("Windows") != -1) { $("#threeD").css("visibility", "hidden"); }
 
   var cluster_nbr = parseInt(d.attr('id').substr(15))
+  console.log(cluster_nbr);
   // console.log("expanding cluster "+ cluster_nbr);
   var pdbid = d.attr('id').substr(10, 4)
 

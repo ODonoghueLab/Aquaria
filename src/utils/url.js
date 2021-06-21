@@ -16,7 +16,6 @@ var pdb, chain, previousPDB
 
 export function remoteSuccess () {
   var pathname = document.location.pathname // document.URL.split('?')[0];
-
   if (pathname
     .match(/\/(?:leap\/)?([A-Z a-z][0-9][A-Z a-z,0-9][A-Z a-z,0-9][A-Z a-z,0-9][0-9])\/?$/)) {
     uniprotAccession.push(RegExp.$1.toUpperCase())
@@ -27,7 +26,15 @@ export function remoteSuccess () {
     if (!previousPDB) {
       LoadAQUARIA.loadAccession(uniprotAccession)
     } else {
-      LoadAQUARIA.loadAccession(uniprotAccession, previousPDB)
+      const featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/) // eslint-disable-line
+      var searchParam = decodeURIComponent(window.location.search.split('?')[1])
+
+      if (featureRegex.test(searchParam)) {
+        console.log('The pdbParam should now be false')
+        LoadAQUARIA.loadAccession(uniprotAccession)
+      } else {
+        LoadAQUARIA.loadAccession(uniprotAccession, previousPDB)
+      }
     }
     // LoadAQUARIA.loadAccession(uniprotAccession)
   } else if (pathname // primary accession and pdb
@@ -104,7 +111,16 @@ export function remoteSuccess () {
           if (!previousPDB) {
             LoadAQUARIA.loadAccession(accession)
           } else {
-            LoadAQUARIA.loadAccession(accession, previousPDB)
+            const featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/) // eslint-disable-line
+            var searchParam = decodeURIComponent(window.location.search.split('?')[1])
+
+            if (featureRegex.test(searchParam)) {
+              console.log('The pdbParam should now be false')
+              LoadAQUARIA.loadAccession(accession)
+            } else {
+              LoadAQUARIA.loadAccession(accession, previousPDB)
+            }
+            // LoadAQUARIA.loadAccession(accession, previousPDB)
           }
         }
       })

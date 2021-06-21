@@ -23,6 +23,7 @@ jobs:
       AQUARIA_CLIENT_EMIT_CNAME_PROD: aquaria.app
       VUE_APP_AQUARIA_BACKEND_PROD: https://aquaria.ws:8010
       PUBLISH_REPO_PROD: ODonoghueLab/aquaria.github.io
+      VUE_APP_AQUARIA_EXPORT_URL: ${{secrets.EXPORT_PROD}}
       # test specific settings
       AQUARIA_CLIENT_EMIT_CNAME_TEST: dev.aquaria.app
       VUE_APP_AQUARIA_BACKEND_TEST: https://odonoghuelab.org:8011
@@ -34,12 +35,14 @@ jobs:
       run: |
         echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_PROD" >> $GITHUB_ENV
         echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_PROD" >> $GITHUB_ENV
+        echo "VUE_APP_AQUARIA_EXPORT_URL=$VUE_APP_AQUARIA_EXPORT_URL" >> $GITHUB_ENV
         echo "PUBLISH_REPO=$PUBLISH_REPO_PROD" >> $GITHUB_ENV
     - name: Configure environment (dev)
       if: github.ref == 'refs/heads/dev'
       run: |
         echo "AQUARIA_CLIENT_EMIT_CNAME=$AQUARIA_CLIENT_EMIT_CNAME_TEST" >> $GITHUB_ENV
         echo "VUE_APP_AQUARIA_BACKEND=$VUE_APP_AQUARIA_BACKEND_TEST" >> $GITHUB_ENV
+        echo "VUE_APP_AQUARIA_EXPORT_URL=$VUE_APP_AQUARIA_EXPORT_URL" >> $GITHUB_ENV
         echo "PUBLISH_REPO=$PUBLISH_REPO_TEST" >> $GITHUB_ENV
     - name: Checkout source repo
       uses: actions/checkout@v2

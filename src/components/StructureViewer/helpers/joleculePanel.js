@@ -16,7 +16,7 @@ var JoleculePanel = function (attachToDiv, chainSelected) {
     isLoop: false,
     isGrid: true,
     isLegend: true,
-    backgroundColor: '#C0C0C0',
+    backgroundColor: '#cccccc',
     isEditable: true,
     isResidueSelector: false,
     isExtraEditable: true,
@@ -146,15 +146,14 @@ JoleculePanel.prototype.reload = function (attributes) {
   var DataServer = require('./data-server')
 
   let PDB_URI = ''
+  var group = ''
   if (attributes.biounit == 0) {
     // 0, null or undefined
-    // url = 'https://files.rcsb.org/download/' + pdbId + '.pdb';
-    // PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb`;
-    PDB_URI = `https://pdbj.org/rest/downloadPDBfile?format=pdb&id=${attributes.pdb_id}`
+    group = attributes.pdb_id[1] + attributes.pdb_id[2]
+    PDB_URI = `https://data.pdbj.org/pub/pdb/data/structures/divided/pdb/${group}/pdb${attributes.pdb_id}.ent.gz`
   } else {
-    // url = 'https://files.rcsb.org/download/' + pdbId + '.pdb' + biounit;
-    // PDB_URI = `${window.BACKEND}/getPDB/${attributes.pdb_id}.pdb${attributes.biounit}`;
-    PDB_URI = `https://pdbj.org/rest/downloadPDBfile?format=bu&id=${attributes.pdb_id}.${attributes.biounit}`
+    group = attributes.pdb_id[1] + attributes.pdb_id[2]
+    PDB_URI = `https://data.pdbj.org/pub/pdb/data/biounit/coordinates/divided/${group}/${attributes.pdb_id}.pdb${attributes.biounit}.gz`
   }
   console.log(PDB_URI)
   const dataServer = new DataServer.DataServer(PDB_URI, attributes.pdb_id)

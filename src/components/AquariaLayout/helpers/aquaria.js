@@ -56,6 +56,9 @@ var MAX_PROTEIN_HISTORY = 10;
     elemDiv.className = 'dimmer'
     document.body.append(elemDiv)
   }
+  AQUARIA.RemoveOverlay = function () {
+    document.querySelectorAll('div.dimmer').forEach(el => el.remove())
+  }
 
   AQUARIA.fireProteinSubmitListeners = function (proteinName, primary_accession, pdb_id) {
     proteinSubmitListeners.forEach(function (listener) {
@@ -349,7 +352,18 @@ var MAX_PROTEIN_HISTORY = 10;
       //   AQUARIA.panel3d.blankApplet(true, "Waiting for PDB...");
       //   AQUARIA.blankPanel("#vis", true);
       // }
+
+      // if (localStorage.getItem('LastSuccess') == null) {
+      //   document.querySelector('#help').style.display = 'block'
+      //   document.querySelector('.ytpl-player').style.height = '100%'
+      //   document.querySelector('.ytpl-player > iframe').style.height = '100%'
+      //   // document.querySelector('.ytpl-playlist, .ytpl-playlist ps').style.height = '100%'
+      //   // window.addEventListener('resize', function () {
+      //   //   document.querySelector('.ytpl-playlist, .ytpl-playlist ps').style.height = '100%'
+      //   // });
+      // }
       AQUARIA.panel3d.blankApplet(true, 'Waiting for PDB...')
+      //if first time using Aquaria, display Youtube playlist
       AQUARIA.blankPanel('#featurelist', true)
       AQUARIA.blankPanel('#aboutPDB', true)
       // AQUARIA.blankPanel("#uniProtDesc", true);

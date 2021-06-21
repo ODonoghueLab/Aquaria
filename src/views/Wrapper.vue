@@ -12,6 +12,8 @@
     </div>
     <div>
       <AboutAquaria />
+      <!-- <div class='dimmer' @click="closeHelp"></div> -->
+      <UserHelp />
       <Errors />
     </div>
     <div id="heightinspector"></div>
@@ -20,6 +22,14 @@
     <!-- AquariaLayout -->
     <Tabs />
     <PopUp />
+    <!-- <div id = 'help'>
+      <div id='helpDoc'>
+        <a href="https://aquaria.ws/help>">Help manual</a>
+        <a href="#" class="close" @click="closeHelp">X</a>
+        </div>
+      <youtube-playlist :videos="data.arrayOfVideos" id='playlist'></youtube-playlist>
+      <iframe id='playlist' src="https://www.youtube.com/embed/videoseries?list=PLsGaleFn8YydVFkxDhOvHHE5NoTsl6D1e" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div> -->
     <a v-bind:href="data.hash"><div id="scrim" class="hide" @click="dismissPanel"></div></a>
   </div>
 </template>
@@ -36,6 +46,7 @@ import Tabs from '../components/AquariaLayout/Tabs'
 import PopUp from '../components/AquariaLayout/PopUp'
 import AboutAquaria from '../components/InfoAbout/AboutAquaria'
 import Errors from '../components/InfoAbout/Errors'
+import UserHelp from '../components/InfoAbout/UserHelp'
 
 export default {
   name: 'Wrapper',
@@ -48,16 +59,31 @@ export default {
     Tabs,
     PopUp,
     AboutAquaria,
-    Errors
+    Errors,
+    UserHelp
   },
   computed: {
     data () {
       return {
-        hash: store.state.hash
+        hash: store.state.hash,
+        arrayOfVideos: [
+          'https://youtu.be/FAQ3yVGYSzY?list=PLsGaleFn8YydVFkxDhOvHHE5NoTsl6D1e',
+          'https://www.youtube.com/watch?v=UZNEmPOaVrA&list=PLsGaleFn8YydVFkxDhOvHHE5NoTsl6D1e&index=2'
+        ]
       }
     }
   },
   methods: {
+    closeHelp: function () {
+      var _this = this
+      document.getElementById('UserHelp').classList.remove('show')
+      document.getElementById('UserHelp').className += (' hide')
+      document.querySelector('.dimmer').style.display = 'none'
+      if (document.querySelector('#helpbtn').classList.contains('active')) {
+        window.AQUARIA.RemoveOverlay()
+        _this.toggleActive(document.querySelector('#helpbtn'))
+      }
+    },
     checkPhone: function () {
       var iDevices = [
         'iPad Simulator',
@@ -91,6 +117,12 @@ export default {
       document.querySelectorAll('#title span a').forEach(el => {
         el.className = ''
       })
+      document.querySelector('#pdb_id > span#help').style.visibility = 'visible'
+    },
+    toggleActive: function (ev) {
+      if (ev.className === 'lnk active') {
+        ev.className = 'lnk'
+      }
     }
   },
   mounted () {
@@ -119,7 +151,33 @@ export default {
 </script>
 
 <style>
+/* .dimmer {
+  z-index: 99;
+  display: none;
+} */
+/* .close {
+  float: right;
+}
+#helpDoc {
+  background: white;
+  z-index: 9999;
+  position: relative;
+  padding: 4px;
+}
+#help {
+  position: absolute;
+  width: 90vw;
+  height: 90vh;
+  margin: 5vh 5vw 5vh 5vw;
+}
 
+#playlist {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: black;
+} */
 div#heightinspector {
   display: none;
   position: absolute;
@@ -133,6 +191,7 @@ body {
     background-color: var(--background);
     color: var(--dark-text);
     font-size: calc(0.8rem + 3 * ((100vw - 320px) / 680));
+    line-height: 1.3;
     transition: All 0.5s ease;
   }
 .main {
@@ -162,7 +221,7 @@ body {
     background: radial-gradient(closest-side,var(--secondary-label), var(--background));
 }
 .panel.overlay.about {
-  padding-top: 3em;
+  padding-top: 4em;
   max-height: 85vh;
 }
 .about p {

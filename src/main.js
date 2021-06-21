@@ -5,6 +5,7 @@ import App from './App'
 // import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
 import VueMq from 'vue-mq'
 import ToggleSwitch from 'vuejs-toggle-switch'
+import VueYoutube from 'vue-youtube'
 
 // import vue material resources
 import VueMaterial from 'vue-material'
@@ -24,6 +25,8 @@ import './components/AquariaLayout/helpers/chardinjs.mod'
 // load other globals (some may depend on jquery/plugins above)
 import './components/AquariaLayout/helpers/browser_check'
 import './assets/js/plugins'
+
+Vue.use(VueYoutube)
 // import './assets/js/vendor/modernizr-3.11.2.min'
 
 // Import all styles

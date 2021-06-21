@@ -18,6 +18,7 @@
       </span>
       <span id="pdb_id" v-if="pdb && !seqRes" v-on:click="storeHash">
         <a href="#Structure" class="" @click="makeActive">{{pdb}}</a>
+        <span id='help' @click="showHelp">?</span>
       </span>
       <div id='titleAlign' class='' v-if="seqRes">
         <span class='titlepanel' v-on:click="storeHash">
@@ -86,13 +87,34 @@ export default {
     }
   },
   methods: {
+    showHelp: function () {
+      store.commit('setHelpTitle', 'Aquaria Help')
+      store.commit('setUserStatus', false)
+      document.getElementById('UserHelp').classList.remove('hide')
+      document.getElementById('UserHelp').className += (' show')
+      // document.querySelector('#UserHelp').style.display = 'flex'
+      // document.querySelector('.main .dimmer').style.display = 'block'
+      if (!document.querySelector('div.dimmer')) {
+        window.AQUARIA.overlay()
+        document.querySelector('div.dimmer').className += ' level7'
+      }
+      document.querySelector('div.dimmer').addEventListener('click', function () {
+        window.AQUARIA.RemoveOverlay()
+        document.getElementById('UserHelp').classList.remove('show')
+        document.getElementById('UserHelp').className += (' hide')
+      })
+    },
     storeHash: function () {
       store.commit('setHash', window.location.hash)
     },
     makeActive: function (ev) {
+      document.querySelector('#pdb_id > span#help').style.visibility = 'hidden'
       document.querySelectorAll('#title span a').forEach(el => {
-        el.className = ''
+        el.classList.remove('active')
       })
+      if (ev.target.localName.includes('strong')) {
+        ev.target = ev.target.parentElement
+      }
       ev.target.className = 'active'
       if (document.querySelector('#title').className.indexOf('active') === -1) { document.querySelector('#title').className += ' active' }
       document.querySelector('#scrim').className = 'show level3'
@@ -104,6 +126,7 @@ export default {
     },
     dismissPanel: function () {
       // hide scrim
+      document.querySelector('#pdb_id > span#help').style.visibility = 'visible'
       document.querySelector('#scrim').className = 'hide'
       // reset title to neutral state
       document.querySelector('#title').className = 'item title fix level6'
@@ -153,6 +176,21 @@ export default {
 </script>
 
 <style>
+#pdb_id > span#help {
+  background: white;
+  color: #595656;
+  padding: 0px 0.4em;
+  border-radius: 1.5rem;
+  margin: 2px;
+  font-size: 100%;
+}
+/* #pdb_id:hover{
+  background-color: var(--primary-link);
+} */
+#pdb_id > span#help:hover {
+  background-color: var(--primary-link);
+  color: white;
+}
 .title {
     flex-basis: auto;
     color: white;
@@ -196,6 +234,7 @@ export default {
 #title span a:hover {
   background-color: var(--primary-link);
 }
+
 #title span a:active, #title span a.active {
   background-color: var(--primary-highlight);
 }
@@ -205,26 +244,27 @@ export default {
   border-left: 1px dotted var(--background);
 }
 span#org_prot, span#uniprotpanel {
-  border-top-left-radius: 1.5rem;
-  border-bottom-left-radius: 1.5rem;
+  border-top-left-radius: 2rem;
+  border-bottom-left-radius: 2rem;
 }
 span#org_prot a, span#uniprotpanel a {
-  padding-left: 1rem;
-  border-top-left-radius: 1.5rem;
-  border-bottom-left-radius: 1.5rem;
+  padding-left: 0.5rem;
+  border-top-left-radius: 2rem;
+  border-bottom-left-radius: 2rem;
   transition: all 0.7s ease;
 }
-span#org_prot img, span#uniprotpanel img  {
+span#org_prot img, span#uniprotpanel img, span#pdb_id img  {
 height: calc(10px + .4vw);
 }
 span#pdb_id , span#no_pdb_id {
-  padding-right: 1rem;
+  padding-right: 0.5rem;
   font-weight: 600;
-  border-top-right-radius: 1.5rem;
-  border-bottom-right-radius: 1.5rem;
+  border-top-right-radius: 2rem;
+  border-bottom-right-radius: 2rem;
 }
 #titleAlign {
   display: flex;
+  justify-content: center;
 }
 #titleAlign.active {
   /* background-color: var(--primary-highlight); */
@@ -239,6 +279,7 @@ span#pdb_id , span#no_pdb_id {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 15rem;
+  text-align: center;
 }
 
 #title span.titlepanel {

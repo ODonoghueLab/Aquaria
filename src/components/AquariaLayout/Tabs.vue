@@ -2,11 +2,11 @@
   <div>
     <div class="tabs rel level3">
       <div class="tab"  id="Structures" v-on:click="storeHash">
-        <a href="#Structures"><span class="icon"><img v-bind:src="MS" /></span>Matching Structures&nbsp;<span class="counter"></span></a>
+        <a href="#Structures"><span class="icon"><img v-bind:src="MS" /></span>&nbsp;&nbsp;Matching Structures&nbsp;&nbsp;<span class="counter"></span></a>
       </div>
       <MatchingStructures />
       <div class="tab" id="Features" v-on:click="storeHash">
-        <a href="#Features"><span class="icon"><img v-bind:src="FT" /></span> Features <span class="counter" id="featureCounter"></span></a>
+        <a href="#Features"><span class="icon"><img v-bind:src="FT" /></span>&nbsp;&nbsp;Features&nbsp;&nbsp;<span class="counter" id="featureCounter"></span></a>
       </div>
       <Features />
     </div>
@@ -54,7 +54,8 @@ export default {
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
-      document.querySelector('div.dimmer').style.zIndex = '0'
+      document.querySelector('div.dimmer').className += ' level0'
+      // document.querySelector('div.dimmer').style.zIndex = '0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         // document.querySelector('div.tabs').style.bottom = '50px'
         Panels.hidePanels()
@@ -71,7 +72,7 @@ export default {
       if (document.getElementsByClassName('dimmer').length === 0) {
         window.AQUARIA.overlay()
       }
-      document.querySelector('div.dimmer').style.zIndex = '0'
+      document.querySelector('div.dimmer').className += ' level0'
       document.querySelector('div.dimmer').addEventListener('click', function () {
         document.querySelector('a.close').click()
         // document.querySelector('div.tabs').style.bottom = '50px'

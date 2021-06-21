@@ -39,7 +39,7 @@ export default {
     // var regex = /(^\d+\/*$)/
     if (window.location.pathname === '/') {
       if (localStorage.getItem('LastSuccess') == null) {
-        window.location.pathname = '/P04637/3kmd'
+        window.location.pathname = '/Human/TP53'
       } else {
         window.location.pathname = localStorage.getItem('LastSuccess')
       }
@@ -127,7 +127,6 @@ div.dimmer {
     opacity: 0.68;
     -moz-opacity: 0.68;
     width: 100%;
-    z-index: 1;
 }
 div.dimmer2 {
     background: #5E5E5E;

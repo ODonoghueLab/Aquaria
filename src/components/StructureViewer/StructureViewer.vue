@@ -111,14 +111,9 @@ export default {
     left: 0px;
     height: 100vh;
     position: fixed;
-    z-index: 101;
+    z-index: 6;
     pointer-events: none;
     display: none;
-    /* padding: 0px;
-    margin: 0px;
-    width: 100%;
-    height: 107vh;
-    bottom: 112vh; */
 }
 
 #threeDSpan, #threeDSpan-inner-jolecule-soup-display {
