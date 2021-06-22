@@ -16,7 +16,7 @@ var JoleculePanel = function (attachToDiv, chainSelected) {
     isLoop: false,
     isGrid: true,
     isLegend: true,
-    backgroundColor: '#C0C0C0',
+    backgroundColor: '#cccccc',
     isEditable: true,
     isResidueSelector: false,
     isExtraEditable: true,

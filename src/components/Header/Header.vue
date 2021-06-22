@@ -9,6 +9,7 @@
 <script>
 import Title from './Title'
 import Menu from './Menu'
+import store from '../../store/index'
 export default {
   name: 'Header',
   components: {
@@ -23,6 +24,7 @@ export default {
   },
   methods: {
     showScrim: function () {
+      store.commit('setHash', window.location.hash)
       document.querySelector('#scrim').className = 'show level3'
       document.querySelector('#xr-button').click()
     }

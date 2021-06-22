@@ -91,10 +91,10 @@ export default {
         document.querySelector('#switch').style.display = 'block'
         document.querySelector('div.dimmer').addEventListener('click', function () {
           document.querySelector('#switch').style.display = 'none'
-          document.querySelector('div.dimmer').remove()
+          window.AQUARIA.RemoveOverlay()
         })
       } else {
-        document.querySelector('div.dimmer').remove()
+        window.AQUARIA.RemoveOverlay()
       }
     },
     AboutAquaria: function () {
@@ -116,10 +116,10 @@ export default {
             window.history.replaceState({}, document.title, '#Matrix')
           }
           document.querySelector('#about_overlay').style.display = 'none'
-          document.querySelector('div.dimmer').remove()
+          window.AQUARIA.RemoveOverlay()
         })
       } else {
-        document.querySelector('div.dimmer').remove()
+        window.AQUARIA.RemoveOverlay()
       }
     }
   }

@@ -12,7 +12,7 @@
     </div>
     <div>
       <AboutAquaria />
-      <div class='dimmer' @click="closeHelp"></div>
+      <!-- <div class='dimmer' @click="closeHelp"></div> -->
       <UserHelp />
       <Errors />
     </div>
@@ -76,9 +76,11 @@ export default {
   methods: {
     closeHelp: function () {
       var _this = this
-      document.querySelector('#UserHelp').style.display = 'none'
+      document.getElementById('UserHelp').classList.remove('show')
+      document.getElementById('UserHelp').className += (' hide')
       document.querySelector('.dimmer').style.display = 'none'
       if (document.querySelector('#helpbtn').classList.contains('active')) {
+        window.AQUARIA.RemoveOverlay()
         _this.toggleActive(document.querySelector('#helpbtn'))
       }
     },
@@ -149,10 +151,10 @@ export default {
 </script>
 
 <style>
-.dimmer {
+/* .dimmer {
   z-index: 99;
   display: none;
-}
+} */
 /* .close {
   float: right;
 }
@@ -189,7 +191,7 @@ body {
     background-color: var(--background);
     color: var(--dark-text);
     font-size: calc(0.8rem + 3 * ((100vw - 320px) / 680));
-    line-height: 1.05rem;
+    line-height: 1.3;
     transition: All 0.5s ease;
   }
 .main {

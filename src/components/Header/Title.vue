@@ -88,8 +88,21 @@ export default {
   },
   methods: {
     showHelp: function () {
-      document.querySelector('#UserHelp').style.display = 'flex'
-      document.querySelector('.main .dimmer').style.display = 'block'
+      store.commit('setHelpTitle', 'Aquaria Help')
+      store.commit('setUserStatus', false)
+      document.getElementById('UserHelp').classList.remove('hide')
+      document.getElementById('UserHelp').className += (' show')
+      // document.querySelector('#UserHelp').style.display = 'flex'
+      // document.querySelector('.main .dimmer').style.display = 'block'
+      if (!document.querySelector('div.dimmer')) {
+        window.AQUARIA.overlay()
+        document.querySelector('div.dimmer').className += ' level7'
+      }
+      document.querySelector('div.dimmer').addEventListener('click', function () {
+        window.AQUARIA.RemoveOverlay()
+        document.getElementById('UserHelp').classList.remove('show')
+        document.getElementById('UserHelp').className += (' hide')
+      })
     },
     storeHash: function () {
       store.commit('setHash', window.location.hash)
@@ -97,8 +110,11 @@ export default {
     makeActive: function (ev) {
       document.querySelector('#pdb_id > span#help').style.visibility = 'hidden'
       document.querySelectorAll('#title span a').forEach(el => {
-        el.className = ''
+        el.classList.remove('active')
       })
+      if (ev.target.localName.includes('strong')) {
+        ev.target = ev.target.parentElement
+      }
       ev.target.className = 'active'
       if (document.querySelector('#title').className.indexOf('active') === -1) { document.querySelector('#title').className += ' active' }
       document.querySelector('#scrim').className = 'show level3'
@@ -163,8 +179,8 @@ export default {
 #pdb_id > span#help {
   background: white;
   color: #595656;
-  padding: 0px 7px;
-  border-radius: 12px;
+  padding: 0px 0.4em;
+  border-radius: 1.5rem;
   margin: 2px;
   font-size: 100%;
 }
@@ -228,23 +244,23 @@ export default {
   border-left: 1px dotted var(--background);
 }
 span#org_prot, span#uniprotpanel {
-  border-top-left-radius: 1.5rem;
-  border-bottom-left-radius: 1.5rem;
+  border-top-left-radius: 2rem;
+  border-bottom-left-radius: 2rem;
 }
 span#org_prot a, span#uniprotpanel a {
-  padding-left: 1rem;
-  border-top-left-radius: 1.5rem;
-  border-bottom-left-radius: 1.5rem;
+  padding-left: 0.5rem;
+  border-top-left-radius: 2rem;
+  border-bottom-left-radius: 2rem;
   transition: all 0.7s ease;
 }
 span#org_prot img, span#uniprotpanel img, span#pdb_id img  {
 height: calc(10px + .4vw);
 }
 span#pdb_id , span#no_pdb_id {
-  padding-right: 1rem;
+  padding-right: 0.5rem;
   font-weight: 600;
-  border-top-right-radius: 1.5rem;
-  border-bottom-right-radius: 1.5rem;
+  border-top-right-radius: 2rem;
+  border-bottom-right-radius: 2rem;
 }
 #titleAlign {
   display: flex;

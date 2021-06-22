@@ -108,10 +108,10 @@ p.thetitle {
   .affiliations span {
       margin-right: 1.2em;
   } */
-  .ErrorPanel .close::after {
+  /* .ErrorPanel .close::after {
     width: 1.5rem;
     height: 1.5rem;
-  }
+  } */
 
   .ErrorPanel .close {
     position: relative;
@@ -120,8 +120,8 @@ p.thetitle {
   .ErrorPanel .close::after {
     right: 0.25rem;
     top: 0.25rem;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: calc(1.25rem + 0.5vw);
+    height: calc(1.25rem + 0.5vw);
     position: absolute;
     display: flex;
     z-index: 11;
@@ -132,7 +132,7 @@ p.thetitle {
     color: white;
     content: "×";
     cursor: pointer;
-    font-size: 1rem;
+    font-size: calc(1.25rem + 0.5vw);
   }
   .ErrorPanel .close:hover::after {
       background-color: var(--primary-highlight);

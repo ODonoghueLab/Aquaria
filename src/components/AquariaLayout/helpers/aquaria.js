@@ -56,6 +56,9 @@ var MAX_PROTEIN_HISTORY = 10;
     elemDiv.className = 'dimmer'
     document.body.append(elemDiv)
   }
+  AQUARIA.RemoveOverlay = function () {
+    document.querySelectorAll('div.dimmer').forEach(el => el.remove())
+  }
 
   AQUARIA.fireProteinSubmitListeners = function (proteinName, primary_accession, pdb_id) {
     proteinSubmitListeners.forEach(function (listener) {

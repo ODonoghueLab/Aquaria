@@ -22,7 +22,7 @@
 <script>
 
 import { screenshot } from '../AquariaLayout/helpers/Screenshot'
-
+import store from '../../store/index'
 export default {
   name: 'Menu',
   data () {
@@ -31,19 +31,39 @@ export default {
     }
   },
   methods: {
-    onChange (event) {
+    onChange: function (event) {
       const id = event.target.value.toLowerCase()
       document.querySelector('#threeDSpan-inner-menu-' + id).click()
-    }
-  },
-  mounted () {
-    const toggleActive = function (ev) {
+    },
+    showHelp: function () {
+      var _this = this
+      store.commit('setHelpTitle', 'Aquaria Help')
+      store.commit('setUserStatus', false)
+      document.getElementById('UserHelp').classList.remove('hide')
+      document.getElementById('UserHelp').className += (' show')
+      if (!document.querySelector('div.dimmer')) {
+        window.AQUARIA.overlay()
+        document.querySelector('div.dimmer').className += ' level7'
+      }
+      document.querySelector('div.dimmer').addEventListener('click', function () {
+        window.AQUARIA.RemoveOverlay()
+        document.getElementById('UserHelp').classList.remove('show')
+        document.getElementById('UserHelp').className += (' hide')
+        var elem = {}
+        elem.target = document.querySelector('#helpbtn')
+        _this.toggleActive(elem)
+      })
+    },
+    toggleActive: function (ev) {
       if (ev.target.className === 'lnk active') {
         ev.target.className = 'lnk'
       } else {
         ev.target.className = 'lnk active'
       }
     }
+  },
+  mounted () {
+    var _this = this
     document.querySelector('#print').addEventListener('click', async function (ev) {
       ev.preventDefault() // prevent default navigation
       const screenshotHref = await screenshot(7680, 4320, 0, 0)
@@ -59,28 +79,27 @@ export default {
     // })
     document.querySelector('#helpbtn').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
-      document.querySelector('#UserHelp').style.display = 'flex'
-      document.querySelector('.main .dimmer').style.display = 'block'
+      _this.toggleActive(ev) // toggle active state
+      _this.showHelp()
     })
     document.querySelector('#Sidechains').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
+      _this.toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar > span:nth-child(6)').click()
     })
     document.querySelector('#Neighbors').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
+      _this.toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner > div.jolecule-embed-header.jolecule-embed-toolbar > span:nth-child(7)').click()
     })
     document.querySelector('#Ligands').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
+      _this.toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner-menu-ligand').click()
     })
     document.querySelector('#Water').addEventListener('click', function (ev) {
       ev.preventDefault() // prevent default navigation
-      toggleActive(ev) // toggle active state
+      _this.toggleActive(ev) // toggle active state
       document.querySelector('#threeDSpan-inner-menu-water').click()
     })
   }
@@ -88,7 +107,8 @@ export default {
 </script>
 <style scoped>
 /* Menu */
-  #Menu:target.panel.floating {
+  @media only screen and (max-width: 570px) {
+    #Menu:target.panel.floating {
     display: flex;
     background-color: transparent;
     width: 136px;
@@ -96,6 +116,18 @@ export default {
     top: 3rem;
     right: 1rem;
     }
+  }
+  @media only screen and (min-width: 571px) {
+    #Menu:target.panel.floating {
+    display: flex;
+    background-color: transparent;
+    width: 136px;
+    border-radius: 0.25rem;
+    top: 1rem;
+    right: 1rem;
+    }
+  }
+
   #Menu a.lnk {
     color: var(--text);
     display: block;

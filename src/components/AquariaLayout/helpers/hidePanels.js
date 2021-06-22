@@ -4,7 +4,7 @@ export function hidePanel (elemParent, elemChild) {
 }
 
 export function hidePanels () {
-  document.querySelectorAll('div.dimmer').forEach(el => el.remove())
+  window.AQUARIA.RemoveOverlay()
   this.hidePanel('vis', 'Structures')
   this.hidePanel('featurelist', 'Features')
   document.querySelector('#Structures').className = 'tab'

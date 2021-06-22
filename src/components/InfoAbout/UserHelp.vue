@@ -1,40 +1,72 @@
 <template>
-    <div id="UserHelp" class="HelpPanel overlay level7">
+    <div id="UserHelp" class="HelpPanel hide dialouge-window overlay level7">
         <a href="#" class="close" @click="closeHelp"></a>
-        <div>
+          <div id='fullwindow-video' class='fill'>
+            <youtube v-for="video in videos" :key="video.id" :id='video.id' :video-id="video.id" class='hide' ref="youtube" @paused="paused($event)" @ended="finished($event)"></youtube>
+          </div>
+          <div id='contents'>
             <p class="thetitle">{{data.title}}</p>
-            <!-- <div v-if="play" id="playlist"></div> -->
-            <p class="intro1">Watch tutorial videos to get started.</p>
-            <p>Skip watching tutorial videos and start using Aquaria.</p>
-            <youtube id='playlist' video-id="FAQ3yVGYSzY" ref="youtube" @playing="playing" @paused="paused" @ended="finished"></youtube>
-            <!-- <iframe id='playlist' src="https://www.youtube.com/embed/videoseries?list=PLsGaleFn8YydVFkxDhOvHHE5NoTsl6D1e" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+            <p class="intro">Watch tutorial videos to get started.</p>
+            <p class="intro">Skip watching tutorial videos and start using Aquaria.</p>
+            <Playlist v-if="!data.newUser" v-bind:playlist='videos'/>
+            <div v-if="data.newUser">
+              <youtube id='intro-video' video-id="FAQ3yVGYSzY" ref="youtube" @playing="playing($event)" @paused="paused($event)" @ended="finished($event)"></youtube>
+            </div>
             <a href="#" id='skip' @click="closeHelp">Skip > </a>
-        </div>
+          </div>
     </div>
 </template>
 
 <script>
 import store from '@/store/index'
+import Playlist from './Playlist'
+var targetId
+var index
 export default {
   name: 'UserHelp',
+  components: {
+    Playlist
+  },
+  data () {
+    return {
+      videos: [
+        { id: 'FAQ3yVGYSzY', title: 'Introduction to Aquaria' },
+        { id: 'UZNEmPOaVrA', title: 'How to Calculate Distances' }
+      ]
+    }
+  },
   computed: {
-    player () {
-      return this.$refs.youtube.player
-    },
     data () {
       return {
-        title: store.state.helpTitle
+        title: store.state.helpTitle,
+        newUser: store.state.newUser
       }
     }
   },
   methods: {
     closeHelp: function () {
       var _this = this
-      store.commit('setHelpTitle', 'Aquaria Help')
-      document.querySelector('#UserHelp').style.display = 'none'
-      document.querySelector('.dimmer').style.display = 'none'
-      if (document.querySelector('#helpbtn').classList.contains('active')) {
-        _this.toggleActive(document.querySelector('#helpbtn'))
+      if (document.querySelector('iframe.show')) {
+        var activeVideoID = document.querySelector('iframe.show').id
+        document.getElementById('contents').classList.remove('hide')
+        document.getElementById(activeVideoID).classList.remove('show')
+        document.getElementById('UserHelp').className += ' dialouge-window'
+        document.getElementById('UserHelp').className += ' overlay'
+        document.getElementById('UserHelp').className += ' level7'
+        document.getElementById('UserHelp').classList.remove('fullwindow')
+        var event = {}
+        event.h = {}
+        event.h.id = activeVideoID
+        _this.paused(event)
+      } else {
+        window.AQUARIA.RemoveOverlay()
+        document.getElementById('UserHelp').classList.remove('show')
+        document.getElementById('UserHelp').className += (' hide')
+        // document.querySelector('#UserHelp').style.display = 'none'
+        // document.querySelector('.dimmer').style.display = 'none'
+        if (document.querySelector('#helpbtn').classList.contains('active')) {
+          _this.toggleActive(document.querySelector('#helpbtn'))
+        }
       }
     },
     toggleActive: function (ev) {
@@ -44,70 +76,109 @@ export default {
         ev.className = 'lnk active'
       }
     },
-    // showTutorial: function () {
-    //   var elem = document.getElementById('UserHelp')
-    //   elem.classList.remove('overlay')
-    //   elem.className += ' fullwindow'
-    //   document.querySelector('#UserHelp').style.left = '0px'
-    // },
-    // openFullscreen: function (iframe) {
-    //   var requestFullScreen = iframe.requestFullScreen || iframe.mozRequestFullScreen || iframe.webkitRequestFullScreen
-    //   if (requestFullScreen) {
-    //     requestFullScreen.bind(iframe)()
-    //   }
-    // },
-    // closeFullscreen: function (iframe) {
-    //   var ExitFullScreen = iframe.exitFullscreen || iframe.msExitFullscreen || iframe.webkitExitFullscreen
-    //   if (ExitFullScreen) {
-    //     ExitFullScreen.bind(iframe)()
-    //   }
-    // },
-    playing: function () {
-      this.player.playVideo()
-      var iframe = document.querySelector('#playlist')
-      var requestFullScreen = iframe.requestFullScreen || iframe.mozRequestFullScreen || iframe.webkitRequestFullScreen
-      if (requestFullScreen) {
-        requestFullScreen.bind(iframe)()
+    getIndex: function (targetId) {
+      for (var i = 0; i < this.$refs.youtube.length; i++) {
+        if (this.$refs.youtube[i].$attrs.id === targetId) {
+          return i
+        }
       }
     },
-    paused: function () {
-      this.player.pauseVideo()
-      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
-        document.exitFullscreen()
+    playing: function (event) {
+      targetId = event.h.id
+      if (this.$refs.youtube.length) {
+        index = this.getIndex(targetId)
+        this.$refs.youtube[index].player.playVideo()
+      } else {
+        this.$refs.youtube.player.playVideo()
+        var iframe = document.querySelector('#intro-video')
+        var requestFullScreen = iframe.requestFullScreen || iframe.mozRequestFullScreen || iframe.webkitRequestFullScreen
+        if (requestFullScreen) {
+          requestFullScreen.bind(iframe)()
+        }
       }
     },
-    finished: function () {
-      this.player.stopVideo()
+    paused: function (event) {
+      targetId = event.h.id
+      if (document.querySelector('iframe.active')) {
+        this.closeHelp()
+      } else {
+        if (this.$refs.youtube.length) {
+          index = this.getIndex(targetId)
+          this.$refs.youtube[index].player.pauseVideo()
+        } else {
+          this.$refs.youtube.player.pauseVideo()
+        }
+        if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+          document.exitFullscreen()
+        }
+      }
+    },
+    finished: function (event) {
+      targetId = event.h.id
+      if (this.$refs.youtube.length) {
+        index = this.getIndex(targetId)
+        this.$refs.youtube[index].player.stopVideo()
+      } else {
+        this.$refs.youtube.player.stopVideo()
+      }
+      if (document.querySelector('iframe.active')) {
+        document.querySelector('#UserHelp a.close').click()
+      }
       document.exitFullscreen()
       this.closeHelp()
-      store.commit('setHelpTitle', 'Help')
     }
   }
 }
 </script>
 
 <style>
-#UserHelp iframe {
-  /* width: 100%; */
+.intro {
+  padding: 0px 4px;
+}
+.dialouge-window {
+  left: 50%;
+  max-height: 86vh;
+}
+#fullwindow-video iframe, .fill {
+  width: 100%;
+  height: 100%;
+}
+.fullwindow {
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+}
+.deactive{
+  display: none;
+}
+.active {
+  display: block;
+}
+.showIframe {
+  display: flex;
+  left: 0;
+  width: 100%;
+  max-height: 98vh;
+  position: absolute;
+  height: 100vh;
+}
+iframe#intro-video {
   height: 29vh;
+  margin-bottom: 0.5rem;
 }
 #skip {
   float: right;
   padding: 2px;
 }
-.fullwindow {
-    left: 0px;
-    width: 100vw;
-    height: 100vh;
-}
 #UserHelp{
-    display: none;
+    overflow: scroll;
+    /* display: none; */
     position: absolute;
-    z-index: 9999999999999;
+    z-index: 9;
     top: 1vh;
-    left: 50%;
     background: var(--primary-tab);
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 0.5rem 0.75rem 0.5rem;
     border-radius: 1rem;
     flex-direction: column;
 }
@@ -124,7 +195,7 @@ p.thetitle {
     color: var(--text);
     text-align: center;
     line-height: 1.25;
-    padding: 0.5rem 2rem;
+    padding: 0.5rem 1rem;
     border-radius: 1.5rem;
     margin: auto;
 }
@@ -138,12 +209,12 @@ p.thetitle {
     left: 50%;
     transform: translate(-50%, 0%);
     width: 90vw;
-    max-width: 20rem;
+    max-width: calc(23rem + 3vw);
   }
-  .HelpPanel .close::after {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
+  /* .HelpPanel .close::after {
+    width: calc(1.25rem + 0.5vw);
+    height: calc(1.25rem + 0.5vw);
+  } */
 
   .HelpPanel .close {
     position: relative;
@@ -152,8 +223,8 @@ p.thetitle {
   .HelpPanel .close::after {
     right: 0.25rem;
     top: 0.25rem;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: calc(1.25rem + 0.5vw);
+    height: calc(1.25rem + 0.5vw);
     position: absolute;
     display: flex;
     z-index: 11;
@@ -164,7 +235,7 @@ p.thetitle {
     color: white;
     content: "×";
     cursor: pointer;
-    font-size: 1rem;
+    font-size: calc(1rem + 0.5vw)
   }
   .HelpPanel .close:hover::after {
       background-color: var(--primary-highlight);
