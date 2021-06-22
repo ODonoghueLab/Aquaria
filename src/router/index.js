@@ -21,6 +21,11 @@ const routes = [
     component: Matrix
   },
   {
+    path: '/coverage/:organism?',
+    name: 'Coverage',
+    component: () => import(/* webpackChunkName: "wrapper" */ '../views/Coverage.vue') // lazy load
+  },
+  {
     path: '/:id?/:pdbid?/:chainid?/:chain?',
     name: 'Wrapper',
     component: () => import(/* webpackChunkName: "wrapper" */ '../views/Wrapper.vue') // lazy load
