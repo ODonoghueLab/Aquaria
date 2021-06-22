@@ -503,7 +503,7 @@ export default {
 
     // get the genomic position of a particular protein using primary accession
     async getPositions (id) {
-      var posUrl = 'http://localhost:8010/getGenomicPosition/' + id
+      var posUrl = `${window.BACKEND}/getGenomicPosition/${id}`
       var r = {}
       await axios({
         method: 'get',
@@ -580,7 +580,7 @@ export default {
 
       for (let index = 0; index < allStructures.length; index++) {
         allStructures[index].count = 0
-        purl = 'https://odonoghuelab.org:8011/get_3D_alignment?selector[]=' + allStructures[index].primary_accession
+        purl = `${window.BACKEND}/get_3D_alignment?selector[]=${allStructures[index].primary_accession}`
         await axios({
           method: 'get',
           url: purl
@@ -608,8 +608,7 @@ export default {
 
     // TODO: if clean proteins was split, get fragments but also be split! Need to do this before the cleanProteins step
     async getFragments (id) {
-      console.log('getting fragments for d', id)
-      var posUrl = 'http://localhost:8010/getProteinFragments/' + id
+      var posUrl = `${window.BACKEND}/getProteinFragments/${id}`
       var r = []
       await axios({
         method: 'get',
