@@ -33,6 +33,7 @@
     "v-lazy-image": "^1.4.0",
     "vue": "^2.6.12",
     "vue-autosuggest": "^2.2.0",
+    "vue-burger": "^1.1.0",
     "vue-expandable-text-line": "^2.0.9",
     "vue-material": "^1.0.0-beta-15",
     "vue-mq": "^1.0.1",

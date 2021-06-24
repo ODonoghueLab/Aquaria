@@ -2,11 +2,14 @@
     <div id="header">
         <div id="logo" class="item fix level3"><a href="#About" @click="showScrim"><img v-bind:src="aquariasymbol" /></a></div>
         <Title />
-        <div id="menu-btn" class="item fix level3"><a href="#Menu"><img v-bind:src="hamburger" /></a></div>
+        <div id="menu-btn" class="item fix level3">
+          <v-burger type="squeeze" />
+        </div>
         <Menu />
     </div>
 </template>
 <script>
+import { VBurger } from 'vue-burger'
 import Title from './Title'
 import Menu from './Menu'
 import store from '../../store/index'
@@ -14,7 +17,8 @@ export default {
   name: 'Header',
   components: {
     Title,
-    Menu
+    Menu,
+    VBurger
   },
   data () {
     return {
