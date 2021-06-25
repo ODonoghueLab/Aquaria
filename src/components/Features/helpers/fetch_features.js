@@ -1330,7 +1330,7 @@ function parseFeatures (primary_accession, categories, server, featureCallback, 
   finishServer(clustered_annotations, primary_accession, featureCallback)
 }
 
-AQUARIA.ifUrlHasVarExtractInfo = function(){
+AQUARIA.ifUrlHasVarExtractInfo2 = function(){
   return new Promise(function(resolve, reject){
     // console.log("In the magic function");
     var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
@@ -1383,6 +1383,58 @@ AQUARIA.ifUrlHasVarExtractInfo = function(){
     }
 
   })
+}
+
+AQUARIA.ifUrlHasVarExtractInfo = async function(){
+    // console.log("In the magic function");
+    var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
+    var searchParam = decodeURIComponent(window.location.search.split('?')[1])
+
+    let variantResidues = {}; // variantRes{resNum} => {defaultDesc: , oldAa: , positionInfo: , order: , newAas: [], A, C, D, }
+    if (featureRegex.test(searchParam)) {
+
+      var features = searchParam.split('&')
+
+
+      features.forEach(function (feature, feature_i) {
+        feature = feature.replace(/%22/g, '\"')
+
+        const featAndDesc = extractDescription(feature)
+        const consInfoRes = consequence.getConsInfo(featAndDesc.featStr)
+        const consInfo = consInfoRes.newResidues;
+        featAndDesc.featStr = consInfoRes.theOrigFeatStr;
+
+        let counter =0;
+        for (const resNum in consInfo) {
+
+          // Adding for filling up pop-up info.
+          variantResidues[resNum] = {}
+          if (consInfo[resNum].hasOwnProperty('oldRes')) {
+            variantResidues[resNum].oldAa = consInfo[resNum].oldRes
+          }
+
+          if (consInfo[resNum].hasOwnProperty('newAas')) {
+            variantResidues[resNum]['newAas'] = consInfo[resNum]['newAas']
+          }
+
+
+          variantResidues[resNum].defaultDesc = featAndDesc.description
+          addNewResAndGrantham(variantResidues[resNum], consInfo[resNum])
+
+
+          variantResidues[resNum].order = feature_i
+          counter = counter + 1;
+        }
+
+        if (feature_i == features.length - 1){
+          console.log("In the ifUrlHasVar_extractInfo fn: ");
+          console.log(variantResidues);
+          console.log(Object.keys(variantResidues))
+          return variantResidues
+        }
+      })
+
+    }
 }
 
 function checkURLForFeatures (primary_accession, server, featureCallback) {
