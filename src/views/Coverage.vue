@@ -2,12 +2,6 @@
   <div id="matrix">
     <MatrixHeader />
     <LoadingPage />
-    <a id='graph' title='Click to open interactive version'>
-      <v-lazy-image
-        :src="Fig100"
-        :src-placeholder="Fig55"
-        />
-    </a>
      <div id="container">
     </div>
   </div>
@@ -17,67 +11,55 @@
 import axios from 'axios'
 import MatrixHeader from '../components/MatrixLayout/MatrixHeader'
 import LoadingPage from '../components/MatrixLayout/LoadingPage'
-import VLazyImage from 'v-lazy-image'
 import store from '@/store/index'
 
 export default {
   name: 'Matrix',
   components: {
-    VLazyImage,
     MatrixHeader,
     LoadingPage
   },
   data () {
     return {
-      Fig55: require('../assets/img/Fig_2_55.jpg'),
-      Fig100: require('../assets/img/Fig_2_100.jpg'),
       hostname: store.state.url,
       publicPath: process.env.BASE_URL,
       structures: null,
-      organism: null,
-      clicked: false,
       totalStructures: 0,
       d3: require('d3'),
       green: '#7A9D5B',
       backgroundColour: '#cccccc',
       x: 0,
       y: 20,
-      organismId: '2697049' // can look at others but they do not exist in database for getGenomicPosition COVID:2697049 SARS:694009 MERS:1263720
+      organismId: '2697049' // COVID:2697049 SARS:694009 MERS:1263720
     }
   },
   mounted () {
-    document.querySelector('#graph').style.display = 'none'
-    // document.querySelector('#container').style.display = 'grid'
-    // TODO: INTERACTIVE COLLAPSE AND EXPAND THE DIFFERENT SECTIONS
-    // TODO: REPLACE IMAGES WITH THE ONES ON KEYNOTE, AUTOMATICALLY FETCH IMAGES FROM IMAGE SERVER FOR SARS AND MERS
-
     let allStructures
 
     // gets an organism and runs all the functions and loads everything
     var url = 'https://aquaria.ws:8010/' + this.organismId
-    document.querySelector('#graph > img').addEventListener('load', () => {
-      setTimeout(function () {
-        if (document.querySelector('.matrixLoading')) {
-          document.querySelector('.matrixLoading').style.visibility = 'hidden'
-          document.querySelector('.matrixLoading').style.display = 'none'
-        }
-      }, 350)
-      axios({
-        method: 'get',
-        url: url
-      })
-        .then(response => {
-          allStructures = JSON.parse(response.data.primary_accessions)
-          this.getStructures(this.organismId, allStructures).then(response => {
-            this.getMatchingStructures(response).then(response => {
-              this.getProteinSynonyms(response).then(response => {
-                this.loadShapes(response)
+    axios({
+      method: 'get',
+      url: url
+    })
+      .then(response => {
+        allStructures = JSON.parse(response.data.primary_accessions)
+        this.getStructures(this.organismId, allStructures).then(response => {
+          this.getMatchingStructures(response).then(response => {
+            this.getProteinSynonyms(response).then(response => {
+              this.loadShapes(response).then(() => {
+                if (document.querySelector('.matrixLoading')) {
+                  document.querySelector('.matrixLoading').style.visibility = 'hidden'
+                  document.querySelector('.matrixLoading').style.display = 'none'
+                }
               })
             })
           })
-          this.structures = allStructures
         })
-    })
+        this.structures = allStructures
+      })
+
+    window.addEventListener('resize', this.initialDisplay)
   },
   methods: {
     // given sequence length, return length of the rectangle to generate.
@@ -114,9 +96,7 @@ export default {
           this.drawArrow(svg, data[i][n], width, height, triangleSize, offset)
 
           // Draw the axis
-          var xScale = this.d3.scale.linear()
-            .domain([continuous, continuous + data[i][n].length]) // This is what is written on the Axis: from 0 to length of residue
-            .range([1, width + triangleSize - 1]) // This is where the axis is placed: from start to end of triangle. Add a tiny bit of spacing between the two
+          this.drawRuler(svg, data[i][n], continuous, width, triangleSize, offset)
 
           if (data[i][n].continuous) {
             continuous = data[i][n].length
@@ -124,164 +104,21 @@ export default {
             continuous = 0
           }
 
-          var ticks = Math.floor(data[i][n].length / 500 + 1) // a tick every 500 residues
-          if (ticks > 3) { // if longer than 1500 residues
-            var axis = svg
-              .append('g')
-              .attr('transform', 'translate(' + offset + ',' + (this.y - 15) + ')') // This controls the vertical position of the Axis
-              .attr('style', '')
-              .style('fill', 'gray')
-              .style('font-size', '10px')
-              .attr('class', 'rowContent')
-              .call(this.d3.svg.axis().scale(xScale).tickSize(0, 1).tickFormat((interval, i) => { return interval % 1000 !== 0 ? ' ' : interval }).orient('bottom').ticks(ticks)) // render only thousand ticks
-              // .call(g => g.selectAll('text')
-              //   .attr('y', 4)
-              //   .attr('dx', -4)) // shifts text to the left. How to align properly?
-
-            axis.selectAll('.tick')
-              .attr('stroke', 'gray')
-              .attr('x1', this.x)
-              .attr('x2', this.x)
-              .attr('y2', -1)
-              .attr('y1', 2)
-              .attr('stroke-width', '1')
-          } else if (data[i][n].length > 200) {
-            var smallAxis = svg.append('g')
-              .attr('transform', 'translate(' + offset + ',' + (this.y - 14) + ')')
-              .style('fill', 'gray')
-              .attr('class', 'rowContent')
-              .call(this.d3.svg.axis().scale(this.d3.scale.linear().domain([0, 1]).range([1, width + triangleSize - 1])).tickSize(2, 1).orient('top').ticks(2).tickFormat(''))
-
-            smallAxis.selectAll('.tick')
-              .attr('stroke', 'gray')
-              .attr('x1', this.x)
-              .attr('y1', 4) // height of the ticks
-              .attr('y2', -1) // displacement from the line
-              .attr('stroke-width', '1')
-
-            var axisLabel = svg.append('text') // set this as var la
-              .attr('x', this.x + 0.5 * (width + triangleSize))
-              .attr('y', this.y - 14)
-              .attr('dy', '.35em')
-              .style('text-anchor', 'middle')
-              .attr('transform', 'translate(' + offset + ',0)')
-              .style('fill', 'gray')
-              .style('font-size', '10px')
-              .attr('class', 'rowContent')
-              .text(data[i][n].length)
-
-            svg.append('rect', 'text') // draw a white rectangle
-              .datum(function () { return axisLabel.node().getBBox() })
-              .attr('x', function (d) { return d.x - 2 })
-              .attr('y', function (d) { return d.y })
-              .style('fill', this.backgroundColour)
-              .attr('transform', 'translate(' + offset + ',0)')
-              .attr('class', 'rowContent')
-              .attr('width', function (d) { return d.width + 2 * 2 })
-              .attr('height', function (d) { return d.height })
-
-            axisLabel.node().parentNode.appendChild(axisLabel.node()) // put label above rectangle
-          }
-
           // Draw fragments if they exist
-          this.renderFragments(svg, data[i][n].fragments, scale)
+          this.drawFragments(svg, data[i][n].fragments, scale)
 
-          // Add the image of the protein if one exists
-          // TODO: trim images and crop them down.
-          var imgYOffset = 30
-          var imgSize = width * 2 < 200 ? width * 2 : 200
-          var img = svg.append('svg:image') // add the image of the protein
-            .attr('x', width * 0.5)
-            .attr('y', this.y + height)
-            .attr('transform', 'translate(' + (offset - imgSize / 2) + ',' + imgYOffset + ')') // - half its width to have image anchor center
-            .attr('width', imgSize)
-            .attr('height', imgSize)
+          // Draw the image of the protein if one exists, or fetch default if it does not
+          var imgYOffset = this.renderImage(svg, data[i][n], width, height, offset)
 
-          if (!data[i][n].dark && this.organismId === '2697049') {
-            img.attr('xlink:href', '../images/covid19/WEBP/' + data[i][n].primary_accession + '_w500.webp')
-          } else if (!data[i][n].dark) {
-            img.attr('xlink:href', 'https://aquaria.ws:8080/image/' + data[i][n].primary_accession + '/' + data[i][n].pdb + '?color=0x000000&alpha=0')
-          } else {
-            img.attr('xlink:href', '../images/covid19/unknown-structure_1000.png')
-          }
+          this.drawMatchingStructures(svg, data[i][n], width, height, triangleSize, offset, imgYOffset)
 
-          // draw the bottom matching structures axis
-          if (!data[i][n].dark) {
-            var matchingScale = this.d3.scale.linear()
-              .domain([0, 2]) // This is what is written on the Axis: from 0 to length of residue
-              .range([2, width + triangleSize - 2]) // This is where the axis is placed: from start to end of triangle. Add a tiny bit of spacing between the two
-              .nice()
-
-            var matchingAxis = svg
-              .append('g')
-              .attr('transform', 'translate(' + offset + ',' + (this.y + height + 10) + ')') // This controls the vertical position of the Axis
-              .attr('style', '')
-              .style('fill', this.green)
-              .style('font-size', '10px')
-              .call(this.d3.svg.axis().scale(matchingScale).tickSize(0, 1).tickFormat('').orient('bottom').ticks(2)) // render only thousand ticks
-
-            // Create a long down tick in the centre of the bottom axis
-            this.d3.select(matchingAxis.selectAll('.tick')[0][1])
-              .attr('stroke', this.green)
-              .attr('x1', this.x)
-              .attr('x2', this.x)
-              .attr('y2', 0)
-              .attr('y1', imgYOffset)
-              .attr('stroke-width', '1')
-
-            var matchingLabel = svg.append('text') // set this as var la
-              .attr('x', this.x + 0.5 * (width + triangleSize))
-              .attr('y', this.y + height + imgYOffset + 5) // the axis offset from matchingAxis
-              .attr('dy', '.35em')
-              .style('text-anchor', 'middle')
-              .attr('transform', 'translate(' + offset + ',0)')
-              .style('fill', 'white')
-              .style('font-size', '12px')
-              .text(this.countMatchingStructures(data[i][n].clusters))
-
-            svg.append('rect', 'text') // draw a green round rectangle
-              .datum(function () { return matchingLabel.node().getBBox() })
-              .attr('x', function (d) { return d.x - 4 })
-              .attr('y', function (d) { return d.y })
-              .attr('rx', 6)
-              .attr('ry', 10)
-              .style('fill', this.green)
-              .attr('transform', 'translate(' + offset + ',0)')
-              .attr('width', function (d) { return d.width + 4 * 2 })
-              .attr('height', function (d) { return d.height })
-
-            matchingLabel.node().parentNode.appendChild(matchingLabel.node()) // put label above rectangle
-
-            // Create the expand and collapse button
-            var expandButton = svg.append('circle')
-              .attr('cx', 15)
-              .attr('cy', 30)
-              .attr('stroke', 'gray')
-              .attr('fill', '#69b3a2')
-              .attr('r', 15)
-
-            expandButton.on('click', function (d, i) { // TODO COLLAPSE AND EXPAND : Change the initial display of open
-              var d3 = require('d3')
-              if (this.parentNode.className.baseVal.split(' ').indexOf('open') > -1) {
-                d3.select(this.parentNode).classed('open', false)
-                d3.selectAll('.row').transition().duration(1000).attr('viewBox', '0 0 960 50')
-                d3.selectAll('.rowContent').transition().duration(1000).attr('opacity', 0)
-              } else {
-                d3.selectAll('.row').classed('open', false)
-                d3.selectAll('.row').transition().duration(1000).attr('viewBox', '0 0 960 50')
-                d3.selectAll('.rowContent').transition().duration(1000).attr('opacity', 0)
-
-                d3.select(this.parentNode).classed('open', true)
-                d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 300')
-                d3.selectAll('.open .rowContent').transition().duration(1000).attr('opacity', 1)
-              }
-            })
-          }
+          this.drawExpandButton(svg)
 
           // Adjust the offset for the next protein
           offset = offset + width + triangleSize
         }
       }
+      this.initialDisplay(false)
     },
 
     drawArrow (svg, protein, width, height, triangleSize, offset) {
@@ -293,7 +130,7 @@ export default {
         .attr('width', width)
         .attr('height', height)
         .attr('fill', fill)
-        .attr('id', protein.primary_accession)
+        .attr('id', protein.id ? protein.id : protein.primary_accession)
         .attr('title', protein.primary_accession)
         .attr('transform', 'translate(' + offset + ',0)')
         .on('mouseover', function (d, i) {
@@ -323,7 +160,7 @@ export default {
       svg.append('svg:polygon')
         .attr('points', points)
         .attr('fill', fill)
-        .attr('id', protein.primary_accession)
+        .attr('id', protein.id ? protein.id : protein.primary_accession)
         .attr('title', protein.primary_accession)
         .attr('transform', 'translate(' + offset + ',0)')
         .on('mouseover', function (d, i) {
@@ -355,19 +192,88 @@ export default {
         .text(protein.name)
 
       if (lab.node().getComputedTextLength() > width) {
-        var shortest = protein.synonym.reduce((a, b) => a.length <= b.length ? a : b)
-        shortest = shortest.replace('orf', '').replace('ORF', '')
-        lab.text(shortest)
-        if (lab.node().getComputedTextLength() > width + 0.5 * triangleSize) {
-          lab.attr('y', this.y + height * 1.5)
-          lab.style('fill', this.green)
-          lab.attr('class', 'rowContent')
+        lab.text(protein.synonym[0]) // prefer the first synonym
+        if (lab.node().getComputedTextLength() > width) { // if it's too long
+          var shortest = protein.synonym.reduce((a, b) => a.length <= b.length ? a : b)
+          shortest = shortest.replace('orf', '').replace('ORF', '')
+          lab.text(shortest) // use the shortest name
+          if (lab.node().getComputedTextLength() > width + 0.5 * triangleSize) {
+            // if the shortest name still doesn't fit, display it below the arrow in green
+            lab.attr('y', this.y + height * 1.5)
+            lab.style('fill', this.green)
+            lab.attr('class', 'rowContent')
+          }
         }
       }
     },
 
-    renderFragments (svg, fragments, scale) {
-      console.log(fragments)
+    drawRuler (svg, protein, continuous, width, triangleSize, offset) {
+      // Draw the axis
+      var xScale = this.d3.scale.linear()
+        .domain([continuous, continuous + protein.length]) // This is what is written on the Axis: from 0 to length of residue
+        .range([1, width + triangleSize - 1]) // This is where the axis is placed: from start to end of triangle. Add a tiny bit of spacing between the two
+
+      var ticks = Math.floor(protein.length / 500 + 1) // a tick every 500 residues
+      if (ticks > 3) { // if longer than 1500 residues
+        var axis = svg
+          .append('g')
+          .attr('transform', 'translate(' + offset + ',' + (this.y - 15) + ')') // This controls the vertical position of the Axis
+          .attr('style', '')
+          .style('fill', 'gray')
+          .style('font-size', '10px')
+          .attr('class', 'rowContent')
+          .call(this.d3.svg.axis().scale(xScale).tickSize(0, 1).tickFormat((interval, i) => { return interval % 1000 !== 0 ? ' ' : interval }).orient('bottom').ticks(ticks)) // render only thousand ticks
+          // .call(g => g.selectAll('text')
+          //   .attr('y', 4)
+          //   .attr('dx', -4)) // shifts text to the left. How to align properly?
+
+        axis.selectAll('.tick')
+          .attr('stroke', 'gray')
+          .attr('x1', this.x)
+          .attr('x2', this.x)
+          .attr('y2', -1)
+          .attr('y1', 2)
+          .attr('stroke-width', '1')
+      } else if (protein.length > 200) {
+        var smallAxis = svg.append('g')
+          .attr('transform', 'translate(' + offset + ',' + (this.y - 14) + ')')
+          .style('fill', 'gray')
+          .attr('class', 'rowContent')
+          .call(this.d3.svg.axis().scale(this.d3.scale.linear().domain([0, 1]).range([1, width + triangleSize - 1])).tickSize(2, 1).orient('top').ticks(2).tickFormat(''))
+
+        smallAxis.selectAll('.tick')
+          .attr('stroke', 'gray')
+          .attr('x1', this.x)
+          .attr('y1', 4) // height of the ticks
+          .attr('y2', -1) // displacement from the line
+          .attr('stroke-width', '1')
+
+        var axisLabel = svg.append('text') // set this as var la
+          .attr('x', this.x + 0.5 * (width + triangleSize))
+          .attr('y', this.y - 14)
+          .attr('dy', '.35em')
+          .style('text-anchor', 'middle')
+          .attr('transform', 'translate(' + offset + ',0)')
+          .style('fill', 'gray')
+          .style('font-size', '10px')
+          .attr('class', 'rowContent')
+          .text(protein.length)
+
+        svg.append('rect', 'text') // draw a white rectangle
+          .datum(function () { return axisLabel.node().getBBox() })
+          .attr('x', function (d) { return d.x - 2 })
+          .attr('y', function (d) { return d.y })
+          .style('fill', this.backgroundColour)
+          .attr('transform', 'translate(' + offset + ',0)')
+          .attr('class', 'rowContent')
+          .attr('width', function (d) { return d.width + 2 * 2 })
+          .attr('height', function (d) { return d.height })
+
+        axisLabel.node().parentNode.appendChild(axisLabel.node()) // put label above rectangle
+      }
+    },
+
+    drawFragments (svg, fragments, scale) {
       if (fragments.length !== 0) {
         this.y = this.y + 30
       }
@@ -376,9 +282,10 @@ export default {
         var protein = {
           name: fragments[i].Name,
           primary_accession: fragments[i].Primary_Accession,
-          synonym: [fragments[i].Short_Name],
+          synonym: [fragments[i].Short_Name].concat(fragments[i].Short_Name.match(/[0-9]+/g)),
           pdb: null,
-          dark: true
+          dark: true,
+          id: fragments[i].Primary_Accession + '_' + fragments[i].Short_Name.match(/[0-9]+/g)[0]
         }
         var len = fragments[i].Stop - fragments[i].Start
         var height = 20 // the height of the rectangles, and the length of the triangle that is appended. Triangle width is 2*height
@@ -388,8 +295,161 @@ export default {
           triangleSize = this.getResidueSize(scale, len) // scale down the triangle
           width = 0
         }
-        this.drawArrow(svg, protein, width, height, triangleSize, offset)
-        offset = offset + width + triangleSize
+        if (i === 0) {
+          this.drawArrow(svg, protein, width, height, triangleSize, offset)
+          offset = offset + width + triangleSize
+        // if the start of the fragment is after the end of the previous fragment (not occupying the same space)
+        } else if (fragments[i].Start >= fragments[i - 1].Stop) {
+          this.drawArrow(svg, protein, width, height, triangleSize, offset) // draw the fragment
+          offset = offset + width + triangleSize
+        }
+      }
+    },
+
+    renderImage (svg, protein, width, height, offset) {
+      // Add the image of the protein if one exists
+      // TODO: trim images and crop them down.
+      var imgYOffset = 30
+      var imgSize = width * 2 < 200 ? width * 2 : 200
+      var img = svg.append('svg:image') // add the image of the protein
+        .attr('x', width * 0.5)
+        .attr('y', this.y + height)
+        .attr('transform', 'translate(' + (offset - imgSize / 2) + ',' + imgYOffset + ')') // - half its width to have image anchor center
+        .attr('width', imgSize)
+        .attr('height', imgSize)
+
+      if (!protein.dark && this.organismId === '2697049') {
+        img.attr('xlink:href', '../images/covid19/WEBP/' + protein.primary_accession + '_w500.webp')
+      } else if (!protein.dark) {
+        img.attr('xlink:href', 'https://aquaria.ws:8080/image/' + protein.primary_accession + '/' + protein.pdb + '?color=0x000000&alpha=0')
+      } else {
+        img.attr('xlink:href', '../images/covid19/unknown-structure_1000.png')
+      }
+      return imgYOffset
+    },
+
+    drawMatchingStructures (svg, protein, width, height, triangleSize, offset, imgYOffset) {
+      // draw the bottom matching structures axis
+      if (!protein.dark) {
+        var matchingScale = this.d3.scale.linear()
+          .domain([0, 2]) // This is what is written on the Axis: from 0 to length of residue
+          .range([2, width + triangleSize - 2]) // This is where the axis is placed: from start to end of triangle. Add a tiny bit of spacing between the two
+          .nice()
+
+        var matchingAxis = svg
+          .append('g')
+          .attr('transform', 'translate(' + offset + ',' + (this.y + height + 10) + ')') // This controls the vertical position of the Axis
+          .attr('style', '')
+          .style('fill', this.green)
+          .style('font-size', '10px')
+          .call(this.d3.svg.axis().scale(matchingScale).tickSize(0, 1).tickFormat('').orient('bottom').ticks(2)) // render only thousand ticks
+
+        // Create a long down tick in the centre of the bottom axis
+        this.d3.select(matchingAxis.selectAll('.tick')[0][1])
+          .attr('stroke', this.green)
+          .attr('x1', this.x)
+          .attr('x2', this.x)
+          .attr('y2', 0)
+          .attr('y1', imgYOffset)
+          .attr('stroke-width', '1')
+
+        var matchingLabel = svg.append('text') // set this as var la
+          .attr('x', this.x + 0.5 * (width + triangleSize))
+          .attr('y', this.y + height + imgYOffset + 5) // the axis offset from matchingAxis
+          .attr('dy', '.35em')
+          .style('text-anchor', 'middle')
+          .attr('transform', 'translate(' + offset + ',0)')
+          .style('fill', 'white')
+          .style('font-size', '12px')
+          .text(this.countMatchingStructures(protein.clusters))
+
+        svg.append('rect', 'text') // draw a green round rectangle
+          .datum(function () { return matchingLabel.node().getBBox() })
+          .attr('x', function (d) { return d.x - 4 })
+          .attr('y', function (d) { return d.y })
+          .attr('rx', 6)
+          .attr('ry', 10)
+          .style('fill', this.green)
+          .attr('transform', 'translate(' + offset + ',0)')
+          .attr('width', function (d) { return d.width + 4 * 2 })
+          .attr('height', function (d) { return d.height })
+
+        matchingLabel.node().parentNode.appendChild(matchingLabel.node()) // put label above rectangle
+      }
+    },
+
+    drawExpandButton (svg) {
+      // Create the expand and collapse button
+      var expandButton = svg.append('circle')
+        .attr('cx', 15)
+        .attr('cy', 30)
+        .attr('stroke', 'gray')
+        .attr('fill', '#69b3a2')
+        .attr('r', 12)
+        .attr('id', 'expand')
+
+      if (window.innerHeight > window.innerWidth) {
+        expandButton.attr('display', 'none')
+      }
+
+      expandButton.on('click', function (d, i) { // TODO COLLAPSE AND EXPAND : Change the initial display of open
+        var d3 = require('d3')
+        // var collapsedElementSize = 100
+        // const vw = document.documentElement.clientWidth
+        // const vh = document.documentElement.clientHeight
+        // var viewboxHeight = vh * 0.9 / (vw / 960) - collapsedElementSize // account for the 10% header bar
+        if (this.parentNode.className.baseVal.split(' ').indexOf('open') > -1) {
+          d3.select(this.parentNode).classed('open', false)
+          d3.selectAll('.row').transition().duration(1000).attr('viewBox', '0 0 960 45')
+          d3.selectAll('.rowContent').transition().duration(1000).attr('opacity', 0)
+        } else {
+          d3.selectAll('.row').classed('open', false)
+          d3.selectAll('.row').transition().duration(1000).attr('viewBox', '0 0 960 45')
+          d3.selectAll('.rowContent').transition().duration(1000).attr('opacity', 0)
+
+          d3.select(this.parentNode).classed('open', true)
+          // d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 ' + viewboxHeight)
+          d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 320')
+          d3.selectAll('.open .rowContent').transition().duration(1000).attr('opacity', 1)
+        }
+      })
+    },
+
+    initialDisplay (isResize) { // Change the display if the window is resized
+      // var collapsedElementSize = 100
+      // const vw = document.documentElement.clientWidth
+      // const vh = document.documentElement.clientHeight
+      // var viewboxHeight = vh * 0.9 / (vw / 960) - collapsedElementSize // account for the 10% header bar
+      // if (viewboxHeight < 45) { viewboxHeight = 45 }
+      if (window.innerHeight > window.innerWidth) {
+        this.d3.selectAll('circle#expand').attr('display', 'none')
+        this.d3.selectAll('.row').classed('open', true)
+        // this.d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 ' + (vh * 0.9 / (vw / 960)) / 3)
+        this.d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 320')
+        this.d3.selectAll('.open .rowContent').transition().duration(1000).attr('opacity', 1)
+      } else if (window.innerHeight < 0.25 * window.innerWidth) {
+        this.d3.selectAll('circle#expand').attr('display', 'block')
+        this.d3.selectAll('.row').classed('open', false)
+        this.d3.selectAll('.row').transition().duration(500).attr('viewBox', '0 0 960 45')
+        this.d3.selectAll('.rowContent').transition().duration(500).attr('opacity', 0)
+      } else {
+        var opened = this.d3.select('.open')
+        this.d3.selectAll('circle#expand').attr('display', 'block')
+        this.d3.selectAll('.row').classed('open', false)
+        this.d3.selectAll('.row').transition().duration(500).attr('viewBox', '0 0 960 45')
+        this.d3.selectAll('.rowContent').transition().duration(500).attr('opacity', 0)
+
+        if (!isResize) {
+          this.d3.select('.row').classed('open', true)
+          this.d3.selectAll('.open').transition().duration(500).attr('viewBox', '0 0 960 320')
+          // this.d3.selectAll('.open').transition().duration(500).attr('viewBox', '0 0 960 ' + viewboxHeight)
+          this.d3.selectAll('.open .rowContent').transition().duration(500).attr('opacity', 1)
+        } else {
+          opened.classed('open', true)
+          opened.transition().duration(1000).attr('viewBox', '0 0 960 320')
+          // opened.transition().duration(1000).attr('viewBox', '0 0 960 ' + viewboxHeight)
+          this.d3.selectAll('.open .rowContent').transition().duration(500).attr('opacity', 1)
+        }
       }
     },
 
@@ -580,10 +640,15 @@ export default {
 
       for (let index = 0; index < allStructures.length; index++) {
         allStructures[index].count = 0
-        purl = `${window.BACKEND}/get_3D_alignment?selector[]=${allStructures[index].primary_accession}`
+
+        var loadRequest = {
+          selector: [allStructures[index].primary_accession]
+        }
+        purl = `${window.BACKEND}/get_3D_alignment`
         await axios({
           method: 'get',
-          url: purl
+          url: purl,
+          params: loadRequest
         })
           .then(response => {
             var sequence = ''
@@ -606,7 +671,6 @@ export default {
       return proteins
     },
 
-    // TODO: if clean proteins was split, get fragments but also be split! Need to do this before the cleanProteins step
     async getFragments (id) {
       var posUrl = `${window.BACKEND}/getProteinFragments/${id}`
       var r = []
@@ -687,7 +751,7 @@ export default {
         grid-gap: 6px;
         background: #cccccc;
         padding: 6px;
-        height: 90%;
+        height: 95%;
         margin: 0 auto;
         overflow: scroll;
     }
@@ -695,7 +759,7 @@ export default {
     #container {
         grid-template-columns: repeat(1, 1fr);
         grid-template-rows: repeat(3, 1fr);
-        height: 90%;
+        height: 95%;
     }
 
     .cell {
@@ -757,24 +821,4 @@ export default {
         z-index:1;
         font-size: inherit;
     }
-
-    /* iframe#slide{
-      height:91.7vh;
-      width: 100%;
-      border: none;
-    } */
-
-    #graph{
-      width: 100vw;
-      position: absolute;
-    }
-
-  .v-lazy-image {
-  filter: blur(10px);
-  transition: filter 1.5s;
-  }
-
-  .v-lazy-image-loaded {
-    filter: blur(0);
-  }
 </style>
