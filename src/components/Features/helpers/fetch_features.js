@@ -9,6 +9,7 @@ var handleCath = require('./handleCath')
 var handleCath_covid = require('./handleCath_covid')
 var handleMyVariantInfo = require('./handleMyVariantInfo_v2')
 var handleFunVar_cancer = require('./handleFunVar_cancer.js')
+var handleFunVar_covid = require('./handleFunVar_covid.js')
 var consequence = require('./consequentInfo.js')
 var grantham = require('./getGranthamConservation.js')
 
@@ -60,7 +61,9 @@ var servers = [
     id: 'FunVar',
     Server: 'FunVar',
     URL_CATH_v2: window.location.protocol + '//www.cathdb.info/version/v4_2_0/api/rest/uniprot_to_funfam/',
-    URL_funVar_cancer: window.location.protocol + '//funvar.cathdb.info/api/nfe/version/v4_2_0?funfam_id='
+    URL_funVar_cancer: window.location.protocol + '//funvar.cathdb.info/api/nfe/version/v4_2_0?funfam_id=',
+    URL_CATH_covid: window.location.protocol + '//aquaria.ws/covid19cath/',
+    URL_funVar_covid: window.location.protocol + '//funvar.cathdb.info/api/nfe/version/v4_3_0?funfam_id=',
   },
   /* {
 			"id": 'myVariant',
@@ -802,7 +805,13 @@ function getJsonFromUrl (requestedFeature, url, primary_accession, featureCallba
       if (requestedFeature == 'FunVar') {
         // console.log("FunVar response is ");
         // console.log(response);
-        handleFunVar_cancer(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues)
+        handleFunVar_cancer.handleFunVar_cancer(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues)
+      }
+
+      if (requestedFeature == 'FunVarCovid'){
+        console.log('FunVar response is ');
+        console.log(response);
+        handleFunVar_covid(response, getJsonFromUrl, validateAquariaFeatureSet, primary_accession, featureCallback, variantResidues)
       }
 
       if (requestedFeature == 'myVariant.info') {
@@ -882,17 +891,22 @@ var processNextServer = function (primary_accession,
 			else {
       // console.log('^^ Failed to fetch item: err=', err);
       // console.log('Now fetching CATH .... ')
-      getJsonFromUrl(servers[currentServer].id, servers[currentServer].URL + primary_accession + '?content-type=application/json', primary_accession, featureCallback, validateAquariaFeatureSet)
-      featureCallback(aggregatedAnnotations, extServerIds_forLoading)
-      processNextServer(primary_accession,
-        featureCallback)
+        getJsonFromUrl(servers[currentServer].id, servers[currentServer].URL + primary_accession + '?content-type=application/json', primary_accession, featureCallback, validateAquariaFeatureSet)
+        featureCallback(aggregatedAnnotations, extServerIds_forLoading)
+        processNextServer(primary_accession,
+          featureCallback)
       }
     } else if (servers[currentServer].id == 'FunVar') {
       if (primary_accession == 'P0DTC1' || primary_accession == 'P0DTC2' || primary_accession == 'P0DTC7' || primary_accession == 'P0DTD1') {
         // FunVar covid
+        getJsonFromUrl('FunVarCovid', servers[currentServer].URL_CATH_covid + primary_accession + '?content-type=application/json', primary_accession, featureCallback, validateAquariaFeatureSet)
+        featureCallback(aggregatedAnnotations, extServerIds_forLoading)
+        processNextServer(primary_accession,
+          featureCallback)
+
 	 		} else {
         // FunVar cancer
-        getJsonFromUrl(servers[currentServer].id, servers[currentServer].URL_CATH_v2 + primary_accession + '?content-type=application/json', primary_accession, featureCallback, validateAquariaFeatureSet)
+        getJsonFromUrl(servers[currentServer].id, servers[currentServer].URL_aCATH_v2 + primary_accession + '?content-type=application/json', primary_accession, featureCallback, validateAquariaFeatureSet)
         featureCallback(aggregatedAnnotations, extServerIds_forLoading)
         processNextServer(primary_accession,
           featureCallback)
