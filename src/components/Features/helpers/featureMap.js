@@ -124,7 +124,7 @@ export function drawTrack (datum, svg, extServerIds_) {
       // console.log(features[o][p])
 
       if (firstSpecifiedPos == -1){
-        window.AQUARIA.ifUrlHasVarExtractInfo().then(function (varRes) {
+        window.AQUARIA.ifUrlHasVarExtractInfo2().then(function (varRes) {
           Object.keys(varRes).forEach(function(aRes, aRes_i){
             // console.log('aRes.order is ' + varRes[aRes].order)
             if (varRes[aRes].order == 0){
