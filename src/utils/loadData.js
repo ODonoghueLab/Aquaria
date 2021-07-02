@@ -5,6 +5,7 @@ import * as textpanel from '../components/InfoAbout/helpers/textpanels'
 import ShowMatchingStructures from '../components/MatchingStructures/helpers/show_matching_structures'
 import showExpandedCluster from '../components/MatchingStructures/helpers/show_expanded_clusters'
 import Store from '../store/index'
+import * as fetchFeature from '../components/Features/helpers/fetch_features'
 // import ifUrlHasVarExtractInfo from '../components/Features/helpers/fetch_features' // eslint-disable-line
 // const ff = require('../components/Features/helpers/fetch_features.js') // eslint-disable-line
 
@@ -34,9 +35,9 @@ export async function loadAccession (primaryAccession, autoSelectPDB, autoSelect
   window.AQUARIA.prefferedChain = [] // Set preferred Chain
   // window.AQUARIA.prefferedChain.push(autoSelectChain || '')
   var urlParams = window.location.href.substr(window.location.origin.length + window.location.pathname.length)
-  if (window.AQUARIA.orgName) {
+  if (Store.state.Organism) {
     history.pushState(primaryAccession, document.title, '/' +
-     window.AQUARIA.orgName + '/' + window.AQUARIA.Gene + pdbParam + chainParam + urlParams)
+    Store.state.Organism + '/' + Store.state.Gene + pdbParam + chainParam + urlParams)
   } else {
     history.pushState(primaryAccession, document.title, '/' +
       primaryAccession + pdbParam + (chainParam || '') + urlParams)
@@ -71,7 +72,7 @@ export async function loadAccession (primaryAccession, autoSelectPDB, autoSelect
 
   var matches = await getMatchingStructures(loadRequest)
 
-  var varRes = await window.AQUARIA.ifUrlHasVarExtractInfo()
+  var varRes = await fetchFeature.ifUrlHasVarExtractInfo()
   if (varRes) {
     var data = await getTheBestStructureForVar(pdbParam, chainParam, loadRequest.selector[0], varRes)
     matches.Selected_PDB = data.Selected_PDB
@@ -241,11 +242,19 @@ async function getTheBestStructureForVar (pdbParam, chainParam, uniprotId, varRe
   if (sortedKeys.length === 0) {
     return null
   }
+  var varResParam = {}
+  var key = Object.keys(varRes)[0]
+  varResParam[key] = {}
+  varResParam[key].newAas = varRes[key].newAas
+  varResParam[key].defaultDesc = varRes[key].defaultDesc
+  varResParam[key].oldAa = varRes[key].oldAa
+  varResParam[key].order = varRes[key].order
+
   var loadRequest = {
     selector: [uniprotId],
     selectPDB: pdbParam,
     selectChain: chainParam,
-    varRes: varRes,
+    varRes: varResParam,
     sortedKeys: sortedKeys,
     variantStructs: window.AQUARIA.variantStructs
   }

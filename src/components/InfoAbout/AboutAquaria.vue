@@ -63,7 +63,9 @@ export default {
       return {
         message: store.state.message,
         error: store.state.error,
-        hash: store.state.hash
+        hash: store.state.hash,
+        Organism: store.state.Organism,
+        Gene: store.state.Gene
       }
     }
   },
@@ -73,7 +75,7 @@ export default {
       if (!window.AQUARIA.currentMember) {
         setTimeout(_this.waitForElement, 50)
       } else {
-        _this.title = window.AQUARIA.Organism.Name + ' ' + window.AQUARIA.Gene + ' aligned onto ' + window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain
+        _this.title = _this.data.Organism + ' ' + _this.data.Gene + ' aligned onto ' + window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain
         _this.issues = 'https://github.com/aqclient/dev.aqclient.github.io/issues/new?title=Problem with this page&labels=bug&body=<a href="' + encodeURIComponent(window.location.href) + '">' + _this.title + '</a>'
       // proposed code change
       }

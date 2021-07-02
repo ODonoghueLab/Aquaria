@@ -49,7 +49,9 @@ export default {
   computed: {
     data () {
       return {
-        hash: store.state.hash
+        hash: store.state.hash,
+        Gene: store.state.Gene,
+        Organism: store.state.Organism
       }
     }
   },
@@ -66,8 +68,8 @@ export default {
         window.AQUARIA.short_moleculeName = shortName
 
         if (accession && pdbId && score) {
-          _this.organism_name = window.AQUARIA.Organism.Name
-          _this.primary_accession = window.AQUARIA.Gene
+          _this.organism_name = _this.data.Organism
+          _this.primary_accession = _this.data.Gene
           _this.text = 'aligned onto'
           _this.pdb = pdbId + '-' + chainId
 
@@ -76,7 +78,7 @@ export default {
           // $('#help3D').show().parent().attr('onmouseenter', "AQUARIA.explainTitle('" + accession + "','" + window.AQUARIA.preferred_protein_name + "','" + shortName + "','" + pdbId + "','" + chainId +
           //   "','" + score + "','" + evalue + "');")
         } else { // DNA or RNA (no accession)
-          _this.organism_name = window.AQUARIA.Organism.Name
+          _this.organism_name = _this.data.Organism
           _this.primary_accession = shortName
           _this.text = 'structure from'
           _this.pdb = pdbId + '-' + chainId
@@ -162,7 +164,7 @@ export default {
       } else {
         var residues = document.querySelector('#threeDSpan-inner-jolecule-soup-display-canvas-wrapper-selection').innerText.split('\n')
         var pdb = window.AQUARIA.currentMember.pdb_id + '-' + window.AQUARIA.currentMember.pdb_chain + ':'
-        var accession = window.AQUARIA.Gene + ':'
+        var accession = _this.data.Gene + ':'
         _this.seqRes = residues[1].split(accession)[1]
         _this.structRes = residues[0].split(pdb)[1]
         // _this.alignment = window.AQUARIA.panel3d.joleculeAlignment.copyToClipboard()

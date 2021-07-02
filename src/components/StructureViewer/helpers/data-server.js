@@ -21,8 +21,8 @@ export default class DataServer {
         showHelp()
       }
       localStorage.setItem('LastSuccess', window.location.pathname)
-      if (!window.AQUARIA.pdbTopTen.previousLookupByName(AQUARIA.Organism.Name + '_' + window.AQUARIA.Gene)) {
-        window.AQUARIA.pdbTopTen.submitFired(AQUARIA.Organism.Name + '_' + window.AQUARIA.Gene, window.AQUARIA.protein_primaryAccession[0], window.AQUARIA.currentMember.pdb_id)
+      if (!window.AQUARIA.pdbTopTen.previousLookupByName(Store.state.Organism + '_' + Store.state.Gene)) {
+        window.AQUARIA.pdbTopTen.submitFired(Store.state.Organism + '_' + Store.state.Gene, window.AQUARIA.protein_primaryAccession[0], window.AQUARIA.currentMember.pdb_id)
       } else {
         window.AQUARIA.pdbTopTen.updatePDB(window.AQUARIA.protein_primaryAccession[0], window.AQUARIA.currentMember.pdb_id)
       }

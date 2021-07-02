@@ -1,9 +1,10 @@
 var LRU = require('lru-cache')
+var URL = require('../../../utils/url')
 
 var TopTen = function (id, MAX_SIZE) {
   var that = this
   this.id = id
-  if (AQUARIA.getUrlParameter('clearCache')) {
+  if (URL.getUrlParameter('clearCache')) {
 	  localStorage.removeItem(this.id)
   }
   var existing = localStorage.getItem(this.id)

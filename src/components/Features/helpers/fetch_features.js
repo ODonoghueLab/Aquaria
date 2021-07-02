@@ -11,6 +11,9 @@ var handleMyVariantInfo = require('./handleMyVariantInfo_v2')
 var handleFunVar_cancer = require('./handleFunVar_cancer.js')
 var consequence = require('./consequentInfo.js')
 var grantham = require('./getGranthamConservation.js')
+var URL = require('../../../utils/url')
+var cur_ann_type
+var consInfo
 
 function getRequestProtocol () {
   const arr = window.location.href.split(/\:+/)
@@ -177,27 +180,12 @@ var extServerIds_forLoading = {
 var djb2Code = function (str, bins) {
   var hash = 5381
   for (var i = 0; i < str.length; i++) {
-    char = str.charCodeAt(i)
+    var char = str.charCodeAt(i)
     hash = ((hash << 5) + hash) + char /* hash * 33 + c */
   }
 
   // console.log("POLICY " + hash + " bins " + (hash % bins));
   return Math.abs(hash % bins)
-}
-
-AQUARIA.getUrlParameter = function (sParam) {
-  if (window.location.search.length > 0) {
-	  var sPageURL = window.location.search.substring(1) // no .toLowerCase() here (this affects the value!)
-	  var sURLVariables = sPageURL.split('&')
-	  sParam = sParam.toLowerCase()
-	  for (var i = 0; i < sURLVariables.length; i++) {
-      var sParameterName = sURLVariables[i].split('=')
-      if (sParameterName[0].toLowerCase() === sParam) {
-		  return decodeURIComponent(sParameterName[1]) // the value might have been encoded
-      }
-	  }
-  }
-  return null
 }
 
 function capitaliseFirstLetter (string) {
@@ -698,22 +686,22 @@ function getAllFeatureNamesRequested (primary_accession) {
   const features = []
 
   // URL
-  if (AQUARIA.getUrlParameter('features') != '') {
+  if (URL.getUrlParameter('features') != '') {
     features.push('features')
   };
 
   // Uniprot
-  if (AQUARIA.getUrlParameter('UniprotFeatures') != '') {
+  if (URL.getUrlParameter('UniprotFeatures') != '') {
     features.push('UniprotFeatures')
   };
 
   // PredictProtein
-  if (AQUARIA.getUrlParameter('PredictProtein') != '') {
+  if (URL.getUrlParameter('PredictProtein') != '') {
     features.push('PredictProtein')
   };
 
   // Snap2
-  if (AQUARIA.getUrlParameter('SNAP2') != '') {
+  if (URL.getUrlParameter('SNAP2') != '') {
     features.push('SNAP2')
   };
 
@@ -726,7 +714,7 @@ function getAllFeatureNamesRequested (primary_accession) {
   return (features)
 }
 
-function fetch_annotations (primary_accession,
+export function fetch_annotations (primary_accession,
   featureCallback) {
   // get fresh set of annotations as well
   // console.log("fetch_features.fetch_annotations: reset DAS annotations");
@@ -1025,8 +1013,8 @@ function toDescAndAddToAdedFeat () { // convert to description and add to added 
           // console.log("An aggregate annotation of interest is ");
           // console.log(aggregatedAnnotations[i].Tracks);
 
-          for (j = 0; j < aggregatedAnnotations[i].Tracks.length; j++) {
-            for (k = 0; k < aggregatedAnnotations[i].Tracks[j].length; k++) {
+          for (var j = 0; j < aggregatedAnnotations[i].Tracks.length; j++) {
+            for (var k = 0; k < aggregatedAnnotations[i].Tracks[j].length; k++) {
               // console.log(aggregatedAnnotations[i].Tracks[j][k]);
 
               if (parseInt(residue) >= parseInt(aggregatedAnnotations[i].Tracks[j][k].start) && parseInt(residue) <= parseInt(aggregatedAnnotations[i].Tracks[j][k].end)) {
@@ -1330,7 +1318,7 @@ function parseFeatures (primary_accession, categories, server, featureCallback, 
   finishServer(clustered_annotations, primary_accession, featureCallback)
 }
 
-AQUARIA.ifUrlHasVarExtractInfo2 = function(){
+export function ifUrlHasVarExtractInfo2 (){
   return new Promise(function(resolve, reject){
     // console.log("In the magic function");
     var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
@@ -1347,7 +1335,7 @@ AQUARIA.ifUrlHasVarExtractInfo2 = function(){
 
         const featAndDesc = extractDescription(feature)
         const consInfoRes = consequence.getConsInfo(featAndDesc.featStr)
-        const consInfo = consInfoRes.newResidues;
+        consInfo = consInfoRes.newResidues;
         featAndDesc.featStr = consInfoRes.theOrigFeatStr;
 
         let counter =0;
@@ -1385,7 +1373,8 @@ AQUARIA.ifUrlHasVarExtractInfo2 = function(){
   })
 }
 
-AQUARIA.ifUrlHasVarExtractInfo = async function(){
+// AQUARIA.ifUrlHasVarExtractInfo = async function(){
+export async function ifUrlHasVarExtractInfo () {
     // console.log("In the magic function");
     var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
     var searchParam = decodeURIComponent(window.location.search.split('?')[1])
@@ -1401,7 +1390,7 @@ AQUARIA.ifUrlHasVarExtractInfo = async function(){
 
         const featAndDesc = extractDescription(feature)
         const consInfoRes = consequence.getConsInfo(featAndDesc.featStr)
-        const consInfo = consInfoRes.newResidues;
+        consInfo = consInfoRes.newResidues;
         featAndDesc.featStr = consInfoRes.theOrigFeatStr;
 
         let counter =0;
@@ -1426,14 +1415,14 @@ AQUARIA.ifUrlHasVarExtractInfo = async function(){
           counter = counter + 1;
         }
 
-        if (feature_i == features.length - 1){
-          console.log("In the ifUrlHasVar_extractInfo fn: ");
-          console.log(variantResidues);
-          console.log(Object.keys(variantResidues))
-          return variantResidues
-        }
+        // if (feature_i == features.length - 1){
+        //   console.log("In the ifUrlHasVar_extractInfo fn: ");
+        //   console.log(variantResidues);
+        //   console.log(Object.keys(variantResidues))
+        //   return variantResidues
+        // }
       })
-
+      return variantResidues
     }
 }
 
@@ -1441,7 +1430,7 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
   var featureRegex = new RegExp(/(p\.)?[A-Za-z]+[0-9]+[A-Za-z\*\_\?\[\]\(\)\%\=]+/)
   var searchParam = decodeURIComponent(window.location.search.split('?')[1])
 
-  var url = AQUARIA.getUrlParameter('features')
+  var url = URL.getUrlParameter('features')
   if (url) {
     axios({
       method: 'get',
@@ -1641,7 +1630,7 @@ function checkIfInVal_ig (oneLetterCode) {
  */
 function fetch_uniprot (primary_accession, server, featureCallback) {
   console.log('fetch_features.fetch_uniprot fetching features from uniprot...')
-  url = 'https://www.uniprot.org/uniprot/' + primary_accession + '.xml'
+  var url = 'https://www.uniprot.org/uniprot/' + primary_accession + '.xml'
   $.ajax({
     url: url,
     type: 'GET',
@@ -1705,5 +1694,3 @@ function extractVariantInfoFromUniprot (uniprotData) {
     }
   })
 }
-
-exports.fetch_annotations = fetch_annotations

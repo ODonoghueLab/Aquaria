@@ -2,6 +2,7 @@ import d3 from 'd3'
 import $ from 'jquery'
 import * as Panels from '../../AquariaLayout/helpers/hidePanels'
 import * as common from '../../AquariaLayout/helpers/common'
+import * as fetchFeature from './fetch_features'
 var Highcharts = require('./highstocks.js')
 
 export function createFeatureMap (datum, extServerIds_) {
@@ -124,7 +125,7 @@ export function drawTrack (datum, svg, extServerIds_) {
       // console.log(features[o][p])
 
       if (firstSpecifiedPos == -1){
-        window.AQUARIA.ifUrlHasVarExtractInfo2().then(function (varRes) {
+        fetchFeature.ifUrlHasVarExtractInfo2().then(function (varRes) {
           Object.keys(varRes).forEach(function(aRes, aRes_i){
             // console.log('aRes.order is ' + varRes[aRes].order)
             if (varRes[aRes].order == 0){

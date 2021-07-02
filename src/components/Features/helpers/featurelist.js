@@ -11,6 +11,7 @@ var d3 = require('d3')
 var _ = require('lodash')
 var $ = require('jquery')
 var featureMap = require('./featureMap')
+var URL = require('./../../../utils/url')
 var Panels = require('../../AquariaLayout/helpers/hidePanels')
 var extServerIds_
 
@@ -250,7 +251,7 @@ var updateFeatureUI = function (featureList, extServerIds_forLoading) {
   var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
   var searchParam = window.location.search.split('?')[1]
   // searchParam = window.location.search.split('=')[0]
-  if ((AQUARIA.getUrlParameter('features') || featureRegex.test(searchParam)) && !AQUARIA.addedFeature) {
+  if ((URL.getUrlParameter('features') || featureRegex.test(searchParam)) && !AQUARIA.addedFeature) {
     waitForElement()
   }
 }

@@ -9,7 +9,9 @@ export default new Vuex.Store({
     url: window.location.protocol + '//' + window.location.hostname,
     hash: '',
     alignment: '',
-    organism: '',
+    Organism: '',
+    OrgID: '',
+    Gene: '',
     error: '',
     errorMsg: '',
     helpTitle: 'Aquaria Help',
@@ -24,6 +26,15 @@ export default new Vuex.Store({
     },
     setErrorTitle (state, value) {
       state.error = value
+    },
+    setOrganism (state, value) {
+      state.Organism = value
+    },
+    setOrgID (state, value) {
+      state.OrgID = value
+    },
+    setGene (state, value) {
+      state.Gene = value
     },
     setErrorMsg (state, value) {
       state.errorMsg = value

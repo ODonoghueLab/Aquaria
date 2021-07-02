@@ -14,6 +14,7 @@ import axios from 'axios'
 import * as textpanel from '../InfoAbout/helpers/textpanels'
 // import * as resizeApp from '../AquariaLayout/helpers/resize_app'
 // import $ from 'jquery'
+import store from '../../store/index'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import '@trevoreyre/autocomplete-vue/dist/style.css'
 
@@ -27,15 +28,24 @@ export default {
       OrganismSynonyms: {}
     }
   },
+  computed: {
+    data () {
+      return {
+        OrgID: store.state.OrgID,
+        Organism: store.state.Organism
+      }
+    }
+  },
   methods: {
     getResultValue (result) {
       return result.value
     },
     handleSubmit (result) {
-      var AQUARIA = window.AQUARIA
+      var _this = this
+      // var AQUARIA = window.AQUARIA
       if (result.value &&
           result.value.indexOf('No organisms for: ') !== 0) {
-        if (result.id !== AQUARIA.Organism.ID) {
+        if (result.id !== _this.data.OrgID) {
           const url = `${window.BACKEND}/getOrganismSynonyms`
           axios({
             method: 'get',
@@ -46,7 +56,8 @@ export default {
           })
             .then(function (response) {
               const orgNames = response.data
-              AQUARIA.Organism.ID = result.id
+              store.commit('setOrgID', result.id)
+              // AQUARIA.Organism.ID = result.id
               localStorage.preferred_organism_name = result.value
               textpanel.displayOrgSynonyms(orgNames)
               document.querySelector('#organism_syn_input').setAttribute('size', result.value.length)
@@ -59,6 +70,7 @@ export default {
       this.$refs.autocomplete.value = ''
     },
     search (input) {
+      var _this = this
       var OrganismSynonyms = this.OrganismSynonyms
       // resizeApp.startLogoSpin()
       var labelValues
@@ -105,8 +117,8 @@ export default {
             })
         } else {
           labelValues = {
-            label: window.AQUARIA.Organism.Name,
-            value: window.AQUARIA.Organism.ID
+            label: _this.data.Organism,
+            value: _this.data.OrgID
           }
           resolve(labelValues)
         }

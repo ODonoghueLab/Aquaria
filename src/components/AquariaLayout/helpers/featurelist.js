@@ -8,6 +8,7 @@ var d3 = require('d3')
 var featureMap = require('../utils/featureMap')
 var Panels = require('../utils/matches_features_panels')
 var extServerIds_
+var URL = require('../../../utils/url')
 
 function createFeatureUI () {
   width = document.getElementById('structureviewer').offsetWidth -
@@ -247,7 +248,7 @@ var updateFeatureUI = function (featureList, extServerIds_forLoading) {
   var featureRegex = new RegExp(/[A-Z a-z]+[0-9]+[A-za-z]+/)
   var searchParam = window.location.search.split('?')[1]
   // searchParam = window.location.search.split('=')[0]
-  if ((AQUARIA.getUrlParameter('features') || featureRegex.test(searchParam)) && !AQUARIA.addedFeature) {
+  if ((URL.getUrlParameter('features') || featureRegex.test(searchParam)) && !AQUARIA.addedFeature) {
     waitForElement()
   }
 }

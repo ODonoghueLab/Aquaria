@@ -364,12 +364,15 @@ export function fetchSynonyms (proteinId) {
 export function displayOrgSynonyms (orgNames) {
   console.log('textpanels.displayOrgSynonyms: ' + orgNames.synonyms[0])
   const entries = orgNames.synonyms.length
-  AQUARIA.Organism = {}
-  AQUARIA.Organism.Name = orgNames.synonyms[entries - 1]
+  Store.commit('setOrganism', orgNames.synonyms[entries - 1])
+  // AQUARIA.Organism = {}
+  // AQUARIA.Organism.Name = orgNames.synonyms[entries - 1]
   if (orgNames.organism_id) {
-    AQUARIA.Organism.ID = orgNames.organism_id
+    Store.commit('setOrgID', orgNames.organism_id)
+    // AQUARIA.Organism.ID = orgNames.organism_id
   } else {
-    AQUARIA.Organism.ID = orgNames.synonyms[0]
+    Store.commit('setOrgID', orgNames.synonyms[0])
+    // AQUARIA.Organism.ID = orgNames.synonyms[0]
   }
   var onames = "<a href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=" + orgNames.synonyms[0] + "' title='Go to NCBI' target='_blank' >" + orgNames.synonyms[1] + '</a>'
   for (var n = 2; n < orgNames.synonyms.length; n++) { // omit first name (numeric ID)
@@ -433,7 +436,7 @@ export function displayProtSynonyms (data) {
         gnames = '<b>Gene:</b>&nbsp;'
       }
       gnames += "<a href='http://www.uniprot.org/uniprot/" + AQUARIA.protein_primary_accession + "' title='Go to UniProt'>" + gns[0] + '</a>'
-      AQUARIA.Gene = gns[0]
+      Store.state.Gene = gns[0]
       for (var i = 1; i < gns.length; i++) {
         gnames += ', ' + gns[i]
       }

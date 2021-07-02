@@ -22,6 +22,7 @@
 // This work is licensed under the terms of the GNU GPL version 2.
 
 import * as LoadAQUARIA from '../../../utils/loadData'
+import Store from '../../../store/index'
 window.AQUARIA = {}
 var AQUARIA = window.AQUARIA
 var jQuery = require('jquery')
@@ -245,7 +246,7 @@ var MAX_PROTEIN_HISTORY = 10;
               // pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
               history.pushState(null, sequences[0].primary_accession,
                 window.location.protocol + '//' + window.location.host +
-            '/' + AQUARIA.Organism.Name + '/' + AQUARIA.Gene + '/' +
+            '/' + Store.state.Organism + '/' + Store.state.Gene + '/' +
             pdb_id + '/' + (window.AQUARIA.prefferedChain[0] ? window.AQUARIA.prefferedChain[0] : pdb_chain[0]) + urlParams)
 
               function findPDBMember (pdbid, chain) {
@@ -435,10 +436,10 @@ var MAX_PROTEIN_HISTORY = 10;
   //
   // Authors: Sean O'Donoghue, Kenny Sabir, Christian Stolte, Julian Heinrich
   //
-  AQUARIA.initialisePanels = function (hasUrl) {
-    hasUrl = (typeof hasUrl === 'undefined') ? false : hasUrl
-    // the rest was commented out
-  }
+  // AQUARIA.initialisePanels = function (hasUrl) {
+  //   hasUrl = (typeof hasUrl === 'undefined') ? false : hasUrl
+  //   // the rest was commented out
+  // }
 
   domready(function () {
     if (window.threedViewer === 'applet') {
