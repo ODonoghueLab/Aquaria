@@ -8,7 +8,7 @@
       <p>To learn more, watch the<a href="https://www.youtube.com/watch?v=FAQ3yVGYSzY&t=306s" title="Watch on Youtube"> introductory video</a> or read the <a href="https://www.nature.com/articles/nmeth.3258">Nature Methods paper</a>.<br>
       To improve Aquaria, we encourage you to <a v-bind:href="issues" target="_blank" title="Go to Github">report issues</a>, <a :href="changes" title="Go to Github">propose code changes</a>, or <a href="mailto:contact@aquaria.app" title="Email us">contact us</a> regarding suggestions or collaboration.
       </p>
-      <div id="XRcontent">
+      <div id="XRcontent" v-if="!matrix">
         <XRButton />
       </div>
       <!-- <p><i>Last updated May, 2020. PDB entries released since then are not yet available in Aquaria.</i><p> -->
@@ -52,11 +52,16 @@ export default {
       issues: '',
       title: '',
       changes: 'https://github.com/aqclient/dev.aqclient.github.io/issues/new?labels=enhancement',
-      logo: require('../../assets/img/logo-large.png')
+      logo: require('../../assets/img/logo-large.png'),
+      matrix: true
     }
   },
   mounted () {
-    this.waitForElement()
+    var _this = this
+    if (!document.querySelector('#matrix')) {
+      _this.matrix = false
+      _this.waitForElement()
+    }
   },
   computed: {
     data () {

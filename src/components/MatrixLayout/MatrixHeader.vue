@@ -79,48 +79,45 @@ export default {
       document.querySelector('#selected').innerHTML = currentSelection
       document.querySelector('#idle').innerHTML = '| ' + previousSelection
       document.querySelector('#switch').style.display = 'none'
-      document.querySelector('.dimmer').remove()
+      document.querySelector('div.dimmer').classList.remove('show')
+      document.querySelector('div.dimmer').className += ' hide'
     },
     showSwitch: function () {
       // dim background
       document.querySelector('#switch').style.display = 'block'
-      if (document.getElementsByClassName('dimmer').length === 0) {
-        var elemDiv = document.createElement('div')
-        elemDiv.className = 'dimmer'
-        document.body.append(elemDiv)
-        document.querySelector('#switch').style.display = 'block'
-        document.querySelector('div.dimmer').addEventListener('click', function () {
-          document.querySelector('#switch').style.display = 'none'
-          window.AQUARIA.RemoveOverlay()
-        })
-      } else {
-        window.AQUARIA.RemoveOverlay()
+      if (document.querySelector('div.dimmer').classList.contains('hide')) {
+        document.querySelector('div.dimmer').classList.remove('hide')
+        document.querySelector('div.dimmer').className += ' show'
       }
+      document.querySelector('#switch').style.display = 'block'
+      document.querySelector('div.dimmer').addEventListener('click', function () {
+        document.querySelector('#switch').style.display = 'none'
+        document.querySelector('div.dimmer').classList.remove('show')
+        document.querySelector('div.dimmer').className += ' hide'
+      })
     },
     AboutAquaria: function () {
       window.history.replaceState({}, document.title, '#About')
       // dim background
-      document.querySelector('#about_overlay').style.display = 'block'
-      var Position = window.innerWidth / 2 - document.querySelector('#about_overlay').offsetWidth / 2
+      document.querySelector('#About').style.display = 'block'
+      var Position = window.innerWidth / 2 - document.querySelector('#About').offsetWidth / 2
       Position = Position + 'px'
-      document.querySelector('#about_overlay').style.left = Position
-      if (document.getElementsByClassName('dimmer').length === 0) {
-        var elemDiv = document.createElement('div')
-        elemDiv.className = 'dimmer'
-        document.body.append(elemDiv)
-        document.querySelector('#about_overlay').style.display = 'block'
-        document.querySelector('div.dimmer').addEventListener('click', function () {
-          if (document.querySelector('#graph').style.display === 'block') {
-            window.history.replaceState({}, document.title, '#Map')
-          } else {
-            window.history.replaceState({}, document.title, '#Matrix')
-          }
-          document.querySelector('#about_overlay').style.display = 'none'
-          window.AQUARIA.RemoveOverlay()
-        })
-      } else {
-        window.AQUARIA.RemoveOverlay()
+      document.querySelector('#About').style.left = Position
+      if (document.querySelector('div.dimmer').classList.contains('hide')) {
+        document.querySelector('div.dimmer').classList.remove('hide')
+        document.querySelector('div.dimmer').className += ' show'
       }
+      document.querySelector('#About').style.display = 'block'
+      document.querySelector('div.dimmer').addEventListener('click', function () {
+        if (document.querySelector('#graph').style.display === 'block') {
+          window.history.replaceState({}, document.title, '#Map')
+        } else {
+          window.history.replaceState({}, document.title, '#Matrix')
+        }
+        document.querySelector('#About').style.display = 'none'
+        document.querySelector('div.dimmer').classList.remove('show')
+        document.querySelector('div.dimmer').className += ' hide'
+      })
     }
   }
 }

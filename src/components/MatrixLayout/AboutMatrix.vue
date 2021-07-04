@@ -1,26 +1,28 @@
 <template>
     <div id="about_matrix">
         <div id="title_0">
-            <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay(0)" @mouseleave="resetPlay(0)" class='icon' id='play' v-bind:src="play"/></a>
-            <span id="Orgname_0" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'mobile'">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
-            <span id="Orgname_0" @click="showAbout" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
-             <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(0)" @mouseleave="resetPaper(0)" class='icon' id='paper' v-bind:src="document"/></a>
-            <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="info"/>
+            <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank" @mouseover="playHover = true" @mouseleave="playHover = false"><img class='icon' id='play' :src="play" v-if="!playHover"/><img class='icon' id='play' :src="activePlay" v-if="playHover"/></a>
+            <span id="Orgname_0" @mouseover="infoHover = true" @mouseleave="infoHover = false" v-if="$mq === 'mobile'">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
+            <span id="Orgname_0" @click="showAbout" @mouseover="infoHover = true" @mouseleave="infoHover = false" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
+             <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank" @mouseover="documentHover = true" @mouseleave="documentHover = false"><img class='icon' id='paper' :src="document" v-if="!documentHover"/><img class='icon' id='paper' :src="activeDocument" v-if="documentHover"/></a>
+            <!-- <img class='icon' id='help' @mouseover="activateOver" @click="showAbout" @mouseleave="resetOver" v-bind:src="info"/> -->
+            <a href="javascript:;" @mouseover="infoHover = true" @mouseleave="infoHover = false" @click="showAbout"><img class='icon' id='help' :src="info" v-if="!infoHover"/><img class='icon' id='help' :src="activeInfo" v-if="infoHover"/></a>
         </div>
         <div id="content">
             <div id="title">
-                <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank"><img @mouseover="activatePlay(1)" @mouseleave="resetPlay(1)" class='icon' id='play' v-bind:src="play"/></a>
-                <span id="Orgname" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'mobile'">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
-                <span id="Orgname" @mouseover="activateHelp" @mouseleave="resetOver" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
-                <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank"><img @mouseover="activatePaper(1)" @mouseleave="resetPaper(1)" class='icon' id='paper' v-bind:src="document"/></a>
-                <img class='icon' id='close' @mouseover="activateClose(1)" @mouseleave="resetClose(1)" @click="hideAbout()" v-bind:src="close"/>
+                <a title='Watch the introductory video' v-bind:href="'https://youtu.be/J2nWQTlJNaY'" target="_blank" @mouseover="playHover = true" @mouseleave="playHover = false"><img class='icon' id='play' :src="play" v-if="!playHover"/><img class='icon' id='play' :src="activePlay" v-if="playHover"/></a>
+                <span id="Orgname" @mouseover="infoHover = true" @mouseleave="infoHover = false" v-if="$mq === 'mobile'">{{ OrganismName }} PROTEIN STRUCTURES&nbsp;</span>
+                <span id="Orgname" v-if="$mq === 'laptop' || $mq === 'tablet'">STRUCTURAL MODELS OF {{ OrganismName }} PROTEINS&nbsp;</span>
+                <a title="Read our bioRxiv preprint" v-bind:href="'https://doi.org/10.1101/2020.07.16.207308'" target="_blank" @mouseover="documentHover = true" @mouseleave="documentHover = false"><img class='icon' id='paper' :src="document" v-if="!documentHover"/><img class='icon' id='paper' :src="activeDocument" v-if="documentHover"/></a>
+                <a href="javascript:;" @mouseover="closeHover = true" @mouseleave="closeHover = false" @click="hideAbout"><img class='icon' id='close' :src="close" v-if="!closeHover"/><img class='icon' id='help' :src="activeClose" v-if="closeHover"/></a>
+                <!-- <img class='icon' id='close' @mouseover="activateClose(1)" @mouseleave="resetClose(1)" @click="hideAbout()" v-bind:src="close"/> -->
             </div>
             <div>
             <p>This page summarizes all available 3D structural information for all proteins comprising the {{ OrganismName }} virus (SARS-CoV-2).
               <!-- (a.k.a. {{ this.synonymsString }} ). -->
             </p>
             <p>
-            The page gives access to 872 structural models generated by finding all sequence regions with detectable similarity to any currently published 3D structure.
+            The page gives access to 2,060 structural models generated by finding all sequence regions with detectable similarity to any currently published 3D structure.
             <!-- For each protein, structural models were generated by finding all sequence regions with detectable similarity to any currently published 3D structure (in the <a href="https://www.wwpdb.org/">PDB</a>), based on a systematic, machine-learning search method (<a href="https://www.nature.com/articles/nmeth.3258">O'Donoghue et al., Nature Methods 2015</a>). -->
             </p>
             <p>
@@ -47,7 +49,7 @@
 </template>
 
 <script>
-import store from '@/store/index'
+import store from '../../store/index'
 
 export default {
   name: 'AboutMatrix',
@@ -62,67 +64,24 @@ export default {
       synonymsArray: null,
       timer: null,
       play: require('../../assets/img/Play.png'),
+      activePlay: require('../../assets/img/Play_Hover.png'),
       info: require('../../assets/img/Info.png'),
+      activeInfo: require('../../assets/img/Info_Hover.png'),
       document: require('../../assets/img/Document.png'),
-      close: require('../../assets/img/Close.png')
+      activeDocument: require('../../assets/img/Document_Hover.png'),
+      close: require('../../assets/img/Close.png'),
+      activeClose: require('../../assets/img/Close_Hover.png'),
+      playHover: false,
+      infoHover: false,
+      documentHover: false,
+      closeHover: false,
+      showContent: false
     }
   },
-  // beforeMount () {
-  //   // this.synonymsArray = this.OrgSynonyms.split(',')
-  //   this.synonymsString = this.synonymsArray[1]
-  //   for (var i = 2; i < this.synonymsArray.length; i++) {
-  //     this.synonymsString = this.synonymsString + ', ' + this.synonymsArray[i]
-  //   }
-  // },
   props: ['OrganismName', 'OrgSynonyms', 'checkDevice'],
-  mounted () {
-    document.querySelector('img#play').addEventListener('mouseover', function () {
-      document.querySelector('img#play').src = '/images/Play_Hover.png'
-    })
-    document.querySelector('img#play').addEventListener('mouseout', function () {
-      document.querySelector('img#play').src = '/images/Play.png'
-    })
-    document.querySelector('img#paper').addEventListener('mouseover', function () {
-      document.querySelector('img#paper').src = '/images/Document_Hover.png'
-    })
-    document.querySelector('img#paper').addEventListener('mouseout', function () {
-      document.querySelector('img#paper').src = '/images/Document.png'
-    })
-  },
   methods: {
-    activatePlay (n) {
-      document.querySelector('#help').src = '/images/Info.png'
-      document.querySelectorAll('#play')[n].src = '/images/Play_Hover.png'
-      document.querySelectorAll('#play'[n]).style.cursor = 'pointer'
-    },
-    activatePaper (n) {
-      document.querySelector('#help').src = '/images/Info.png'
-      document.querySelectorAll('#paper')[n].src = '/images/Document_Hover.png'
-      document.querySelectorAll('#paper')[n].style.cursor = 'pointer'
-    },
-    resetPlay (n) {
-      document.querySelectorAll('#play')[n].src = '/images/Play.png'
-    },
-    resetPaper (n) {
-      document.querySelectorAll('#paper')[n].src = '/images/Document.png'
-    },
-    activateHelp () {
-      document.querySelector('#help').src = '/images/Info_Hover.png'
-      document.querySelector('#help').style.cursor = 'pointer'
-    },
-    activateClose () {
-      document.querySelector('#close').src = '/images/Close_Hover.png'
-      document.querySelector('#close').style.cursor = 'pointer'
-    },
-    resetClose () {
-      document.querySelector('#close').src = '/images/Close.png'
-      document.querySelector('#close').style.cursor = 'pointer'
-    },
-    resetOver () {
-      clearTimeout(this.timer)
-      document.querySelector('#help').src = '/images/Info.png'
-    },
     hideAbout: function () {
+      this.showContent = false
       if (document.querySelector('#graph').style.display === 'block') {
         window.history.replaceState({}, document.title, '#Map')
       } else {
@@ -131,41 +90,39 @@ export default {
       document.querySelector('#content').style.width = document.querySelector('#title_0').offsetWidth + 25 + 'px'
       document.querySelector('#content').style.display = 'none'
       document.querySelector('#title_0').style.visibility = 'visible'
-      window.AQUARIA.RemoveOverlay()
+      document.querySelector('div.dimmer').classList.remove('show')
+      document.querySelector('div.dimmer').className += ' hide'
+      // document.querySelector('div.dimmer').remove()
       setTimeout(function () { document.querySelector('#help').style.pointerEvents = 'auto' }, 1000)
       document.querySelector('#help').style.pointerEvents = 'none'
     },
     showAbout: function () {
+      this.showContent = true
       window.history.replaceState({}, document.title, '#info')
       var titleWidth = document.querySelector('#Orgname_0').offsetWidth + 80 + 'px'
       document.querySelector('#content').style.width = 'calc(' + titleWidth + ' + 3vw)'
       document.querySelector('#content').style.display = 'block'
       document.querySelector('#title_0').style.visibility = 'hidden'
-      if (document.querySelector('div.dimmer').length === 0) {
-        var elemDiv = document.createElement('div')
-        elemDiv.className = 'dimmer'
-        document.body.append(elemDiv)
-        document.querySelector('#content').style.display = 'block'
-        document.querySelector('#title_0').style.visibility = 'hidden'
-
-        document.querySelector('div.dimmer').addEventListener('click', function () {
-          if (document.querySelector('#graph').style.display === 'block') {
-            window.history.replaceState({}, document.title, '#Map')
-          } else {
-            window.history.replaceState({}, document.title, '#Matrix')
-          }
-          document.querySelector('#content').style.display = 'none'
-          document.querySelector('#title_0').style.visibility = 'visible'
-          window.AQUARIA.RemoveOverlay()
-        })
-      } else {
-        window.AQUARIA.RemoveOverlay()
+      if (document.querySelector('div.dimmer').classList.contains('hide')) {
+        document.querySelector('div.dimmer').classList.remove('hide')
+        document.querySelector('div.dimmer').className += ' show'
       }
-    },
-    activateOver () {
-      document.querySelector('#help').src = '/images/Info_Hover.png'
-      document.querySelector('#help').style.cursor = 'pointer'
-      document.querySelector('#Orgname_0').style.cursor = 'pointer'
+      document.querySelector('#content').style.display = 'block'
+      document.querySelector('#title_0').style.visibility = 'hidden'
+
+      document.querySelector('div.dimmer').addEventListener('click', function () {
+        if (document.querySelector('#graph').style.display === 'block') {
+          window.history.replaceState({}, document.title, '#Map')
+        } else {
+          window.history.replaceState({}, document.title, '#Matrix')
+        }
+        document.querySelector('#content').style.display = 'none'
+        document.querySelector('#title_0').style.visibility = 'visible'
+        if (document.querySelector('div.dimmer').classList.contains('show')) {
+          document.querySelector('div.dimmer').classList.remove('show')
+          document.querySelector('div.dimmer').className += ' hide'
+        }
+      })
     },
     redirect: function (OrganismID) {
       var url = 'https://www.uniprot.org/taxonomy/' + OrganismID
@@ -184,6 +141,13 @@ export default {
 </script>
 
 <style scoped>
+#title{
+  cursor: default;
+}
+
+#title_0 {
+  cursor: pointer;
+}
 #help, #close, #paper{
   padding-left: 0px;
 }
@@ -197,7 +161,7 @@ img#play{
 }
 #about_matrix{
     margin-left: 12px;
-    margin-top: calc(7px + 0.55vh);
+    margin-top: calc(5px + 1.5vh);
     margin-bottom: 20px;
 }
 
@@ -254,33 +218,6 @@ p#teams{
     font-size: calc(10px + 0.4vw);
 }
 
-/* iPhone SE */
-/* @media only screen
-  and (min-width : 200px)
-  and (max-height : 600px) { */
-  /* #Orgname, #Orgname_0 {
-    color: #fff;
-    font-size: calc(6px + 0.8vw);
-    font-weight: 500;
-}
-  #matches {
-    font-size: calc(7px + 0.5vw);
-  }
-  #title_0 {
-    padding: 5px calc(3px + 0.4vw);
-  }
-  #title{
-    padding: 5px calc(9px + 0.4);
-  } */
-  /* #content{
-    left: 5%;
-    right: 5%;
-    width: 90%;
-  } */
-  /* #about_matrix{
-    margin-bottom: 15px;
-  }
-} */
 @media all and (max-width: 280px) {
   #content{
     right: 12%;

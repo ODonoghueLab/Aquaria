@@ -21,6 +21,7 @@
           </a>
         </div>
     </div>
+    <div class='dimmer level1 hide'></div>
   </div>
 </template>
 
