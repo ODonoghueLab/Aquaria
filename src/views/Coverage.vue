@@ -1,8 +1,8 @@
 <template>
-  <div id="matrix">
+  <div id='matrix'>
     <MatrixHeader />
     <LoadingPage />
-     <div id="container">
+     <div id='container'>
     </div>
   </div>
 </template>
@@ -35,9 +35,10 @@ export default {
   },
   mounted () {
     let allStructures
+    window.BACKEND = 'https://odonoghuelab.org:8011/'
 
     // gets an organism and runs all the functions and loads everything
-    var url = 'https://aquaria.ws:8010/' + this.organismId
+    var url = `${window.BACKEND}/${this.organismId}`
     axios({
       method: 'get',
       url: url
@@ -45,6 +46,7 @@ export default {
       .then(response => {
         allStructures = JSON.parse(response.data.primary_accessions)
         this.getStructures(this.organismId, allStructures).then(response => {
+          console.log(response)
           this.getMatchingStructures(response).then(response => {
             this.getProteinSynonyms(response).then(response => {
               this.loadShapes(response).then(() => {
@@ -62,6 +64,8 @@ export default {
     window.addEventListener('resize', this.initialDisplay)
   },
   methods: {
+    // TODO: INITIAL STATE SEEMS TO BE BROKEN. EVERYTHING IS COLLAPSED.
+
     // given sequence length, return length of the rectangle to generate.
     getResidueSize (scale, length) {
       return length * scale
@@ -95,6 +99,9 @@ export default {
           // Draw the arrows for the protein
           this.drawArrow(svg, data[i][n], width, height, triangleSize, offset)
 
+          // draw the non-dark regions
+          // this.fillArrow(svg, data[i][n], width, height, triangleSize, offset, scale)
+
           // Draw the axis
           this.drawRuler(svg, data[i][n], continuous, width, triangleSize, offset)
 
@@ -121,57 +128,98 @@ export default {
       this.initialDisplay(false)
     },
 
+    fillData (protein) {
+      var data = [{ offset: '0%', color: 'black' }]
+      if (protein.nonDark) {
+        for (var i = 0; i < protein.nonDark.length; i++) {
+          var segment = protein.nonDark[i]
+          data.push({ offset: '' + 100 * (segment.Start / protein.length) + '%', color: 'black' }) // end of the black
+          data.push({ offset: '' + 100 * (segment.Start / protein.length) + '%', color: this.green }) // start of the green
+          data.push({ offset: '' + 100 * (segment.Stop / protein.length) + '%', color: this.green }) // end of the green
+          data.push({ offset: '' + 100 * (segment.Stop / protein.length) + '%', color: 'black' }) // start of the black
+        }
+      }
+      // data.push({ offset: '100%', color: 'black' })
+      return data
+    },
+
+    /* eslint-disable */
+
     drawArrow (svg, protein, width, height, triangleSize, offset) {
-      var fill = protein.dark ? 'black' : this.green
+      // var fill = protein.dark ? 'black' : this.green
       // create a rectangle
-      svg.append('rect')
-        .attr('x', this.x)
-        .attr('y', this.y)
-        .attr('width', width)
-        .attr('height', height)
-        .attr('fill', fill)
-        .attr('id', protein.id ? protein.id : protein.primary_accession)
-        .attr('title', protein.primary_accession)
-        .attr('transform', 'translate(' + offset + ',0)')
-        .on('mouseover', function (d, i) {
-          var d3 = require('d3')
-          d3.select(this).transition().duration('50').attr('opacity', '.85')
-          d3.select('polygon#' + this.id).transition().duration('50').attr('opacity', '.85')
-        })
-        .on('mouseout', function (d, i) {
-          var d3 = require('d3')
-          d3.select(this).transition().duration('50').attr('opacity', '1')
-          d3.select('polygon#' + this.id).transition().duration('50').attr('opacity', '1')
-        //   div.transition().duration('50').style('opacity', 0)
-        })
-        .on('click', function () {
-          var d3 = require('d3')
-          var baseUrl = window.location.origin
-          window.open(baseUrl + '/' + d3.select(this).attr('title'))
-        })
-        .append('svg:title')
-        .text(protein.name)
+      var fill = this.fillData(protein)
+      console.log(fill, protein.name)
+      var id = protein.id ? protein.id : protein.primary_accession
 
-      var xend = this.x + width // x coords at the right-most end of the rectangle
-      var ycenter = this.y + (height / 2) // the y coords of the center of the rectangle. y displacement + half the rectangle's height
-      var points = [xend, ycenter - triangleSize, xend, ycenter + triangleSize, xend + triangleSize, ycenter] // point 1 x coords, y coords. Point 2 x, y. Point 3 x,y.
+      svg.append('linearGradient')
+        .attr('id', 'grad_' + id)
+        .attr('x1', '0%').attr('y1', '0%')
+        .attr('x2', '100%').attr('y2', '0%')
+        .selectAll('stop')
+        .data(fill)
+        // .data([{"offset":"0%","color":"black"},{"offset":"0%","color":"black"},{"offset":"0%","color":"#7A9D5B"},{"offset":"2%","color":"#7A9D5B"},{"offset":"2%","color":"black"},{"offset":"3%","color":"black"},{"offset":"3%","color":"#7A9D5B"},{"offset":"4%","color":"#7A9D5B"},{"offset":"4%","color":"black"},{"offset":"18%","color":"black"},{"offset":"18%","color":"#7A9D5B"},{"offset":"21%","color":"#7A9D5B"},{"offset":"21%","color":"black"},{"offset":"23%","color":"black"},{"offset":"23%","color":"#7A9D5B"},{"offset":"27%","color":"#7A9D5B"},{"offset":"27%","color":"black"},{"offset":"27%","color":"black"},{"offset":"27%","color":"#7A9D5B"},{"offset":"42%","color":"#7A9D5B"},{"offset":"42%","color":"black"},{"offset":"42%","color":"black"},{"offset":"42%","color":"#7A9D5B"},{"offset":"45%","color":"#7A9D5B"},{"offset":"45%","color":"black"},{"offset":"71%","color":"black"},{"offset":"71%","color":"#7A9D5B"},{"offset":"72%","color":"#7A9D5B"},{"offset":"72%","color":"black"},{"offset":"72%","color":"black"},{"offset":"72%","color":"#7A9D5B"},{"offset":"81%","color":"#7A9D5B"},{"offset":"81%","color":"black"},{"offset":"87%","color":"black"},{"offset":"87%","color":"#7A9D5B"},{"offset":"99%","color":"#7A9D5B"},{"offset":"99%","color":"black"}])
+        .enter().append('stop')
+        .attr('offset', function (d) { return d.offset })
+        .attr('stop-color', function (d) { return d.color })
+        .attr("stop-opacity", 1)
 
-      // create a triangle
+      // svg.append('rect')
+      //   .attr('x', this.x)
+      //   .attr('y', this.y)
+      //   .attr('width', width)
+      //   .attr('height', height)
+      //   .attr('fill', 'url(#grad)')
+      //   .attr('id', protein.id ? protein.id : protein.primary_accession)
+      //   .attr('title', protein.primary_accession)
+      //   .attr('transform', 'translate(' + offset + ',0)')
+      //   .on('mouseover', function (d, i) {
+      //     var d3 = require('d3')
+      //     d3.select(this).transition().duration('50').attr('opacity', '.85')
+      //     d3.select('polygon#' + this.id).transition().duration('50').attr('opacity', '.85')
+      //   })
+      //   .on('mouseout', function (d, i) {
+      //     var d3 = require('d3')
+      //     d3.select(this).transition().duration('50').attr('opacity', '1')
+      //     d3.select('polygon#' + this.id).transition().duration('50').attr('opacity', '1')
+      //   //   div.transition().duration('50').style('opacity', 0)
+      //   })
+      //   .on('click', function () {
+      //     var d3 = require('d3')
+      //     var baseUrl = window.location.origin
+      //     window.open(baseUrl + '/' + d3.select(this).attr('title'))
+      //   })
+      //   .append('svg:title')
+      //   .text(protein.name)
+
+      // var xend = this.x + width // x coords at the right-most end of the rectangle
+      // var ycenter = this.y + (height / 2) // the y coords of the center of the rectangle. y displacement + half the rectangle's height
+      // var points = [xend, ycenter - triangleSize, xend, ycenter + triangleSize, xend + triangleSize, ycenter] // point 1 x coords, y coords. Point 2 x, y. Point 3 x,y.
+
+      let p
+      if (width > 0) {
+        p = [this.x, this.y, this.x, this.y + height, this.x + width, this.y + height, this.x + width, this.y + (0.5 * height) + triangleSize, this.x + width + triangleSize, this.y + 0.5 * height, this.x + width, this.y + (0.5 * height) - triangleSize, this.x + width, this.y]
+      } else {
+        p = [this.x, this.y + (0.5 * height) - triangleSize, this.x, this.y + (0.5 * height) + triangleSize, this.x + triangleSize, this.y + (0.5 * height)] // point 1 x coords, y coords. Point 2 x, y. Point 3 x,y.
+      }
+
+      // create an arrow
       svg.append('svg:polygon')
-        .attr('points', points)
-        .attr('fill', fill)
-        .attr('id', protein.id ? protein.id : protein.primary_accession)
+        .attr('points', p)
+        // .attr('fill', fill)
+        .attr('fill', 'url(#grad_' + id + ')')
+        .attr('id', id)
         .attr('title', protein.primary_accession)
         .attr('transform', 'translate(' + offset + ',0)')
         .on('mouseover', function (d, i) {
           var d3 = require('d3')
           d3.select(this).transition().duration('50').attr('opacity', '.85')
-          d3.select('rect#' + this.id).transition().duration('50').attr('opacity', '.85')
+          // d3.select('rect#' + this.id).transition().duration('50').attr('opacity', '.85')
         })
         .on('mouseout', function (d, i) {
           var d3 = require('d3')
           d3.select(this).transition().duration('50').attr('opacity', '1')
-          d3.select('rect#' + this.id).transition().duration('50').attr('opacity', '1')
+          // d3.select('rect#' + this.id).transition().duration('50').attr('opacity', '1')
         })
         .on('click', function () {
           var d3 = require('d3')
@@ -206,6 +254,25 @@ export default {
         }
       }
     },
+
+    // fillArrow (svg, protein, width, height, triangleSize, offset, scale) {
+    //   // TODO: POLYPOTEIN 1B IS INCORRECT. NEED TO FIND PROBLEM IN CLEAN PROTEINS
+    //   var range = protein.nonDark
+    //   console.log(width, height, triangleSize, range)
+    //   for (var i = 0; i < range.length; i++) {
+    //     var length = this.getResidueSize(scale, range[i].Stop - range[i].Start)
+    //     console.log('x1:', this.x + this.getResidueSize(scale, range[i].Start) / 2, protein.name)
+    //     svg.append('line')
+    //       .style('stroke', this.green)
+    //       .style('stroke-width', length) // scaled by scale?
+    //       .attr('x1', this.x + this.getResidueSize(scale, range[i].Start) + this.getResidueSize(scale, (range[i].Stop - range[i].Start) / 2))
+    //       .attr('y1', this.y)
+    //       .attr('x2', this.x + this.getResidueSize(scale, range[i].Start) + this.getResidueSize(scale, (range[i].Stop - range[i].Start) / 2))
+    //       .attr('y2', this.y + height)
+    //       .attr('id', protein.id ? protein.id : protein.primary_accession)
+    //       .attr('transform', 'translate(' + offset + ',0)')
+    //   }
+    // },
 
     drawRuler (svg, protein, continuous, width, triangleSize, offset) {
       // Draw the axis
@@ -499,7 +566,7 @@ export default {
     },
 
     // checks if any proteins overlap in genomic position, and cuts them when necessary
-    cleanProteins (proteins) {
+    async cleanProteins (proteins) {
       var positionArrays = {}
       proteins.forEach(function (protein) {
         // Get the array for this position, if any
@@ -541,6 +608,15 @@ export default {
                   cur.fragments = cur.fragments.filter(function (e) { return e.Name !== fragment.Name })
                 })
               }
+
+              // clean the non-dark regions data
+              var newNonDark = []
+              for (var j = 0; j < cur.nonDark.length; j++) {
+                if (cur.nonDark[j].Start > positionArrays[i][n].length) {
+                  newNonDark.push({ Primary_Accession: cur.primary_accession, Start: cur.nonDark[j].Start - positionArrays[i][n].length, Stop: cur.nonDark[j].Stop - positionArrays[i][n].length })
+                }
+              }
+              cur.nonDark = newNonDark
             }
           }
 
@@ -589,7 +665,7 @@ export default {
     },
 
     async getSynonym (id) {
-      var synUrl = 'https://aquaria.ws:8010/getProteinSynonyms/' + id
+      var synUrl = `${window.BACKEND}/getProteinSynonyms/${id}`
       var synonyms = []
       await axios({
         method: 'get',
@@ -606,10 +682,14 @@ export default {
 
     async getMatchingStructures (proteins) {
       for (var i = 0; i < proteins.length; i++) {
-        var urlMatching = 'https://aquaria.ws:8010/get_matching_structures?selector[]=' + proteins[i].primary_accession
+        var loadRequest = {
+          selector: [proteins[i].primary_accession]
+        }
+        var urlMatching = `${window.BACKEND}/get_matching_structures`
         await axios({
           method: 'get',
-          url: urlMatching
+          url: urlMatching,
+          params: loadRequest
         })
           .then(function (response) {
             if (response.data === '\'Dark\' protein') {
@@ -630,6 +710,30 @@ export default {
       } else {
         return clusters.reduce(function (prev, cur) { return prev + cur.members.length }, 0)
       }
+    },
+
+    async getNonDarkRegions (proteins) {
+      for (var i = 0; i < proteins.length; i++) {
+        var nonDark = await this.getNonDark(proteins[i].primary_accession)
+        proteins[i].nonDark = nonDark
+      }
+      return proteins
+    },
+
+    async getNonDark (id) {
+      var url = `${window.BACKEND}/getNonDarkRegions/${id}`
+      // var url = 'http://localhost:8010/getNonDarkRegions/' + id
+      var nonDark = []
+      await axios({
+        method: 'get',
+        url: url
+      })
+        .then(response => {
+          if (response.data) {
+            nonDark = response.data
+          }
+        })
+      return nonDark
     },
 
     // Gets all the structures of a particular organism, removes irrelevant information
@@ -667,7 +771,7 @@ export default {
             proteins[index].fragments = fragments
           })
       }
-      proteins = this.cleanProteins(proteins)
+      proteins = await this.getNonDarkRegions(proteins).then(response => { return this.cleanProteins(response) })
       return proteins
     },
 

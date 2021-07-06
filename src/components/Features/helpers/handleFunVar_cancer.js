@@ -1,10 +1,18 @@
 var cathFunctions = require('./handleCath.js')
+
+module.exports = {
+  handleFunVar_cancer: handleFunVar_cancer,
+  sendTheFirstUrls: sendTheFirstUrls,
+  extractPosAndFurtherPromises: extractPosAndFurtherPromises,
+  processNextPagesData: processNextPagesData,
+}
+
 var funVar_pageLimit = 20
 
 var checkIfValInSnpResAndAdd = require('./variantResiduesDesc')
 var variantResFeats = ['All variants']
 
-module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, primary_accession, featureCallback, variantResidues) {
+function handleFunVar_cancer(jsonObj1, getJsonFromUrl, validateAgainstSchema, primary_accession, featureCallback, variantResidues) {
   if (!jsonObj1.hasOwnProperty('data') || jsonObj1.data.length < 1) {
     validateAgainstSchema(convertedFeatures, primary_accession, featureCallback, 'CATH')
   }
@@ -16,7 +24,7 @@ module.exports = function (jsonObj1, getJsonFromUrl, validateAgainstSchema, prim
         // console.log("FunVar data is ");
         // console.log(firstUrlData);
 
-        extractPosAndFurtherPromises(firstUrlData, ids_sfFfs, features).then(function (promises_nextPages) {
+        extractPosAndFurtherPromises(firstUrlData, ids_sfFfs, features, getBaseUrl).then(function (promises_nextPages) {
           return new Promise(function (resolve, reject) {
             if (promises_nextPages.length > 0) {
               Promise.all(promises_nextPages).then(function (nextPagesData) {
@@ -147,7 +155,7 @@ function processNextPagesData (nextPagesData, featsAsDict) {
   })
 }
 
-function extractPosAndFurtherPromises (firstUrlData, ids_sfFfs, features) {
+function extractPosAndFurtherPromises (firstUrlData, ids_sfFfs, features, getBaseUrl) {
   return new Promise(function (resolve, reject) {
     const promises_nextPages = []
 
@@ -156,7 +164,7 @@ function extractPosAndFurtherPromises (firstUrlData, ids_sfFfs, features) {
         // if > 20, get total number of pages;
         const callsToMake = Math.ceil(dataObj.data.records_total / funVar_pageLimit) - 1 // -1 because one call is already done;
         if (callsToMake > 0) {
-          addNextPagesToUrl(callsToMake, ids_sfFfs[dataObj_i], promises_nextPages)
+          addNextPagesToUrl(callsToMake, ids_sfFfs[dataObj_i], promises_nextPages, getBaseUrl)
         }
         // console.log("Funvar callsToMake " + callsToMake);
 
@@ -240,7 +248,7 @@ function addAnObjIfNotPresent (featsAsDict, anFunVarItem) {
   }
 }
 
-function addNextPagesToUrl (callsToMake, id_sfFf, promises_nextPages) {
+function addNextPagesToUrl (callsToMake, id_sfFf, promises_nextPages, getBaseUrl) {
   for (let i = 0; i < callsToMake; i++) {
     const pageNum = i + 2
     promises_nextPages.push(cathFunctions.getFromLocation(getBaseUrl(id_sfFf) + '&page=' + pageNum))
