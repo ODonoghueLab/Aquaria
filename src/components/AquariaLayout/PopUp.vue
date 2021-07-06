@@ -1,26 +1,41 @@
 <template>
     <!-- Draggable DIV -->
-    <div id="popup" v-observer:subtree.childList="handler">
+    <div id="popup" v-observer:subtree.childList="handler" class='level3'>
     <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
     <!-- <div id="mydivheader">
     </div> -->
         <p id='popuptext'>Pop-up text box component for features</p>
-        <img v-bind:src="popupTail" id='popupTail'>
+        <!-- <TreeView v-show="showTree" id='treeView' class='level5'/> -->
+        <img v-bind:src="popupTail" id='popupTail' @click="showTreeView" v-bind:myprop='data.variantStructs'>
     </div>
 </template>
 
 <script>
 // import $ from 'jquery'
+// import TreeView from '../MatchingStructures/TreeView'
 import observer from 'vue-mutation-observer'
 import ExpandableTextLine from 'vue-expandable-text-line'
-import Vue from 'vue'
+import * as Panels from '../AquariaLayout/helpers/hidePanels'
+import store from '../../store/index'
 
+import Vue from 'vue'
 export default {
   name: 'PopUp',
+  // components: {
+  //   TreeView
+  // },
   data () {
     return {
       popupTail: require('../../assets/img//popupTail.png'),
-      expandTextLine: []
+      expandTextLine: [],
+      showTree: false
+    }
+  },
+  computed: {
+    data () {
+      return {
+        variantStructs: store.state.variantStructs
+      }
     }
   },
   directives: {
@@ -30,6 +45,14 @@ export default {
     this.dragElement(document.getElementById('popup'))
   },
   methods: {
+    showTreeView: function () {
+      this.showTree = true
+      Panels.overlay()
+      document.querySelector('div.dimmer').className += ' level4'
+      document.querySelector('div.dimmer').addEventListener('click', function () {
+        Panels.RemoveOverlay()
+      })
+    },
     handler: function () {
       this.dragElement(document.getElementById('popup'))
 
@@ -119,6 +142,10 @@ export default {
             if (document.getElementById('btnVI_' + clickedAa)) {
               // document.getElementById('btnVI_' + clickedAa).style.display = 'none'
               document.getElementById('btnVI_' + clickedAa).classList.add('selCol')
+              // document.querySelector('.selCol').addEventListener('click', function () {
+              //   console.log('this')
+              //   _this.showTree = true
+              // })
             }
           } else {
             if (document.getElementById('btnVI_' + oneAaCodes[i])) {
@@ -155,52 +182,8 @@ export default {
             moveAndShowClickedDivAa(arr[1])
           }
         }
-        // document.getElementById('span_missenseHeading').innerHTML = a
       }
     },
-    // appendPopup: function (text, position, width) {
-    //   var s, tailLeft
-    //   document.querySelector('#popuptext').innerHTML = text
-    //   $('div#popup').fadeIn()
-    //   var popheight = document.querySelector('div#popup').offsetHeight
-
-    //   var bleft = parseInt(position.left + (width / 2) - 120)
-    //   var btop = parseInt(position.top - popheight)
-
-    //   // var tailLeft = parseInt(position.left + (width / 2))
-    //   document.querySelector('#popupTail').style.marginLeft = '107px'
-    //   // document.querySelector('#popupTail').style.top = btop + 'px'
-
-    //   $('div#popup').css({
-    //     left: bleft + 'px',
-    //     top: btop + 'px',
-    //     width: '400px'
-    //   }).fadeIn(600)
-
-    //   if (bleft < 0) {
-    //     tailLeft = 107 + bleft + 3
-    //     document.querySelector('#popupTail').style.marginLeft = tailLeft + 'px'
-    //     document.querySelector('div#popup').style.left = '-5px'
-    //   }
-    //   if (bleft + document.querySelector('div#popup').offsetWidth + 10 > document.querySelector('#structure-viewer').clientWidth) {
-    //     document.querySelector('div#popup').style.left = (document.querySelector('#structure-viewer').clientWidth + 11 - 400) + 'px'
-    //     tailLeft = 107 + (400 - (document.querySelector('#structure-viewer').clientWidth - bleft) - 11)
-    //     document.querySelector('#popupTail').style.marginLeft = tailLeft + 'px'
-    //   }
-
-    //   // Click on X to close popup
-    //   $('span.x').on('click', function () {
-    //     $('div#popup').fadeOut()
-    //   })
-
-    //   $('div#popup').on('hover', function () {
-    //     clearTimeout(s)
-    //   }, function () {
-    //     s = setTimeout(function () {
-    //       $('div#popup').fadeOut()
-    //     }, 500)
-    //   })
-    // },
     dragElement: function (elmnt) {
       var pos1 = 0; var pos2 = 0; var pos3 = 0; var pos4 = 0
       if (document.getElementById(elmnt.id + 'header')) {
@@ -249,7 +232,6 @@ export default {
     #popup {
     display: none;
     position: absolute;
-    z-index: 9;
     text-align: left;
     max-width: 90%;
     }

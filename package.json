@@ -16,6 +16,7 @@
     "axios": "^0.21.1",
     "core-js": "^3.9.1",
     "d3": "^2.10.3",
+    "d3-shape": "^3.0.1",
     "domready": "^1.0.8",
     "i": "^0.3.6",
     "jolecule": "git+https://github.com/boscoh/jolecule.git#21dd403",

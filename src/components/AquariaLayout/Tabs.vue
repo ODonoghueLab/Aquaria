@@ -52,7 +52,7 @@ export default {
       showPanel('vis', 'Structures')
       Panels.hidePanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {
-        window.AQUARIA.overlay()
+        Panels.overlay()
       }
       document.querySelector('div.dimmer').className += ' level0'
       // document.querySelector('div.dimmer').style.zIndex = '0'
@@ -70,7 +70,7 @@ export default {
       Panels.hidePanel('vis', 'Structures')
       showPanel('featurelist', 'Features')
       if (document.getElementsByClassName('dimmer').length === 0) {
-        window.AQUARIA.overlay()
+        Panels.overlay()
       }
       document.querySelector('div.dimmer').className += ' level0'
       document.querySelector('div.dimmer').addEventListener('click', function () {

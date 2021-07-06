@@ -24,6 +24,7 @@
 import store from '../../store/index'
 import $ from 'jquery'
 import d3 from 'd3'
+import * as Panels from '../AquariaLayout/helpers/hidePanels'
 // import ExpandableTextLine from 'vue-expandable-text-line'
 
 export default {
@@ -102,7 +103,7 @@ export default {
     },
     showBubble: function (msgHtml) {
       if (document.getElementsByClassName('dimmer').length === 0) {
-        window.AQUARIA.overlay()
+        Panels.overlay()
       }
       // $('body').append('<div class="dimmer" style="opacity: 0.08; -moz-opacity: 0.08;"></div>');
       $('span#help3D.roundButton').css('background-position', '0 -21px')

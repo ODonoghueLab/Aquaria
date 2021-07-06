@@ -20,6 +20,7 @@
 <script>
 import store from '@/store/index'
 import Playlist from './Playlist'
+import * as Panels from '../AquariaLayout/helpers/hidePanels'
 var targetId
 var index
 export default {
@@ -59,11 +60,11 @@ export default {
         event.h.id = activeVideoID
         _this.paused(event)
       } else {
-        window.AQUARIA.RemoveOverlay()
+        // window.AQUARIA.RemoveOverlay()
         document.getElementById('UserHelp').classList.remove('show')
         document.getElementById('UserHelp').className += (' hide')
         // document.querySelector('#UserHelp').style.display = 'none'
-        // document.querySelector('.dimmer').style.display = 'none'
+        Panels.RemoveOverlay()
         if (document.querySelector('#helpbtn').classList.contains('active')) {
           _this.toggleActive(document.querySelector('#helpbtn'))
         }

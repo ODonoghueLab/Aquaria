@@ -15,9 +15,13 @@ export default new Vuex.Store({
     error: '',
     errorMsg: '',
     helpTitle: 'Aquaria Help',
-    newUser: true
+    newUser: true,
+    variantStructs: {}
   },
   mutations: {
+    setvariantStructs (state, value) {
+      state.variantStructs = value
+    },
     setUserStatus (state, value) {
       state.newUser = value
     },

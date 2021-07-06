@@ -13,3 +13,16 @@ export function hidePanels () {
   document.querySelector('a.close').click()
   window.scrollBy(0, 100)
 }
+
+export function overlay (className) {
+    var elemDiv = document.createElement('div')
+    elemDiv.className = 'dimmer'
+    if(className) {
+      elemDiv.className += ' ' + className
+    }
+    document.body.append(elemDiv)
+}
+
+export function RemoveOverlay () {
+  document.querySelectorAll('div.dimmer').forEach(el => el.remove())
+}

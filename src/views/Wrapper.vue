@@ -47,6 +47,7 @@ import PopUp from '../components/AquariaLayout/PopUp'
 import AboutAquaria from '../components/InfoAbout/AboutAquaria'
 import Errors from '../components/InfoAbout/Errors'
 import UserHelp from '../components/InfoAbout/UserHelp'
+import * as Panels from '../components/AquariaLayout/helpers/hidePanels'
 
 export default {
   name: 'Wrapper',
@@ -80,7 +81,7 @@ export default {
       document.getElementById('UserHelp').className += (' hide')
       document.querySelector('.dimmer').style.display = 'none'
       if (document.querySelector('#helpbtn').classList.contains('active')) {
-        window.AQUARIA.RemoveOverlay()
+        Panels.RemoveOverlay()
         _this.toggleActive(document.querySelector('#helpbtn'))
       }
     },

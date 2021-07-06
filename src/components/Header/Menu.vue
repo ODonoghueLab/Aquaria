@@ -23,6 +23,7 @@
 
 import { screenshot } from '../AquariaLayout/helpers/Screenshot'
 import store from '../../store/index'
+import * as Panels from '../AquariaLayout/helpers/hidePanels'
 export default {
   name: 'Menu',
   data () {
@@ -42,11 +43,11 @@ export default {
       document.getElementById('UserHelp').classList.remove('hide')
       document.getElementById('UserHelp').className += (' show')
       if (!document.querySelector('div.dimmer')) {
-        window.AQUARIA.overlay()
+        Panels.overlay()
         document.querySelector('div.dimmer').className += ' level7'
       }
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        window.AQUARIA.RemoveOverlay()
+        Panels.RemoveOverlay()
         document.getElementById('UserHelp').classList.remove('show')
         document.getElementById('UserHelp').className += (' hide')
         var elem = {}

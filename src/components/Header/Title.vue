@@ -33,6 +33,7 @@
 
 <script>
 import store from '../../store/index'
+import * as Panels from '../AquariaLayout/helpers/hidePanels'
 export default {
   name: 'Title',
   data () {
@@ -97,11 +98,11 @@ export default {
       // document.querySelector('#UserHelp').style.display = 'flex'
       // document.querySelector('.main .dimmer').style.display = 'block'
       if (!document.querySelector('div.dimmer')) {
-        window.AQUARIA.overlay()
+        Panels.overlay()
         document.querySelector('div.dimmer').className += ' level7'
       }
       document.querySelector('div.dimmer').addEventListener('click', function () {
-        window.AQUARIA.RemoveOverlay()
+        Panels.RemoveOverlay()
         document.getElementById('UserHelp').classList.remove('show')
         document.getElementById('UserHelp').className += (' hide')
       })

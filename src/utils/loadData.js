@@ -77,6 +77,7 @@ export async function loadAccession (primaryAccession, autoSelectPDB, autoSelect
     var data = await getTheBestStructureForVar(pdbParam, chainParam, loadRequest.selector[0], varRes)
     matches.Selected_PDB = data.Selected_PDB
     window.AQUARIA.variantStructs = data.variantStructs
+    Store.commit('setvariantStructs', data.variantStructs)
     processMatches(matches, loadRequest, skip3DView)
   } else {
     processMatches(matches, loadRequest, skip3DView)
