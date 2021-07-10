@@ -4,6 +4,8 @@ import * as Panels from '../../AquariaLayout/helpers/hidePanels'
 import * as common from '../../AquariaLayout/helpers/common'
 import * as fetchFeature from './fetch_features'
 var Highcharts = require('./highstocks.js')
+import Store from '../../../store/index' 
+
 
 export function createFeatureMap (datum, extServerIds_) {
 
@@ -214,12 +216,17 @@ const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 
 
 // show feature pop-up
 function showAnnotation (f, eid, extServerIds_) {
+
+  console.log('showAnnotation.f is ')
+  console.log(f.desc)
+  console.log(eid)
+
   var urlhtml = ''
   if (f.urls.length > 0) {
     // var lnx = f.urls.split(";");
     urlhtml = '<p>'
     for (var i = 0; i < f.urls.length; i++) {
-      urlhtml += "<a href='" + f.urls[i].href + "' target='_blank'>" + f.urls[i].text + '</a><br>'
+      urlhtml += "<a href='" + f.urls[i].href + "' target='_blank'>" + f.urls[i].text + '</a>'
     }
     urlhtml += '</p>'
   }
@@ -267,16 +274,23 @@ function showAnnotation (f, eid, extServerIds_) {
       // console.log(extServerIds_)
     }
   }
+  let balloonTitle = '<b>' + f.label + '</b>'
 
   balloon = balloon + f.label
   if (!f.name.includes('span_missenseHeading')) {
     balloon = balloon + ' ('
+    balloonTitle = balloonTitle + ' ('
     if (f.start === f.end) {
+      balloonTitle = balloonTitle + 'Residue ' + f.start
+      // Store.commit('setPopupTitle', 'Residue ' + f.start)
       balloon = balloon + 'Residue ' + f.start
     } else {
+      balloonTitle = balloonTitle + 'Residues ' + f.start + '-' + f.end
       balloon = balloon + 'Residues ' + f.start + '-' + f.end
     }
     balloon = balloon + ') '
+    balloonTitle = balloonTitle + ') '
+    Store.commit('setPopupTitle', balloonTitle)
   }
 
   if (!f.name.includes('span_missenseHeading')) {
@@ -285,6 +299,9 @@ function showAnnotation (f, eid, extServerIds_) {
 
   // balloon = balloon.append(f.desc);
   balloon = balloon + f.desc + '</p>' + urlhtml + '</div>'
+  let balloonText = f.desc + "<br>" + urlhtml; 
+  Store.commit('setPopupText', balloonText)
+  // Store.commit('setPopupText', balloonText)
   // d3.select('#popuptext')
   //   // .append('div')
   //   // .attr('class', 'popup')

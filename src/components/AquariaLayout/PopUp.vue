@@ -4,9 +4,16 @@
     <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
     <!-- <div id="mydivheader">
     </div> -->
+      <div id='vueBased' class='balloon'>
+        <span class="x">&nbsp;</span>
+        <p v-html="$store.state.popupTitle">  </p>
+        <p v-html="$store.state.popupText">  </p>
+      </div>
         <p id='popuptext'>Pop-up text box component for features</p>
         <!-- <TreeView v-show="showTree" id='treeView' class='level5'/> -->
         <img v-bind:src="popupTail" id='popupTail' @click="showTreeView" v-bind:myprop='data.variantStructs'>
+        <!-- Variant structures: {{ $store.state.variantStructs }} -->
+        Popup title: {{ $store.state.popupTitle }}
     </div>
 </template>
 
@@ -16,7 +23,7 @@
 import observer from 'vue-mutation-observer'
 import ExpandableTextLine from 'vue-expandable-text-line'
 import * as Panels from '../AquariaLayout/helpers/hidePanels'
-import store from '../../store/index'
+// import store from '../../store/index'
 
 import Vue from 'vue'
 export default {
@@ -34,7 +41,8 @@ export default {
   computed: {
     data () {
       return {
-        variantStructs: store.state.variantStructs
+        // variantStructs: store.state.variantStructs,
+        popupTitle: this.$store.state.popupTitle
       }
     }
   },

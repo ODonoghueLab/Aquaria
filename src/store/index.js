@@ -16,7 +16,9 @@ export default new Vuex.Store({
     errorMsg: '',
     helpTitle: 'Aquaria Help',
     newUser: true,
-    variantStructs: {}
+    variantStructs: {},
+    popupTitle: 'This is the initial title',
+    popupText: 'This is the initial text'
   },
   mutations: {
     setvariantStructs (state, value) {
@@ -48,6 +50,12 @@ export default new Vuex.Store({
     },
     setHash (state, value) {
       state.hash = value
+    },
+    setPopupTitle (state, value) {
+      state.popupTitle = value // 'This is the popup title'
+    },
+    setPopupText (state, value) {
+      state.popupText = value // 'This is the popup title'
     }
   },
   actions: {
