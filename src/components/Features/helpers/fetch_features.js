@@ -15,6 +15,7 @@ var grantham = require('./getGranthamConservation.js')
 var URL = require('../../../utils/url')
 var cur_ann_type
 var consInfo
+import Store from '../../../store/index' 
 
 function getRequestProtocol () {
   const arr = window.location.href.split(/\:+/)
@@ -935,10 +936,11 @@ var counter_complete = 0
 
 function toDescAndAddToAdedFeat () { // convert to description and add to added feature's description
   // return new Promise(function(resolve, reject) {
-  // console.log("Convert the variant features to description, and update added feature's description");
+  console.log("Convert the variant features to description, and update added feature's description");
   // });
 
-  // console.log(variantResidues);
+  Store.commit('setVariantResidues', variantResidues);
+  console.log(variantResidues);
 
   // Variant residues
   for (const residue in variantResidues) {

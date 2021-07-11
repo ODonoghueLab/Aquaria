@@ -8,6 +8,24 @@
         <span class="x">&nbsp;</span>
         <p v-html="$store.state.popupTitle">  </p>
         <p v-html="$store.state.popupText">  </p>
+        <div class='aaLightBg'>
+          <div v-for='aaCode in oneAaCodes' v-bind:key='aaCode' :id="'divVarInfo_' + aaCode">
+            {{ aaCode }}
+            <p v-for='dataStr in $store.state.variantResidues[126][aaCode]' v-bind:key='dataStr' v-html="dataStr">
+            </p>
+            Structures with mutation: {{ getPdbCount(126, aaCode) }}
+          </div>
+          <hr class='anAaHr'>
+          <div id='divPosInfo'>
+            <b> Residue 126 </b>
+            <p v-for='(arrObj, keyStr) in $store.state.variantResidues[126]["positionInfo"]' v-bind:key='keyStr'>
+              <span v-html='keyStr'></span>:
+              <span v-for='dataStr in arrObj' v-bind:key='dataStr' v-html='dataStr'>
+              </span>
+            </p>
+            Strcutures with mutation: {{ getTotalPdbCount(126) }}
+          </div>
+        </div>
       </div>
         <p id='popuptext'>Pop-up text box component for features</p>
         <!-- <TreeView v-show="showTree" id='treeView' class='level5'/> -->
@@ -35,7 +53,13 @@ export default {
     return {
       popupTail: require('../../assets/img//popupTail.png'),
       expandTextLine: [],
-      showTree: false
+      showTree: false,
+      oneAaCodes: ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+    }
+  },
+  filters: {
+    structCntAa (obj) {
+      return 0
     }
   },
   computed: {
@@ -53,6 +77,26 @@ export default {
     this.dragElement(document.getElementById('popup'))
   },
   methods: {
+    getTotalPdbCount: function (resNum) {
+      let totalNumStructs = 0
+      for (let i = 0; i < this.oneAaCodes.length; i++) {
+        console.log('Testing ' + this.oneAaCodes[i])
+        if (Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum], this.oneAaCodes[i]) && Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum][this.oneAaCodes[i]], 'pdbs')) {
+          console.log('Testing ')
+          totalNumStructs = totalNumStructs + this.$store.state.variantStructs[resNum][this.oneAaCodes[i]].pdbs.length
+        }
+      }
+      console.log(this.$store.state.variantStructs[resNum])
+      return totalNumStructs
+    },
+    getPdbCount: function (resNum, aa) {
+      console.log('Testing 1 2 3')
+      // let count = 0
+      if (Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum], aa) && Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum][aa], 'pdbs')) {
+        return this.$store.state.variantStructs[resNum][aa].pdbs.length
+      }
+      return 0
+    },
     showTreeView: function () {
       this.showTree = true
       Panels.overlay()
