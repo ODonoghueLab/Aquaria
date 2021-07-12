@@ -27,15 +27,17 @@ export default {
       totalStructures: 0,
       d3: require('d3'),
       green: '#7A9D5B',
-      backgroundColour: '#cccccc',
+      backgroundColour: '#ffffff',
       x: 0,
-      y: 20,
+      y: 15,
       organismId: '2697049' // COVID:2697049 SARS:694009 MERS:1263720
     }
   },
   mounted () {
+    // TODO: ruler at the top, shrink the space, offset the ticks, make the rectangles' height smaller
+
     let allStructures
-    window.BACKEND = 'https://odonoghuelab.org:8011/'
+    // window.BACKEND = 'https://odonoghuelab.org:8011/'
 
     // gets an organism and runs all the functions and loads everything
     var url = `${window.BACKEND}/${this.organismId}`
@@ -73,7 +75,7 @@ export default {
 
     // This function takes in the protein data, and draws all the shapes
     async loadShapes (data) {
-      // data in the format of [{name:string, primary_accession:string, sequence:string, position:int, length:int, clusters:array or 0, dark:bool, continuous:bool}]
+      // data in the format of [{name:string, primary_accession:string, sequence:string, position:int, length:int, clusters:array or 0, continuous:bool}]
       data = this.partitionToThree(data)
       var continuous = 0 // used to draw continuous axis over multiple proteins
 
@@ -81,10 +83,10 @@ export default {
       var scale = 960 / Math.max(...(data.map(el => this.getListSum(el)))) // scale the viewport by the longest of the three lists in data
 
       for (var i = 0; i < data.length; i++) {
-        var svg = this.d3.select('#container').append('svg').attr('class', 'row').attr('preserveAspectRatio', 'xMinYMin meet').attr('viewBox', '0 0 960 300') // 960 width preserving aspect ratio instead of using window.innerWidth
+        var svg = this.d3.select('#container').append('svg').attr('class', 'row').attr('preserveAspectRatio', 'xMinYMin meet').attr('viewBox', '0 0 960 340') // 960 width preserving aspect ratio instead of using window.innerWidth
 
         this.x = 0 // displacement from the left
-        this.y = 20
+        this.y = 15
         var offset = 0
 
         for (var n = 0; n < data[i].length; n++) {
@@ -97,7 +99,7 @@ export default {
           }
 
           // Draw the arrows for the protein
-          this.drawArrow(svg, data[i][n], width, height, triangleSize, offset)
+          this.drawArrow(svg, data[i][n], width, height, triangleSize, offset, scale)
 
           // draw the non-dark regions
           // this.fillArrow(svg, data[i][n], width, height, triangleSize, offset, scale)
@@ -111,6 +113,8 @@ export default {
             continuous = 0
           }
 
+          this.addNonDarkToFragments(data[i][n])
+
           // Draw fragments if they exist
           this.drawFragments(svg, data[i][n].fragments, scale)
 
@@ -119,11 +123,10 @@ export default {
 
           this.drawMatchingStructures(svg, data[i][n], width, height, triangleSize, offset, imgYOffset)
 
-          this.drawExpandButton(svg)
-
           // Adjust the offset for the next protein
           offset = offset + width + triangleSize
         }
+        this.drawExpandButton(svg)
       }
       this.initialDisplay(false)
     },
@@ -143,91 +146,195 @@ export default {
       return data
     },
 
-    /* eslint-disable */
+    getNonDarkBetween (protein, start, stop) {
+      var nonDark = []
+      if (protein.nonDark) {
+        for (var i = 0; i < protein.nonDark.length; i++) {
+          if (protein.nonDark[i].Start <= start && protein.nonDark[i].Stop >= start) {
+            nonDark.push({ Start: 0, Stop: (protein.nonDark[i].Stop - start) })
+          } else if (protein.nonDark[i].Start >= start && protein.nonDark[i].Stop <= stop) {
+            nonDark.push({ Start: (protein.nonDark[i].Start - start), Stop: (protein.nonDark[i].Stop - start) })
+          } else if (protein.nonDark[i].Start <= stop && protein.nonDark[i].Stop >= stop) {
+            nonDark.push({ Start: (protein.nonDark[i].Start - start), Stop: (stop - start) })
+          }
+        }
+      }
+      return nonDark
+    },
 
-    drawArrow (svg, protein, width, height, triangleSize, offset) {
+    splitToChunks (array, parts) {
+      var result = []
+      for (let i = parts; i > 0; i--) {
+        result.push(array.splice(0, Math.ceil(array.length / i)))
+      }
+      return result
+    },
+
+    addNonDarkToFragments (protein) {
+      if (protein.fragments) {
+        for (var j = 0; j < protein.fragments.length; j++) {
+          var fragment = protein.fragments[j]
+          protein.fragments[j].nonDark = this.getNonDarkBetween(protein, fragment.Start, fragment.Stop)
+        }
+      }
+    },
+
+    /* eslint-enable */
+
+    drawArrow (svg, protein, width, height, triangleSize, offset, scale) {
       // var fill = protein.dark ? 'black' : this.green
       // create a rectangle
       var fill = this.fillData(protein)
-      console.log(fill, protein.name)
       var id = protein.id ? protein.id : protein.primary_accession
 
-      svg.append('linearGradient')
-        .attr('id', 'grad_' + id)
-        .attr('x1', '0%').attr('y1', '0%')
-        .attr('x2', '100%').attr('y2', '0%')
-        .selectAll('stop')
-        .data(fill)
-        // .data([{"offset":"0%","color":"black"},{"offset":"0%","color":"black"},{"offset":"0%","color":"#7A9D5B"},{"offset":"2%","color":"#7A9D5B"},{"offset":"2%","color":"black"},{"offset":"3%","color":"black"},{"offset":"3%","color":"#7A9D5B"},{"offset":"4%","color":"#7A9D5B"},{"offset":"4%","color":"black"},{"offset":"18%","color":"black"},{"offset":"18%","color":"#7A9D5B"},{"offset":"21%","color":"#7A9D5B"},{"offset":"21%","color":"black"},{"offset":"23%","color":"black"},{"offset":"23%","color":"#7A9D5B"},{"offset":"27%","color":"#7A9D5B"},{"offset":"27%","color":"black"},{"offset":"27%","color":"black"},{"offset":"27%","color":"#7A9D5B"},{"offset":"42%","color":"#7A9D5B"},{"offset":"42%","color":"black"},{"offset":"42%","color":"black"},{"offset":"42%","color":"#7A9D5B"},{"offset":"45%","color":"#7A9D5B"},{"offset":"45%","color":"black"},{"offset":"71%","color":"black"},{"offset":"71%","color":"#7A9D5B"},{"offset":"72%","color":"#7A9D5B"},{"offset":"72%","color":"black"},{"offset":"72%","color":"black"},{"offset":"72%","color":"#7A9D5B"},{"offset":"81%","color":"#7A9D5B"},{"offset":"81%","color":"black"},{"offset":"87%","color":"black"},{"offset":"87%","color":"#7A9D5B"},{"offset":"99%","color":"#7A9D5B"},{"offset":"99%","color":"black"}])
-        .enter().append('stop')
-        .attr('offset', function (d) { return d.offset })
-        .attr('stop-color', function (d) { return d.color })
-        .attr("stop-opacity", 1)
+      // split longer proteins into multiple rectangles to get around chrome issue. No more than 7 explicit start / end definitions
+      // this is necessary for some browers like chrome, which renders large gradients with many explicit divisions incorrectly
+      if (fill.length > 14 && width > 300) {
+        var prevOffset = 0
+        var nonDarkFragments = JSON.parse(JSON.stringify(protein.nonDark))
+        var numChunks = Math.floor(fill.length / 10) > 4 ? Math.floor(fill.length / 10) : 4
+        console.log(numChunks)
+        var newFill = this.splitToChunks(nonDarkFragments, numChunks) // can split into more chunks if needed to get around chrome blurring
+        var prevStop = 0
+        for (var i = 0; i < newFill.length; i++) {
+          var len = newFill[i].slice(-1)[0].Stop - prevStop
+          if (i === newFill.length - 1) {
+            len = protein.length - prevStop
+          }
+          var fragmentWidth = this.getResidueSize(scale, len)
+          for (var k = 0; k < newFill[i].length; k++) {
+            newFill[i][k].Start = newFill[i][k].Start - prevStop
+            newFill[i][k].Stop = newFill[i][k].Stop - prevStop
+          }
 
-      // svg.append('rect')
-      //   .attr('x', this.x)
-      //   .attr('y', this.y)
-      //   .attr('width', width)
-      //   .attr('height', height)
-      //   .attr('fill', 'url(#grad)')
-      //   .attr('id', protein.id ? protein.id : protein.primary_accession)
-      //   .attr('title', protein.primary_accession)
-      //   .attr('transform', 'translate(' + offset + ',0)')
-      //   .on('mouseover', function (d, i) {
-      //     var d3 = require('d3')
-      //     d3.select(this).transition().duration('50').attr('opacity', '.85')
-      //     d3.select('polygon#' + this.id).transition().duration('50').attr('opacity', '.85')
-      //   })
-      //   .on('mouseout', function (d, i) {
-      //     var d3 = require('d3')
-      //     d3.select(this).transition().duration('50').attr('opacity', '1')
-      //     d3.select('polygon#' + this.id).transition().duration('50').attr('opacity', '1')
-      //   //   div.transition().duration('50').style('opacity', 0)
-      //   })
-      //   .on('click', function () {
-      //     var d3 = require('d3')
-      //     var baseUrl = window.location.origin
-      //     window.open(baseUrl + '/' + d3.select(this).attr('title'))
-      //   })
-      //   .append('svg:title')
-      //   .text(protein.name)
+          var shapeFill = this.fillData({ length: len, nonDark: newFill[i] })
 
-      // var xend = this.x + width // x coords at the right-most end of the rectangle
-      // var ycenter = this.y + (height / 2) // the y coords of the center of the rectangle. y displacement + half the rectangle's height
-      // var points = [xend, ycenter - triangleSize, xend, ycenter + triangleSize, xend + triangleSize, ycenter] // point 1 x coords, y coords. Point 2 x, y. Point 3 x,y.
+          svg.append('linearGradient')
+            .attr('id', 'grad_partial_' + id + '_' + i)
+            .attr('x1', '0%').attr('y1', '0%')
+            .attr('x2', '100%').attr('y2', '0%')
+            .selectAll('stop')
+            .data(shapeFill)
+            // .data([{"offset":"0%","color":"black"},{"offset":"0%","color":"black"},{"offset":"0%","color":"#7A9D5B"},{"offset":"2%","color":"#7A9D5B"},{"offset":"2%","color":"black"},{"offset":"3%","color":"black"},{"offset":"3%","color":"#7A9D5B"},{"offset":"4%","color":"#7A9D5B"},{"offset":"4%","color":"black"},{"offset":"18%","color":"black"},{"offset":"18%","color":"#7A9D5B"},{"offset":"21%","color":"#7A9D5B"},{"offset":"21%","color":"black"},{"offset":"23%","color":"black"},{"offset":"23%","color":"#7A9D5B"},{"offset":"27%","color":"#7A9D5B"},{"offset":"27%","color":"black"},{"offset":"27%","color":"black"},{"offset":"27%","color":"#7A9D5B"},{"offset":"42%","color":"#7A9D5B"},{"offset":"42%","color":"black"},{"offset":"42%","color":"black"},{"offset":"42%","color":"#7A9D5B"},{"offset":"45%","color":"#7A9D5B"},{"offset":"45%","color":"black"},{"offset":"71%","color":"black"},{"offset":"71%","color":"#7A9D5B"},{"offset":"72%","color":"#7A9D5B"},{"offset":"72%","color":"black"},{"offset":"72%","color":"black"},{"offset":"72%","color":"#7A9D5B"},{"offset":"81%","color":"#7A9D5B"},{"offset":"81%","color":"black"},{"offset":"87%","color":"black"},{"offset":"87%","color":"#7A9D5B"},{"offset":"99%","color":"#7A9D5B"},{"offset":"99%","color":"black"}])
+            .enter().append('stop')
+            .attr('offset', function (d) { return d.offset })
+            .attr('stop-color', function (d) { return d.color })
+            .attr('stop-opacity', 1)
 
-      let p
-      if (width > 0) {
-        p = [this.x, this.y, this.x, this.y + height, this.x + width, this.y + height, this.x + width, this.y + (0.5 * height) + triangleSize, this.x + width + triangleSize, this.y + 0.5 * height, this.x + width, this.y + (0.5 * height) - triangleSize, this.x + width, this.y]
+          if (i === newFill.length - 1) {
+            var rectLen = fragmentWidth - triangleSize
+            let p
+            if (rectLen > 0) {
+              p = [this.x, this.y, this.x, this.y + height, this.x + rectLen, this.y + height, this.x + rectLen, this.y + (0.5 * height) + triangleSize, this.x + rectLen + triangleSize, this.y + 0.5 * height, this.x + rectLen, this.y + (0.5 * height) - triangleSize, this.x + rectLen, this.y]
+            } else {
+              p = [this.x, this.y + (0.5 * height) - triangleSize, this.x, this.y + (0.5 * height) + triangleSize, this.x + triangleSize, this.y + (0.5 * height)] // point 1 x coords, y coords. Point 2 x, y. Point 3 x,y.
+            }
+
+            // create an arrow
+            svg.append('svg:polygon')
+              .attr('points', p)
+              // .attr('fill', fill)
+              .attr('fill', 'url(#grad_partial_' + id + '_' + i + ')')
+              .attr('id', id)
+              .attr('title', protein.primary_accession)
+              .attr('transform', 'translate(' + (offset + prevOffset) + ',0)')
+              .on('mouseover', function (d, i) {
+                var d3 = require('d3')
+                d3.select(this).attr('opacity', '.85')
+                d3.selectAll('rect#' + this.id).attr('opacity', '.85')
+              })
+              .on('mouseout', function (d, i) {
+                var d3 = require('d3')
+                d3.select(this).attr('opacity', '1')
+                d3.selectAll('rect#' + this.id).attr('opacity', '1')
+              })
+              .on('click', function () {
+                var d3 = require('d3')
+                var baseUrl = window.location.origin
+                window.open(baseUrl + '/' + d3.select(this).attr('title'))
+              })
+              .append('svg:title')
+              .text(protein.name)
+          } else {
+            // create an arrow
+            svg.append('svg:rect')
+              .attr('fill', 'url(#grad_partial_' + id + '_' + i + ')')
+              .attr('x', this.x)
+              .attr('y', this.y)
+              .attr('width', fragmentWidth)
+              .attr('height', height)
+              .attr('id', id)
+              .attr('title', protein.primary_accession)
+              .attr('transform', 'translate(' + (offset + prevOffset) + ',0)')
+              .on('mouseover', function (d, i) {
+                var d3 = require('d3')
+                d3.select(this).attr('opacity', '.85')
+                d3.selectAll('rect#' + this.id).attr('opacity', '.85')
+                d3.selectAll('polygon#' + this.id).attr('opacity', '.85')
+              })
+              .on('mouseout', function (d, i) {
+                var d3 = require('d3')
+                d3.select(this).attr('opacity', '1')
+                d3.selectAll('rect#' + this.id).attr('opacity', '1')
+                d3.selectAll('polygon#' + this.id).attr('opacity', '1')
+              })
+              .on('click', function () {
+                var d3 = require('d3')
+                var baseUrl = window.location.origin
+                window.open(baseUrl + '/' + d3.select(this).attr('title'))
+              })
+              .append('svg:title')
+              .text(protein.name)
+          }
+          prevStop = prevStop + len
+          prevOffset = prevOffset + fragmentWidth
+        }
       } else {
-        p = [this.x, this.y + (0.5 * height) - triangleSize, this.x, this.y + (0.5 * height) + triangleSize, this.x + triangleSize, this.y + (0.5 * height)] // point 1 x coords, y coords. Point 2 x, y. Point 3 x,y.
-      }
+        svg.append('linearGradient')
+          .attr('id', 'grad_' + id)
+          .attr('x1', '0%').attr('y1', '0%')
+          .attr('x2', '100%').attr('y2', '0%')
+          .selectAll('stop')
+          .data(fill)
+          // .data([{"offset":"0%","color":"black"},{"offset":"0%","color":"black"},{"offset":"0%","color":"#7A9D5B"},{"offset":"2%","color":"#7A9D5B"},{"offset":"2%","color":"black"},{"offset":"3%","color":"black"},{"offset":"3%","color":"#7A9D5B"},{"offset":"4%","color":"#7A9D5B"},{"offset":"4%","color":"black"},{"offset":"18%","color":"black"},{"offset":"18%","color":"#7A9D5B"},{"offset":"21%","color":"#7A9D5B"},{"offset":"21%","color":"black"},{"offset":"23%","color":"black"},{"offset":"23%","color":"#7A9D5B"},{"offset":"27%","color":"#7A9D5B"},{"offset":"27%","color":"black"},{"offset":"27%","color":"black"},{"offset":"27%","color":"#7A9D5B"},{"offset":"42%","color":"#7A9D5B"},{"offset":"42%","color":"black"},{"offset":"42%","color":"black"},{"offset":"42%","color":"#7A9D5B"},{"offset":"45%","color":"#7A9D5B"},{"offset":"45%","color":"black"},{"offset":"71%","color":"black"},{"offset":"71%","color":"#7A9D5B"},{"offset":"72%","color":"#7A9D5B"},{"offset":"72%","color":"black"},{"offset":"72%","color":"black"},{"offset":"72%","color":"#7A9D5B"},{"offset":"81%","color":"#7A9D5B"},{"offset":"81%","color":"black"},{"offset":"87%","color":"black"},{"offset":"87%","color":"#7A9D5B"},{"offset":"99%","color":"#7A9D5B"},{"offset":"99%","color":"black"}])
+          .enter().append('stop')
+          .attr('offset', function (d) { return d.offset })
+          .attr('stop-color', function (d) { return d.color })
+          .attr('stop-opacity', 1)
 
-      // create an arrow
-      svg.append('svg:polygon')
-        .attr('points', p)
-        // .attr('fill', fill)
-        .attr('fill', 'url(#grad_' + id + ')')
-        .attr('id', id)
-        .attr('title', protein.primary_accession)
-        .attr('transform', 'translate(' + offset + ',0)')
-        .on('mouseover', function (d, i) {
-          var d3 = require('d3')
-          d3.select(this).transition().duration('50').attr('opacity', '.85')
-          // d3.select('rect#' + this.id).transition().duration('50').attr('opacity', '.85')
-        })
-        .on('mouseout', function (d, i) {
-          var d3 = require('d3')
-          d3.select(this).transition().duration('50').attr('opacity', '1')
-          // d3.select('rect#' + this.id).transition().duration('50').attr('opacity', '1')
-        })
-        .on('click', function () {
-          var d3 = require('d3')
-          var baseUrl = window.location.origin
-          window.open(baseUrl + '/' + d3.select(this).attr('title'))
-        })
-        .append('svg:title')
-        .text(protein.name)
+        let p
+        if (width > 0) {
+          p = [this.x, this.y, this.x, this.y + height, this.x + width, this.y + height, this.x + width, this.y + (0.5 * height) + triangleSize, this.x + width + triangleSize, this.y + 0.5 * height, this.x + width, this.y + (0.5 * height) - triangleSize, this.x + width, this.y]
+        } else {
+          p = [this.x, this.y + (0.5 * height) - triangleSize, this.x, this.y + (0.5 * height) + triangleSize, this.x + triangleSize, this.y + (0.5 * height)] // point 1 x coords, y coords. Point 2 x, y. Point 3 x,y.
+        }
+
+        // create an arrow
+        svg.append('svg:polygon')
+          .attr('points', p)
+          // .attr('fill', fill)
+          .attr('fill', 'url(#grad_' + id + ')')
+          .attr('id', id)
+          .attr('title', protein.primary_accession)
+          .attr('transform', 'translate(' + offset + ',0)')
+          .on('mouseover', function (d, i) {
+            var d3 = require('d3')
+            d3.select(this).attr('opacity', '.85')
+            // d3.select('rect#' + this.id).transition().duration('50').attr('opacity', '.85')
+          })
+          .on('mouseout', function (d, i) {
+            var d3 = require('d3')
+            d3.select(this).attr('opacity', '1')
+            // d3.select('rect#' + this.id).transition().duration('50').attr('opacity', '1')
+          })
+          .on('click', function () {
+            var d3 = require('d3')
+            var baseUrl = window.location.origin
+            window.open(baseUrl + '/' + d3.select(this).attr('title'))
+          })
+          .append('svg:title')
+          .text(protein.name)
+      }
 
       // append protein names to the rectangles
       var lab = svg.append('text')
@@ -289,21 +396,21 @@ export default {
           .style('fill', 'gray')
           .style('font-size', '10px')
           .attr('class', 'rowContent')
-          .call(this.d3.svg.axis().scale(xScale).tickSize(0, 1).tickFormat((interval, i) => { return interval % 1000 !== 0 ? ' ' : interval }).orient('bottom').ticks(ticks)) // render only thousand ticks
+          .call(this.d3.svg.axis().scale(xScale).tickSize(0, 1).tickFormat((interval, i) => { return (interval === 0 || interval % 1000 !== 0) ? ' ' : interval }).orient('bottom').ticks(ticks)) // render only thousand ticks
           // .call(g => g.selectAll('text')
           //   .attr('y', 4)
-          //   .attr('dx', -4)) // shifts text to the left. How to align properly?
+          //   .attr('dx', -4)) // shifts text to the left.
 
         axis.selectAll('.tick')
           .attr('stroke', 'gray')
           .attr('x1', this.x)
           .attr('x2', this.x)
-          .attr('y2', -1)
-          .attr('y1', 2)
+          .attr('y2', 0)
+          .attr('y1', 3)
           .attr('stroke-width', '1')
       } else if (protein.length > 200) {
         var smallAxis = svg.append('g')
-          .attr('transform', 'translate(' + offset + ',' + (this.y - 14) + ')')
+          .attr('transform', 'translate(' + offset + ',' + (this.y - 10) + ')')
           .style('fill', 'gray')
           .attr('class', 'rowContent')
           .call(this.d3.svg.axis().scale(this.d3.scale.linear().domain([0, 1]).range([1, width + triangleSize - 1])).tickSize(2, 1).orient('top').ticks(2).tickFormat(''))
@@ -317,7 +424,7 @@ export default {
 
         var axisLabel = svg.append('text') // set this as var la
           .attr('x', this.x + 0.5 * (width + triangleSize))
-          .attr('y', this.y - 14)
+          .attr('y', this.y - 10)
           .attr('dy', '.35em')
           .style('text-anchor', 'middle')
           .attr('transform', 'translate(' + offset + ',0)')
@@ -342,7 +449,7 @@ export default {
 
     drawFragments (svg, fragments, scale) {
       if (fragments.length !== 0) {
-        this.y = this.y + 30
+        this.y = this.y + 35
       }
       var offset = 0
       for (var i = 0; i < fragments.length; i++) {
@@ -350,9 +457,12 @@ export default {
           name: fragments[i].Name,
           primary_accession: fragments[i].Primary_Accession,
           synonym: [fragments[i].Short_Name].concat(fragments[i].Short_Name.match(/[0-9]+/g)),
+          Start: fragments[i].Start,
+          Stop: fragments[i].Stop,
           pdb: null,
-          dark: true,
-          id: fragments[i].Primary_Accession + '_' + fragments[i].Short_Name.match(/[0-9]+/g)[0]
+          length: (fragments[i].Stop - fragments[i].Start),
+          id: fragments[i].Primary_Accession + '_' + fragments[i].Short_Name.match(/[0-9]+/g)[0],
+          nonDark: fragments[i].nonDark
         }
         var len = fragments[i].Stop - fragments[i].Start
         var height = 20 // the height of the rectangles, and the length of the triangle that is appended. Triangle width is 2*height
@@ -363,11 +473,11 @@ export default {
           width = 0
         }
         if (i === 0) {
-          this.drawArrow(svg, protein, width, height, triangleSize, offset)
+          this.drawArrow(svg, protein, width, height, triangleSize, offset, scale)
           offset = offset + width + triangleSize
         // if the start of the fragment is after the end of the previous fragment (not occupying the same space)
         } else if (fragments[i].Start >= fragments[i - 1].Stop) {
-          this.drawArrow(svg, protein, width, height, triangleSize, offset) // draw the fragment
+          this.drawArrow(svg, protein, width, height, triangleSize, offset, scale) // draw the fragment
           offset = offset + width + triangleSize
         }
       }
@@ -447,74 +557,223 @@ export default {
 
     drawExpandButton (svg) {
       // Create the expand and collapse button
-      var expandButton = svg.append('circle')
-        .attr('cx', 15)
-        .attr('cy', 30)
-        .attr('stroke', 'gray')
-        .attr('fill', '#69b3a2')
-        .attr('r', 12)
+      var expandButton = svg.append('svg:rect')
+        .attr('x', 0)
+        .attr('y', 5)
+        .attr('stroke', '#CCCCCC')
+        .attr('fill', '#CCCCCC')
+        .attr('opacity', 0.80)
+        .attr('width', window.innerWidth)
+        .attr('height', 40)
         .attr('id', 'expand')
 
       if (window.innerHeight > window.innerWidth) {
         expandButton.attr('display', 'none')
       }
 
-      expandButton.on('click', function (d, i) { // TODO COLLAPSE AND EXPAND : Change the initial display of open
+      expandButton.on('mouseover', function (d, i) {
         var d3 = require('d3')
-        // var collapsedElementSize = 100
-        // const vw = document.documentElement.clientWidth
-        // const vh = document.documentElement.clientHeight
-        // var viewboxHeight = vh * 0.9 / (vw / 960) - collapsedElementSize // account for the 10% header bar
-        if (this.parentNode.className.baseVal.split(' ').indexOf('open') > -1) {
+        d3.select(this.parentNode).select('path#expand:last-child').attr('stroke', 'orange')
+      })
+        .on('mouseout', function (d, i) {
+          var d3 = require('d3')
+          d3.select(this.parentNode).select('path#expand:last-child').attr('stroke', '#CCCCCC')
+        })
+
+      expandButton.on('click', function (d, i) {
+        var d3 = require('d3')
+
+        if (this.parentNode.className.baseVal.split(' ').indexOf('open') > -1) { // if current row is open
           d3.select(this.parentNode).classed('open', false)
           d3.selectAll('.row').transition().duration(1000).attr('viewBox', '0 0 960 45')
           d3.selectAll('.rowContent').transition().duration(1000).attr('opacity', 0)
         } else {
+          d3.selectAll('.open').selectAll('rect#expand').attr('opacity', 0)
+          d3.selectAll('.open').selectAll('rect#expand').attr('display', 'block')
+          d3.selectAll('.open').selectAll('rect#expand').transition().duration(1000).attr('opacity', 0.8)
+
+          d3.selectAll('.open').selectAll('path#expand').attr('opacity', 0)
+          d3.selectAll('.open').selectAll('path#expand').attr('display', 'block')
+          d3.selectAll('.open').selectAll('path#expand').transition().duration(1000).attr('opacity', 1)
+
           d3.selectAll('.row').classed('open', false)
           d3.selectAll('.row').transition().duration(1000).attr('viewBox', '0 0 960 45')
           d3.selectAll('.rowContent').transition().duration(1000).attr('opacity', 0)
 
           d3.select(this.parentNode).classed('open', true)
+          d3.select(this).attr('display', 'none')
           // d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 ' + viewboxHeight)
-          d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 320')
+          d3.select(this.parentNode).selectAll('path#expand').attr('display', 'none')
+          d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 340')
           d3.selectAll('.open .rowContent').transition().duration(1000).attr('opacity', 1)
+
+          // change the direction of the semi-circle arrows
+          var rows = d3.selectAll('.row')
+          var foundOpen = false
+          for (var j = 0; j < rows[0].length; j++) {
+            if (d3.select(rows[0][j]).classed('open')) {
+              foundOpen = true
+            }
+            if (!foundOpen) {
+              d3.select(rows[0][j]).select('path#expand').attr('transform', 'translate(' + 480 + ',' + 45 + ')')
+              d3.select(rows[0][j]).select('path#expand:last-child').attr('transform', 'scale(1, -1) translate(' + 480 + ', -' + 45 + ')')
+            } else {
+              d3.select(rows[0][j]).select('path#expand').attr('transform', 'scale(1, -1) translate(' + 480 + ', -' + 5 + ')')
+              d3.select(rows[0][j]).select('path#expand:last-child').attr('transform', 'translate(' + 480 + ',' + 5 + ')')
+            }
+          }
+        }
+      })
+
+      this.renderHalfMoon(svg, 480, 5)
+    },
+
+    renderHalfMoon (svg, x, y) {
+      var arcGenerator = this.d3.svg.arc()
+        .outerRadius(20)
+        .innerRadius(0)
+        .startAngle(-Math.PI / 2)
+        .endAngle(Math.PI / 2)
+
+      var semicircle = svg.append('path')
+        .attr('transform', 'scale(1, -1) translate(' + x + ', -' + y + ')')
+        .attr('d', arcGenerator())
+        .attr('fill', 'gray')
+        .attr('id', 'expand')
+        .on('mouseover', function (d, i) {
+          var d3 = require('d3')
+          d3.select(this.parentNode).select('path#expand:last-child').attr('stroke', 'orange')
+        })
+        .on('mouseout', function (d, i) {
+          var d3 = require('d3')
+          d3.select(this.parentNode).select('path#expand:last-child').attr('stroke', '#CCCCCC')
+        })
+
+      var arrow = svg.append('path')
+        .attr('transform', 'translate(' + x + ',' + y + ')')
+        .attr('d', 'M-8 12 0 5 8 12')
+        .attr('stroke', '#CCCCCC')
+        .attr('stroke-width', 3)
+        .attr('fill', 'transparent')
+        .attr('id', 'expand')
+        .on('mouseover', function (d, i) {
+          var d3 = require('d3')
+          d3.select(this).attr('stroke', 'orange')
+        })
+        .on('mouseout', function (d, i) {
+          var d3 = require('d3')
+          d3.select(this).attr('stroke', '#CCCCCC')
+        })
+
+      arrow.on('click', function (d, i) {
+        var d3 = require('d3')
+
+        d3.selectAll('.open').selectAll('rect#expand').attr('opacity', 0)
+        d3.selectAll('.open').selectAll('rect#expand').attr('display', 'block')
+        d3.selectAll('.open').selectAll('rect#expand').transition().duration(1000).attr('opacity', 0.8)
+
+        d3.selectAll('.open').selectAll('path#expand').attr('opacity', 0)
+        d3.selectAll('.open').selectAll('path#expand').attr('display', 'block')
+        d3.selectAll('.open').selectAll('path#expand').transition().duration(1000).attr('opacity', 1)
+
+        d3.selectAll('.row').classed('open', false)
+        d3.selectAll('.row').transition().duration(1000).attr('viewBox', '0 0 960 45')
+        d3.selectAll('.rowContent').transition().duration(1000).attr('opacity', 0)
+
+        d3.select(this.parentNode).classed('open', true)
+        d3.select(this.parentNode).selectAll('rect#expand').attr('display', 'none')
+        d3.select(this.parentNode).selectAll('path#expand').attr('display', 'none')
+        d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 340')
+        d3.selectAll('.open .rowContent').transition().duration(1000).attr('opacity', 1)
+
+        // change the direction of the semi-circle arrows
+        var rows = d3.selectAll('.row')
+        var foundOpen = false
+        for (var j = 0; j < rows[0].length; j++) {
+          if (d3.select(rows[0][j]).classed('open')) {
+            foundOpen = true
+          }
+          if (!foundOpen) {
+            d3.select(rows[0][j]).select('path#expand').attr('transform', 'translate(' + 480 + ',' + 45 + ')')
+            d3.select(rows[0][j]).select('path#expand:last-child').attr('transform', 'scale(1, -1) translate(' + 480 + ', -' + 45 + ')')
+          } else {
+            d3.select(rows[0][j]).select('path#expand').attr('transform', 'scale(1, -1) translate(' + 480 + ', -' + 5 + ')')
+            d3.select(rows[0][j]).select('path#expand:last-child').attr('transform', 'translate(' + 480 + ',' + 5 + ')')
+          }
+        }
+      })
+
+      semicircle.on('click', function (d, i) {
+        var d3 = require('d3')
+
+        d3.selectAll('.open').selectAll('rect#expand').attr('opacity', 0)
+        d3.selectAll('.open').selectAll('rect#expand').attr('display', 'block')
+        d3.selectAll('.open').selectAll('rect#expand').transition().duration(1000).attr('opacity', 0.8)
+
+        d3.selectAll('.open').selectAll('path#expand').attr('opacity', 0)
+        d3.selectAll('.open').selectAll('path#expand').attr('display', 'block')
+        d3.selectAll('.open').selectAll('path#expand').transition().duration(1000).attr('opacity', 1)
+
+        d3.selectAll('.row').classed('open', false)
+        d3.selectAll('.row').transition().duration(1000).attr('viewBox', '0 0 960 45')
+        d3.selectAll('.rowContent').transition().duration(1000).attr('opacity', 0)
+
+        d3.select(this.parentNode).classed('open', true)
+        d3.select(this.parentNode).selectAll('rect#expand').attr('display', 'none')
+        d3.select(this.parentNode).selectAll('path#expand').attr('display', 'none')
+        d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 340')
+        d3.selectAll('.open .rowContent').transition().duration(1000).attr('opacity', 1)
+
+        // change the direction of the semi-circle arrows
+        var rows = d3.selectAll('.row')
+        var foundOpen = false
+        for (var j = 0; j < rows[0].length; j++) {
+          if (d3.select(rows[0][j]).classed('open')) {
+            foundOpen = true
+          }
+          if (!foundOpen) {
+            d3.select(rows[0][j]).select('path#expand').attr('transform', 'translate(' + 480 + ',' + 45 + ')')
+            d3.select(rows[0][j]).select('path#expand:last-child').attr('transform', 'scale(1, -1) translate(' + 480 + ', -' + 45 + ')')
+          } else {
+            d3.select(rows[0][j]).select('path#expand').attr('transform', 'scale(1, -1) translate(' + 480 + ', -' + 5 + ')')
+            d3.select(rows[0][j]).select('path#expand:last-child').attr('transform', 'translate(' + 480 + ',' + 5 + ')')
+          }
         }
       })
     },
 
     initialDisplay (isResize) { // Change the display if the window is resized
-      // var collapsedElementSize = 100
-      // const vw = document.documentElement.clientWidth
-      // const vh = document.documentElement.clientHeight
-      // var viewboxHeight = vh * 0.9 / (vw / 960) - collapsedElementSize // account for the 10% header bar
-      // if (viewboxHeight < 45) { viewboxHeight = 45 }
-      if (window.innerHeight > window.innerWidth) {
-        this.d3.selectAll('circle#expand').attr('display', 'none')
+      if (window.innerHeight > window.innerWidth) { // expand everything
+        this.d3.selectAll('rect#expand').attr('display', 'none')
+        this.d3.selectAll('path#expand').attr('display', 'none')
         this.d3.selectAll('.row').classed('open', true)
-        // this.d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 ' + (vh * 0.9 / (vw / 960)) / 3)
-        this.d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 320')
+        this.d3.selectAll('.open').transition().duration(1000).attr('viewBox', '0 0 960 340')
         this.d3.selectAll('.open .rowContent').transition().duration(1000).attr('opacity', 1)
-      } else if (window.innerHeight < 0.25 * window.innerWidth) {
-        this.d3.selectAll('circle#expand').attr('display', 'block')
+      } else if (window.innerHeight < 0.25 * window.innerWidth) { // collapse everything
+        this.d3.selectAll('rect#expand').attr('display', 'block')
+        this.d3.selectAll('path#expand').attr('display', 'block')
         this.d3.selectAll('.row').classed('open', false)
         this.d3.selectAll('.row').transition().duration(500).attr('viewBox', '0 0 960 45')
         this.d3.selectAll('.rowContent').transition().duration(500).attr('opacity', 0)
       } else {
         var opened = this.d3.select('.open')
-        this.d3.selectAll('circle#expand').attr('display', 'block')
+        this.d3.selectAll('rect#expand').attr('display', 'block')
+        this.d3.selectAll('path#expand').attr('display', 'block')
         this.d3.selectAll('.row').classed('open', false)
         this.d3.selectAll('.row').transition().duration(500).attr('viewBox', '0 0 960 45')
         this.d3.selectAll('.rowContent').transition().duration(500).attr('opacity', 0)
 
         if (!isResize) {
-          this.d3.select('.row').classed('open', true)
-          this.d3.selectAll('.open').transition().duration(500).attr('viewBox', '0 0 960 320')
-          // this.d3.selectAll('.open').transition().duration(500).attr('viewBox', '0 0 960 ' + viewboxHeight)
+          opened = this.d3.select('.row').classed('open', true)
+          this.d3.select('rect#expand').attr('display', 'none')
+          opened.selectAll('path#expand').attr('display', 'none')
+          this.d3.selectAll('.open').transition().duration(500).attr('viewBox', '0 0 960 340')
           this.d3.selectAll('.open .rowContent').transition().duration(500).attr('opacity', 1)
         } else {
           opened.classed('open', true)
-          opened.transition().duration(1000).attr('viewBox', '0 0 960 320')
-          // opened.transition().duration(1000).attr('viewBox', '0 0 960 ' + viewboxHeight)
+          opened.select('rect#expand').attr('display', 'none')
+          opened.selectAll('path#expand').attr('display', 'none')
+          opened.transition().duration(1000).attr('viewBox', '0 0 960 340')
           this.d3.selectAll('.open .rowContent').transition().duration(500).attr('opacity', 1)
         }
       }
@@ -609,11 +868,26 @@ export default {
                 })
               }
 
+              // change the starts and stops to be relative to the split protein
+              for (var k = 0; k < cur.fragments.length; k++) {
+                cur.fragments[k].Start = cur.fragments[k].Start - positionArrays[i][n].length
+                cur.fragments[k].Stop = cur.fragments[k].Stop - positionArrays[i][n].length
+                if (cur.fragments[k].Start < 0) {
+                  cur.fragments[k].Start = 0
+                }
+              }
+              cur.fragments = cur.fragments.filter(function (e) { return e.Start >= 0 })
+
               // clean the non-dark regions data
               var newNonDark = []
               for (var j = 0; j < cur.nonDark.length; j++) {
-                if (cur.nonDark[j].Start > positionArrays[i][n].length) {
-                  newNonDark.push({ Primary_Accession: cur.primary_accession, Start: cur.nonDark[j].Start - positionArrays[i][n].length, Stop: cur.nonDark[j].Stop - positionArrays[i][n].length })
+                if (cur.nonDark[j].Stop > positionArrays[i][n].length) {
+                  var start = cur.nonDark[j].Start - positionArrays[i][n].length
+                  if (start < 0) {
+                    start = 0
+                  }
+                  var stop = cur.nonDark[j].Stop - positionArrays[i][n].length
+                  newNonDark.push({ Primary_Accession: cur.primary_accession, Start: start, Stop: stop })
                 }
               }
               cur.nonDark = newNonDark
@@ -721,7 +995,7 @@ export default {
     },
 
     async getNonDark (id) {
-      var url = `${window.BACKEND}/getNonDarkRegions/${id}`
+      var url = `${window.BACKEND}getNonDarkRegions/${id}`
       // var url = 'http://localhost:8010/getNonDarkRegions/' + id
       var nonDark = []
       await axios({
@@ -760,11 +1034,11 @@ export default {
               sequence = response.data.sequences[0]
               var seqLength = sequence.length
               console.log('Loaded ', allStructures[index].synonym, seqLength)
-              proteins.push({ name: allStructures[index].synonym, primary_accession: allStructures[index].primary_accession, sequence: sequence.sequence, position: allStructures[index].position, length: seqLength, dark: false })
+              proteins.push({ name: allStructures[index].synonym, primary_accession: allStructures[index].primary_accession, sequence: sequence.sequence, position: allStructures[index].position, length: seqLength })
             } else {
               // this is a dark protein
               sequence = response.data[allStructures[index].primary_accession]
-              proteins.push({ name: allStructures[index].synonym, primary_accession: allStructures[index].primary_accession, sequence: sequence.sequence, position: allStructures[index].position, length: sequence.length, dark: true })
+              proteins.push({ name: allStructures[index].synonym, primary_accession: allStructures[index].primary_accession, sequence: sequence.sequence, position: allStructures[index].position, length: sequence.length })
             }
             return this.getFragments(allStructures[index].primary_accession)
           }).then(fragments => {
@@ -832,7 +1106,7 @@ export default {
         font-weight:400;
     }
     .cell {
-        background-color: #cccccc;
+        background-color: #ffffff;
         position: relative;
         overflow: scroll;
         /* 'relative' as reference point for absolute positioned elements inside */
@@ -853,8 +1127,8 @@ export default {
     #container {
         /* display: grid; c0c0c0 */
         grid-gap: 6px;
-        background: #cccccc;
-        padding: 6px;
+        background: #ffffff;
+        padding: 0px; /* removed the padding here */
         height: 95%;
         margin: 0 auto;
         overflow: scroll;
