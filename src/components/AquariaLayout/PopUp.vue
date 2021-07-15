@@ -9,22 +9,28 @@
         <p v-html="$store.state.popupTitle">  </p>
         <p v-html="$store.state.popupText">  </p>
         <div class='aaLightBg'>
-          <div v-for='aaCode in oneAaCodes' v-bind:key='aaCode' :id="'divVarInfo_' + aaCode">
+          <div v-for='aaCode in listWithNoOldAa(126)' v-bind:key='aaCode' :id="'divVarInfo_' + aaCode" :hidden="getIsInitAa(126, aaCode)">
             {{ aaCode }}
-            <p v-for='dataStr in $store.state.variantResidues[126][aaCode]' v-bind:key='dataStr' v-html="dataStr">
-            </p>
-            Structures with mutation: {{ getPdbCount(126, aaCode) }}
+            <expandable-text-line use-click v-for='dataStr in $store.state.variantResidues[126][aaCode]' v-bind:key='dataStr' v-html="dataStr">
+            </expandable-text-line>
+            <i>Structures with mutation:</i> {{ getPdbCount(126, aaCode) }}
           </div>
           <hr class='anAaHr'>
           <div id='divPosInfo'>
             <b> Residue 126 </b>
             <p v-for='(arrObj, keyStr) in $store.state.variantResidues[126]["positionInfo"]' v-bind:key='keyStr'>
-              <span v-html='keyStr'></span>:
-              <span v-for='dataStr in arrObj' v-bind:key='dataStr' v-html='dataStr'>
-              </span>
+              <expandable-text-line use-click>
+                <i><span v-html='keyStr'></span>: </i>
+                <span v-for='dataStr in arrObj' v-bind:key='dataStr' v-html='dataStr'>
+                </span>
+              </expandable-text-line>
             </p>
-            Strcutures with mutation: {{ getTotalPdbCount(126) }}
+            <i>Structures with residue:</i> {{ getTotalPdbCount(126) }}
           </div>
+        </div>
+        <div>
+          <b>See also:</b> <span class='pAaColor'> {{getOldAa(126)}} &rarr; </span>
+          <button v-for='aaCode in listWithNoOldAa(126)' v-bind:key='aaCode' :id="'btnVarInfo_' + aaCode" :class="getIfBoldInfoPres(126, aaCode)" @click="showThisAaInfoHideOthers(126, aaCode)">{{aaCode}}</button>
         </div>
       </div>
         <p id='popuptext'>Pop-up text box component for features</p>
@@ -46,9 +52,10 @@ import * as Panels from '../AquariaLayout/helpers/hidePanels'
 import Vue from 'vue'
 export default {
   name: 'PopUp',
-  // components: {
+  components: {
   //   TreeView
-  // },
+    ExpandableTextLine
+  },
   data () {
     return {
       popupTail: require('../../assets/img//popupTail.png'),
@@ -77,10 +84,69 @@ export default {
     this.dragElement(document.getElementById('popup'))
   },
   methods: {
+    showThisAaInfoHideOthers: function (resNum, aa) {
+      console.log('The click has been invoked')
+      for (let i = 0; i < this.oneAaCodes.length; i++) {
+        const theDiv = document.getElementById('divVarInfo_' + this.oneAaCodes[i])
+        if (typeof (theDiv) !== 'undefined' && theDiv !== null) {
+          if (aa === this.oneAaCodes[i]) {
+            // show this one
+            document.getElementById('divVarInfo_' + this.oneAaCodes[i]).hidden = false
+            document.getElementById('btnVarInfo_' + this.oneAaCodes[i]).classList.add('selCol')
+          } else {
+            // hide these ones
+            document.getElementById('divVarInfo_' + this.oneAaCodes[i]).hidden = true
+            document.getElementById('btnVarInfo_' + this.oneAaCodes[i]).classList.remove('selCol')
+          }
+          console.log(theDiv)
+        }
+      }
+    },
+    getIsInitAa: function (resNum, aa) {
+      /*
+      console.log('The new Aas are ')
+      console.log(this.$store.state.variantResidues[resNum])
+      if (Object.hasOwnProperty.call(this.$store.state.variantResidues[resNum], 'newAas')) {
+        console.log('The new Aas are ')
+        console.log(this.$store.state.variantResidues[resNum].newAas)
+        if (this.$store.state.variantResidues[resNum].newAas[0] === aa) {
+          return false
+        }
+      }
+      */
+      return false
+    },
+    listWithNoOldAa: function (resNum) {
+      const noOldAaCodes = this.oneAaCodes.slice()
+      const idx = noOldAaCodes.indexOf(this.$store.state.variantResidues[resNum].oldAa)
+      if (idx !== -1) {
+        noOldAaCodes.splice(idx, 1)
+      }
+      // console.log('"The original oneAaCodes is "')
+      // console.log(this.oneAaCodes)
+      return (noOldAaCodes)
+    },
+    getOldAa: function (resNum) {
+      return (this.$store.state.variantResidues[resNum].oldAa)
+    },
+    getIfBoldInfoPres: function (resNum, aa) {
+      let isMakeBold = false
+      for (let i = 0; i < this.$store.state.variantResidues[resNum][aa].length; i++) {
+        if (this.$store.state.variantResidues[resNum][aa][i].match('UniProt') || this.$store.state.variantResidues[resNum][aa][i].match('FunVar') || this.$store.state.variantResidues[resNum][aa][i].match('COSMIC') || (Object.hasOwnProperty.call(this.$store.state.variantStructs, resNum) && Object.hasOwnProperty.call(this.$store.state.variantStructs[resNum], aa) && Object.hasOwnProperty.call(this.$store.state.variantStructs[resNum][aa], 'pdbs') && this.$store.state.variantStructs[resNum][aa].pdbs.length > 0)) {
+          isMakeBold = true
+        }
+      }
+      // console.log(this.$store.state.variantResidues[resNum][aa])
+      if (isMakeBold === true) {
+        return 'btnAaBold_b'
+      } else {
+        return 'btnAaBold'
+      }
+    },
     getTotalPdbCount: function (resNum) {
       let totalNumStructs = 0
       for (let i = 0; i < this.oneAaCodes.length; i++) {
-        console.log('Testing ' + this.oneAaCodes[i])
+        // console.log('Testing ' + this.oneAaCodes[i])
         if (Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum], this.oneAaCodes[i]) && Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum][this.oneAaCodes[i]], 'pdbs')) {
           console.log('Testing ')
           totalNumStructs = totalNumStructs + this.$store.state.variantStructs[resNum][this.oneAaCodes[i]].pdbs.length
@@ -301,7 +367,6 @@ export default {
 </style>
 
 <style>
-
   .expandable {
     margin: 8px 0px;
     /* cursor: ns-resize; */
@@ -313,6 +378,9 @@ export default {
     cursor: n-resize !important;
   }
   #popuptext a{
+    color: var(--background);
+  }
+  #vueBased a{
     color: var(--background);
   }
   .anAaHr {
@@ -335,6 +403,7 @@ export default {
     padding-left: 3.5px;
     padding-right: 3.5px;
     display: inline;
+    font-weight: bold;
   }
 
   .selCol {
@@ -370,6 +439,7 @@ export default {
 
   .btnAaBold_b:hover {
     background-color: var(--primary-link);
+    font-weight: bold;
   }
 
   /* Add this via class to link.

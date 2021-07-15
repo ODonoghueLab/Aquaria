@@ -18,7 +18,8 @@ export default new Vuex.Store({
     newUser: true,
     variantStructs: {},
     popupTitle: 'This is the initial title',
-    popupText: 'This is the initial text'
+    popupText: 'This is the initial text',
+    variantResidues: {}
   },
   mutations: {
     setvariantStructs (state, value) {
@@ -56,7 +57,13 @@ export default new Vuex.Store({
     },
     setPopupText (state, value) {
       state.popupText = value // 'This is the popup title'
+    },
+    setVariantResidues (state, value) {
+      state.variantResidues = value
     }
+  },
+  getters: {
+
   },
   actions: {
   },

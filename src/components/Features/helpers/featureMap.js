@@ -216,11 +216,11 @@ const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 
 
 // show feature pop-up
 function showAnnotation (f, eid, extServerIds_) {
-
+  /* 
   console.log('showAnnotation.f is ')
   console.log(f.desc)
   console.log(eid)
-
+  */ 
   var urlhtml = ''
   if (f.urls.length > 0) {
     // var lnx = f.urls.split(";");
@@ -393,7 +393,7 @@ export function moveTheDiv () {
 }
 
 function isUniCosOrFunPresent (anAa, desc, resNum) {
-  console.log('These values are: ' + anAa + ' ' + resNum)
+  // console.log('These values are: ' + anAa + ' ' + resNum)
   const tagOpen = '<toReplace_varInfo_' + anAa + '>'
   const tagClose = '</toReplace_varInfo_' + anAa + '>'
 
