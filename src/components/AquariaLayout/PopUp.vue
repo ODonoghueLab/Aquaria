@@ -6,38 +6,37 @@
     </div> -->
       <div id='vueBased' class='balloon'>
         <span class="x">&nbsp;</span>
-        <p v-html="$store.state.popupTitle">  </p>
-        <p v-html="$store.state.popupText">  </p>
+        <p> {{ getPopupTitle }} </p>
+        <!-- p> {{ getPopupText }} </p -->
         <div class='aaLightBg'>
-          <div v-for='aaCode in listWithNoOldAa(126)' v-bind:key='aaCode' :id="'divVarInfo_' + aaCode" :hidden="getIsInitAa(126, aaCode)">
+          <div v-for='aaCode in listWithNoOldAa()' v-bind:key='aaCode' :id="'divVarInfo_' + aaCode" :hidden="getIsInitAa(getVariant, aaCode)">
             {{ aaCode }}
-            <expandable-text-line use-click v-for='dataStr in $store.state.variantResidues[126][aaCode]' v-bind:key='dataStr' v-html="dataStr">
+            <expandable-text-line use-click v-for='dataStr in getAaDataAsArr(aaCode)' v-bind:key='dataStr' v-html="dataStr">
             </expandable-text-line>
-            <i>Structures with mutation:</i> {{ getPdbCount(126, aaCode) }}
+            <i>Structures with mutation:</i> <span :class='getIsShownVar(aaCode)'> {{ getPdbCount(aaCode) }} </span>
           </div>
           <hr class='anAaHr'>
           <div id='divPosInfo'>
-            <b> Residue 126 </b>
-            <p v-for='(arrObj, keyStr) in $store.state.variantResidues[126]["positionInfo"]' v-bind:key='keyStr'>
+            <b> Residue {{ getVariant }} </b>
+            <p v-for='(arrObj, keyStr) in getPosInfoDataAsArr()' v-bind:key='keyStr'>
               <expandable-text-line use-click>
                 <i><span v-html='keyStr'></span>: </i>
                 <span v-for='dataStr in arrObj' v-bind:key='dataStr' v-html='dataStr'>
                 </span>
               </expandable-text-line>
             </p>
-            <i>Structures with residue:</i> {{ getTotalPdbCount(126) }}
+            <i>Structures with residue {{ getVariant }}:</i> <span :class='getIsShownRes()'> {{ getTotalPdbCount() }} </span>
           </div>
         </div>
         <div>
-          <b>See also:</b> <span class='pAaColor'> {{getOldAa(126)}} &rarr; </span>
-          <button v-for='aaCode in listWithNoOldAa(126)' v-bind:key='aaCode' :id="'btnVarInfo_' + aaCode" :class="getIfBoldInfoPres(126, aaCode)" @click="showThisAaInfoHideOthers(126, aaCode)">{{aaCode}}</button>
+          <b>See also:</b> <span class='pAaColor'> {{getOldAa()}} &rarr; </span>
+          <button v-for='aaCode in listWithNoOldAa()' v-bind:key='aaCode' :id="'btnVarInfo_' + aaCode" :class="getIfBoldInfoPres(aaCode)" @click="showThisAaInfoHideOthers(aaCode)">{{aaCode}}</button>
         </div>
       </div>
         <p id='popuptext'>Pop-up text box component for features</p>
         <!-- <TreeView v-show="showTree" id='treeView' class='level5'/> -->
         <img v-bind:src="popupTail" id='popupTail' @click="showTreeView" v-bind:myprop='data.variantStructs'>
         <!-- Variant structures: {{ $store.state.variantStructs }} -->
-        Popup title: {{ $store.state.popupTitle }}
     </div>
 </template>
 
@@ -47,9 +46,11 @@
 import observer from 'vue-mutation-observer'
 import ExpandableTextLine from 'vue-expandable-text-line'
 import * as Panels from '../AquariaLayout/helpers/hidePanels'
-// import store from '../../store/index'
+import store from '../../store/index' // eslint-disable-line  no-unused-vars
 
 import Vue from 'vue'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'PopUp',
   components: {
@@ -72,10 +73,17 @@ export default {
   computed: {
     data () {
       return {
-        // variantStructs: store.state.variantStructs,
-        popupTitle: this.$store.state.popupTitle
+        variantStructs: store.state.variantStructs
+        // popupTitle: this.$store.state.popupTitle
       }
-    }
+    },
+    ...mapGetters([
+      'getVariant',
+      'getVariantStructs',
+      'getVariantResidues',
+      'getPopupTitle',
+      'getPopupText'
+    ])
   },
   directives: {
     observer
@@ -84,8 +92,20 @@ export default {
     this.dragElement(document.getElementById('popup'))
   },
   methods: {
-    showThisAaInfoHideOthers: function (resNum, aa) {
-      console.log('The click has been invoked')
+    getAaDataAsArr: function (aa) {
+      if (Object.hasOwnProperty.call(this.getVariantResidues, this.getVariant) && Object.hasOwnProperty.call(this.getVariantResidues[this.getVariant], aa)) {
+        return this.getVariantResidues[this.getVariant][aa]
+      }
+      return []
+    },
+    getPosInfoDataAsArr: function () {
+      if (Object.hasOwnProperty.call(this.getVariantResidues, this.getVariant) && Object.hasOwnProperty.call(this.getVariantResidues[this.getVariant], 'positionInfo')) {
+        return this.getVariantResidues[this.getVariant].positionInfo
+      }
+      return []
+    },
+    showThisAaInfoHideOthers: function (aa) {
+      // console.log('The click has been invoked')
       for (let i = 0; i < this.oneAaCodes.length; i++) {
         const theDiv = document.getElementById('divVarInfo_' + this.oneAaCodes[i])
         if (typeof (theDiv) !== 'undefined' && theDiv !== null) {
@@ -98,9 +118,21 @@ export default {
             document.getElementById('divVarInfo_' + this.oneAaCodes[i]).hidden = true
             document.getElementById('btnVarInfo_' + this.oneAaCodes[i]).classList.remove('selCol')
           }
-          console.log(theDiv)
+          // console.log(theDiv)
         }
       }
+    },
+    getIsShownVar: function (aa) {
+      if (Object.hasOwnProperty.call(this.getVariantStructs, this.getVariant) && Object.hasOwnProperty.call(this.getVariantStructs[this.getVariant], aa) && Object.hasOwnProperty.call(this.getVariantStructs[this.getVariant][aa], 'isShown') && this.getVariantStructs[this.getVariant][aa].isShown === true) {
+        return 'selCol_padded'
+      }
+      return ''
+    },
+    getIsShownRes: function () {
+      if (Object.hasOwnProperty.call(this.getVariantStructs, this.getVariant) && Object.hasOwnProperty.call(this.getVariantStructs[this.getVariant], 'isShown') && this.getVariantStructs[this.getVariant].isShown === true) {
+        return 'selCol_padded'
+      }
+      return ''
     },
     getIsInitAa: function (resNum, aa) {
       /*
@@ -116,9 +148,15 @@ export default {
       */
       return false
     },
-    listWithNoOldAa: function (resNum) {
-      const noOldAaCodes = this.oneAaCodes.slice()
-      const idx = noOldAaCodes.indexOf(this.$store.state.variantResidues[resNum].oldAa)
+    listWithNoOldAa: function () {
+      const noOldAaCodes = this.oneAaCodes.slice() // to clone the array
+      const oldAa = this.getOldAa()
+
+      if (oldAa === '') {
+        return noOldAaCodes
+      }
+
+      const idx = noOldAaCodes.indexOf(oldAa)
       if (idx !== -1) {
         noOldAaCodes.splice(idx, 1)
       }
@@ -126,40 +164,46 @@ export default {
       // console.log(this.oneAaCodes)
       return (noOldAaCodes)
     },
-    getOldAa: function (resNum) {
-      return (this.$store.state.variantResidues[resNum].oldAa)
+    getOldAa: function () {
+      if (Object.hasOwnProperty.call(this.getVariantResidues, this.getVariant) && Object.hasOwnProperty.call(this.getVariantResidues[this.getVariant], 'oldAa')) {
+        return this.getVariantResidues[this.getVariant].oldAa
+      }
+      return ''
     },
-    getIfBoldInfoPres: function (resNum, aa) {
+    getIfBoldInfoPres: function (aa) {
       let isMakeBold = false
-      for (let i = 0; i < this.$store.state.variantResidues[resNum][aa].length; i++) {
-        if (this.$store.state.variantResidues[resNum][aa][i].match('UniProt') || this.$store.state.variantResidues[resNum][aa][i].match('FunVar') || this.$store.state.variantResidues[resNum][aa][i].match('COSMIC') || (Object.hasOwnProperty.call(this.$store.state.variantStructs, resNum) && Object.hasOwnProperty.call(this.$store.state.variantStructs[resNum], aa) && Object.hasOwnProperty.call(this.$store.state.variantStructs[resNum][aa], 'pdbs') && this.$store.state.variantStructs[resNum][aa].pdbs.length > 0)) {
-          isMakeBold = true
+      if (Object.hasOwnProperty.call(this.getVariantResidues, this.getVariant) && Object.hasOwnProperty.call(this.getVariantResidues[this.getVariant], aa)) {
+        for (let i = 0; i < this.getVariantResidues[this.getVariant][aa].length; i++) {
+          if (this.getVariantResidues[this.getVariant][aa][i].match('UniProt') || this.getVariantResidues[this.getVariant][aa][i].match('FunVar') || this.getVariantResidues[this.getVariant][aa][i].match('COSMIC') || (Object.hasOwnProperty.call(this.getVariantStructs, this.getVariant) && Object.hasOwnProperty.call(this.getVariantStructs[this.getVariant], aa) && Object.hasOwnProperty.call(this.getVariantStructs[this.getVariant][aa], 'pdbs') && this.getVariantStructs[this.getVariant][aa].pdbs.length > 0)) {
+            isMakeBold = true
+          }
         }
       }
-      // console.log(this.$store.state.variantResidues[resNum][aa])
+
       if (isMakeBold === true) {
         return 'btnAaBold_b'
       } else {
         return 'btnAaBold'
       }
     },
-    getTotalPdbCount: function (resNum) {
+    getTotalPdbCount: function () {
       let totalNumStructs = 0
+
       for (let i = 0; i < this.oneAaCodes.length; i++) {
         // console.log('Testing ' + this.oneAaCodes[i])
-        if (Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum], this.oneAaCodes[i]) && Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum][this.oneAaCodes[i]], 'pdbs')) {
-          console.log('Testing ')
-          totalNumStructs = totalNumStructs + this.$store.state.variantStructs[resNum][this.oneAaCodes[i]].pdbs.length
+        if (Object.hasOwnProperty.call(this.getVariantStructs, this.getVariant) && Object.hasOwnProperty.call(this.getVariantStructs[this.getVariant], this.oneAaCodes[i]) && Object.hasOwnProperty.call(this.getVariantStructs[this.getVariant][this.oneAaCodes[i]], 'pdbs')) {
+          // console.log('Testing ')
+          totalNumStructs = totalNumStructs + this.getVariantStructs[this.getVariant][this.oneAaCodes[i]].pdbs.length
         }
       }
-      console.log(this.$store.state.variantStructs[resNum])
+      // console.log(this.$store.state.variantStructs[resNum])
       return totalNumStructs
     },
-    getPdbCount: function (resNum, aa) {
-      console.log('Testing 1 2 3')
-      // let count = 0
-      if (Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum], aa) && Object.prototype.hasOwnProperty.call(this.$store.state.variantStructs[resNum][aa], 'pdbs')) {
-        return this.$store.state.variantStructs[resNum][aa].pdbs.length
+    getPdbCount: function (aa) {
+      // console.log(store.getters.getVariant)
+      // return 100// store.getters.getPdbCount(aa)
+      if (Object.hasOwnProperty.call(this.getVariantStructs, this.getVariant) && Object.hasOwnProperty.call(this.getVariantStructs[this.getVariant], aa) && Object.hasOwnProperty.call(this.getVariantStructs[this.getVariant][aa], 'pdbs')) {
+        return this.getVariantStructs[this.getVariant][aa].pdbs.length
       }
       return 0
     },
@@ -179,8 +223,8 @@ export default {
       */
       const ExpandableTextLineCtor = Vue.extend(ExpandableTextLine)
       const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
-      const b = document.getElementsByTagName('toReplace_varInfo')
-      console.log('The number of nodes to remove are: ' + b.length)
+      // const b = document.getElementsByTagName('toReplace_varInfo')
+      // console.log('The number of nodes to remove are: ' + b.length)
 
       const b2 = document.getElementsByTagName('toReplace_posInfo')
       if (b2.length > 0) {
@@ -410,6 +454,14 @@ export default {
     color: var(--text) !important;
     background-color: var(--primary-highlight);
     border-radius: 25%;
+  }
+
+  .selCol_padded {
+    color: var(--text) !important;
+    background-color: var(--primary-highlight);
+    border-radius: 25%;
+    padding-right: 4px;
+    padding-left: 4px;
   }
 
   /*

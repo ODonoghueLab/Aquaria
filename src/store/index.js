@@ -19,7 +19,8 @@ export default new Vuex.Store({
     variantStructs: {},
     popupTitle: 'This is the initial title',
     popupText: 'This is the initial text',
-    variantResidues: {}
+    variantResidues: {},
+    variant: 126
   },
   mutations: {
     setvariantStructs (state, value) {
@@ -60,10 +61,45 @@ export default new Vuex.Store({
     },
     setVariantResidues (state, value) {
       state.variantResidues = value
+    },
+    setVariant (state, value) {
+      state.variant = value
     }
   },
   getters: {
-
+    getVariant: (state) => {
+      return state.variant
+    },
+    getVariantStructs: function (state) {
+      // if (Object.hasOwnProperty.call(state.variantStructs, getters.getVariant)) {
+      // console.log('Is this true????')
+      return state.variantStructs
+    },
+    getVariantResidues: function (state) {
+      // if (Object.hasOwnProperty.call(state.variantStructs, getters.getVariant)) {
+      // console.log('Is this true????')
+      return state.variantResidues
+    },
+    getPopupTitle: (state) => {
+      return state.popupTitle // 'This is the popup title'
+    },
+    getPopupText: (state) => {
+      return state.popupText // 'This is the popup title'
+    }
+    /* getPdbCount: function (state, getters) {
+      return function (aa) {
+        // if (Object.prototype.hasOwnProperty.call())
+        const resVarStruct = getters.getVariantStruct_resNum
+        console.log('Res var struct is ')
+        console.log(resVarStruct[aa])
+        if (resVarStruct !== undefined && Object.prototype.hasOwnProperty.call(resVarStruct, aa) && Object.prototype.hasOwnProperty.call(resVarStruct[aa], 'pdbs')) {
+          console.log('The aa struct count is ' + aa + resVarStruct[aa].pdbs.length)
+          return resVarStruct[aa].pdbs.length
+        } else {
+          return 0
+        }
+      }
+    } */
   },
   actions: {
   },
