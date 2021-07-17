@@ -254,6 +254,9 @@ var updateFeatureUI = function (featureList, extServerIds_forLoading) {
   if ((URL.getUrlParameter('features') || featureRegex.test(searchParam)) && !AQUARIA.addedFeature) {
     waitForElement()
   }
+
+ 
+  // Store.state.setVariant(126)
 }
 
 function drawTrack (datum, i) {
@@ -539,6 +542,8 @@ function doThePlotting_v2 (divId, theSeriesData_inner, theSeriesData_outer, theT
 }
 
 var common = require('../../AquariaLayout/helpers/common')
+const { default: store } = require('../../../store/index.js')
+const { Store } = require('vuex')
 const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
 function showAnnotation (f, eid) {

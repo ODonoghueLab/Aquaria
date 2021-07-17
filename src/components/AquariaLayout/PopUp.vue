@@ -6,31 +6,36 @@
     </div> -->
       <div id='vueBased' class='balloon'>
         <span class="x">&nbsp;</span>
-        <p> {{ getPopupTitle }} </p>
+        <p id="popupheader" v-html="getPopupTitle"> </p>
         <!-- p> {{ getPopupText }} </p -->
-        <div class='aaLightBg'>
-          <div v-for='aaCode in listWithNoOldAa()' v-bind:key='aaCode' :id="'divVarInfo_' + aaCode" :hidden="getIsInitAa(getVariant, aaCode)">
-            {{ aaCode }}
-            <expandable-text-line use-click v-for='dataStr in getAaDataAsArr(aaCode)' v-bind:key='dataStr' v-html="dataStr">
-            </expandable-text-line>
-            <i>Structures with mutation:</i> <span :class='getIsShownVar(aaCode)'> {{ getPdbCount(aaCode) }} </span>
-          </div>
-          <hr class='anAaHr'>
-          <div id='divPosInfo'>
-            <b> Residue {{ getVariant }} </b>
-            <p v-for='(arrObj, keyStr) in getPosInfoDataAsArr()' v-bind:key='keyStr'>
-              <expandable-text-line use-click>
-                <i><span v-html='keyStr'></span>: </i>
-                <span v-for='dataStr in arrObj' v-bind:key='dataStr' v-html='dataStr'>
-                </span>
+        <div id="popupText_variant" :hidden="isVarSpecified()">
+          <div class='aaLightBg'>
+            <div v-for='aaCode in oneAaCodes' v-bind:key='aaCode' :id="'divVarInfo_' + aaCode">
+              {{ aaCode }}
+              <expandable-text-line use-click v-for='dataStr in getAaDataAsArr(aaCode)' v-bind:key='dataStr' v-html="dataStr + '. '" >
               </expandable-text-line>
-            </p>
-            <i>Structures with residue {{ getVariant }}:</i> <span :class='getIsShownRes()'> {{ getTotalPdbCount() }} </span>
+              <i>Structures with mutation:</i> <span :class='getIsShownVar(aaCode)'> {{ getPdbCount(aaCode) }} </span>
+            </div>
+            <hr class='anAaHr'>
+            <div id='divPosInfo'>
+              <b> Residue {{ getVariant }} </b>
+              <p v-for='(arrObj, keyStr) in getPosInfoDataAsArr()' v-bind:key='keyStr'>
+                <expandable-text-line use-click>
+                  <i><span v-html='keyStr'></span>: </i>
+                  <span v-for='dataStr in arrObj' v-bind:key="dataStr" v-html="dataStr  + '. '">
+                  </span>
+                </expandable-text-line>
+              </p>
+              <i>Structures with residue {{ getVariant }}:</i> <span :class='getIsShownRes()'> {{ getTotalPdbCount() }} </span>
+            </div>
+          </div>
+          <div>
+            <b>See also:</b> <span class='pAaColor'> {{getOldAa()}} &rarr; </span>
+            <button v-for='aaCode in oneAaCodes' v-bind:key='aaCode' :id="'btnVarInfo_' + aaCode" :class="getIfBoldInfoPres(aaCode)" @click="showThisAaInfoHideOthers(aaCode)">{{aaCode}}</button>
           </div>
         </div>
-        <div>
-          <b>See also:</b> <span class='pAaColor'> {{getOldAa()}} &rarr; </span>
-          <button v-for='aaCode in listWithNoOldAa()' v-bind:key='aaCode' :id="'btnVarInfo_' + aaCode" :class="getIfBoldInfoPres(aaCode)" @click="showThisAaInfoHideOthers(aaCode)">{{aaCode}}</button>
+        <div id="popupText_noVariant" :hidden="!isVarSpecified()">
+          <span v-html="getPopupText"></span>
         </div>
       </div>
         <p id='popuptext'>Pop-up text box component for features</p>
@@ -73,7 +78,8 @@ export default {
   computed: {
     data () {
       return {
-        variantStructs: store.state.variantStructs
+        variantStructs: store.state.variantStructs,
+        variantResidues: store.state.variantResidues
         // popupTitle: this.$store.state.popupTitle
       }
     },
@@ -90,8 +96,35 @@ export default {
   },
   mounted () {
     this.dragElement(document.getElementById('popup'))
+    // this.handleInitAa()
+    // console.log('Running the created hook')
+    // const submitBtn = document.getElementById('btnVarInfo_F')
+    // submitBtn.click()
+  },
+  updated () {
+    this.handleInitAa()
   },
   methods: {
+    handleInitAa: function () {
+      if (Object.hasOwnProperty.call(this.getVariantResidues, this.getVariant) && Object.hasOwnProperty.call(this.getVariantResidues[this.getVariant], 'newAas') && this.oneAaCodes.includes(this.getVariantResidues[this.getVariant].newAas[0])) {
+        const aaBtn = document.getElementById('btnVarInfo_' + this.getVariantResidues[this.getVariant].newAas[0])
+        aaBtn.click()
+      } else { // Hide all the divs
+        for (let i = 0; i < this.oneAaCodes.length; i++) {
+          const theDiv = document.getElementById('divVarInfo_' + this.oneAaCodes[i])
+          if (typeof (theDiv) !== 'undefined' && theDiv !== null) {
+            document.getElementById('divVarInfo_' + this.oneAaCodes[i]).hidden = true
+            document.getElementById('btnVarInfo_' + this.oneAaCodes[i]).classList.remove('selCol')
+          }
+        }
+      }
+    },
+    isVarSpecified: function () {
+      if (this.getVariant === -1) {
+        return true
+      }
+      return false
+    },
     getAaDataAsArr: function (aa) {
       if (Object.hasOwnProperty.call(this.getVariantResidues, this.getVariant) && Object.hasOwnProperty.call(this.getVariantResidues[this.getVariant], aa)) {
         return this.getVariantResidues[this.getVariant][aa]
@@ -134,22 +167,16 @@ export default {
       }
       return ''
     },
-    getIsInitAa: function (resNum, aa) {
-      /*
-      console.log('The new Aas are ')
-      console.log(this.$store.state.variantResidues[resNum])
-      if (Object.hasOwnProperty.call(this.$store.state.variantResidues[resNum], 'newAas')) {
-        console.log('The new Aas are ')
-        console.log(this.$store.state.variantResidues[resNum].newAas)
-        if (this.$store.state.variantResidues[resNum].newAas[0] === aa) {
-          return false
-        }
+    getIsInitAa: function (aa) {
+      const newAas = this.getNewAasArr()
+      if (aa === newAas[0]) {
+        this.showThisAaInfoHideOthers(aa)
+        return false
       }
-      */
-      return false
+      return true
     },
     listWithNoOldAa: function () {
-      const noOldAaCodes = this.oneAaCodes.slice() // to clone the array
+      let noOldAaCodes = this.oneAaCodes.slice() // eslint-disable-line prefer-const
       const oldAa = this.getOldAa()
 
       if (oldAa === '') {
@@ -160,8 +187,8 @@ export default {
       if (idx !== -1) {
         noOldAaCodes.splice(idx, 1)
       }
-      // console.log('"The original oneAaCodes is "')
-      // console.log(this.oneAaCodes)
+      console.log('"The new oneAaCodes is "')
+      console.log(noOldAaCodes)
       return (noOldAaCodes)
     },
     getOldAa: function () {

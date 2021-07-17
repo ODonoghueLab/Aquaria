@@ -100,57 +100,12 @@ module.exports = function (resStart_pp, resEnd_pp, variantResidues, featureType,
           // addToVariantResidues(variantResidues, resSnp, varInfo, [], otherResInfo, 'FunVar')
         }
 
-        /*
-				if (serverName == 'SNAP2'){
-					description = getSubstringOfInterest(description, variantResidues[resSnp].newResidue);
-				}
-				else if (serverName == 'CATH'){
-					description = getSubstringOfInterest_cath(description);
-				}
-				// console.log("The counter is " + counter_complete);
-				let aDesc =  "<span class=\"teaser\"> <i> " + featureType + "</i> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + description + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> more... </span>";
 
-				if (!variantResidues[resSnp].hasOwnProperty(serverName)){
-					variantResidues[resSnp][serverName] = [];
-					console.log("over here! " + serverName);
-				}
-				variantResidues[resSnp][serverName].push(aDesc);
-
-				console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
-
-				counter_complete = counter_complete + 1;
-				*/
       }
     })
   }
 
-  /* Previously (to changing the variant residues function):
-	if (variants_featTypesOfInt.includes(featureType)){
-		Object.keys(variantResidues).forEach(function(resSnp, i){
-			if (parseInt(resSnp) >= parseInt(resStart_pp) && parseInt(resSnp) <= parseInt(resEnd_pp)){
 
-				if (serverName == 'SNAP2'){
-					description = getSubstringOfInterest(description, variantResidues[resSnp].newResidue);
-				}
-				else if (serverName == 'CATH'){
-					description = getSubstringOfInterest_cath(description);
-				}
-				// console.log("The counter is " + counter_complete);
-				let aDesc =  "<span class=\"teaser\"> <i> " + featureType + "</i> </span> <span id=\"complete" + counter_complete + "\" style=\"display: none\"> " + description + " </span><span id=\"more\" class=\"more\" onclick=\"(function(){ " + generateShowHideFnStr("complete"+counter_complete) + "  })();\"> more... </span>";
-
-				if (!variantResidues[resSnp].hasOwnProperty(serverName)){
-					variantResidues[resSnp][serverName] = [];
-					console.log("over here! " + serverName);
-				}
-				variantResidues[resSnp][serverName].push(aDesc);
-
-				console.log("restart " + resStart_pp + " resEnd " + resEnd_pp + " featuretype " + featureType + " description " + description + " serverNameSet " + serverName);
-
-				counter_complete = counter_complete + 1;
-			}
-		});
-	}
-	*/
 }
 
 function addToVariantResidues (variantResidues, resSnp, varInfo, posInfo, otherResInfo, serverName) {

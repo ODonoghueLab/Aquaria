@@ -20,7 +20,7 @@ export default new Vuex.Store({
     popupTitle: 'This is the initial title',
     popupText: 'This is the initial text',
     variantResidues: {},
-    variant: 126
+    variant: -1
   },
   mutations: {
     setvariantStructs (state, value) {

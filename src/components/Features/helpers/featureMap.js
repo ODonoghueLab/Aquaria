@@ -135,7 +135,7 @@ export function drawTrack (datum, svg, extServerIds_) {
               firstSpecifiedId = 'r_' + o + '_' + p
 
               var element = document.getElementById(firstSpecifiedId)
-              console.log("The first specified element is " + element)
+              // console.log("The first specified element is " + element)
               var event = new MouseEvent('mouseover', {
                 'view': window,
                 'bubbles': true,
@@ -216,11 +216,11 @@ const oneAaCodes = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 
 
 // show feature pop-up
 function showAnnotation (f, eid, extServerIds_) {
-  /* 
-  console.log('showAnnotation.f is ')
-  console.log(f.desc)
-  console.log(eid)
-  */ 
+  
+  // console.log('showAnnotation.f is ')
+  // console.log(f)
+  // console.log(eid)
+   
   var urlhtml = ''
   if (f.urls.length > 0) {
     // var lnx = f.urls.split(";");
@@ -290,7 +290,7 @@ function showAnnotation (f, eid, extServerIds_) {
     }
     balloon = balloon + ') '
     balloonTitle = balloonTitle + ') '
-    Store.commit('setPopupTitle', balloonTitle)
+    
   }
 
   if (!f.name.includes('span_missenseHeading')) {
@@ -300,7 +300,18 @@ function showAnnotation (f, eid, extServerIds_) {
   // balloon = balloon.append(f.desc);
   balloon = balloon + f.desc + '</p>' + urlhtml + '</div>'
   let balloonText = f.desc + "<br>" + urlhtml; 
-  Store.commit('setPopupText', balloonText)
+  if (f.name.includes('span_missenseHeading')){
+    Store.commit('setVariant', f.start)
+    Store.commit('setPopupTitle', f.label)
+  }
+  else {
+    Store.commit('setVariant', -1)
+    Store.commit('setPopupTitle', balloonTitle)
+    Store.commit('setPopupText', balloonText)
+  }
+  
+  
+  
   // Store.commit('setPopupText', balloonText)
   // d3.select('#popuptext')
   //   // .append('div')

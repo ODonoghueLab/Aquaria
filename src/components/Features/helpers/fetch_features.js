@@ -1364,7 +1364,7 @@ export function ifUrlHasVarExtractInfo2 (){
           }
 
           if (consInfo[resNum].hasOwnProperty('newAas')) {
-            variantResidues[resNum]['newAas'] = consInfo[resNum]['newAas']
+            variantResidues[resNum]['newAas'] = consInfo[resNum]['newAas'].slice()
           }
 
 
@@ -1419,7 +1419,7 @@ export async function ifUrlHasVarExtractInfo () {
           }
 
           if (consInfo[resNum].hasOwnProperty('newAas')) {
-            variantResidues[resNum]['newAas'] = consInfo[resNum]['newAas']
+            variantResidues[resNum]['newAas'] = consInfo[resNum]['newAas'].slice()
           }
 
 
@@ -1461,8 +1461,6 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
         }
       })
   } else if (featureRegex.test(searchParam)) {
-
-    console.log('Passes the regex')
 
     var data = {}
     var residue
@@ -1514,6 +1512,9 @@ function checkURLForFeatures (primary_accession, server, featureCallback) {
         variantResidues[resNum] = {}
         if (consInfo[resNum].hasOwnProperty('oldRes')) {
           variantResidues[resNum].oldAa = consInfo[resNum].oldRes
+        }
+        if (consInfo[resNum].hasOwnProperty('newAas')) {
+          variantResidues[resNum].newAas = consInfo[resNum].newAas.slice()
         }
 
         // variantResidues[resNum]['newResidues'] = consInfo[resNum]['newAas'];
